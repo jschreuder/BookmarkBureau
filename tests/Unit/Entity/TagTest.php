@@ -30,8 +30,8 @@ describe('Tag Entity', function () {
 
             $tag = new Tag($tagName, $color);
 
-            expect($tag->getTagName())->toBe($tagName);
-            expect($tag->getColor())->toBe($color);
+            expect($tag->tagName)->toBe($tagName);
+            expect($tag->color)->toBe($color);
         });
     });
 
@@ -40,8 +40,8 @@ describe('Tag Entity', function () {
             $tagName = 'important';
             $tag = createTestTag(tagName: $tagName);
 
-            expect($tag->getTagName())->toBe($tagName);
-            expect($tag->getTagName())->toBeString();
+            expect($tag->tagName)->toBe($tagName);
+            expect($tag->tagName)->toBeString();
         });
 
         test('getTagName returns the exact tag name provided', function () {
@@ -54,7 +54,7 @@ describe('Tag Entity', function () {
 
             foreach ($tagNames as $tagName) {
                 $tag = createTestTag(tagName: $tagName);
-                expect($tag->getTagName())->toBe($tagName);
+                expect($tag->tagName)->toBe($tagName);
             }
         });
 
@@ -71,17 +71,17 @@ describe('Tag Entity', function () {
             $color = new HexColor('#00FF00');
             $tag = createTestTag(color: $color);
 
-            expect($tag->getColor())->toBe($color);
-            expect($tag->getColor())->toBeInstanceOf(HexColor::class);
+            expect($tag->color)->toBe($color);
+            expect($tag->color)->toBeInstanceOf(HexColor::class);
         });
 
         test('setColor updates the color', function () {
             $tag = createTestTag();
             $newColor = new HexColor('#0000FF');
 
-            $tag->setColor($newColor);
+            $tag->color = $newColor;
 
-            expect($tag->getColor())->toBe($newColor);
+            expect($tag->color)->toBe($newColor);
         });
 
         test('setColor works with various hex colors', function () {
@@ -94,8 +94,8 @@ describe('Tag Entity', function () {
             ];
 
             foreach ($colors as $color) {
-                $tag->setColor($color);
-                expect($tag->getColor())->toBe($color);
+                $tag->color = $color;
+                expect($tag->color)->toBe($color);
             }
         });
     });
@@ -107,14 +107,14 @@ describe('Tag Entity', function () {
             $color2 = new HexColor('#00FF00');
             $color3 = new HexColor('#0000FF');
 
-            $tag->setColor($color1);
-            expect($tag->getColor())->toBe($color1);
+            $tag->color = $color1;
+            expect($tag->color)->toBe($color1);
 
-            $tag->setColor($color2);
-            expect($tag->getColor())->toBe($color2);
+            $tag->color = $color2;
+            expect($tag->color)->toBe($color2);
 
-            $tag->setColor($color3);
-            expect($tag->getColor())->toBe($color3);
+            $tag->color = $color3;
+            expect($tag->color)->toBe($color3);
         });
     });
 
@@ -125,39 +125,32 @@ describe('Tag Entity', function () {
             expect(fn() => $tag->tagName = 'different-tag')
                 ->toThrow(Error::class);
         });
-
-        test('color property cannot be modified directly', function () {
-            $tag = createTestTag();
-
-            expect(fn() => $tag->color = new HexColor('#000000'))
-                ->toThrow(Error::class);
-        });
     });
 
     describe('edge cases', function () {
         test('can create tag with single character tag name', function () {
             $tag = createTestTag(tagName: 'a');
 
-            expect($tag->getTagName())->toBe('a');
+            expect($tag->tagName)->toBe('a');
         });
 
         test('can create tag with long tag name', function () {
             $longTagName = str_repeat('tag', 30);
             $tag = createTestTag(tagName: $longTagName);
 
-            expect($tag->getTagName())->toBe($longTagName);
+            expect($tag->tagName)->toBe($longTagName);
         });
 
         test('can create tag with tag name containing special characters', function () {
             $tag = createTestTag(tagName: 'tag-with-dashes_and_underscores');
 
-            expect($tag->getTagName())->toBe('tag-with-dashes_and_underscores');
+            expect($tag->tagName)->toBe('tag-with-dashes_and_underscores');
         });
 
         test('can create tag with tag name containing numbers', function () {
             $tag = createTestTag(tagName: 'tag123');
 
-            expect($tag->getTagName())->toBe('tag123');
+            expect($tag->tagName)->toBe('tag123');
         });
     });
 });

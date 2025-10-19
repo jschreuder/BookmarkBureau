@@ -52,13 +52,13 @@ describe('Link Entity', function () {
 
             $link = new Link($id, $url, $title, $description, $icon, $createdAt, $updatedAt);
 
-            expect($link->getId())->toBe($id);
-            expect($link->getUrl())->toBe($url);
-            expect($link->getTitle())->toBe($title);
-            expect($link->getDescription())->toBe($description);
-            expect($link->getIcon())->toBe($icon);
-            expect($link->getCreatedAt())->toBe($createdAt);
-            expect($link->getUpdatedAt())->toBe($updatedAt);
+            expect($link->linkId)->toBe($id);
+            expect($link->url)->toBe($url);
+            expect($link->title)->toBe($title);
+            expect($link->description)->toBe($description);
+            expect($link->icon)->toBe($icon);
+            expect($link->createdAt)->toBe($createdAt);
+            expect($link->updatedAt)->toBe($updatedAt);
         });
     });
 
@@ -67,8 +67,8 @@ describe('Link Entity', function () {
             $id = UuidV4::uuid4();
             $link = createTestLink(id: $id);
 
-            expect($link->getId())->toBe($id);
-            expect($link->getId())->toBeInstanceOf(UuidInterface::class);
+            expect($link->linkId)->toBe($id);
+            expect($link->linkId)->toBeInstanceOf(UuidInterface::class);
         });
     });
 
@@ -77,28 +77,28 @@ describe('Link Entity', function () {
             $url = new Url('https://example.com/page');
             $link = createTestLink(url: $url);
 
-            expect($link->getUrl())->toBe($url);
-            expect($link->getUrl())->toBeInstanceOf(Url::class);
+            expect($link->url)->toBe($url);
+            expect($link->url)->toBeInstanceOf(Url::class);
         });
 
         test('setUrl updates the URL', function () {
             $link = createTestLink();
             $newUrl = new Url('https://newexample.com');
 
-            $link->setUrl($newUrl);
+            $link->url = $newUrl;
 
-            expect($link->getUrl())->toBe($newUrl);
+            expect($link->url)->toBe($newUrl);
         });
 
         test('setUrl calls markAsUpdated', function () {
             $link = createTestLink();
-            $originalUpdatedAt = $link->getUpdatedAt();
+            $originalUpdatedAt = $link->updatedAt;
 
             $newUrl = new Url('https://newexample.com');
-            $link->setUrl($newUrl);
+            $link->url = $newUrl;
 
-            expect($link->getUpdatedAt())->toBeInstanceOf(DateTimeInterface::class);
-            expect($link->getUpdatedAt()->getTimestamp())
+            expect($link->updatedAt)->toBeInstanceOf(DateTimeInterface::class);
+            expect($link->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
         });
     });
@@ -108,25 +108,25 @@ describe('Link Entity', function () {
             $title = 'My Bookmark Title';
             $link = createTestLink(title: $title);
 
-            expect($link->getTitle())->toBe($title);
+            expect($link->title)->toBe($title);
         });
 
         test('setTitle updates the title', function () {
             $link = createTestLink();
             $newTitle = 'Updated Title';
 
-            $link->setTitle($newTitle);
+            $link->title = $newTitle;
 
-            expect($link->getTitle())->toBe($newTitle);
+            expect($link->title)->toBe($newTitle);
         });
 
         test('setTitle calls markAsUpdated', function () {
             $link = createTestLink();
-            $originalUpdatedAt = $link->getUpdatedAt();
+            $originalUpdatedAt = $link->updatedAt;
 
-            $link->setTitle('New Title');
+            $link->title = 'New Title';
 
-            expect($link->getUpdatedAt()->getTimestamp())
+            expect($link->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
         });
     });
@@ -136,43 +136,43 @@ describe('Link Entity', function () {
             $description = 'A detailed description of the link';
             $link = createTestLink(description: $description);
 
-            expect($link->getDescription())->toBe($description);
+            expect($link->description)->toBe($description);
         });
 
         test('setDescription updates the description', function () {
             $link = createTestLink();
             $newDescription = 'Updated description';
 
-            $link->setDescription($newDescription);
+            $link->description = $newDescription;
 
-            expect($link->getDescription())->toBe($newDescription);
+            expect($link->description)->toBe($newDescription);
         });
 
         test('setDescription calls markAsUpdated', function () {
             $link = createTestLink();
-            $originalUpdatedAt = $link->getUpdatedAt();
+            $originalUpdatedAt = $link->updatedAt;
 
-            $link->setDescription('New description');
+            $link->description = 'New description';
 
-            expect($link->getUpdatedAt()->getTimestamp())
+            expect($link->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
         });
 
         test('setDescription works with empty string', function () {
             $link = createTestLink();
 
-            $link->setDescription('');
+            $link->description = '';
 
-            expect($link->getDescription())->toBe('');
+            expect($link->description)->toBe('');
         });
 
         test('setDescription works with long text', function () {
             $link = createTestLink();
             $longDescription = str_repeat('Lorem ipsum dolor sit amet. ', 100);
 
-            $link->setDescription($longDescription);
+            $link->description = $longDescription;
 
-            expect($link->getDescription())->toBe($longDescription);
+            expect($link->description)->toBe($longDescription);
         });
     });
 
@@ -181,43 +181,43 @@ describe('Link Entity', function () {
             $icon = 'bookmark-icon';
             $link = createTestLink(icon: $icon);
 
-            expect($link->getIcon())->toBe($icon);
+            expect($link->icon)->toBe($icon);
         });
 
         test('setIcon updates the icon', function () {
             $link = createTestLink();
             $newIcon = 'new-icon';
 
-            $link->setIcon($newIcon);
+            $link->icon = $newIcon;
 
-            expect($link->getIcon())->toBe($newIcon);
+            expect($link->icon)->toBe($newIcon);
         });
 
         test('setIcon calls markAsUpdated', function () {
             $link = createTestLink();
-            $originalUpdatedAt = $link->getUpdatedAt();
+            $originalUpdatedAt = $link->updatedAt;
 
-            $link->setIcon('new-icon');
+            $link->icon = 'new-icon';
 
-            expect($link->getUpdatedAt()->getTimestamp())
+            expect($link->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
         });
 
         test('setIcon works with empty string', function () {
             $link = createTestLink();
 
-            $link->setIcon('');
+            $link->icon = '';
 
-            expect($link->getIcon())->toBe('');
+            expect($link->icon)->toBe('');
         });
 
         test('setIcon works with URL-like strings', function () {
             $link = createTestLink();
             $iconUrl = 'https://example.com/icon.png';
 
-            $link->setIcon($iconUrl);
+            $link->icon = $iconUrl;
 
-            expect($link->getIcon())->toBe($iconUrl);
+            expect($link->icon)->toBe($iconUrl);
         });
     });
 
@@ -226,8 +226,8 @@ describe('Link Entity', function () {
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $link = createTestLink(createdAt: $createdAt);
 
-            expect($link->getCreatedAt())->toBe($createdAt);
-            expect($link->getCreatedAt())->toBeInstanceOf(DateTimeInterface::class);
+            expect($link->createdAt)->toBe($createdAt);
+            expect($link->createdAt)->toBeInstanceOf(DateTimeInterface::class);
         });
 
         test('createdAt is readonly and cannot be modified', function () {
@@ -243,19 +243,19 @@ describe('Link Entity', function () {
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
             $link = createTestLink(updatedAt: $updatedAt);
 
-            expect($link->getUpdatedAt())->toBe($updatedAt);
-            expect($link->getUpdatedAt())->toBeInstanceOf(DateTimeInterface::class);
+            expect($link->updatedAt)->toBe($updatedAt);
+            expect($link->updatedAt)->toBeInstanceOf(DateTimeInterface::class);
         });
 
         test('updatedAt is updated when properties change', function () {
             $link = createTestLink();
-            $originalUpdatedAt = $link->getUpdatedAt();
+            $originalUpdatedAt = $link->updatedAt;
 
-            $link->setTitle('New Title');
+            $link->title = 'New Title';
 
-            expect($link->getUpdatedAt())
+            expect($link->updatedAt)
                 ->not->toBe($originalUpdatedAt);
-            expect($link->getUpdatedAt()->getTimestamp())
+            expect($link->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
         });
     });
@@ -263,13 +263,13 @@ describe('Link Entity', function () {
     describe('markAsUpdated method', function () {
         test('markAsUpdated updates the updatedAt timestamp', function () {
             $link = createTestLink();
-            $originalUpdatedAt = $link->getUpdatedAt();
+            $originalUpdatedAt = $link->updatedAt;
 
             $link->markAsUpdated();
 
-            expect($link->getUpdatedAt())
+            expect($link->updatedAt)
                 ->not->toBe($originalUpdatedAt);
-            expect($link->getUpdatedAt()->getTimestamp())
+            expect($link->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
         });
 
@@ -281,7 +281,7 @@ describe('Link Entity', function () {
 
             $afterMark = new DateTimeImmutable();
 
-            expect($link->getUpdatedAt()->getTimestamp())
+            expect($link->updatedAt->getTimestamp())
                 ->toBeGreaterThanOrEqual($beforeMark->getTimestamp())
                 ->toBeLessThanOrEqual($afterMark->getTimestamp());
         });
@@ -291,7 +291,7 @@ describe('Link Entity', function () {
 
             $link->markAsUpdated();
 
-            expect($link->getUpdatedAt())->toBeInstanceOf(DateTimeImmutable::class);
+            expect($link->updatedAt)->toBeInstanceOf(DateTimeImmutable::class);
         });
     });
 
@@ -303,15 +303,15 @@ describe('Link Entity', function () {
             $newDescription = 'Updated Description';
             $newIcon = 'updated-icon';
 
-            $link->setUrl($newUrl);
-            $link->setTitle($newTitle);
-            $link->setDescription($newDescription);
-            $link->setIcon($newIcon);
+            $link->url = $newUrl;
+            $link->title = $newTitle;
+            $link->description = $newDescription;
+            $link->icon = $newIcon;
 
-            expect($link->getUrl())->toBe($newUrl);
-            expect($link->getTitle())->toBe($newTitle);
-            expect($link->getDescription())->toBe($newDescription);
-            expect($link->getIcon())->toBe($newIcon);
+            expect($link->url)->toBe($newUrl);
+            expect($link->title)->toBe($newTitle);
+            expect($link->description)->toBe($newDescription);
+            expect($link->icon)->toBe($newIcon);
         });
     });
 
@@ -320,13 +320,6 @@ describe('Link Entity', function () {
             $link = createTestLink();
 
             expect(fn() => $link->linkId = UuidV4::uuid4())
-                ->toThrow(Error::class);
-        });
-
-        test('url property cannot be modified directly', function () {
-            $link = createTestLink();
-
-            expect(fn() => $link->url = new Url('https://direct-modification.com'))
                 ->toThrow(Error::class);
         });
     });
