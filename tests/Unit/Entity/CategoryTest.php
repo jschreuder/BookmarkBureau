@@ -3,23 +3,25 @@
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\Title;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
 
 describe('Category Entity', function () {
     function createCategoryTestDashboard(
         ?UuidInterface $id = null,
-        ?string $title = null,
+        ?Title $title = null,
         ?string $description = null,
-        ?string $icon = null,
+        ?Icon $icon = null,
         ?DateTimeInterface $createdAt = null,
         ?DateTimeInterface $updatedAt = null
     ): Dashboard {
         return new Dashboard(
             dashboardId: $id ?? UuidV4::uuid4(),
-            title: $title ?? 'Test Dashboard',
+            title: $title ?? new Title('Test Dashboard'),
             description: $description ?? 'Test Description',
-            icon: $icon ?? 'dashboard-icon',
+            icon: $icon ?? new Icon('dashboard-icon'),
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
             updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
         );
@@ -28,7 +30,7 @@ describe('Category Entity', function () {
     function createTestCategory(
         ?UuidInterface $id = null,
         ?Dashboard $dashboard = null,
-        ?string $title = null,
+        ?Title $title = null,
         ?HexColor $color = null,
         ?int $sortOrder = null,
         ?DateTimeInterface $createdAt = null,
@@ -37,7 +39,7 @@ describe('Category Entity', function () {
         return new Category(
             categoryId: $id ?? UuidV4::uuid4(),
             dashboard: $dashboard ?? createCategoryTestDashboard(),
-            title: $title ?? 'Test Category',
+            title: $title ?? new Title('Test Category'),
             color: $color,
             sortOrder: $sortOrder ?? 0,
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
@@ -49,7 +51,7 @@ describe('Category Entity', function () {
         test('creates a category with all properties', function () {
             $id = UuidV4::uuid4();
             $dashboard = createCategoryTestDashboard();
-            $title = 'Test Category';
+            $title = new Title('Test Category');
             $color = new HexColor('#FF5733');
             $sortOrder = 5;
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
@@ -63,7 +65,7 @@ describe('Category Entity', function () {
         test('stores all properties correctly during construction', function () {
             $id = UuidV4::uuid4();
             $dashboard = createCategoryTestDashboard();
-            $title = 'Test Category';
+            $title = new Title('Test Category');
             $color = new HexColor('#FF5733');
             $sortOrder = 5;
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
@@ -110,7 +112,7 @@ describe('Category Entity', function () {
 
     describe('title getter and setter', function () {
         test('getting title returns the title', function () {
-            $title = 'My Category';
+            $title = new Title('My Category');
             $category = createTestCategory(title: $title);
 
             expect($category->title)->toBe($title);
@@ -118,7 +120,7 @@ describe('Category Entity', function () {
 
         test('setting title updates the title', function () {
             $category = createTestCategory();
-            $newTitle = 'Updated Category';
+            $newTitle = new Title('Updated Category');
 
             $category->title = $newTitle;
 
@@ -129,7 +131,7 @@ describe('Category Entity', function () {
             $category = createTestCategory();
             $originalUpdatedAt = $category->updatedAt;
 
-            $category->title = 'New Name';
+            $category->title = new Title('New Name');
 
             expect($category->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
@@ -246,7 +248,7 @@ describe('Category Entity', function () {
             $category = createTestCategory();
             $originalUpdatedAt = $category->updatedAt;
 
-            $category->title = 'New Name';
+            $category->title = new Title('New Name');
 
             expect($category->updatedAt)
                 ->not->toBe($originalUpdatedAt);
@@ -293,7 +295,7 @@ describe('Category Entity', function () {
     describe('multiple setters', function () {
         test('can update multiple properties in sequence', function () {
             $category = createTestCategory();
-            $newTitle = 'Updated Category';
+            $newTitle = new Title('Updated Category');
             $newColor = new HexColor('#33FF57');
             $newSortOrder = 15;
 

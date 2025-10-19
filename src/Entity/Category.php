@@ -13,7 +13,7 @@ final class Category
 
     public readonly Dashboard $dashboard;
 
-    public string $title {
+    public Value\Title $title {
         set {
             $this->title = $value;
             $this->markAsUpdated();
@@ -41,7 +41,7 @@ final class Category
     public function __construct(
         UuidInterface $categoryId,
         Dashboard $dashboard,
-        string $title,
+        Value\Title $title,
         ?Value\HexColor $color,
         int $sortOrder,
         DateTimeInterface $createdAt,

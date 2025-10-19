@@ -1,6 +1,8 @@
 <?php
 
 use jschreuder\BookmarkBureau\Entity\Link;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
@@ -9,16 +11,16 @@ describe('Link Entity', function () {
     function createTestLink(
         ?UuidInterface $id = null,
         ?Url $url = null,
-        ?string $title = null,
+        ?Title $title = null,
         ?string $description = null,
-        ?string $icon = null,
+        ?Icon $icon = null,
         ?DateTimeInterface $createdAt = null,
         ?DateTimeInterface $updatedAt = null
     ): Link {
         return new Link(
             linkId: $id ?? UuidV4::uuid4(),
             url: $url ?? new Url('https://example.com'),
-            title: $title ?? 'Example Title',
+            title: $title ?? new Title('Example Title'),
             description: $description ?? 'Example Description',
             icon: $icon,
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
@@ -30,9 +32,9 @@ describe('Link Entity', function () {
         test('creates a link with all properties', function () {
             $id = UuidV4::uuid4();
             $url = new Url('https://example.com');
-            $title = 'Test Title';
+            $title = new Title('Test Title');
             $description = 'Test Description';
-            $icon = 'test-icon';
+            $icon = new Icon('test-icon');
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
 
@@ -44,9 +46,9 @@ describe('Link Entity', function () {
         test('stores all properties correctly during construction', function () {
             $id = UuidV4::uuid4();
             $url = new Url('https://example.com');
-            $title = 'Test Title';
+            $title = new Title('Test Title');
             $description = 'Test Description';
-            $icon = 'test-icon';
+            $icon = new Icon('test-icon');
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
 
@@ -105,7 +107,7 @@ describe('Link Entity', function () {
 
     describe('title getter and setter', function () {
         test('getTitle returns the title', function () {
-            $title = 'My Bookmark Title';
+            $title = new Title('My Bookmark Title');
             $link = createTestLink(title: $title);
 
             expect($link->title)->toBe($title);
@@ -113,7 +115,7 @@ describe('Link Entity', function () {
 
         test('setTitle updates the title', function () {
             $link = createTestLink();
-            $newTitle = 'Updated Title';
+            $newTitle = new Title('Updated Title');
 
             $link->title = $newTitle;
 
@@ -124,7 +126,7 @@ describe('Link Entity', function () {
             $link = createTestLink();
             $originalUpdatedAt = $link->updatedAt;
 
-            $link->title = 'New Title';
+            $link->title = new Title('New Title');
 
             expect($link->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
@@ -178,7 +180,7 @@ describe('Link Entity', function () {
 
     describe('icon getter and setter', function () {
         test('getting icon returns the icon', function () {
-            $icon = 'bookmark-icon';
+            $icon = new Icon('bookmark-icon');
             $link = createTestLink(icon: $icon);
 
             expect($link->icon)->toBe($icon);
@@ -186,7 +188,7 @@ describe('Link Entity', function () {
 
         test('setting icon updates the icon', function () {
             $link = createTestLink();
-            $newIcon = 'new-icon';
+            $newIcon = new Icon('new-icon');
 
             $link->icon = $newIcon;
 
@@ -197,7 +199,7 @@ describe('Link Entity', function () {
             $link = createTestLink();
             $originalUpdatedAt = $link->updatedAt;
 
-            $link->icon = 'new-icon';
+            $link->icon = new Icon('new-icon');
 
             expect($link->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
@@ -213,7 +215,7 @@ describe('Link Entity', function () {
 
         test('setIcon works with URL-like strings', function () {
             $link = createTestLink();
-            $iconUrl = 'https://example.com/icon.png';
+            $iconUrl = new Icon('https://example.com/icon.png');
 
             $link->icon = $iconUrl;
 
@@ -251,7 +253,7 @@ describe('Link Entity', function () {
             $link = createTestLink();
             $originalUpdatedAt = $link->updatedAt;
 
-            $link->title = 'New Title';
+            $link->title = new Title('New Title');
 
             expect($link->updatedAt)
                 ->not->toBe($originalUpdatedAt);
@@ -299,9 +301,9 @@ describe('Link Entity', function () {
         test('can update multiple properties in sequence', function () {
             $link = createTestLink();
             $newUrl = new Url('https://updated.com');
-            $newTitle = 'Updated Title';
+            $newTitle = new Title('Updated Title');
             $newDescription = 'Updated Description';
-            $newIcon = 'updated-icon';
+            $newIcon = new Icon('updated-icon');
 
             $link->url = $newUrl;
             $link->title = $newTitle;

@@ -1,21 +1,23 @@
 <?php
 
 use jschreuder\BookmarkBureau\Entity\Dashboard;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\Title;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
 
 describe('Dashboard Entity', function () {
     function createTestDashboard(
         ?UuidInterface $id = null,
-        ?string $title = null,
+        ?Title $title = null,
         ?string $description = null,
-        ?string $icon = null,
+        ?Icon $icon = null,
         ?DateTimeInterface $createdAt = null,
         ?DateTimeInterface $updatedAt = null
     ): Dashboard {
         return new Dashboard(
             dashboardId: $id ?? UuidV4::uuid4(),
-            title: $title ?? 'Example Dashboard',
+            title: $title ?? new Title('Example Dashboard'),
             description: $description ?? 'Example Description',
             icon: $icon,
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
@@ -26,9 +28,9 @@ describe('Dashboard Entity', function () {
     describe('construction', function () {
         test('creates a dashboard with all properties', function () {
             $id = UuidV4::uuid4();
-            $title = 'Test Dashboard';
+            $title = new Title('Test Dashboard');
             $description = 'Test Description';
-            $icon = 'test-icon';
+            $icon = new Icon('test-icon');
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
 
@@ -39,9 +41,9 @@ describe('Dashboard Entity', function () {
 
         test('stores all properties correctly during construction', function () {
             $id = UuidV4::uuid4();
-            $title = 'Test Dashboard';
+            $title = new Title('Test Dashboard');
             $description = 'Test Description';
-            $icon = 'test-icon';
+            $icon = new Icon('test-icon');
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
 
@@ -66,9 +68,9 @@ describe('Dashboard Entity', function () {
         });
     });
 
-    describe('name getter and setter', function () {
+    describe('title getter and setter', function () {
         test('getting title returns the title', function () {
-            $title = 'My Dashboard';
+            $title = new Title('My Dashboard');
             $dashboard = createTestDashboard(title: $title);
 
             expect($dashboard->title)->toBe($title);
@@ -76,7 +78,7 @@ describe('Dashboard Entity', function () {
 
         test('setting title updates the title', function () {
             $dashboard = createTestDashboard();
-            $newTitle = 'Updated Dashboard';
+            $newTitle = new Title('Updated Dashboard');
 
             $dashboard->title = $newTitle;
 
@@ -87,7 +89,7 @@ describe('Dashboard Entity', function () {
             $dashboard = createTestDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
-            $dashboard->title = 'New Dashboard';
+            $dashboard->title = new Title('New Dashboard');
 
             expect($dashboard->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
@@ -141,7 +143,7 @@ describe('Dashboard Entity', function () {
 
     describe('icon getter and setter', function () {
         test('getting icon returns the icon', function () {
-            $icon = 'dashboard-icon';
+            $icon = new Icon('dashboard-icon');
             $dashboard = createTestDashboard(icon: $icon);
 
             expect($dashboard->icon)->toBe($icon);
@@ -149,7 +151,7 @@ describe('Dashboard Entity', function () {
 
         test('setting icon updates the icon', function () {
             $dashboard = createTestDashboard();
-            $newIcon = 'new-icon';
+            $newIcon = new Icon('new-icon');
 
             $dashboard->icon = $newIcon;
 
@@ -160,7 +162,7 @@ describe('Dashboard Entity', function () {
             $dashboard = createTestDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
-            $dashboard->icon = 'new-icon';
+            $dashboard->icon = new Icon('new-icon');
 
             expect($dashboard->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
@@ -176,7 +178,7 @@ describe('Dashboard Entity', function () {
 
         test('setting icon works with URL-like strings', function () {
             $dashboard = createTestDashboard();
-            $iconUrl = 'https://example.com/icon.png';
+            $iconUrl = new Icon('https://example.com/icon.png');
 
             $dashboard->icon = $iconUrl;
 
@@ -214,7 +216,7 @@ describe('Dashboard Entity', function () {
             $dashboard = createTestDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
-            $dashboard->title = 'New Name';
+            $dashboard->title = new Title('New Name');
 
             expect($dashboard->updatedAt)
                 ->not->toBe($originalUpdatedAt);
@@ -261,9 +263,9 @@ describe('Dashboard Entity', function () {
     describe('multiple setters', function () {
         test('can update multiple properties in sequence', function () {
             $dashboard = createTestDashboard();
-            $newTitle = 'Updated Dashboard';
+            $newTitle = new Title('Updated Dashboard');
             $newDescription = 'Updated Description';
-            $newIcon = 'updated-icon';
+            $newIcon = new Icon('updated-icon');
 
             $dashboard->title = $newTitle;
             $dashboard->description = $newDescription;

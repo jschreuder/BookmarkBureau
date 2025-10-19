@@ -5,13 +5,15 @@ use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
 describe('CategoryLink Entity', function () {
     function createCategoryLinkTestCategory(
         ?Dashboard $dashboard = null,
-        ?string $name = null,
+        ?Title $title = null,
         ?HexColor $color = null,
         ?int $sortOrder = null,
         ?DateTimeInterface $createdAt = null
@@ -20,13 +22,13 @@ describe('CategoryLink Entity', function () {
             categoryId: UuidV4::uuid4(),
             dashboard: $dashboard ?? new Dashboard(
                 dashboardId: UuidV4::uuid4(),
-                title: 'Test Dashboard',
+                title: new Title('Test Dashboard'),
                 description: 'Test Description',
-                icon: 'dashboard-icon',
+                icon: new Icon('dashboard-icon'),
                 createdAt: new DateTimeImmutable('2024-01-01 12:00:00'),
                 updatedAt: new DateTimeImmutable('2024-01-01 12:00:00')
             ),
-            title: $name ?? 'Test Category',
+            title: $title ?? new Title('Test Category'),
             color: $color ?? new HexColor('#FF5733'),
             sortOrder: $sortOrder ?? 0,
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
@@ -36,18 +38,18 @@ describe('CategoryLink Entity', function () {
 
     function createCategoryLinkTestLink(
         ?Url $url = null,
-        ?string $title = null,
+        ?Title $title = null,
         ?string $description = null,
-        ?string $icon = null,
+        ?Icon $icon = null,
         ?DateTimeInterface $createdAt = null,
         ?DateTimeInterface $updatedAt = null
     ): Link {
         return new Link(
             linkId: UuidV4::uuid4(),
             url: $url ?? new Url('https://example.com'),
-            title: $title ?? 'Example Title',
+            title: $title ?? new Title('Example Title'),
             description: $description ?? 'Example Description',
-            icon: $icon ?? 'icon-example',
+            icon: $icon ?? new Icon('icon-example'),
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
             updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
         );

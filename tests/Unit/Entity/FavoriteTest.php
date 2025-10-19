@@ -3,12 +3,14 @@
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Entity\Link;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
 describe('Favorite Entity', function () {
     function createFavoriteTestDashboard(
-        ?string $name = null,
+        ?Title $title = null,
         ?string $description = null,
         ?string $icon = null,
         ?DateTimeInterface $createdAt = null,
@@ -16,9 +18,9 @@ describe('Favorite Entity', function () {
     ): Dashboard {
         return new Dashboard(
             dashboardId: UuidV4::uuid4(),
-            title: $name ?? 'Test Dashboard',
+            title: $title ?? new Title('Test Dashboard'),
             description: $description ?? 'Test Description',
-            icon: $icon ?? 'dashboard-icon',
+            icon: $icon ?? new Icon('dashboard-icon'),
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
             updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
         );
@@ -26,7 +28,7 @@ describe('Favorite Entity', function () {
 
     function createFavorieTestLink(
         ?Url $url = null,
-        ?string $title = null,
+        ?Title $title = null,
         ?string $description = null,
         ?string $icon = null,
         ?DateTimeInterface $createdAt = null,
@@ -35,9 +37,9 @@ describe('Favorite Entity', function () {
         return new Link(
             linkId: UuidV4::uuid4(),
             url: $url ?? new Url('https://example.com'),
-            title: $title ?? 'Example Title',
+            title: $title ?? new Title('Example Title'),
             description: $description ?? 'Example Description',
-            icon: $icon ?? 'icon-example',
+            icon: $icon ?? new Icon('icon-example'),
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
             updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
         );

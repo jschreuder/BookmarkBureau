@@ -18,7 +18,7 @@ final class Link
         }
     }
 
-    public string $title {
+    public Value\Title $title {
         set {
             $this->title = $value;
             $this->markAsUpdated();
@@ -32,7 +32,7 @@ final class Link
         }
     }
     
-    public ?string $icon {
+    public ?Value\Icon $icon {
         set {
             $this->icon = $value;
             $this->markAsUpdated();
@@ -46,9 +46,9 @@ final class Link
     public function __construct(
         UuidInterface $linkId,
         Value\Url $url,
-        string $title,
+        Value\Title $title,
         string $description,
-        ?string $icon,
+        ?Value\Icon $icon,
         DateTimeInterface $createdAt,
         DateTimeInterface $updatedAt
     )
