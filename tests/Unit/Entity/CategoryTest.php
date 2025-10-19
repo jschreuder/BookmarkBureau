@@ -9,7 +9,7 @@ use Ramsey\Uuid\UuidInterface;
 describe('Category Entity', function () {
     function createCategoryTestDashboard(
         ?UuidInterface $id = null,
-        ?string $name = null,
+        ?string $title = null,
         ?string $description = null,
         ?string $icon = null,
         ?DateTimeInterface $createdAt = null,
@@ -17,7 +17,7 @@ describe('Category Entity', function () {
     ): Dashboard {
         return new Dashboard(
             dashboardId: $id ?? UuidV4::uuid4(),
-            name: $name ?? 'Test Dashboard',
+            title: $title ?? 'Test Dashboard',
             description: $description ?? 'Test Description',
             icon: $icon ?? 'dashboard-icon',
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
@@ -28,7 +28,7 @@ describe('Category Entity', function () {
     function createTestCategory(
         ?UuidInterface $id = null,
         ?Dashboard $dashboard = null,
-        ?string $name = null,
+        ?string $title = null,
         ?HexColor $color = null,
         ?int $sortOrder = null,
         ?DateTimeInterface $createdAt = null,
@@ -37,7 +37,7 @@ describe('Category Entity', function () {
         return new Category(
             categoryId: $id ?? UuidV4::uuid4(),
             dashboard: $dashboard ?? createCategoryTestDashboard(),
-            name: $name ?? 'Test Category',
+            title: $title ?? 'Test Category',
             color: $color,
             sortOrder: $sortOrder ?? 0,
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
@@ -49,13 +49,13 @@ describe('Category Entity', function () {
         test('creates a category with all properties', function () {
             $id = UuidV4::uuid4();
             $dashboard = createCategoryTestDashboard();
-            $name = 'Test Category';
+            $title = 'Test Category';
             $color = new HexColor('#FF5733');
             $sortOrder = 5;
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
 
-            $category = new Category($id, $dashboard, $name, $color, $sortOrder, $createdAt, $updatedAt);
+            $category = new Category($id, $dashboard, $title, $color, $sortOrder, $createdAt, $updatedAt);
 
             expect($category)->toBeInstanceOf(Category::class);
         });
@@ -63,17 +63,17 @@ describe('Category Entity', function () {
         test('stores all properties correctly during construction', function () {
             $id = UuidV4::uuid4();
             $dashboard = createCategoryTestDashboard();
-            $name = 'Test Category';
+            $title = 'Test Category';
             $color = new HexColor('#FF5733');
             $sortOrder = 5;
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
 
-            $category = new Category($id, $dashboard, $name, $color, $sortOrder, $createdAt, $updatedAt);
+            $category = new Category($id, $dashboard, $title, $color, $sortOrder, $createdAt, $updatedAt);
 
             expect($category->categoryId)->toBe($id);
             expect($category->dashboard)->toBe($dashboard);
-            expect($category->name)->toBe($name);
+            expect($category->title)->toBe($title);
             expect($category->color)->toBe($color);
             expect($category->sortOrder)->toBe($sortOrder);
             expect($category->createdAt)->toBe($createdAt);
@@ -82,7 +82,7 @@ describe('Category Entity', function () {
     });
 
     describe('ID getter', function () {
-        test('getCategoryId returns the UUID', function () {
+        test('getting categoryId returns the UUID', function () {
             $id = UuidV4::uuid4();
             $category = createTestCategory(id: $id);
 
@@ -92,7 +92,7 @@ describe('Category Entity', function () {
     });
 
     describe('dashboard getter', function () {
-        test('getDashboard returns the Dashboard object', function () {
+        test('getting dashboard returns the Dashboard object', function () {
             $dashboard = createCategoryTestDashboard();
             $category = createTestCategory(dashboard: $dashboard);
 
@@ -108,28 +108,28 @@ describe('Category Entity', function () {
         });
     });
 
-    describe('name getter and setter', function () {
-        test('getName returns the name', function () {
-            $name = 'My Category';
-            $category = createTestCategory(name: $name);
+    describe('title getter and setter', function () {
+        test('getting title returns the title', function () {
+            $title = 'My Category';
+            $category = createTestCategory(title: $title);
 
-            expect($category->name)->toBe($name);
+            expect($category->title)->toBe($title);
         });
 
-        test('setName updates the name', function () {
+        test('setting title updates the title', function () {
             $category = createTestCategory();
-            $newName = 'Updated Category';
+            $newTitle = 'Updated Category';
 
-            $category->name = $newName;
+            $category->title = $newTitle;
 
-            expect($category->name)->toBe($newName);
+            expect($category->title)->toBe($newTitle);
         });
 
-        test('setName calls markAsUpdated', function () {
+        test('setting title calls markAsUpdated', function () {
             $category = createTestCategory();
             $originalUpdatedAt = $category->updatedAt;
 
-            $category->name = 'New Name';
+            $category->title = 'New Name';
 
             expect($category->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
@@ -246,7 +246,7 @@ describe('Category Entity', function () {
             $category = createTestCategory();
             $originalUpdatedAt = $category->updatedAt;
 
-            $category->name = 'New Name';
+            $category->title = 'New Name';
 
             expect($category->updatedAt)
                 ->not->toBe($originalUpdatedAt);
@@ -293,15 +293,15 @@ describe('Category Entity', function () {
     describe('multiple setters', function () {
         test('can update multiple properties in sequence', function () {
             $category = createTestCategory();
-            $newName = 'Updated Category';
+            $newTitle = 'Updated Category';
             $newColor = new HexColor('#33FF57');
             $newSortOrder = 15;
 
-            $category->name = $newName;
+            $category->title = $newTitle;
             $category->color = $newColor;
             $category->sortOrder = $newSortOrder;
 
-            expect($category->name)->toBe($newName);
+            expect($category->title)->toBe($newTitle);
             expect($category->color)->toBe($newColor);
             expect($category->sortOrder)->toBe($newSortOrder);
         });

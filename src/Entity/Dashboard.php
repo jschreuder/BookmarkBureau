@@ -11,9 +11,9 @@ final class Dashboard
 
     public readonly UuidInterface $dashboardId;
 
-    public string $name {
+    public string $title {
         set {
-            $this->name = $value;
+            $this->title = $value;
             $this->markAsUpdated();
         }
     }
@@ -38,7 +38,7 @@ final class Dashboard
 
     public function __construct(
         UuidInterface $dashboardId,
-        string $name,
+        string $title,
         string $description,
         ?string $icon,
         DateTimeInterface $createdAt,
@@ -46,7 +46,7 @@ final class Dashboard
     )
     {
         $this->dashboardId = $dashboardId;
-        $this->name = $name;
+        $this->title = $title;
         $this->description = $description;
         $this->icon = $icon;
         $this->createdAt = $createdAt;

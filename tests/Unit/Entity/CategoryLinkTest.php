@@ -20,13 +20,13 @@ describe('CategoryLink Entity', function () {
             categoryId: UuidV4::uuid4(),
             dashboard: $dashboard ?? new Dashboard(
                 dashboardId: UuidV4::uuid4(),
-                name: 'Test Dashboard',
+                title: 'Test Dashboard',
                 description: 'Test Description',
                 icon: 'dashboard-icon',
                 createdAt: new DateTimeImmutable('2024-01-01 12:00:00'),
                 updatedAt: new DateTimeImmutable('2024-01-01 12:00:00')
             ),
-            name: $name ?? 'Test Category',
+            title: $name ?? 'Test Category',
             color: $color ?? new HexColor('#FF5733'),
             sortOrder: $sortOrder ?? 0,
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),

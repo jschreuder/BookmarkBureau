@@ -13,9 +13,9 @@ final class Category
 
     public readonly Dashboard $dashboard;
 
-    public string $name {
+    public string $title {
         set {
-            $this->name = $value;
+            $this->title = $value;
             $this->markAsUpdated();
         }
     }
@@ -41,7 +41,7 @@ final class Category
     public function __construct(
         UuidInterface $categoryId,
         Dashboard $dashboard,
-        string $name,
+        string $title,
         ?Value\HexColor $color,
         int $sortOrder,
         DateTimeInterface $createdAt,
@@ -50,7 +50,7 @@ final class Category
     {
         $this->categoryId = $categoryId;
         $this->dashboard = $dashboard;
-        $this->name = $name;
+        $this->title = $title;
         $this->color = $color;
         $this->sortOrder = $sortOrder;
         $this->createdAt = $createdAt;

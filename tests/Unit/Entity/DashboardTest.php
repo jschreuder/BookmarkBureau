@@ -7,7 +7,7 @@ use Ramsey\Uuid\UuidInterface;
 describe('Dashboard Entity', function () {
     function createTestDashboard(
         ?UuidInterface $id = null,
-        ?string $name = null,
+        ?string $title = null,
         ?string $description = null,
         ?string $icon = null,
         ?DateTimeInterface $createdAt = null,
@@ -15,7 +15,7 @@ describe('Dashboard Entity', function () {
     ): Dashboard {
         return new Dashboard(
             dashboardId: $id ?? UuidV4::uuid4(),
-            name: $name ?? 'Example Dashboard',
+            title: $title ?? 'Example Dashboard',
             description: $description ?? 'Example Description',
             icon: $icon,
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
@@ -26,29 +26,29 @@ describe('Dashboard Entity', function () {
     describe('construction', function () {
         test('creates a dashboard with all properties', function () {
             $id = UuidV4::uuid4();
-            $name = 'Test Dashboard';
+            $title = 'Test Dashboard';
             $description = 'Test Description';
             $icon = 'test-icon';
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
 
-            $dashboard = new Dashboard($id, $name, $description, $icon, $createdAt, $updatedAt);
+            $dashboard = new Dashboard($id, $title, $description, $icon, $createdAt, $updatedAt);
 
             expect($dashboard)->toBeInstanceOf(Dashboard::class);
         });
 
         test('stores all properties correctly during construction', function () {
             $id = UuidV4::uuid4();
-            $name = 'Test Dashboard';
+            $title = 'Test Dashboard';
             $description = 'Test Description';
             $icon = 'test-icon';
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
 
-            $dashboard = new Dashboard($id, $name, $description, $icon, $createdAt, $updatedAt);
+            $dashboard = new Dashboard($id, $title, $description, $icon, $createdAt, $updatedAt);
 
             expect($dashboard->dashboardId)->toBe($id);
-            expect($dashboard->name)->toBe($name);
+            expect($dashboard->title)->toBe($title);
             expect($dashboard->description)->toBe($description);
             expect($dashboard->icon)->toBe($icon);
             expect($dashboard->createdAt)->toBe($createdAt);
@@ -67,27 +67,27 @@ describe('Dashboard Entity', function () {
     });
 
     describe('name getter and setter', function () {
-        test('getting name returns the name', function () {
-            $name = 'My Dashboard';
-            $dashboard = createTestDashboard(name: $name);
+        test('getting title returns the title', function () {
+            $title = 'My Dashboard';
+            $dashboard = createTestDashboard(title: $title);
 
-            expect($dashboard->name)->toBe($name);
+            expect($dashboard->title)->toBe($title);
         });
 
-        test('setting name updates the name', function () {
+        test('setting title updates the title', function () {
             $dashboard = createTestDashboard();
-            $newName = 'Updated Dashboard';
+            $newTitle = 'Updated Dashboard';
 
-            $dashboard->name = $newName;
+            $dashboard->title = $newTitle;
 
-            expect($dashboard->name)->toBe($newName);
+            expect($dashboard->title)->toBe($newTitle);
         });
 
-        test('setting name calls markAsUpdated', function () {
+        test('setting title calls markAsUpdated', function () {
             $dashboard = createTestDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
-            $dashboard->name = 'New Dashboard';
+            $dashboard->title = 'New Dashboard';
 
             expect($dashboard->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
@@ -214,7 +214,7 @@ describe('Dashboard Entity', function () {
             $dashboard = createTestDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
-            $dashboard->name = 'New Name';
+            $dashboard->title = 'New Name';
 
             expect($dashboard->updatedAt)
                 ->not->toBe($originalUpdatedAt);
@@ -261,15 +261,15 @@ describe('Dashboard Entity', function () {
     describe('multiple setters', function () {
         test('can update multiple properties in sequence', function () {
             $dashboard = createTestDashboard();
-            $newName = 'Updated Dashboard';
+            $newTitle = 'Updated Dashboard';
             $newDescription = 'Updated Description';
             $newIcon = 'updated-icon';
 
-            $dashboard->name = $newName;
+            $dashboard->title = $newTitle;
             $dashboard->description = $newDescription;
             $dashboard->icon = $newIcon;
 
-            expect($dashboard->name)->toBe($newName);
+            expect($dashboard->title)->toBe($newTitle);
             expect($dashboard->description)->toBe($newDescription);
             expect($dashboard->icon)->toBe($newIcon);
         });

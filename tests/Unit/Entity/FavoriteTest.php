@@ -16,7 +16,7 @@ describe('Favorite Entity', function () {
     ): Dashboard {
         return new Dashboard(
             dashboardId: UuidV4::uuid4(),
-            name: $name ?? 'Test Dashboard',
+            title: $name ?? 'Test Dashboard',
             description: $description ?? 'Test Description',
             icon: $icon ?? 'dashboard-icon',
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),

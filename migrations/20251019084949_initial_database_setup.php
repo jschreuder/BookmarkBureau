@@ -72,7 +72,7 @@ final class InitialDatabaseSetup extends AbstractMigration
             'collation' => 'utf8mb4_unicode_ci'
         ]);
         $dashboards->addColumn('dashboard_id', 'char', ['limit' => 16])
-                   ->addColumn('name', 'string', ['limit' => 255])
+                   ->addColumn('title', 'string', ['limit' => 255])
                    ->addColumn('description', 'text')
                    ->addColumn('icon', 'string', ['limit' => 100, 'null' => true])
                    ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
@@ -80,7 +80,7 @@ final class InitialDatabaseSetup extends AbstractMigration
                        'default' => 'CURRENT_TIMESTAMP',
                        'update' => 'CURRENT_TIMESTAMP'
                    ])
-                   ->addIndex('name', ['name' => 'idx_dashboards_name'])
+                   ->addIndex('title', ['name' => 'idx_dashboards_title'])
                    ->create();
 
         // Categories table: organizes links within dashboards
@@ -92,7 +92,7 @@ final class InitialDatabaseSetup extends AbstractMigration
         ]);
         $categories->addColumn('category_id', 'char', ['limit' => 16])
                    ->addColumn('dashboard_id', 'char', ['limit' => 16])
-                   ->addColumn('name', 'string', ['limit' => 255])
+                   ->addColumn('title', 'string', ['limit' => 255])
                    ->addColumn('color', 'string', ['limit' => 6, 'null' => true])
                    ->addColumn('sort_order', 'integer', ['default' => 0])
                    ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
