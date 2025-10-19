@@ -16,7 +16,6 @@ class ConsoleCommandsProvider
 
     public function registerCommands(Application $application): void
     {
-        $application->add(new ExampleCommand($this->container->getExample()));
         $application->add(new StartWebserverCommand());
     }
 }

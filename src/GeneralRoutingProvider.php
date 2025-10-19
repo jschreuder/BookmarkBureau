@@ -18,7 +18,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
     public function registerRoutes(RouterInterface $router): void
     {
         $router->get('home', '/', function () {
-            return new ExampleController($this->container->getExample());
+            return new ExampleController();
         });
     }
 }

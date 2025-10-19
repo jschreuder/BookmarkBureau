@@ -80,9 +80,4 @@ class ServiceContainer
             ]
         );
     }
-
-    public function getExample() : ExampleService
-    {
-        return new ExampleService();
-    }
 }
