@@ -20,7 +20,7 @@ final class Category
         }
     }
 
-    public string $color {
+    public ?Value\HexColor $color {
         set {
             $this->color = $value;
             $this->markAsUpdated();
@@ -42,7 +42,7 @@ final class Category
         UuidInterface $categoryId,
         Dashboard $dashboard,
         string $name,
-        string $color,
+        ?Value\HexColor $color,
         int $sortOrder,
         DateTimeInterface $createdAt,
         DateTimeInterface $updatedAt

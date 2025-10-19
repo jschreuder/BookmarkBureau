@@ -2,6 +2,7 @@
 
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
+use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
 
@@ -28,7 +29,7 @@ describe('Category Entity', function () {
         ?UuidInterface $id = null,
         ?Dashboard $dashboard = null,
         ?string $name = null,
-        ?string $color = null,
+        ?HexColor $color = null,
         ?int $sortOrder = null,
         ?DateTimeInterface $createdAt = null,
         ?DateTimeInterface $updatedAt = null
@@ -37,7 +38,7 @@ describe('Category Entity', function () {
             categoryId: $id ?? UuidV4::uuid4(),
             dashboard: $dashboard ?? createCategoryTestDashboard(),
             name: $name ?? 'Test Category',
-            color: $color ?? '#FF5733',
+            color: $color,
             sortOrder: $sortOrder ?? 0,
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
             updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
@@ -49,7 +50,7 @@ describe('Category Entity', function () {
             $id = UuidV4::uuid4();
             $dashboard = createCategoryTestDashboard();
             $name = 'Test Category';
-            $color = '#FF5733';
+            $color = new HexColor('#FF5733');
             $sortOrder = 5;
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
@@ -63,7 +64,7 @@ describe('Category Entity', function () {
             $id = UuidV4::uuid4();
             $dashboard = createCategoryTestDashboard();
             $name = 'Test Category';
-            $color = '#FF5733';
+            $color = new HexColor('#FF5733');
             $sortOrder = 5;
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
@@ -136,50 +137,50 @@ describe('Category Entity', function () {
     });
 
     describe('color getter and setter', function () {
-        test('getColor returns the color', function () {
-            $color = '#FF5733';
+        test('getting color returns the color', function () {
+            $color = new HexColor('#FF5733');
             $category = createTestCategory(color: $color);
 
             expect($category->color)->toBe($color);
         });
 
-        test('setColor updates the color', function () {
+        test('setting color updates the color', function () {
             $category = createTestCategory();
-            $newColor = '#33FF57';
+            $newColor = new HexColor('#33FF57');
 
             $category->color = $newColor;
 
             expect($category->color)->toBe($newColor);
         });
 
-        test('setColor calls markAsUpdated', function () {
+        test('setting color calls markAsUpdated', function () {
             $category = createTestCategory();
             $originalUpdatedAt = $category->updatedAt;
 
-            $category->color = '#33FF57';
+            $category->color = new HexColor('#33FF57');
 
             expect($category->updatedAt->getTimestamp())
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
         });
 
-        test('setColor works with empty string', function () {
+        test('setting color works with empty string', function () {
             $category = createTestCategory();
 
-            $category->color = '';
+            $category->color = null;
 
-            expect($category->color)->toBe('');
+            expect($category->color)->toBeNull();
         });
     });
 
     describe('sortOrder getter and setter', function () {
-        test('getSortOrder returns the sort order', function () {
+        test('getting sortOrder returns the sort order', function () {
             $sortOrder = 42;
             $category = createTestCategory(sortOrder: $sortOrder);
 
             expect($category->sortOrder)->toBe($sortOrder);
         });
 
-        test('setSortOrder updates the sort order', function () {
+        test('setting sortOrder updates the sort order', function () {
             $category = createTestCategory();
             $newSortOrder = 10;
 
@@ -188,7 +189,7 @@ describe('Category Entity', function () {
             expect($category->sortOrder)->toBe($newSortOrder);
         });
 
-        test('setSortOrder calls markAsUpdated', function () {
+        test('setting sortOrder calls markAsUpdated', function () {
             $category = createTestCategory();
             $originalUpdatedAt = $category->updatedAt;
 
@@ -198,7 +199,7 @@ describe('Category Entity', function () {
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
         });
 
-        test('setSortOrder works with zero', function () {
+        test('setting sortOrder works with zero', function () {
             $category = createTestCategory();
 
             $category->sortOrder = 0;
@@ -206,7 +207,7 @@ describe('Category Entity', function () {
             expect($category->sortOrder)->toBe(0);
         });
 
-        test('setSortOrder works with negative values', function () {
+        test('setting sortOrder works with negative values', function () {
             $category = createTestCategory();
 
             $category->sortOrder = -5;
@@ -216,7 +217,7 @@ describe('Category Entity', function () {
     });
 
     describe('createdAt getter', function () {
-        test('getCreatedAt returns the creation timestamp', function () {
+        test('getting createdAt returns the creation timestamp', function () {
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $category = createTestCategory(createdAt: $createdAt);
 
@@ -233,7 +234,7 @@ describe('Category Entity', function () {
     });
 
     describe('updatedAt getter', function () {
-        test('getUpdatedAt returns the update timestamp', function () {
+        test('getting updatedAt returns the update timestamp', function () {
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
             $category = createTestCategory(updatedAt: $updatedAt);
 
@@ -293,7 +294,7 @@ describe('Category Entity', function () {
         test('can update multiple properties in sequence', function () {
             $category = createTestCategory();
             $newName = 'Updated Category';
-            $newColor = '#33FF57';
+            $newColor = new HexColor('#33FF57');
             $newSortOrder = 15;
 
             $category->name = $newName;

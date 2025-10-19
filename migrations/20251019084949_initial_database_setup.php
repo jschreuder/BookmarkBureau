@@ -16,7 +16,7 @@ final class InitialDatabaseSetup extends AbstractMigration
         $links->addColumn('link_id', 'char', ['limit' => 16])
               ->addColumn('url', 'text')
               ->addColumn('title', 'string', ['limit' => 255])
-              ->addColumn('description', 'text', ['null' => true])
+              ->addColumn('description', 'text')
               ->addColumn('icon', 'string', ['limit' => 100, 'null' => true])
               ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
               ->addColumn('updated_at', 'timestamp', [
@@ -39,7 +39,7 @@ final class InitialDatabaseSetup extends AbstractMigration
             'collation' => 'utf8mb4_unicode_ci'
         ]);
         $tags->addColumn('tag_name', 'string', ['limit' => 100])
-             ->addColumn('color', 'string', ['limit' => 50, 'null' => true])
+             ->addColumn('color', 'string', ['limit' => 6, 'null' => true])
              ->create();
 
         // Link-Tags junction table: many-to-many relationship
@@ -73,7 +73,7 @@ final class InitialDatabaseSetup extends AbstractMigration
         ]);
         $dashboards->addColumn('dashboard_id', 'char', ['limit' => 16])
                    ->addColumn('name', 'string', ['limit' => 255])
-                   ->addColumn('description', 'text', ['null' => true])
+                   ->addColumn('description', 'text')
                    ->addColumn('icon', 'string', ['limit' => 100, 'null' => true])
                    ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
                    ->addColumn('updated_at', 'timestamp', [
@@ -93,9 +93,13 @@ final class InitialDatabaseSetup extends AbstractMigration
         $categories->addColumn('category_id', 'char', ['limit' => 16])
                    ->addColumn('dashboard_id', 'char', ['limit' => 16])
                    ->addColumn('name', 'string', ['limit' => 255])
-                   ->addColumn('color', 'string', ['limit' => 50, 'null' => true])
+                   ->addColumn('color', 'string', ['limit' => 6, 'null' => true])
                    ->addColumn('sort_order', 'integer', ['default' => 0])
                    ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
+                   ->addColumn('updated_at', 'timestamp', [
+                       'default' => 'CURRENT_TIMESTAMP',
+                       'update' => 'CURRENT_TIMESTAMP'
+                   ])
                    ->addIndex('dashboard_id', ['name' => 'idx_categories_dashboard'])
                    ->addIndex(['dashboard_id', 'sort_order'], ['name' => 'idx_categories_sort'])
                    ->addForeignKey('dashboard_id', 'dashboards', 'dashboard_id', [

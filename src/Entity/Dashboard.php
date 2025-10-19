@@ -25,7 +25,7 @@ final class Dashboard
         }
     }
 
-    public string $icon {
+    public ?string $icon {
         set {
             $this->icon = $value;
             $this->markAsUpdated();
@@ -40,7 +40,7 @@ final class Dashboard
         UuidInterface $dashboardId,
         string $name,
         string $description,
-        string $icon,
+        ?string $icon,
         DateTimeInterface $createdAt,
         DateTimeInterface $updatedAt
     )

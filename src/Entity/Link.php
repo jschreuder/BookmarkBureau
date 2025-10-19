@@ -32,7 +32,7 @@ final class Link
         }
     }
     
-    public string $icon {
+    public ?string $icon {
         set {
             $this->icon = $value;
             $this->markAsUpdated();
@@ -48,7 +48,7 @@ final class Link
         Value\Url $url,
         string $title,
         string $description,
-        string $icon,
+        ?string $icon,
         DateTimeInterface $createdAt,
         DateTimeInterface $updatedAt
     )

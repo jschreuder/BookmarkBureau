@@ -17,7 +17,7 @@ describe('Dashboard Entity', function () {
             dashboardId: $id ?? UuidV4::uuid4(),
             name: $name ?? 'Example Dashboard',
             description: $description ?? 'Example Description',
-            icon: $icon ?? 'dashboard-icon',
+            icon: $icon,
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
             updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
         );
@@ -57,7 +57,7 @@ describe('Dashboard Entity', function () {
     });
 
     describe('ID getter', function () {
-        test('getDashboardId returns the UUID', function () {
+        test('getting dashboardId returns the UUID', function () {
             $id = UuidV4::uuid4();
             $dashboard = createTestDashboard(id: $id);
 
@@ -67,14 +67,14 @@ describe('Dashboard Entity', function () {
     });
 
     describe('name getter and setter', function () {
-        test('getName returns the name', function () {
+        test('getting name returns the name', function () {
             $name = 'My Dashboard';
             $dashboard = createTestDashboard(name: $name);
 
             expect($dashboard->name)->toBe($name);
         });
 
-        test('setName updates the name', function () {
+        test('setting name updates the name', function () {
             $dashboard = createTestDashboard();
             $newName = 'Updated Dashboard';
 
@@ -83,7 +83,7 @@ describe('Dashboard Entity', function () {
             expect($dashboard->name)->toBe($newName);
         });
 
-        test('setName calls markAsUpdated', function () {
+        test('setting name calls markAsUpdated', function () {
             $dashboard = createTestDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
@@ -95,14 +95,14 @@ describe('Dashboard Entity', function () {
     });
 
     describe('description getter and setter', function () {
-        test('getDescription returns the description', function () {
+        test('getting description returns the description', function () {
             $description = 'A detailed description of the dashboard';
             $dashboard = createTestDashboard(description: $description);
 
             expect($dashboard->description)->toBe($description);
         });
 
-        test('setDescription updates the description', function () {
+        test('setting description updates the description', function () {
             $dashboard = createTestDashboard();
             $newDescription = 'Updated description';
 
@@ -111,7 +111,7 @@ describe('Dashboard Entity', function () {
             expect($dashboard->description)->toBe($newDescription);
         });
 
-        test('setDescription calls markAsUpdated', function () {
+        test('setting description calls markAsUpdated', function () {
             $dashboard = createTestDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
@@ -121,7 +121,7 @@ describe('Dashboard Entity', function () {
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
         });
 
-        test('setDescription works with empty string', function () {
+        test('setting description works with empty string', function () {
             $dashboard = createTestDashboard();
 
             $dashboard->description = '';
@@ -129,7 +129,7 @@ describe('Dashboard Entity', function () {
             expect($dashboard->description)->toBe('');
         });
 
-        test('setDescription works with long text', function () {
+        test('setting description works with long text', function () {
             $dashboard = createTestDashboard();
             $longDescription = str_repeat('Lorem ipsum dolor sit amet. ', 100);
 
@@ -140,14 +140,14 @@ describe('Dashboard Entity', function () {
     });
 
     describe('icon getter and setter', function () {
-        test('getIcon returns the icon', function () {
+        test('getting icon returns the icon', function () {
             $icon = 'dashboard-icon';
             $dashboard = createTestDashboard(icon: $icon);
 
             expect($dashboard->icon)->toBe($icon);
         });
 
-        test('setIcon updates the icon', function () {
+        test('setting icon updates the icon', function () {
             $dashboard = createTestDashboard();
             $newIcon = 'new-icon';
 
@@ -156,7 +156,7 @@ describe('Dashboard Entity', function () {
             expect($dashboard->icon)->toBe($newIcon);
         });
 
-        test('setIcon calls markAsUpdated', function () {
+        test('setting icon calls markAsUpdated', function () {
             $dashboard = createTestDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
@@ -166,15 +166,15 @@ describe('Dashboard Entity', function () {
                 ->toBeGreaterThan($originalUpdatedAt->getTimestamp());
         });
 
-        test('setIcon works with empty string', function () {
+        test('setting icon works with null', function () {
             $dashboard = createTestDashboard();
 
-            $dashboard->icon = '';
+            $dashboard->icon = null;
 
-            expect($dashboard->icon)->toBe('');
+            expect($dashboard->icon)->toBeNull();
         });
 
-        test('setIcon works with URL-like strings', function () {
+        test('setting icon works with URL-like strings', function () {
             $dashboard = createTestDashboard();
             $iconUrl = 'https://example.com/icon.png';
 
@@ -185,7 +185,7 @@ describe('Dashboard Entity', function () {
     });
 
     describe('createdAt getter', function () {
-        test('getCreatedAt returns the creation timestamp', function () {
+        test('getting createdAt returns the creation timestamp', function () {
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $dashboard = createTestDashboard(createdAt: $createdAt);
 
@@ -202,7 +202,7 @@ describe('Dashboard Entity', function () {
     });
 
     describe('updatedAt getter', function () {
-        test('getUpdatedAt returns the update timestamp', function () {
+        test('getting updatedAt returns the update timestamp', function () {
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
             $dashboard = createTestDashboard(updatedAt: $updatedAt);
 

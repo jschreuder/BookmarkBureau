@@ -10,7 +10,7 @@ describe('Tag Entity', function () {
     ): Tag {
         return new Tag(
             tagName: $tagName ?? 'example-tag',
-            color: $color ?? new HexColor('#FF5733')
+            color: $color
         );
     }
 

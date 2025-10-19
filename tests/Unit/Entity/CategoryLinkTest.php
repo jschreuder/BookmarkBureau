@@ -4,6 +4,7 @@ use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Link;
+use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
@@ -11,13 +12,13 @@ describe('CategoryLink Entity', function () {
     function createCategoryLinkTestCategory(
         ?Dashboard $dashboard = null,
         ?string $name = null,
-        ?string $color = null,
+        ?HexColor $color = null,
         ?int $sortOrder = null,
         ?DateTimeInterface $createdAt = null
     ): Category {
         return new Category(
             categoryId: UuidV4::uuid4(),
-            dashboard: new Dashboard(
+            dashboard: $dashboard ?? new Dashboard(
                 dashboardId: UuidV4::uuid4(),
                 name: 'Test Dashboard',
                 description: 'Test Description',
@@ -26,7 +27,7 @@ describe('CategoryLink Entity', function () {
                 updatedAt: new DateTimeImmutable('2024-01-01 12:00:00')
             ),
             name: $name ?? 'Test Category',
-            color: $color ?? '#FF5733',
+            color: $color ?? new HexColor('#FF5733'),
             sortOrder: $sortOrder ?? 0,
             createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
             updatedAt: new DateTimeImmutable('2024-01-01 12:00:00')
