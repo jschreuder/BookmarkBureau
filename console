@@ -1,0 +1,11 @@
+#!/usr/bin/php
+<?php declare(strict_types = 1);
+
+/** @var  jschreuder\BookmarkBureau\ServiceContainer $container */
+$container = require __DIR__ . '/config/app_init.php';
+
+$application = new \Symfony\Component\Console\Application();
+
+(new jschreuder\BookmarkBureau\ConsoleCommandsProvider($container))->registerCommands($application);
+
+$application->run();
