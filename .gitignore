@@ -3,6 +3,7 @@
 /config/env.php
 /config/dev.php
 /var/logs/*.log
+/var/*.sqlite3
 /vendor/
 composer.lock
 coverage.xml
