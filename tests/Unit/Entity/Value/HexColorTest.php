@@ -7,32 +7,32 @@ describe('HexColor Value Object', function () {
         test('creates a valid hex color with lowercase', function () {
             $color = new HexColor('#ff5733');
 
-            expect($color->getValue())->toBe('#ff5733');
+            expect($color->value)->toBe('#ff5733');
             expect((string) $color)->toBe('#ff5733');
         });
 
         test('creates a valid hex color with uppercase', function () {
             $color = new HexColor('#FF5733');
 
-            expect($color->getValue())->toBe('#FF5733');
+            expect($color->value)->toBe('#FF5733');
         });
 
         test('creates a valid hex color with mixed case', function () {
             $color = new HexColor('#FfAaBb');
 
-            expect($color->getValue())->toBe('#FfAaBb');
+            expect($color->value)->toBe('#FfAaBb');
         });
 
         test('creates a valid hex color with all zeros', function () {
             $color = new HexColor('#000000');
 
-            expect($color->getValue())->toBe('#000000');
+            expect($color->value)->toBe('#000000');
         });
 
         test('creates a valid hex color with all F', function () {
             $color = new HexColor('#FFFFFF');
 
-            expect($color->getValue())->toBe('#FFFFFF');
+            expect($color->value)->toBe('#FFFFFF');
         });
 
         test('creates a valid hex color with various values', function () {
@@ -47,7 +47,7 @@ describe('HexColor Value Object', function () {
 
             foreach ($testColors as $colorValue) {
                 $color = new HexColor($colorValue);
-                expect($color->getValue())->toBe($colorValue);
+                expect($color->value)->toBe($colorValue);
             }
         });
     });
@@ -105,7 +105,7 @@ describe('HexColor Value Object', function () {
         test('HexColor value object is immutable', function () {
             $color = new HexColor('#FF5733');
 
-            expect($color->getValue())->toBe('#FF5733');
+            expect($color->value)->toBe('#FF5733');
 
             // The object should be readonly, attempting to modify should fail
             expect(fn() => $color->value = '#000000')

@@ -7,68 +7,68 @@ describe('Url Value Object', function () {
         test('creates a valid URL with http protocol', function () {
             $url = new Url('http://example.com');
 
-            expect($url->getValue())->toBe('http://example.com');
+            expect($url->value)->toBe('http://example.com');
             expect((string) $url)->toBe('http://example.com');
         });
 
         test('creates a valid URL with https protocol', function () {
             $url = new Url('https://example.com');
 
-            expect($url->getValue())->toBe('https://example.com');
+            expect($url->value)->toBe('https://example.com');
         });
 
         test('creates a valid URL with path', function () {
             $url = new Url('https://example.com/path/to/page');
 
-            expect($url->getValue())->toBe('https://example.com/path/to/page');
+            expect($url->value)->toBe('https://example.com/path/to/page');
         });
 
         test('creates a valid URL with query string', function () {
             $url = new Url('https://example.com/search?q=test&sort=date');
 
-            expect($url->getValue())->toBe('https://example.com/search?q=test&sort=date');
+            expect($url->value)->toBe('https://example.com/search?q=test&sort=date');
         });
 
         test('creates a valid URL with fragment', function () {
             $url = new Url('https://example.com/page#section');
 
-            expect($url->getValue())->toBe('https://example.com/page#section');
+            expect($url->value)->toBe('https://example.com/page#section');
         });
 
         test('creates a valid URL with port', function () {
             $url = new Url('https://example.com:8080/path');
 
-            expect($url->getValue())->toBe('https://example.com:8080/path');
+            expect($url->value)->toBe('https://example.com:8080/path');
         });
 
         test('creates a valid URL with authentication', function () {
             $url = new Url('https://user:pass@example.com');
 
-            expect($url->getValue())->toBe('https://user:pass@example.com');
+            expect($url->value)->toBe('https://user:pass@example.com');
         });
 
         test('creates a valid URL with subdomain', function () {
             $url = new Url('https://api.example.com/v1/users');
 
-            expect($url->getValue())->toBe('https://api.example.com/v1/users');
+            expect($url->value)->toBe('https://api.example.com/v1/users');
         });
 
         test('creates a valid URL with www', function () {
             $url = new Url('https://www.example.com');
 
-            expect($url->getValue())->toBe('https://www.example.com');
+            expect($url->value)->toBe('https://www.example.com');
         });
 
         test('creates a valid URL with file protocol', function () {
             $url = new Url('ftp://files.example.com/downloads');
 
-            expect($url->getValue())->toBe('ftp://files.example.com/downloads');
+            expect($url->value)->toBe('ftp://files.example.com/downloads');
         });
 
         test('creates a valid URL with complex query string', function () {
             $url = new Url('https://example.com/search?q=test%20value&filter=type:article&sort=-date');
 
-            expect($url->getValue())->toBe('https://example.com/search?q=test%20value&filter=type:article&sort=-date');
+            expect($url->value)->toBe('https://example.com/search?q=test%20value&filter=type:article&sort=-date');
         });
     });
 
@@ -115,7 +115,7 @@ describe('Url Value Object', function () {
         test('URL value object is immutable', function () {
             $url = new Url('https://example.com');
 
-            expect($url->getValue())->toBe('https://example.com');
+            expect($url->value)->toBe('https://example.com');
 
             // The object should be readonly, attempting to modify should fail
             expect(fn() => $url->value = 'https://different.com')

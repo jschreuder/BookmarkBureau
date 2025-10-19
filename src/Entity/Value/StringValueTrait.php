@@ -4,13 +4,10 @@ namespace jschreuder\BookmarkBureau\Entity\Value;
 
 trait StringValueTrait
 {
-    public function getValue(): string
-    {
-        return $this->value;
-    }
+    public readonly string $value;
 
     public function __toString(): string
     {
-        return $this->getValue();
+        return $this->value;
     }
 }
