@@ -39,7 +39,118 @@
 |
 */
 
-/*function something()
+use jschreuder\BookmarkBureau\Entity\Category;
+use jschreuder\BookmarkBureau\Entity\CategoryLink;
+use jschreuder\BookmarkBureau\Entity\Dashboard;
+use jschreuder\BookmarkBureau\Entity\Favorite;
+use jschreuder\BookmarkBureau\Entity\Link;
+use jschreuder\BookmarkBureau\Entity\Tag;
+use jschreuder\BookmarkBureau\Entity\Value\HexColor;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\Title;
+use jschreuder\BookmarkBureau\Entity\Value\Url;
+use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\UuidInterface;
+
+/**
+ * Test entity factory for creating test entities with sensible defaults.
+ * Using static methods keeps the global namespace clean and avoids needing use() clauses in closures.
+ */
+class TestEntityFactory
 {
-    // ..
-}*/
+    public static function createDashboard(
+        ?UuidInterface $id = null,
+        ?Title $title = null,
+        ?string $description = null,
+        ?Icon $icon = null,
+        ?DateTimeInterface $createdAt = null,
+        ?DateTimeInterface $updatedAt = null
+    ): Dashboard {
+        return new Dashboard(
+            dashboardId: $id ?? UuidV4::uuid4(),
+            title: $title ?? new Title('Test Dashboard'),
+            description: $description ?? 'Test Description',
+            icon: $icon ?? new Icon('dashboard-icon'),
+            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
+            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
+        );
+    }
+
+    public static function createLink(
+        ?UuidInterface $id = null,
+        ?Url $url = null,
+        ?Title $title = null,
+        ?string $description = null,
+        ?Icon $icon = null,
+        ?DateTimeInterface $createdAt = null,
+        ?DateTimeInterface $updatedAt = null
+    ): Link {
+        return new Link(
+            linkId: $id ?? UuidV4::uuid4(),
+            url: $url ?? new Url('https://example.com'),
+            title: $title ?? new Title('Example Title'),
+            description: $description ?? 'Example Description',
+            icon: $icon,
+            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
+            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
+        );
+    }
+
+    public static function createCategory(
+        ?UuidInterface $id = null,
+        ?Dashboard $dashboard = null,
+        ?Title $title = null,
+        ?HexColor $color = null,
+        ?int $sortOrder = null,
+        ?DateTimeInterface $createdAt = null,
+        ?DateTimeInterface $updatedAt = null
+    ): Category {
+        return new Category(
+            categoryId: $id ?? UuidV4::uuid4(),
+            dashboard: $dashboard ?? self::createDashboard(),
+            title: $title ?? new Title('Test Category'),
+            color: $color,
+            sortOrder: $sortOrder ?? 0,
+            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
+            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
+        );
+    }
+
+    public static function createTag(
+        ?string $tagName = null,
+        ?HexColor $color = null
+    ): Tag {
+        return new Tag(
+            tagName: $tagName ?? 'example-tag',
+            color: $color
+        );
+    }
+
+    public static function createFavorite(
+        ?Dashboard $dashboard = null,
+        ?Link $link = null,
+        ?int $sortOrder = null,
+        ?DateTimeInterface $createdAt = null
+    ): Favorite {
+        return new Favorite(
+            dashboard: $dashboard ?? self::createDashboard(),
+            link: $link ?? self::createLink(),
+            sortOrder: $sortOrder ?? 0,
+            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
+        );
+    }
+
+    public static function createCategoryLink(
+        ?Category $category = null,
+        ?Link $link = null,
+        ?int $sortOrder = null,
+        ?DateTimeInterface $createdAt = null
+    ): CategoryLink {
+        return new CategoryLink(
+            category: $category ?? self::createCategory(),
+            link: $link ?? self::createLink(),
+            sortOrder: $sortOrder ?? 0,
+            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
+        );
+    }
+}

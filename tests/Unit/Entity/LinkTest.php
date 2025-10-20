@@ -8,25 +8,6 @@ use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
 
 describe('Link Entity', function () {
-    function createTestLink(
-        ?UuidInterface $id = null,
-        ?Url $url = null,
-        ?Title $title = null,
-        ?string $description = null,
-        ?Icon $icon = null,
-        ?DateTimeInterface $createdAt = null,
-        ?DateTimeInterface $updatedAt = null
-    ): Link {
-        return new Link(
-            linkId: $id ?? UuidV4::uuid4(),
-            url: $url ?? new Url('https://example.com'),
-            title: $title ?? new Title('Example Title'),
-            description: $description ?? 'Example Description',
-            icon: $icon,
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
-            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
-        );
-    }
 
     describe('construction', function () {
         test('creates a link with all properties', function () {
@@ -67,7 +48,7 @@ describe('Link Entity', function () {
     describe('ID getter', function () {
         test('getId returns the UUID', function () {
             $id = UuidV4::uuid4();
-            $link = createTestLink(id: $id);
+            $link = TestEntityFactory::createLink(id: $id);
 
             expect($link->linkId)->toBe($id);
             expect($link->linkId)->toBeInstanceOf(UuidInterface::class);
@@ -77,14 +58,14 @@ describe('Link Entity', function () {
     describe('URL getter and setter', function () {
         test('getUrl returns the URL', function () {
             $url = new Url('https://example.com/page');
-            $link = createTestLink(url: $url);
+            $link = TestEntityFactory::createLink(url: $url);
 
             expect($link->url)->toBe($url);
             expect($link->url)->toBeInstanceOf(Url::class);
         });
 
         test('setUrl updates the URL', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $newUrl = new Url('https://newexample.com');
 
             $link->url = $newUrl;
@@ -93,7 +74,7 @@ describe('Link Entity', function () {
         });
 
         test('setUrl calls markAsUpdated', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $originalUpdatedAt = $link->updatedAt;
 
             $newUrl = new Url('https://newexample.com');
@@ -108,13 +89,13 @@ describe('Link Entity', function () {
     describe('title getter and setter', function () {
         test('getTitle returns the title', function () {
             $title = new Title('My Bookmark Title');
-            $link = createTestLink(title: $title);
+            $link = TestEntityFactory::createLink(title: $title);
 
             expect($link->title)->toBe($title);
         });
 
         test('setTitle updates the title', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $newTitle = new Title('Updated Title');
 
             $link->title = $newTitle;
@@ -123,7 +104,7 @@ describe('Link Entity', function () {
         });
 
         test('setTitle calls markAsUpdated', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $originalUpdatedAt = $link->updatedAt;
 
             $link->title = new Title('New Title');
@@ -136,13 +117,13 @@ describe('Link Entity', function () {
     describe('description getter and setter', function () {
         test('getting description returns the description', function () {
             $description = 'A detailed description of the link';
-            $link = createTestLink(description: $description);
+            $link = TestEntityFactory::createLink(description: $description);
 
             expect($link->description)->toBe($description);
         });
 
         test('setting description updates the description', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $newDescription = 'Updated description';
 
             $link->description = $newDescription;
@@ -151,7 +132,7 @@ describe('Link Entity', function () {
         });
 
         test('setting description calls markAsUpdated', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $originalUpdatedAt = $link->updatedAt;
 
             $link->description = 'New description';
@@ -161,7 +142,7 @@ describe('Link Entity', function () {
         });
 
         test('setting description works with empty string', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
 
             $link->description = '';
 
@@ -169,7 +150,7 @@ describe('Link Entity', function () {
         });
 
         test('setting description works with long text', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $longDescription = str_repeat('Lorem ipsum dolor sit amet. ', 100);
 
             $link->description = $longDescription;
@@ -181,13 +162,13 @@ describe('Link Entity', function () {
     describe('icon getter and setter', function () {
         test('getting icon returns the icon', function () {
             $icon = new Icon('bookmark-icon');
-            $link = createTestLink(icon: $icon);
+            $link = TestEntityFactory::createLink(icon: $icon);
 
             expect($link->icon)->toBe($icon);
         });
 
         test('setting icon updates the icon', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $newIcon = new Icon('new-icon');
 
             $link->icon = $newIcon;
@@ -196,7 +177,7 @@ describe('Link Entity', function () {
         });
 
         test('setting icon calls markAsUpdated', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $originalUpdatedAt = $link->updatedAt;
 
             $link->icon = new Icon('new-icon');
@@ -206,7 +187,7 @@ describe('Link Entity', function () {
         });
 
         test('setting icon works with null', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
 
             $link->icon = null;
 
@@ -214,7 +195,7 @@ describe('Link Entity', function () {
         });
 
         test('setIcon works with URL-like strings', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $iconUrl = new Icon('https://example.com/icon.png');
 
             $link->icon = $iconUrl;
@@ -226,14 +207,14 @@ describe('Link Entity', function () {
     describe('createdAt getter', function () {
         test('getCreatedAt returns the creation timestamp', function () {
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
-            $link = createTestLink(createdAt: $createdAt);
+            $link = TestEntityFactory::createLink(createdAt: $createdAt);
 
             expect($link->createdAt)->toBe($createdAt);
             expect($link->createdAt)->toBeInstanceOf(DateTimeInterface::class);
         });
 
         test('createdAt is readonly and cannot be modified', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
 
             expect(fn() => $link->createdAt = new DateTimeImmutable())
                 ->toThrow(Error::class);
@@ -243,14 +224,14 @@ describe('Link Entity', function () {
     describe('updatedAt getter', function () {
         test('getUpdatedAt returns the update timestamp', function () {
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
-            $link = createTestLink(updatedAt: $updatedAt);
+            $link = TestEntityFactory::createLink(updatedAt: $updatedAt);
 
             expect($link->updatedAt)->toBe($updatedAt);
             expect($link->updatedAt)->toBeInstanceOf(DateTimeInterface::class);
         });
 
         test('updatedAt is updated when properties change', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $originalUpdatedAt = $link->updatedAt;
 
             $link->title = new Title('New Title');
@@ -264,7 +245,7 @@ describe('Link Entity', function () {
 
     describe('markAsUpdated method', function () {
         test('markAsUpdated updates the updatedAt timestamp', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $originalUpdatedAt = $link->updatedAt;
 
             $link->markAsUpdated();
@@ -276,7 +257,7 @@ describe('Link Entity', function () {
         });
 
         test('markAsUpdated sets updatedAt to current time', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $beforeMark = new DateTimeImmutable();
 
             $link->markAsUpdated();
@@ -289,7 +270,7 @@ describe('Link Entity', function () {
         });
 
         test('markAsUpdated creates a DateTimeImmutable instance', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
 
             $link->markAsUpdated();
 
@@ -299,7 +280,7 @@ describe('Link Entity', function () {
 
     describe('multiple setters', function () {
         test('can update multiple properties in sequence', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
             $newUrl = new Url('https://updated.com');
             $newTitle = new Title('Updated Title');
             $newDescription = 'Updated Description';
@@ -319,7 +300,7 @@ describe('Link Entity', function () {
 
     describe('immutability constraints', function () {
         test('linkId cannot be modified', function () {
-            $link = createTestLink();
+            $link = TestEntityFactory::createLink();
 
             expect(fn() => $link->linkId = UuidV4::uuid4())
                 ->toThrow(Error::class);

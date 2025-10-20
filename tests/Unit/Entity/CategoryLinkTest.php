@@ -2,77 +2,16 @@
 
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
-use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Link;
-use jschreuder\BookmarkBureau\Entity\Value\HexColor;
-use jschreuder\BookmarkBureau\Entity\Value\Icon;
-use jschreuder\BookmarkBureau\Entity\Value\Title;
-use jschreuder\BookmarkBureau\Entity\Value\Url;
-use Ramsey\Uuid\Rfc4122\UuidV4;
 
 describe('CategoryLink Entity', function () {
-    function createCategoryLinkTestCategory(
-        ?Dashboard $dashboard = null,
-        ?Title $title = null,
-        ?HexColor $color = null,
-        ?int $sortOrder = null,
-        ?DateTimeInterface $createdAt = null
-    ): Category {
-        return new Category(
-            categoryId: UuidV4::uuid4(),
-            dashboard: $dashboard ?? new Dashboard(
-                dashboardId: UuidV4::uuid4(),
-                title: new Title('Test Dashboard'),
-                description: 'Test Description',
-                icon: new Icon('dashboard-icon'),
-                createdAt: new DateTimeImmutable('2024-01-01 12:00:00'),
-                updatedAt: new DateTimeImmutable('2024-01-01 12:00:00')
-            ),
-            title: $title ?? new Title('Test Category'),
-            color: $color ?? new HexColor('#FF5733'),
-            sortOrder: $sortOrder ?? 0,
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
-            updatedAt: new DateTimeImmutable('2024-01-01 12:00:00')
-        );
-    }
 
-    function createCategoryLinkTestLink(
-        ?Url $url = null,
-        ?Title $title = null,
-        ?string $description = null,
-        ?Icon $icon = null,
-        ?DateTimeInterface $createdAt = null,
-        ?DateTimeInterface $updatedAt = null
-    ): Link {
-        return new Link(
-            linkId: UuidV4::uuid4(),
-            url: $url ?? new Url('https://example.com'),
-            title: $title ?? new Title('Example Title'),
-            description: $description ?? 'Example Description',
-            icon: $icon ?? new Icon('icon-example'),
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
-            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
-        );
-    }
 
-    function createCategoryLinkTestCategoryLink(
-        ?Category $category = null,
-        ?Link $link = null,
-        ?int $sortOrder = null,
-        ?DateTimeInterface $createdAt = null
-    ): CategoryLink {
-        return new CategoryLink(
-            category: $category ?? createCategoryLinkTestCategory(),
-            link: $link ?? createCategoryLinkTestLink(),
-            sortOrder: $sortOrder ?? 0,
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
-        );
-    }
 
     describe('construction', function () {
         test('creates a category link with all properties', function () {
-            $category = createCategoryLinkTestCategory();
-            $link = createCategoryLinkTestLink();
+            $category = TestEntityFactory::createCategory();
+            $link = TestEntityFactory::createLink();
             $sortOrder = 5;
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
 
@@ -82,8 +21,8 @@ describe('CategoryLink Entity', function () {
         });
 
         test('stores all properties correctly during construction', function () {
-            $category = createCategoryLinkTestCategory();
-            $link = createCategoryLinkTestLink();
+            $category = TestEntityFactory::createCategory();
+            $link = TestEntityFactory::createLink();
             $sortOrder = 5;
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
 
@@ -98,34 +37,34 @@ describe('CategoryLink Entity', function () {
 
     describe('category getter', function () {
         test('getCategory returns the Category object', function () {
-            $category = createCategoryLinkTestCategory();
-            $categoryLink = createCategoryLinkTestCategoryLink(category: $category);
+            $category = TestEntityFactory::createCategory();
+            $categoryLink = TestEntityFactory::createCategoryLink(category: $category);
 
             expect($categoryLink->category)->toBe($category);
             expect($categoryLink->category)->toBeInstanceOf(Category::class);
         });
 
         test('category is readonly and cannot be modified', function () {
-            $categoryLink = createCategoryLinkTestCategoryLink();
+            $categoryLink = TestEntityFactory::createCategoryLink();
 
-            expect(fn() => $categoryLink->category = createCategoryLinkTestCategory())
+            expect(fn() => $categoryLink->category = TestEntityFactory::createCategory())
                 ->toThrow(Error::class);
         });
     });
 
     describe('link getter', function () {
         test('getLink returns the Link object', function () {
-            $link = createCategoryLinkTestLink();
-            $categoryLink = createCategoryLinkTestCategoryLink(link: $link);
+            $link = TestEntityFactory::createLink();
+            $categoryLink = TestEntityFactory::createCategoryLink(link: $link);
 
             expect($categoryLink->link)->toBe($link);
             expect($categoryLink->link)->toBeInstanceOf(Link::class);
         });
 
         test('link is readonly and cannot be modified', function () {
-            $categoryLink = createCategoryLinkTestCategoryLink();
+            $categoryLink = TestEntityFactory::createCategoryLink();
 
-            expect(fn() => $categoryLink->link = createCategoryLinkTestLink())
+            expect(fn() => $categoryLink->link = TestEntityFactory::createLink())
                 ->toThrow(Error::class);
         });
     });
@@ -133,13 +72,13 @@ describe('CategoryLink Entity', function () {
     describe('sortOrder getter and setter', function () {
         test('getSortOrder returns the sort order', function () {
             $sortOrder = 42;
-            $categoryLink = createCategoryLinkTestCategoryLink(sortOrder: $sortOrder);
+            $categoryLink = TestEntityFactory::createCategoryLink(sortOrder: $sortOrder);
 
             expect($categoryLink->sortOrder)->toBe($sortOrder);
         });
 
         test('setSortOrder updates the sort order', function () {
-            $categoryLink = createCategoryLinkTestCategoryLink();
+            $categoryLink = TestEntityFactory::createCategoryLink();
             $newSortOrder = 10;
 
             $categoryLink->sortOrder = $newSortOrder;
@@ -148,7 +87,7 @@ describe('CategoryLink Entity', function () {
         });
 
         test('setSortOrder works with zero', function () {
-            $categoryLink = createCategoryLinkTestCategoryLink();
+            $categoryLink = TestEntityFactory::createCategoryLink();
 
             $categoryLink->sortOrder = 0;
 
@@ -156,7 +95,7 @@ describe('CategoryLink Entity', function () {
         });
 
         test('setSortOrder works with negative values', function () {
-            $categoryLink = createCategoryLinkTestCategoryLink();
+            $categoryLink = TestEntityFactory::createCategoryLink();
 
             $categoryLink->sortOrder = -5;
 
@@ -167,14 +106,14 @@ describe('CategoryLink Entity', function () {
     describe('createdAt getter', function () {
         test('getCreatedAt returns the creation timestamp', function () {
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
-            $categoryLink = createCategoryLinkTestCategoryLink(createdAt: $createdAt);
+            $categoryLink = TestEntityFactory::createCategoryLink(createdAt: $createdAt);
 
             expect($categoryLink->createdAt)->toBe($createdAt);
             expect($categoryLink->createdAt)->toBeInstanceOf(DateTimeInterface::class);
         });
 
         test('createdAt is readonly and cannot be modified', function () {
-            $categoryLink = createCategoryLinkTestCategoryLink();
+            $categoryLink = TestEntityFactory::createCategoryLink();
 
             expect(fn() => $categoryLink->createdAt = new DateTimeImmutable())
                 ->toThrow(Error::class);
@@ -183,21 +122,21 @@ describe('CategoryLink Entity', function () {
 
     describe('immutability constraints', function () {
         test('category cannot be modified', function () {
-            $categoryLink = createCategoryLinkTestCategoryLink();
+            $categoryLink = TestEntityFactory::createCategoryLink();
 
-            expect(fn() => $categoryLink->category = createCategoryLinkTestCategory())
+            expect(fn() => $categoryLink->category = TestEntityFactory::createCategory())
                 ->toThrow(Error::class);
         });
 
         test('link cannot be modified', function () {
-            $categoryLink = createCategoryLinkTestCategoryLink();
+            $categoryLink = TestEntityFactory::createCategoryLink();
 
-            expect(fn() => $categoryLink->link = createCategoryLinkTestLink())
+            expect(fn() => $categoryLink->link = TestEntityFactory::createLink())
                 ->toThrow(Error::class);
         });
 
         test('createdAt cannot be modified', function () {
-            $categoryLink = createCategoryLinkTestCategoryLink();
+            $categoryLink = TestEntityFactory::createCategoryLink();
 
             expect(fn() => $categoryLink->createdAt = new DateTimeImmutable())
                 ->toThrow(Error::class);
@@ -206,7 +145,7 @@ describe('CategoryLink Entity', function () {
 
     describe('multiple setters', function () {
         test('can update sortOrder multiple times', function () {
-            $categoryLink = createCategoryLinkTestCategoryLink();
+            $categoryLink = TestEntityFactory::createCategoryLink();
             $sortOrder1 = 5;
             $sortOrder2 = 15;
             $sortOrder3 = 25;
@@ -224,24 +163,24 @@ describe('CategoryLink Entity', function () {
 
     describe('relationship integrity', function () {
         test('can create multiple category links for the same category', function () {
-            $category = createCategoryLinkTestCategory();
-            $link1 = createCategoryLinkTestLink();
-            $link2 = createCategoryLinkTestLink();
+            $category = TestEntityFactory::createCategory();
+            $link1 = TestEntityFactory::createLink();
+            $link2 = TestEntityFactory::createLink();
 
-            $categoryLink1 = createCategoryLinkTestCategoryLink(category: $category, link: $link1);
-            $categoryLink2 = createCategoryLinkTestCategoryLink(category: $category, link: $link2);
+            $categoryLink1 = TestEntityFactory::createCategoryLink(category: $category, link: $link1);
+            $categoryLink2 = TestEntityFactory::createCategoryLink(category: $category, link: $link2);
 
             expect($categoryLink1->category)->toBe($categoryLink2->category);
             expect($categoryLink1->link)->not->toBe($categoryLink2->link);
         });
 
         test('can create multiple category links for the same link', function () {
-            $category1 = createCategoryLinkTestCategory();
-            $category2 = createCategoryLinkTestCategory();
-            $link = createCategoryLinkTestLink();
+            $category1 = TestEntityFactory::createCategory();
+            $category2 = TestEntityFactory::createCategory();
+            $link = TestEntityFactory::createLink();
 
-            $categoryLink1 = createCategoryLinkTestCategoryLink(category: $category1, link: $link);
-            $categoryLink2 = createCategoryLinkTestCategoryLink(category: $category2, link: $link);
+            $categoryLink1 = TestEntityFactory::createCategoryLink(category: $category1, link: $link);
+            $categoryLink2 = TestEntityFactory::createCategoryLink(category: $category2, link: $link);
 
             expect($categoryLink1->link)->toBe($categoryLink2->link);
             expect($categoryLink1->category)->not->toBe($categoryLink2->category);

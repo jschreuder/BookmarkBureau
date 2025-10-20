@@ -7,24 +7,6 @@ use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
 
 describe('Dashboard Entity', function () {
-    function createTestDashboard(
-        ?UuidInterface $id = null,
-        ?Title $title = null,
-        ?string $description = null,
-        ?Icon $icon = null,
-        ?DateTimeInterface $createdAt = null,
-        ?DateTimeInterface $updatedAt = null
-    ): Dashboard {
-        return new Dashboard(
-            dashboardId: $id ?? UuidV4::uuid4(),
-            title: $title ?? new Title('Example Dashboard'),
-            description: $description ?? 'Example Description',
-            icon: $icon,
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
-            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
-        );
-    }
-
     describe('construction', function () {
         test('creates a dashboard with all properties', function () {
             $id = UuidV4::uuid4();
@@ -61,7 +43,7 @@ describe('Dashboard Entity', function () {
     describe('ID getter', function () {
         test('getting dashboardId returns the UUID', function () {
             $id = UuidV4::uuid4();
-            $dashboard = createTestDashboard(id: $id);
+            $dashboard = TestEntityFactory::createDashboard(id: $id);
 
             expect($dashboard->dashboardId)->toBe($id);
             expect($dashboard->dashboardId)->toBeInstanceOf(UuidInterface::class);
@@ -71,13 +53,13 @@ describe('Dashboard Entity', function () {
     describe('title getter and setter', function () {
         test('getting title returns the title', function () {
             $title = new Title('My Dashboard');
-            $dashboard = createTestDashboard(title: $title);
+            $dashboard = TestEntityFactory::createDashboard(title: $title);
 
             expect($dashboard->title)->toBe($title);
         });
 
         test('setting title updates the title', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $newTitle = new Title('Updated Dashboard');
 
             $dashboard->title = $newTitle;
@@ -86,7 +68,7 @@ describe('Dashboard Entity', function () {
         });
 
         test('setting title calls markAsUpdated', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
             $dashboard->title = new Title('New Dashboard');
@@ -99,13 +81,13 @@ describe('Dashboard Entity', function () {
     describe('description getter and setter', function () {
         test('getting description returns the description', function () {
             $description = 'A detailed description of the dashboard';
-            $dashboard = createTestDashboard(description: $description);
+            $dashboard = TestEntityFactory::createDashboard(description: $description);
 
             expect($dashboard->description)->toBe($description);
         });
 
         test('setting description updates the description', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $newDescription = 'Updated description';
 
             $dashboard->description = $newDescription;
@@ -114,7 +96,7 @@ describe('Dashboard Entity', function () {
         });
 
         test('setting description calls markAsUpdated', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
             $dashboard->description = 'New description';
@@ -124,7 +106,7 @@ describe('Dashboard Entity', function () {
         });
 
         test('setting description works with empty string', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
 
             $dashboard->description = '';
 
@@ -132,7 +114,7 @@ describe('Dashboard Entity', function () {
         });
 
         test('setting description works with long text', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $longDescription = str_repeat('Lorem ipsum dolor sit amet. ', 100);
 
             $dashboard->description = $longDescription;
@@ -144,13 +126,13 @@ describe('Dashboard Entity', function () {
     describe('icon getter and setter', function () {
         test('getting icon returns the icon', function () {
             $icon = new Icon('dashboard-icon');
-            $dashboard = createTestDashboard(icon: $icon);
+            $dashboard = TestEntityFactory::createDashboard(icon: $icon);
 
             expect($dashboard->icon)->toBe($icon);
         });
 
         test('setting icon updates the icon', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $newIcon = new Icon('new-icon');
 
             $dashboard->icon = $newIcon;
@@ -159,7 +141,7 @@ describe('Dashboard Entity', function () {
         });
 
         test('setting icon calls markAsUpdated', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
             $dashboard->icon = new Icon('new-icon');
@@ -169,7 +151,7 @@ describe('Dashboard Entity', function () {
         });
 
         test('setting icon works with null', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
 
             $dashboard->icon = null;
 
@@ -177,7 +159,7 @@ describe('Dashboard Entity', function () {
         });
 
         test('setting icon works with URL-like strings', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $iconUrl = new Icon('https://example.com/icon.png');
 
             $dashboard->icon = $iconUrl;
@@ -189,14 +171,14 @@ describe('Dashboard Entity', function () {
     describe('createdAt getter', function () {
         test('getting createdAt returns the creation timestamp', function () {
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
-            $dashboard = createTestDashboard(createdAt: $createdAt);
+            $dashboard = TestEntityFactory::createDashboard(createdAt: $createdAt);
 
             expect($dashboard->createdAt)->toBe($createdAt);
             expect($dashboard->createdAt)->toBeInstanceOf(DateTimeInterface::class);
         });
 
         test('createdAt is readonly and cannot be modified', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
 
             expect(fn() => $dashboard->createdAt = new DateTimeImmutable())
                 ->toThrow(Error::class);
@@ -206,14 +188,14 @@ describe('Dashboard Entity', function () {
     describe('updatedAt getter', function () {
         test('getting updatedAt returns the update timestamp', function () {
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
-            $dashboard = createTestDashboard(updatedAt: $updatedAt);
+            $dashboard = TestEntityFactory::createDashboard(updatedAt: $updatedAt);
 
             expect($dashboard->updatedAt)->toBe($updatedAt);
             expect($dashboard->updatedAt)->toBeInstanceOf(DateTimeInterface::class);
         });
 
         test('updatedAt is updated when properties change', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
             $dashboard->title = new Title('New Name');
@@ -227,7 +209,7 @@ describe('Dashboard Entity', function () {
 
     describe('markAsUpdated method', function () {
         test('markAsUpdated updates the updatedAt timestamp', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $originalUpdatedAt = $dashboard->updatedAt;
 
             $dashboard->markAsUpdated();
@@ -239,7 +221,7 @@ describe('Dashboard Entity', function () {
         });
 
         test('markAsUpdated sets updatedAt to current time', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $beforeMark = new DateTimeImmutable();
 
             $dashboard->markAsUpdated();
@@ -252,7 +234,7 @@ describe('Dashboard Entity', function () {
         });
 
         test('markAsUpdated creates a DateTimeImmutable instance', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
 
             $dashboard->markAsUpdated();
 
@@ -262,7 +244,7 @@ describe('Dashboard Entity', function () {
 
     describe('multiple setters', function () {
         test('can update multiple properties in sequence', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
             $newTitle = new Title('Updated Dashboard');
             $newDescription = 'Updated Description';
             $newIcon = new Icon('updated-icon');
@@ -279,7 +261,7 @@ describe('Dashboard Entity', function () {
 
     describe('immutability constraints', function () {
         test('dashboardId cannot be modified', function () {
-            $dashboard = createTestDashboard();
+            $dashboard = TestEntityFactory::createDashboard();
 
             expect(fn() => $dashboard->dashboardId = UuidV4::uuid4())
                 ->toThrow(Error::class);

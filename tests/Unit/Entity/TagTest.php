@@ -4,16 +4,6 @@ use jschreuder\BookmarkBureau\Entity\Tag;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 
 describe('Tag Entity', function () {
-    function createTestTag(
-        ?string $tagName = null,
-        ?HexColor $color = null
-    ): Tag {
-        return new Tag(
-            tagName: $tagName ?? 'example-tag',
-            color: $color
-        );
-    }
-
     describe('construction', function () {
         test('creates a tag with all properties', function () {
             $tagName = 'important';
@@ -38,7 +28,7 @@ describe('Tag Entity', function () {
     describe('tagName getter', function () {
         test('getTagName returns the tag name', function () {
             $tagName = 'important';
-            $tag = createTestTag(tagName: $tagName);
+            $tag = TestEntityFactory::createTag(tagName: $tagName);
 
             expect($tag->tagName)->toBe($tagName);
             expect($tag->tagName)->toBeString();
@@ -53,13 +43,13 @@ describe('Tag Entity', function () {
             ];
 
             foreach ($tagNames as $tagName) {
-                $tag = createTestTag(tagName: $tagName);
+                $tag = TestEntityFactory::createTag(tagName: $tagName);
                 expect($tag->tagName)->toBe($tagName);
             }
         });
 
         test('tagName is readonly and cannot be modified', function () {
-            $tag = createTestTag();
+            $tag = TestEntityFactory::createTag();
 
             expect(fn() => $tag->tagName = 'modified-tag')
                 ->toThrow(Error::class);
@@ -69,14 +59,14 @@ describe('Tag Entity', function () {
     describe('color getter and setter', function () {
         test('getColor returns the color', function () {
             $color = new HexColor('#00FF00');
-            $tag = createTestTag(color: $color);
+            $tag = TestEntityFactory::createTag(color: $color);
 
             expect($tag->color)->toBe($color);
             expect($tag->color)->toBeInstanceOf(HexColor::class);
         });
 
         test('setColor updates the color', function () {
-            $tag = createTestTag();
+            $tag = TestEntityFactory::createTag();
             $newColor = new HexColor('#0000FF');
 
             $tag->color = $newColor;
@@ -85,7 +75,7 @@ describe('Tag Entity', function () {
         });
 
         test('setColor works with various hex colors', function () {
-            $tag = createTestTag();
+            $tag = TestEntityFactory::createTag();
             $colors = [
                 new HexColor('#FFFFFF'),
                 new HexColor('#000000'),
@@ -102,7 +92,7 @@ describe('Tag Entity', function () {
 
     describe('multiple setters', function () {
         test('can update color multiple times in sequence', function () {
-            $tag = createTestTag();
+            $tag = TestEntityFactory::createTag();
             $color1 = new HexColor('#FF0000');
             $color2 = new HexColor('#00FF00');
             $color3 = new HexColor('#0000FF');
@@ -120,7 +110,7 @@ describe('Tag Entity', function () {
 
     describe('immutability constraints', function () {
         test('tagName cannot be modified directly', function () {
-            $tag = createTestTag();
+            $tag = TestEntityFactory::createTag();
 
             expect(fn() => $tag->tagName = 'different-tag')
                 ->toThrow(Error::class);
@@ -129,26 +119,26 @@ describe('Tag Entity', function () {
 
     describe('edge cases', function () {
         test('can create tag with single character tag name', function () {
-            $tag = createTestTag(tagName: 'a');
+            $tag = TestEntityFactory::createTag(tagName: 'a');
 
             expect($tag->tagName)->toBe('a');
         });
 
         test('can create tag with long tag name', function () {
             $longTagName = str_repeat('tag', 30);
-            $tag = createTestTag(tagName: $longTagName);
+            $tag = TestEntityFactory::createTag(tagName: $longTagName);
 
             expect($tag->tagName)->toBe($longTagName);
         });
 
         test('can create tag with tag name containing special characters', function () {
-            $tag = createTestTag(tagName: 'tag-with-dashes_and_underscores');
+            $tag = TestEntityFactory::createTag(tagName: 'tag-with-dashes_and_underscores');
 
             expect($tag->tagName)->toBe('tag-with-dashes_and_underscores');
         });
 
         test('can create tag with tag name containing numbers', function () {
-            $tag = createTestTag(tagName: 'tag123');
+            $tag = TestEntityFactory::createTag(tagName: 'tag123');
 
             expect($tag->tagName)->toBe('tag123');
         });

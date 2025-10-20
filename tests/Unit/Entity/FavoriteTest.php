@@ -9,60 +9,13 @@ use jschreuder\BookmarkBureau\Entity\Value\Url;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
 describe('Favorite Entity', function () {
-    function createFavoriteTestDashboard(
-        ?Title $title = null,
-        ?string $description = null,
-        ?string $icon = null,
-        ?DateTimeInterface $createdAt = null,
-        ?DateTimeInterface $updatedAt = null
-    ): Dashboard {
-        return new Dashboard(
-            dashboardId: UuidV4::uuid4(),
-            title: $title ?? new Title('Test Dashboard'),
-            description: $description ?? 'Test Description',
-            icon: $icon ?? new Icon('dashboard-icon'),
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
-            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
-        );
-    }
 
-    function createFavorieTestLink(
-        ?Url $url = null,
-        ?Title $title = null,
-        ?string $description = null,
-        ?string $icon = null,
-        ?DateTimeInterface $createdAt = null,
-        ?DateTimeInterface $updatedAt = null
-    ): Link {
-        return new Link(
-            linkId: UuidV4::uuid4(),
-            url: $url ?? new Url('https://example.com'),
-            title: $title ?? new Title('Example Title'),
-            description: $description ?? 'Example Description',
-            icon: $icon ?? new Icon('icon-example'),
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
-            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
-        );
-    }
 
-    function createTestFavorite(
-        ?Dashboard $dashboard = null,
-        ?Link $link = null,
-        ?int $sortOrder = null,
-        ?DateTimeInterface $createdAt = null
-    ): Favorite {
-        return new Favorite(
-            dashboard: $dashboard ?? createFavoriteTestDashboard(),
-            link: $link ?? createFavorieTestLink(),
-            sortOrder: $sortOrder ?? 0,
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
-        );
-    }
 
     describe('construction', function () {
         test('creates a favorite with all properties', function () {
-            $dashboard = createFavoriteTestDashboard();
-            $link = createFavorieTestLink();
+            $dashboard = TestEntityFactory::createDashboard();
+            $link = TestEntityFactory::createLink();
             $sortOrder = 5;
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
 
@@ -72,8 +25,8 @@ describe('Favorite Entity', function () {
         });
 
         test('stores all properties correctly during construction', function () {
-            $dashboard = createFavoriteTestDashboard();
-            $link = createFavorieTestLink();
+            $dashboard = TestEntityFactory::createDashboard();
+            $link = TestEntityFactory::createLink();
             $sortOrder = 5;
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
 
@@ -88,34 +41,34 @@ describe('Favorite Entity', function () {
 
     describe('dashboard getter', function () {
         test('getDashboard returns the Dashboard object', function () {
-            $dashboard = createFavoriteTestDashboard();
-            $favorite = createTestFavorite(dashboard: $dashboard);
+            $dashboard = TestEntityFactory::createDashboard();
+            $favorite = TestEntityFactory::createFavorite(dashboard: $dashboard);
 
             expect($favorite->dashboard)->toBe($dashboard);
             expect($favorite->dashboard)->toBeInstanceOf(Dashboard::class);
         });
 
         test('dashboard is readonly and cannot be modified', function () {
-            $favorite = createTestFavorite();
+            $favorite = TestEntityFactory::createFavorite();
 
-            expect(fn() => $favorite->dashboard = createFavoriteTestDashboard())
+            expect(fn() => $favorite->dashboard = TestEntityFactory::createDashboard())
                 ->toThrow(Error::class);
         });
     });
 
     describe('link getter', function () {
         test('getLink returns the Link object', function () {
-            $link = createFavorieTestLink();
-            $favorite = createTestFavorite(link: $link);
+            $link = TestEntityFactory::createLink();
+            $favorite = TestEntityFactory::createFavorite(link: $link);
 
             expect($favorite->link)->toBe($link);
             expect($favorite->link)->toBeInstanceOf(Link::class);
         });
 
         test('link is readonly and cannot be modified', function () {
-            $favorite = createTestFavorite();
+            $favorite = TestEntityFactory::createFavorite();
 
-            expect(fn() => $favorite->link = createFavorieTestLink())
+            expect(fn() => $favorite->link = TestEntityFactory::createLink())
                 ->toThrow(Error::class);
         });
     });
@@ -123,13 +76,13 @@ describe('Favorite Entity', function () {
     describe('sortOrder getter and setter', function () {
         test('getSortOrder returns the sort order', function () {
             $sortOrder = 42;
-            $favorite = createTestFavorite(sortOrder: $sortOrder);
+            $favorite = TestEntityFactory::createFavorite(sortOrder: $sortOrder);
 
             expect($favorite->sortOrder)->toBe($sortOrder);
         });
 
         test('setSortOrder updates the sort order', function () {
-            $favorite = createTestFavorite();
+            $favorite = TestEntityFactory::createFavorite();
             $newSortOrder = 10;
 
             $favorite->sortOrder = $newSortOrder;
@@ -138,7 +91,7 @@ describe('Favorite Entity', function () {
         });
 
         test('setSortOrder works with zero', function () {
-            $favorite = createTestFavorite();
+            $favorite = TestEntityFactory::createFavorite();
 
             $favorite->sortOrder = 0;
 
@@ -146,7 +99,7 @@ describe('Favorite Entity', function () {
         });
 
         test('setSortOrder works with negative values', function () {
-            $favorite = createTestFavorite();
+            $favorite = TestEntityFactory::createFavorite();
 
             $favorite->sortOrder = -5;
 
@@ -157,14 +110,14 @@ describe('Favorite Entity', function () {
     describe('createdAt getter', function () {
         test('getCreatedAt returns the creation timestamp', function () {
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
-            $favorite = createTestFavorite(createdAt: $createdAt);
+            $favorite = TestEntityFactory::createFavorite(createdAt: $createdAt);
 
             expect($favorite->createdAt)->toBe($createdAt);
             expect($favorite->createdAt)->toBeInstanceOf(DateTimeInterface::class);
         });
 
         test('createdAt is readonly and cannot be modified', function () {
-            $favorite = createTestFavorite();
+            $favorite = TestEntityFactory::createFavorite();
 
             expect(fn() => $favorite->createdAt = new DateTimeImmutable())
                 ->toThrow(Error::class);
@@ -173,21 +126,21 @@ describe('Favorite Entity', function () {
 
     describe('immutability constraints', function () {
         test('dashboard cannot be modified', function () {
-            $favorite = createTestFavorite();
+            $favorite = TestEntityFactory::createFavorite();
 
-            expect(fn() => $favorite->dashboard = createFavoriteTestDashboard())
+            expect(fn() => $favorite->dashboard = TestEntityFactory::createDashboard())
                 ->toThrow(Error::class);
         });
 
         test('link cannot be modified', function () {
-            $favorite = createTestFavorite();
+            $favorite = TestEntityFactory::createFavorite();
 
-            expect(fn() => $favorite->link = createFavorieTestLink())
+            expect(fn() => $favorite->link = TestEntityFactory::createLink())
                 ->toThrow(Error::class);
         });
 
         test('createdAt cannot be modified', function () {
-            $favorite = createTestFavorite();
+            $favorite = TestEntityFactory::createFavorite();
 
             expect(fn() => $favorite->createdAt = new DateTimeImmutable())
                 ->toThrow(Error::class);
@@ -196,7 +149,7 @@ describe('Favorite Entity', function () {
 
     describe('multiple setters', function () {
         test('can update sortOrder multiple times', function () {
-            $favorite = createTestFavorite();
+            $favorite = TestEntityFactory::createFavorite();
             $sortOrder1 = 5;
             $sortOrder2 = 15;
             $sortOrder3 = 25;
