@@ -19,7 +19,10 @@
         "robmorgan/phinx": "^0.16.10",
         "symfony/routing": "^7.3",
         "symfony/console": "^7.3",
-        "ramsey/uuid": "^4.9"
+        "ramsey/uuid": "^4.9",
+        "laminas/laminas-filter": "^3.3",
+        "laminas/laminas-validator": "^3.9",
+        "laminas/laminas-uri": "^2.13"
     },
     "require-dev": {
         "pestphp/pest": "^4.1",
