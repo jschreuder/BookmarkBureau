@@ -7,7 +7,7 @@ use RuntimeException;
 
 final class TagNotFoundException extends RuntimeException
 {
-    public static function forName(UuidInterface $tagName): self
+    public static function forName(string $tagName): self
     {
         return new self("Tag with name '{$tagName}' not found", 404);
     }

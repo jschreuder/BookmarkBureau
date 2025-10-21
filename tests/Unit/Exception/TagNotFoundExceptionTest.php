@@ -7,7 +7,7 @@ describe('TagNotFoundException', function () {
 
     describe('forName factory method', function () {
         test('creates exception with correct message', function () {
-            $tagName = UuidV4::uuid4();
+            $tagName = 'my-tag';
             $exception = TagNotFoundException::forName($tagName);
 
             expect($exception)->toBeInstanceOf(TagNotFoundException::class);
@@ -15,29 +15,29 @@ describe('TagNotFoundException', function () {
         });
 
         test('creates exception with 404 status code', function () {
-            $tagName = UuidV4::uuid4();
+            $tagName = 'other-tag';
             $exception = TagNotFoundException::forName($tagName);
 
             expect($exception->getCode())->toBe(404);
         });
 
         test('exception is throwable', function () {
-            $tagName = UuidV4::uuid4();
+            $tagName = 'error-me';
             expect(function () use ($tagName) {
                 throw TagNotFoundException::forName($tagName);
             })->toThrow(TagNotFoundException::class);
         });
 
         test('exception can be caught as RuntimeException', function () {
-            $tagName = UuidV4::uuid4();
+            $tagName = 'error-me';
             expect(function () use ($tagName) {
                 throw TagNotFoundException::forName($tagName);
             })->toThrow(RuntimeException::class);
         });
 
         test('multiple calls with different names create independent exceptions', function () {
-            $name1 = UuidV4::uuid4();
-            $name2 = UuidV4::uuid4();
+            $name1 = 'not-me';
+            $name2 = 'or me';
             $exception1 = TagNotFoundException::forName($name1);
             $exception2 = TagNotFoundException::forName($name2);
 
