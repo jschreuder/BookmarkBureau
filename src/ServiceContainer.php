@@ -14,8 +14,13 @@ use jschreuder\Middle\ServerMiddleware\RoutingMiddleware;
 use jschreuder\MiddleDi\ConfigTrait;
 use jschreuder\BookmarkBureau\Controller\ErrorHandlerController;
 use jschreuder\BookmarkBureau\Controller\NotFoundHandlerController;
-use jschreuder\BookmarkBureau\Service\ExampleService;
+use jschreuder\Middle\Exception\ValidationFailedException;
+use jschreuder\Middle\ServerMiddleware\RequestFilterMiddleware;
+use jschreuder\Middle\ServerMiddleware\RequestValidatorMiddleware;
+use Laminas\Diactoros\Response\JsonResponse;
+use Monolog;
 use PDO;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 class ServiceContainer
@@ -26,6 +31,10 @@ class ServiceContainer
     {
         return new ApplicationStack(
             new ControllerRunner(),
+            new RequestValidatorMiddleware(function(ServerRequestInterface $request, ValidationFailedException $error) {
+                return new JsonResponse(['errors' => $error->getValidationErrors()], 400);
+            }),
+            new RequestFilterMiddleware,
             new JsonRequestParserMiddleware(),
             new RoutingMiddleware(
                 $this->getAppRouter(),
@@ -43,7 +52,7 @@ class ServiceContainer
         $logger = new \Monolog\Logger($this->config('logger.name'));
         $logger->pushHandler((new \Monolog\Handler\StreamHandler(
             $this->config('logger.path'),
-            \Monolog\Logger::NOTICE
+            Monolog\Level::Notice
         ))->setFormatter(new \Monolog\Formatter\LineFormatter()));
         return $logger;
     }
