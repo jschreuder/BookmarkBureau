@@ -15,7 +15,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * 
  * The Closure must always return an array that can be safely converted to JSON
  */
-final class ActionController implements 
+final readonly class ActionController implements 
     ControllerInterface,
     RequestFilterInterface,
     RequestValidatorInterface

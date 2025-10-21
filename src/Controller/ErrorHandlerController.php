@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
-class ErrorHandlerController implements ControllerInterface
+final readonly class ErrorHandlerController implements ControllerInterface
 {
     private LoggerInterface $logger;
 

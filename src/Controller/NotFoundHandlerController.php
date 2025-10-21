@@ -7,7 +7,7 @@ use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class NotFoundHandlerController implements ControllerInterface
+final readonly class NotFoundHandlerController implements ControllerInterface
 {
     public function execute(ServerRequestInterface $request) : ResponseInterface
     {
