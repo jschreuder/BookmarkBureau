@@ -19,11 +19,11 @@ final readonly class CreateLinkAction implements ActionInterface
     {
         $filtered = [];
         $filtered['url'] = Filter::start($rawData, 'url', '')
-            ->string()->trim()->done();
+            ->string(allowNull: false)->trim()->done();
         $filtered['title'] = Filter::start($rawData, 'title', '')
-            ->string()->trim()->done();
+            ->string(allowNull: false)->trim()->done();
         $filtered['description'] = Filter::start($rawData, 'description', '')
-            ->string()->trim()->done();
+            ->string(allowNull: false)->trim()->done();
         $filtered['icon'] = Filter::start($rawData, 'icon', null)
             ->string()->trim()->done();
 
