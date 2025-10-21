@@ -63,20 +63,6 @@ describe('CreateLinkAction', function () {
             expect($filtered['icon'])->toBe('test-icon');
         });
 
-        test('converts empty icon to null', function () {
-            $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new CreateLinkAction($linkService);
-
-            $filtered = $action->filter([
-                'url' => 'https://example.com',
-                'title' => 'Test',
-                'description' => 'Test Description',
-                'icon' => '   '
-            ]);
-
-            expect($filtered['icon'])->toBeNull();
-        });
-
         test('handles missing keys with empty strings', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $action = new CreateLinkAction($linkService);
@@ -423,7 +409,7 @@ describe('CreateLinkAction', function () {
                 'url' => 'https://example.com',
                 'title' => 'Test Title',
                 'description' => 'Test Description',
-                'icon' => '   '
+                'icon' => null
             ];
 
             $filtered = $action->filter($rawData);

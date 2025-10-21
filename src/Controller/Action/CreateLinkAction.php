@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Controller\Action;
 
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
+use jschreuder\BookmarkBureau\Util\Filter;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator;
@@ -17,11 +18,14 @@ final readonly class CreateLinkAction implements ActionInterface
     public function filter(array $rawData): array
     {
         $filtered = [];
-        $filtered['url'] = trim(strval($rawData['url'] ?? ''));
-        $filtered['title'] = trim(strval($rawData['title'] ?? ''));
-        $filtered['description'] = trim(strval($rawData['description'] ?? ''));
-        $icon = trim(strval($rawData['icon'] ?? ''));
-        $filtered['icon'] = empty($icon) ? null : strval($icon);
+        $filtered['url'] = Filter::start($rawData, 'url', '')
+            ->string()->trim()->done();
+        $filtered['title'] = Filter::start($rawData, 'title', '')
+            ->string()->trim()->done();
+        $filtered['description'] = Filter::start($rawData, 'description', '')
+            ->string()->trim()->done();
+        $filtered['icon'] = Filter::start($rawData, 'icon', null)
+            ->string()->trim()->done();
 
         return $filtered;
     }
