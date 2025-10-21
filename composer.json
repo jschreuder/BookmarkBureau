@@ -20,9 +20,7 @@
         "symfony/routing": "^7.3",
         "symfony/console": "^7.3",
         "ramsey/uuid": "^4.9",
-        "laminas/laminas-filter": "^3.3",
-        "laminas/laminas-validator": "^3.9",
-        "laminas/laminas-uri": "^2.13"
+        "respect/validation": "^2.4"
     },
     "require-dev": {
         "pestphp/pest": "^4.1",

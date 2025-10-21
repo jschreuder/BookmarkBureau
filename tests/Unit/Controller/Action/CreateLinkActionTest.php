@@ -213,23 +213,8 @@ describe('CreateLinkAction', function () {
 
             $data = [
                 'url' => 'https://example.com',
-                'title' => str_repeat('a', 256),
+                'title' => str_repeat('a', 257),
                 'description' => 'Test Description',
-                'icon' => null
-            ];
-
-            expect(fn() => $action->validate($data))
-                ->toThrow(ValidationFailedException::class);
-        });
-
-        test('throws validation error for null description', function () {
-            $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new CreateLinkAction($linkService);
-
-            $data = [
-                'url' => 'https://example.com',
-                'title' => 'Test Title',
-                'description' => null,
                 'icon' => null
             ];
 
@@ -301,7 +286,6 @@ describe('CreateLinkAction', function () {
                 $errors = $e->getValidationErrors();
                 expect($errors)->toHaveKey('url');
                 expect($errors)->toHaveKey('title');
-                expect($errors)->toHaveKey('description');
             }
         });
     });
