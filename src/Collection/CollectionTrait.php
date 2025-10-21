@@ -27,7 +27,7 @@ use Iterator;
  */
 trait CollectionTrait
 {
-    private array $collection;
+    private readonly array $collection;
 
     public function getIterator(): Iterator
     {
