@@ -1,6 +1,7 @@
 <?php
 
 use jschreuder\BookmarkBureau\Controller\Action\DeleteDashboardAction;
+use jschreuder\BookmarkBureau\InputSpec\IdInputSpec;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Rfc4122\UuidV4;
@@ -9,7 +10,8 @@ describe('DeleteDashboardAction', function () {
     describe('filter method', function () {
         test('trims whitespace from id', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -21,7 +23,8 @@ describe('DeleteDashboardAction', function () {
 
         test('handles missing id key with empty string', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $filtered = $action->filter([]);
 
@@ -30,7 +33,8 @@ describe('DeleteDashboardAction', function () {
 
         test('preserves valid id without modification', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -42,7 +46,8 @@ describe('DeleteDashboardAction', function () {
 
         test('ignores additional fields in input', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -62,7 +67,8 @@ describe('DeleteDashboardAction', function () {
     describe('validate method', function () {
         test('passes validation with valid UUID', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = ['id' => $dashboardId->toString()];
@@ -77,7 +83,8 @@ describe('DeleteDashboardAction', function () {
 
         test('throws validation error for invalid UUID', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $data = ['id' => 'not-a-uuid'];
 
@@ -87,7 +94,8 @@ describe('DeleteDashboardAction', function () {
 
         test('throws validation error for empty id', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $data = ['id' => ''];
 
@@ -97,7 +105,8 @@ describe('DeleteDashboardAction', function () {
 
         test('throws validation error for missing id key', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $data = [];
 
@@ -107,7 +116,8 @@ describe('DeleteDashboardAction', function () {
 
         test('throws validation error for whitespace-only id', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $data = ['id' => '   '];
 
@@ -117,7 +127,8 @@ describe('DeleteDashboardAction', function () {
 
         test('throws validation error for null id', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $data = ['id' => null];
 
@@ -127,7 +138,8 @@ describe('DeleteDashboardAction', function () {
 
         test('validates UUID in different formats', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = ['id' => $dashboardId->toString()];
@@ -150,7 +162,8 @@ describe('DeleteDashboardAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once();
 
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $result = $action->execute([
                 'id' => $dashboardId->toString()
@@ -166,7 +179,8 @@ describe('DeleteDashboardAction', function () {
             $dashboardService->shouldReceive('deleteDashboard')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class));
 
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $result = $action->execute([
                 'id' => $dashboardId->toString()
@@ -184,7 +198,8 @@ describe('DeleteDashboardAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once();
 
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $action->execute([
                 'id' => $dashboardId->toString()
@@ -203,7 +218,8 @@ describe('DeleteDashboardAction', function () {
                     $uuidCapture = $uuid;
                 });
 
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $action->execute([
                 'id' => $dashboardId->toString()
@@ -222,7 +238,8 @@ describe('DeleteDashboardAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once();
 
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
                 'id' => "  {$dashboardId->toString()}  "
@@ -247,7 +264,8 @@ describe('DeleteDashboardAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once();
 
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
                 'id' => $dashboardId->toString(),
@@ -276,7 +294,8 @@ describe('DeleteDashboardAction', function () {
             $dashboardService->shouldReceive('deleteDashboard')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class));
 
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
                 'id' => "  {$dashboardId->toString()}  "
@@ -296,7 +315,8 @@ describe('DeleteDashboardAction', function () {
 
             $dashboardService->shouldNotReceive('deleteDashboard');
 
-            $action = new DeleteDashboardAction($dashboardService);
+            $inputSpec = new IdInputSpec();
+            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
                 'id' => 'invalid-uuid'
