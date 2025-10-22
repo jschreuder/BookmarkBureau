@@ -1,16 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace jschreuder\BookmarkBureau\Controller\Action;
+namespace jschreuder\BookmarkBureau\Action;
 
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Expects the LinkInputSpec, but it can be replaced to modify filtering and 
  * validation.
  */
-final readonly class CreateLinkAction implements ActionInterface
+final readonly class UpdateLinkAction implements ActionInterface
 {
     public function __construct(
         private LinkServiceInterface $linkService,
@@ -19,24 +20,22 @@ final readonly class CreateLinkAction implements ActionInterface
 
     public function filter(array $rawData): array
     {
-        // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
-        return $this->inputSpec->filter($rawData, $fields);
+        return $this->inputSpec->filter($rawData);
     }
 
     public function validate(array $data): void
     {
-        // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
-        $this->inputSpec->validate($data, $fields);
+        $this->inputSpec->validate($data);
     }
 
     public function execute(array $data): array
     {
-        $link = $this->linkService->createLink(
-            url: $data['url'], 
-            title: $data['title'], 
-            description: $data['description'], 
+        $linkId = Uuid::fromString($data['id']);
+        $link = $this->linkService->updateLink(
+            linkId: $linkId,
+            url: $data['url'],
+            title: $data['title'],
+            description: $data['description'],
             icon: $data['icon']
         );
         return [

@@ -1,30 +1,30 @@
 <?php
 
-use jschreuder\BookmarkBureau\Controller\Action\DeleteDashboardAction;
+use jschreuder\BookmarkBureau\Action\DeleteLinkAction;
 use jschreuder\BookmarkBureau\InputSpec\IdInputSpec;
-use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
+use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
-describe('DeleteDashboardAction', function () {
+describe('DeleteLinkAction', function () {
     describe('filter method', function () {
         test('trims whitespace from id', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new DeleteLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'id' => "  {$dashboardId->toString()}  "
+                'id' => "  {$linkId->toString()}  "
             ]);
 
-            expect($filtered['id'])->toBe($dashboardId->toString());
+            expect($filtered['id'])->toBe($linkId->toString());
         });
 
         test('handles missing id key with empty string', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $filtered = $action->filter([]);
 
@@ -32,46 +32,46 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('preserves valid id without modification', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new DeleteLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'id' => $dashboardId->toString()
+                'id' => $linkId->toString()
             ]);
 
-            expect($filtered['id'])->toBe($dashboardId->toString());
+            expect($filtered['id'])->toBe($linkId->toString());
         });
 
         test('ignores additional fields in input', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new DeleteLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'id' => $dashboardId->toString(),
+                'id' => $linkId->toString(),
+                'url' => 'https://example.com',
                 'title' => 'Should be ignored',
-                'description' => 'Should be ignored',
                 'extra_field' => 'ignored'
             ]);
 
             expect($filtered)->toHaveKey('id');
+            expect($filtered)->not->toHaveKey('url');
             expect($filtered)->not->toHaveKey('title');
-            expect($filtered)->not->toHaveKey('description');
             expect($filtered)->not->toHaveKey('extra_field');
         });
     });
 
     describe('validate method', function () {
         test('passes validation with valid UUID', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new DeleteLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
-            $data = ['id' => $dashboardId->toString()];
+            $data = ['id' => $linkId->toString()];
 
             try {
                 $action->validate($data);
@@ -82,9 +82,9 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('throws validation error for invalid UUID', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $data = ['id' => 'not-a-uuid'];
 
@@ -93,9 +93,9 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('throws validation error for empty id', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $data = ['id' => ''];
 
@@ -104,9 +104,9 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('throws validation error for missing id key', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $data = [];
 
@@ -115,9 +115,9 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('throws validation error for whitespace-only id', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $data = ['id' => '   '];
 
@@ -126,9 +126,9 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('throws validation error for null id', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $data = ['id' => null];
 
@@ -137,12 +137,12 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('validates UUID in different formats', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new DeleteLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
-            $data = ['id' => $dashboardId->toString()];
+            $data = ['id' => $linkId->toString()];
 
             try {
                 $action->validate($data);
@@ -154,36 +154,36 @@ describe('DeleteDashboardAction', function () {
     });
 
     describe('execute method', function () {
-        test('calls deleteDashboard on service with correct UUID', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+        test('calls deleteLink on service with correct UUID', function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $linkId = UuidV4::uuid4();
 
-            $dashboardService->shouldReceive('deleteDashboard')
+            $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once();
 
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $result = $action->execute([
-                'id' => $dashboardId->toString()
+                'id' => $linkId->toString()
             ]);
 
             expect($result)->toBe([]);
         });
 
         test('returns empty array after successful deletion', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $linkId = UuidV4::uuid4();
 
-            $dashboardService->shouldReceive('deleteDashboard')
+            $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class));
 
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $result = $action->execute([
-                'id' => $dashboardId->toString()
+                'id' => $linkId->toString()
             ]);
 
             expect($result)->toEqual([]);
@@ -191,58 +191,58 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('converts string id to UUID before passing to service', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $linkId = UuidV4::uuid4();
 
-            $dashboardService->shouldReceive('deleteDashboard')
+            $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once();
 
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $action->execute([
-                'id' => $dashboardId->toString()
+                'id' => $linkId->toString()
             ]);
 
             expect(true)->toBeTrue();
         });
 
         test('passes exact UUID to service', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $linkId = UuidV4::uuid4();
 
             $uuidCapture = null;
-            $dashboardService->shouldReceive('deleteDashboard')
+            $linkService->shouldReceive('deleteLink')
                 ->andReturnUsing(function($uuid) use (&$uuidCapture) {
                     $uuidCapture = $uuid;
                 });
 
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $action->execute([
-                'id' => $dashboardId->toString()
+                'id' => $linkId->toString()
             ]);
 
-            expect($uuidCapture->toString())->toBe($dashboardId->toString());
+            expect($uuidCapture->toString())->toBe($linkId->toString());
         });
     });
 
     describe('integration scenarios', function () {
         test('full workflow: filter, validate, and execute', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $linkId = UuidV4::uuid4();
 
-            $dashboardService->shouldReceive('deleteDashboard')
+            $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once();
 
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $rawData = [
-                'id' => "  {$dashboardId->toString()}  "
+                'id' => "  {$linkId->toString()}  "
             ];
 
             $filtered = $action->filter($rawData);
@@ -257,26 +257,26 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('full workflow with extra fields in input', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $linkId = UuidV4::uuid4();
 
-            $dashboardService->shouldReceive('deleteDashboard')
+            $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once();
 
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $rawData = [
-                'id' => $dashboardId->toString(),
+                'id' => $linkId->toString(),
+                'url' => 'https://example.com',
                 'title' => 'Should be ignored',
-                'description' => 'Should be ignored',
                 'extra' => 'data'
             ];
 
             $filtered = $action->filter($rawData);
+            expect($filtered)->not->toHaveKey('url');
             expect($filtered)->not->toHaveKey('title');
-            expect($filtered)->not->toHaveKey('description');
 
             try {
                 $action->validate($filtered);
@@ -288,21 +288,21 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('full workflow filters and validates id correctly', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $linkId = UuidV4::uuid4();
 
-            $dashboardService->shouldReceive('deleteDashboard')
+            $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class));
 
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $rawData = [
-                'id' => "  {$dashboardId->toString()}  "
+                'id' => "  {$linkId->toString()}  "
             ];
 
             $filtered = $action->filter($rawData);
-            expect($filtered['id'])->toBe($dashboardId->toString());
+            expect($filtered['id'])->toBe($linkId->toString());
 
             $action->validate($filtered);
             $result = $action->execute($filtered);
@@ -311,12 +311,12 @@ describe('DeleteDashboardAction', function () {
         });
 
         test('validation failure prevents service call', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $linkService = Mockery::mock(LinkServiceInterface::class);
 
-            $dashboardService->shouldNotReceive('deleteDashboard');
+            $linkService->shouldNotReceive('deleteLink');
 
             $inputSpec = new IdInputSpec();
-            $action = new DeleteDashboardAction($dashboardService, $inputSpec);
+            $action = new DeleteLinkAction($linkService, $inputSpec);
 
             $rawData = [
                 'id' => 'invalid-uuid'

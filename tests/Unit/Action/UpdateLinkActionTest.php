@@ -1,19 +1,39 @@
 <?php
 
-use jschreuder\BookmarkBureau\Controller\Action\CreateLinkAction;
+use jschreuder\BookmarkBureau\Action\UpdateLinkAction;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\InputSpec\LinkInputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 
-describe('CreateLinkAction', function () {
+describe('UpdateLinkAction', function () {
     describe('filter method', function () {
+        test('trims whitespace from id', function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
+
+            $filtered = $action->filter([
+                'id' => "  {$linkId->toString()}  ",
+                'url' => 'https://example.com',
+                'title' => 'Test',
+                'description' => 'Test Description',
+                'icon' => null
+            ]);
+
+            expect($filtered['id'])->toBe($linkId->toString());
+        });
+
         test('trims whitespace from URL', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
+                'id' => $linkId->toString(),
                 'url' => '  https://example.com  ',
                 'title' => 'Test',
                 'description' => 'Test Description',
@@ -26,9 +46,11 @@ describe('CreateLinkAction', function () {
         test('trims whitespace from title', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => '  Test Title  ',
                 'description' => 'Test Description',
@@ -41,9 +63,11 @@ describe('CreateLinkAction', function () {
         test('trims whitespace from description', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test',
                 'description' => '  Test Description  ',
@@ -56,9 +80,11 @@ describe('CreateLinkAction', function () {
         test('trims whitespace from icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test',
                 'description' => 'Test Description',
@@ -71,10 +97,11 @@ describe('CreateLinkAction', function () {
         test('handles missing keys with empty strings', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $filtered = $action->filter([]);
 
+            expect($filtered['id'])->toBe('');
             expect($filtered['url'])->toBe('');
             expect($filtered['title'])->toBe('');
             expect($filtered['description'])->toBe('');
@@ -84,9 +111,11 @@ describe('CreateLinkAction', function () {
         test('preserves null icon as null', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test',
                 'description' => 'Test Description',
@@ -101,9 +130,11 @@ describe('CreateLinkAction', function () {
         test('passes validation with valid data', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $data = [
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test Title',
                 'description' => 'Test Description',
@@ -121,9 +152,11 @@ describe('CreateLinkAction', function () {
         test('passes validation with empty description', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $data = [
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test Title',
                 'description' => '',
@@ -141,9 +174,11 @@ describe('CreateLinkAction', function () {
         test('passes validation with null icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $data = [
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test Title',
                 'description' => 'Test Description',
@@ -158,13 +193,49 @@ describe('CreateLinkAction', function () {
             }
         });
 
+        test('throws validation error for invalid UUID', function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+
+            $data = [
+                'id' => 'not-a-uuid',
+                'url' => 'https://example.com',
+                'title' => 'Test Title',
+                'description' => 'Test Description',
+                'icon' => null
+            ];
+
+            expect(fn() => $action->validate($data))
+                ->toThrow(ValidationFailedException::class);
+        });
+
+        test('throws validation error for empty id', function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+
+            $data = [
+                'id' => '',
+                'url' => 'https://example.com',
+                'title' => 'Test Title',
+                'description' => 'Test Description',
+                'icon' => null
+            ];
+
+            expect(fn() => $action->validate($data))
+                ->toThrow(ValidationFailedException::class);
+        });
+
         test('throws validation error for invalid URL', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $data = [
-                'url' => '  ht!tp://invalid',
+                'id' => $linkId->toString(),
+                'url' => 'ht!tp://invalid',
                 'title' => 'Test Title',
                 'description' => 'Test Description',
                 'icon' => null
@@ -177,9 +248,11 @@ describe('CreateLinkAction', function () {
         test('throws validation error for empty URL', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $data = [
+                'id' => $linkId->toString(),
                 'url' => '',
                 'title' => 'Test Title',
                 'description' => 'Test Description',
@@ -193,9 +266,11 @@ describe('CreateLinkAction', function () {
         test('throws validation error for empty title', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $data = [
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => '',
                 'description' => 'Test Description',
@@ -209,9 +284,11 @@ describe('CreateLinkAction', function () {
         test('throws validation error for title exceeding max length', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $data = [
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => str_repeat('a', 257),
                 'description' => 'Test Description',
@@ -225,9 +302,11 @@ describe('CreateLinkAction', function () {
         test('throws validation error for missing description', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+            $linkId = UuidV4::uuid4();
 
             $data = [
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test Title',
                 'icon' => null
@@ -237,31 +316,15 @@ describe('CreateLinkAction', function () {
                 ->toThrow(ValidationFailedException::class);
         });
 
-        test('includes URL error in validation exceptions', function () {
+        test('includes ID error in validation exceptions', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $data = [
-                'url' => 'ht!tp://in-valid',
-                'title' => 'Test Title',
-                'description' => 'Test Description',
-                'icon' => null
-            ];
-
-            expect(function() use ($action, $data) {
-                $action->validate($data);
-            })->toThrow(ValidationFailedException::class);
-        });
-
-        test('includes title error in validation exceptions', function () {
-            $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
-
-            $data = [
+                'id' => 'invalid-uuid',
                 'url' => 'https://example.com',
-                'title' => '',
+                'title' => 'Test Title',
                 'description' => 'Test Description',
                 'icon' => null
             ];
@@ -274,9 +337,10 @@ describe('CreateLinkAction', function () {
         test('includes multiple validation errors', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $data = [
+                'id' => 'not-uuid',
                 'url' => 'ht!tp://inv',
                 'title' => '',
                 'description' => null,
@@ -288,6 +352,7 @@ describe('CreateLinkAction', function () {
                 expect(true)->toBeFalse();
             } catch (ValidationFailedException $e) {
                 $errors = $e->getValidationErrors();
+                expect($errors)->toHaveKey('id');
                 expect($errors)->toHaveKey('url');
                 expect($errors)->toHaveKey('title');
             }
@@ -297,16 +362,18 @@ describe('CreateLinkAction', function () {
     describe('execute method', function () {
         test('executes with valid data and returns formatted link', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $link = TestEntityFactory::createLink(icon: new Icon('test-icon'));
+            $linkId = UuidV4::uuid4();
+            $link = TestEntityFactory::createLink(id: $linkId, icon: new Icon('test-icon'));
 
-            $linkService->shouldReceive('createLink')
-                ->with('https://example.com', 'Test Title', 'Test Description', 'test-icon')
+            $linkService->shouldReceive('updateLink')
+                ->with(Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'https://example.com', 'Test Title', 'Test Description', 'test-icon')
                 ->andReturn($link);
-            $inputSpec = new LinkInputSpec();
 
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $result = $action->execute([
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test Title',
                 'description' => 'Test Description',
@@ -324,15 +391,17 @@ describe('CreateLinkAction', function () {
 
         test('returns created_at and updated_at in ISO 8601 format', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $link = TestEntityFactory::createLink(icon: new Icon('test-icon'));
+            $linkId = UuidV4::uuid4();
+            $link = TestEntityFactory::createLink(id: $linkId, icon: new Icon('test-icon'));
 
-            $linkService->shouldReceive('createLink')
+            $linkService->shouldReceive('updateLink')
                 ->andReturn($link);
-            $inputSpec = new LinkInputSpec();
 
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $result = $action->execute([
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test Title',
                 'description' => 'Test Description',
@@ -345,16 +414,18 @@ describe('CreateLinkAction', function () {
 
         test('returns correct link service parameters with icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $link = TestEntityFactory::createLink(icon: new Icon('test-icon'));
+            $linkId = UuidV4::uuid4();
+            $link = TestEntityFactory::createLink(id: $linkId, icon: new Icon('test-icon'));
 
-            $linkService->shouldReceive('createLink')
-                ->with('https://example.com', 'Test Title', 'Long description', 'test-icon')
+            $linkService->shouldReceive('updateLink')
+                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'https://example.com', 'Test Title', 'Long description', 'test-icon')
                 ->andReturn($link);
-            $inputSpec = new LinkInputSpec();
 
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $action->execute([
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test Title',
                 'description' => 'Long description',
@@ -366,16 +437,41 @@ describe('CreateLinkAction', function () {
 
         test('returns correct link service parameters with null icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $link = TestEntityFactory::createLink(icon: null);
+            $linkId = UuidV4::uuid4();
+            $link = TestEntityFactory::createLink(id: $linkId, icon: null);
 
-            $linkService->shouldReceive('createLink')
-                ->with('https://example.com', 'Test Title', 'Test Description', null)
+            $linkService->shouldReceive('updateLink')
+                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'https://example.com', 'Test Title', 'Test Description', null)
                 ->andReturn($link);
-            $inputSpec = new LinkInputSpec();
 
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $action->execute([
+                'id' => $linkId->toString(),
+                'url' => 'https://example.com',
+                'title' => 'Test Title',
+                'description' => 'Test Description',
+                'icon' => null
+            ]);
+
+            expect(true)->toBeTrue();
+        });
+
+        test('converts string id to UUID before passing to service', function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $linkId = UuidV4::uuid4();
+            $link = TestEntityFactory::createLink(id: $linkId);
+
+            $linkService->shouldReceive('updateLink')
+                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), \Mockery::any(), \Mockery::any(), \Mockery::any(), \Mockery::any())
+                ->andReturn($link);
+
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+
+            $action->execute([
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test Title',
                 'description' => 'Test Description',
@@ -389,16 +485,18 @@ describe('CreateLinkAction', function () {
     describe('integration scenarios', function () {
         test('full workflow: filter, validate, and execute', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $link = TestEntityFactory::createLink(icon: new Icon('test-icon'));
+            $linkId = UuidV4::uuid4();
+            $link = TestEntityFactory::createLink(id: $linkId, icon: new Icon('test-icon'));
 
-            $linkService->shouldReceive('createLink')
-                ->with('https://example.com', 'Test Title', 'Test Description', 'test-icon')
+            $linkService->shouldReceive('updateLink')
+                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'https://example.com', 'Test Title', 'Test Description', 'test-icon')
                 ->andReturn($link);
-            $inputSpec = new LinkInputSpec();
 
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $rawData = [
+                'id' => "  {$linkId->toString()}  ",
                 'url' => '  https://example.com  ',
                 'title' => '  Test Title  ',
                 'description' => '  Test Description  ',
@@ -418,18 +516,20 @@ describe('CreateLinkAction', function () {
             }
         });
 
-        test('full workflow with empty icon', function () {
+        test('full workflow with null icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $link = TestEntityFactory::createLink(icon: new Icon('default-icon'));
+            $linkId = UuidV4::uuid4();
+            $link = TestEntityFactory::createLink(id: $linkId, icon: null);
 
-            $linkService->shouldReceive('createLink')
-                ->with('https://example.com', 'Test Title', 'Test Description', null)
+            $linkService->shouldReceive('updateLink')
+                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'https://example.com', 'Test Title', 'Test Description', null)
                 ->andReturn($link);
-            $inputSpec = new LinkInputSpec();
 
-            $action = new CreateLinkAction($linkService, $inputSpec);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $rawData = [
+                'id' => $linkId->toString(),
                 'url' => 'https://example.com',
                 'title' => 'Test Title',
                 'description' => 'Test Description',
@@ -446,6 +546,34 @@ describe('CreateLinkAction', function () {
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
+        });
+
+        test('full workflow filters and validates id correctly', function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $linkId = UuidV4::uuid4();
+            $link = TestEntityFactory::createLink(id: $linkId);
+
+            $linkService->shouldReceive('updateLink')
+                ->andReturn($link);
+
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
+
+            $rawData = [
+                'id' => "  {$linkId->toString()}  ",
+                'url' => 'https://example.com',
+                'title' => 'Test Title',
+                'description' => 'Test Description',
+                'icon' => null
+            ];
+
+            $filtered = $action->filter($rawData);
+            expect($filtered['id'])->toBe($linkId->toString());
+
+            $action->validate($filtered);
+            $action->execute($filtered);
+
+            expect(true)->toBeTrue();
         });
     });
 });

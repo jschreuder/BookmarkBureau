@@ -1,6 +1,6 @@
 <?php
 
-use jschreuder\BookmarkBureau\Controller\Action\ActionInterface;
+use jschreuder\BookmarkBureau\Action\ActionInterface;
 use jschreuder\BookmarkBureau\Controller\ActionController;
 use Laminas\Diactoros\ServerRequest;
 

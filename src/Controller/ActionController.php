@@ -2,7 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Controller;
 
-use jschreuder\BookmarkBureau\Controller\Action\ActionInterface;
+use jschreuder\BookmarkBureau\Action\ActionInterface;
 use jschreuder\Middle\Controller\ControllerInterface;
 use jschreuder\Middle\Controller\RequestFilterInterface;
 use jschreuder\Middle\Controller\RequestValidatorInterface;

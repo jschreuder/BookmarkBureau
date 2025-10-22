@@ -1,16 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace jschreuder\BookmarkBureau\Controller\Action;
+namespace jschreuder\BookmarkBureau\Action;
 
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Expects the DashboardInputSpec, but it can be replaced to modify filtering
  * and validation.
  */
-final readonly class CreateDashboardAction implements ActionInterface
+final readonly class UpdateDashboardAction implements ActionInterface
 {
     public function __construct(
         private DashboardServiceInterface $dashboardService,
@@ -19,21 +20,19 @@ final readonly class CreateDashboardAction implements ActionInterface
 
     public function filter(array $rawData): array
     {
-        // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
-        return $this->inputSpec->filter($rawData, $fields);
+        return $this->inputSpec->filter($rawData);
     }
 
     public function validate(array $data): void
     {
-        // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
-        $this->inputSpec->validate($data, $fields);
+        $this->inputSpec->validate($data);
     }
 
     public function execute(array $data): array
     {
-        $dashboard = $this->dashboardService->createDashboard(
+        $dashboardId = Uuid::fromString($data['id']);
+        $dashboard = $this->dashboardService->updateDashboard(
+            dashboardId: $dashboardId,
             title: $data['title'],
             description: $data['description'],
             icon: $data['icon']

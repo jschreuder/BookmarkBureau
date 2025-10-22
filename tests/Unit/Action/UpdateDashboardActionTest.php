@@ -1,34 +1,55 @@
 <?php
 
-use jschreuder\BookmarkBureau\Controller\Action\CreateDashboardAction;
+use jschreuder\BookmarkBureau\Action\UpdateDashboardAction;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 
-describe('CreateDashboardAction', function () {
+describe('UpdateDashboardAction', function () {
     describe('filter method', function () {
-        test('trims whitespace from title', function () {
+        test('trims whitespace from id', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'title' => '  Test Dashboard  ',
+                'id' => "  {$dashboardId->toString()}  ",
+                'title' => 'Test',
                 'description' => 'Test Description',
                 'icon' => null
             ]);
 
-            expect($filtered['title'])->toBe('Test Dashboard');
+            expect($filtered['id'])->toBe($dashboardId->toString());
+        });
+
+        test('trims whitespace from title', function () {
+            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
+
+            $filtered = $action->filter([
+                'id' => $dashboardId->toString(),
+                'title' => '  Test Title  ',
+                'description' => 'Test Description',
+                'icon' => null
+            ]);
+
+            expect($filtered['title'])->toBe('Test Title');
         });
 
         test('trims whitespace from description', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test',
                 'description' => '  Test Description  ',
                 'icon' => null
             ]);
@@ -39,24 +60,27 @@ describe('CreateDashboardAction', function () {
         test('trims whitespace from icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test',
                 'description' => 'Test Description',
-                'icon' => '  dashboard-icon  '
+                'icon' => '  test-icon  '
             ]);
 
-            expect($filtered['icon'])->toBe('dashboard-icon');
+            expect($filtered['icon'])->toBe('test-icon');
         });
 
         test('handles missing keys with empty strings', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $filtered = $action->filter([]);
 
+            expect($filtered['id'])->toBe('');
             expect($filtered['title'])->toBe('');
             expect($filtered['description'])->toBe('');
             expect($filtered['icon'])->toBeNull();
@@ -65,10 +89,12 @@ describe('CreateDashboardAction', function () {
         test('preserves null icon as null', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test',
                 'description' => 'Test Description',
                 'icon' => null
             ]);
@@ -81,12 +107,14 @@ describe('CreateDashboardAction', function () {
         test('passes validation with valid data', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
 
             $data = [
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test Title',
                 'description' => 'Test Description',
-                'icon' => 'dashboard-icon'
+                'icon' => 'test-icon'
             ];
 
             try {
@@ -100,12 +128,14 @@ describe('CreateDashboardAction', function () {
         test('passes validation with empty description', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
 
             $data = [
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test Title',
                 'description' => '',
-                'icon' => 'dashboard-icon'
+                'icon' => 'test-icon'
             ];
 
             try {
@@ -119,10 +149,12 @@ describe('CreateDashboardAction', function () {
         test('passes validation with null icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
 
             $data = [
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test Title',
                 'description' => 'Test Description',
                 'icon' => null
             ];
@@ -135,12 +167,46 @@ describe('CreateDashboardAction', function () {
             }
         });
 
+        test('throws validation error for invalid UUID', function () {
+            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+
+            $data = [
+                'id' => 'not-a-uuid',
+                'title' => 'Test Title',
+                'description' => 'Test Description',
+                'icon' => null
+            ];
+
+            expect(fn() => $action->validate($data))
+                ->toThrow(ValidationFailedException::class);
+        });
+
+        test('throws validation error for empty id', function () {
+            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+
+            $data = [
+                'id' => '',
+                'title' => 'Test Title',
+                'description' => 'Test Description',
+                'icon' => null
+            ];
+
+            expect(fn() => $action->validate($data))
+                ->toThrow(ValidationFailedException::class);
+        });
+
         test('throws validation error for empty title', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
 
             $data = [
+                'id' => $dashboardId->toString(),
                 'title' => '',
                 'description' => 'Test Description',
                 'icon' => null
@@ -153,9 +219,11 @@ describe('CreateDashboardAction', function () {
         test('throws validation error for title exceeding max length', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
 
             $data = [
+                'id' => $dashboardId->toString(),
                 'title' => str_repeat('a', 257),
                 'description' => 'Test Description',
                 'icon' => null
@@ -168,10 +236,12 @@ describe('CreateDashboardAction', function () {
         test('throws validation error for missing description', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+            $dashboardId = UuidV4::uuid4();
 
             $data = [
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test Title',
                 'icon' => null
             ];
 
@@ -179,13 +249,14 @@ describe('CreateDashboardAction', function () {
                 ->toThrow(ValidationFailedException::class);
         });
 
-        test('includes title error in validation exceptions', function () {
+        test('includes ID error in validation exceptions', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
-                'title' => '',
+                'id' => 'invalid-uuid',
+                'title' => 'Test Title',
                 'description' => 'Test Description',
                 'icon' => null
             ];
@@ -198,9 +269,10 @@ describe('CreateDashboardAction', function () {
         test('includes multiple validation errors', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
+                'id' => 'not-uuid',
                 'title' => '',
                 'description' => null,
                 'icon' => null
@@ -211,6 +283,7 @@ describe('CreateDashboardAction', function () {
                 expect(true)->toBeFalse();
             } catch (ValidationFailedException $e) {
                 $errors = $e->getValidationErrors();
+                expect($errors)->toHaveKey('id');
                 expect($errors)->toHaveKey('title');
             }
         });
@@ -219,17 +292,19 @@ describe('CreateDashboardAction', function () {
     describe('execute method', function () {
         test('executes with valid data and returns formatted dashboard', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboard = TestEntityFactory::createDashboard(icon: new Icon('test-icon'));
+            $dashboardId = UuidV4::uuid4();
+            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: new Icon('test-icon'));
 
-            $dashboardService->shouldReceive('createDashboard')
-                ->with('Test Dashboard', 'Test Description', 'test-icon')
+            $dashboardService->shouldReceive('updateDashboard')
+                ->with(Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Title', 'Test Description', 'test-icon')
                 ->andReturn($dashboard);
 
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $result = $action->execute([
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test Title',
                 'description' => 'Test Description',
                 'icon' => 'test-icon'
             ]);
@@ -244,16 +319,18 @@ describe('CreateDashboardAction', function () {
 
         test('returns created_at and updated_at in ISO 8601 format', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboard = TestEntityFactory::createDashboard(icon: new Icon('test-icon'));
+            $dashboardId = UuidV4::uuid4();
+            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: new Icon('test-icon'));
 
-            $dashboardService->shouldReceive('createDashboard')
+            $dashboardService->shouldReceive('updateDashboard')
                 ->andReturn($dashboard);
 
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $result = $action->execute([
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test Title',
                 'description' => 'Test Description',
                 'icon' => 'test-icon'
             ]);
@@ -264,17 +341,19 @@ describe('CreateDashboardAction', function () {
 
         test('returns correct dashboard service parameters with icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboard = TestEntityFactory::createDashboard(icon: new Icon('test-icon'));
+            $dashboardId = UuidV4::uuid4();
+            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: new Icon('test-icon'));
 
-            $dashboardService->shouldReceive('createDashboard')
-                ->with('Test Dashboard', 'Long description', 'test-icon')
+            $dashboardService->shouldReceive('updateDashboard')
+                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Title', 'Long description', 'test-icon')
                 ->andReturn($dashboard);
 
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $action->execute([
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test Title',
                 'description' => 'Long description',
                 'icon' => 'test-icon'
             ]);
@@ -284,17 +363,41 @@ describe('CreateDashboardAction', function () {
 
         test('returns correct dashboard service parameters with null icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboard = TestEntityFactory::createDashboard(icon: null);
+            $dashboardId = UuidV4::uuid4();
+            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: null);
 
-            $dashboardService->shouldReceive('createDashboard')
-                ->with('Test Dashboard', 'Test Description', null)
+            $dashboardService->shouldReceive('updateDashboard')
+                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Title', 'Test Description', null)
                 ->andReturn($dashboard);
 
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $action->execute([
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test Title',
+                'description' => 'Test Description',
+                'icon' => null
+            ]);
+
+            expect(true)->toBeTrue();
+        });
+
+        test('converts string id to UUID before passing to service', function () {
+            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $dashboardId = UuidV4::uuid4();
+            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
+
+            $dashboardService->shouldReceive('updateDashboard')
+                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), \Mockery::any(), \Mockery::any(), \Mockery::any())
+                ->andReturn($dashboard);
+
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+
+            $action->execute([
+                'id' => $dashboardId->toString(),
+                'title' => 'Test Title',
                 'description' => 'Test Description',
                 'icon' => null
             ]);
@@ -306,17 +409,19 @@ describe('CreateDashboardAction', function () {
     describe('integration scenarios', function () {
         test('full workflow: filter, validate, and execute', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboard = TestEntityFactory::createDashboard(icon: new Icon('test-icon'));
+            $dashboardId = UuidV4::uuid4();
+            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: new Icon('test-icon'));
 
-            $dashboardService->shouldReceive('createDashboard')
-                ->with('Test Dashboard', 'Test Description', 'test-icon')
+            $dashboardService->shouldReceive('updateDashboard')
+                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Title', 'Test Description', 'test-icon')
                 ->andReturn($dashboard);
 
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
-                'title' => '  Test Dashboard  ',
+                'id' => "  {$dashboardId->toString()}  ",
+                'title' => '  Test Title  ',
                 'description' => '  Test Description  ',
                 'icon' => '  test-icon  '
             ];
@@ -335,17 +440,19 @@ describe('CreateDashboardAction', function () {
 
         test('full workflow with null icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboard = TestEntityFactory::createDashboard(icon: null);
+            $dashboardId = UuidV4::uuid4();
+            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: null);
 
-            $dashboardService->shouldReceive('createDashboard')
-                ->with('Test Dashboard', 'Test Description', null)
+            $dashboardService->shouldReceive('updateDashboard')
+                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Title', 'Test Description', null)
                 ->andReturn($dashboard);
 
             $inputSpec = new DashboardInputSpec();
-            $action = new CreateDashboardAction($dashboardService, $inputSpec);
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
-                'title' => 'Test Dashboard',
+                'id' => $dashboardId->toString(),
+                'title' => 'Test Title',
                 'description' => 'Test Description',
                 'icon' => null
             ];
@@ -360,6 +467,33 @@ describe('CreateDashboardAction', function () {
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
+        });
+
+        test('full workflow filters and validates id correctly', function () {
+            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $dashboardId = UuidV4::uuid4();
+            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
+
+            $dashboardService->shouldReceive('updateDashboard')
+                ->andReturn($dashboard);
+
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
+
+            $rawData = [
+                'id' => "  {$dashboardId->toString()}  ",
+                'title' => 'Test Title',
+                'description' => 'Test Description',
+                'icon' => null
+            ];
+
+            $filtered = $action->filter($rawData);
+            expect($filtered['id'])->toBe($dashboardId->toString());
+
+            $action->validate($filtered);
+            $action->execute($filtered);
+
+            expect(true)->toBeTrue();
         });
     });
 });
