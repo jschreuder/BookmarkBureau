@@ -10,7 +10,7 @@ use Ramsey\Uuid\Uuid;
  * Expects the IdInputSpec, but it can be replaced to modify filtering and 
  * validation.
  */
-final readonly class DeleteDashboardAction implements ActionInterface
+final readonly class DashboardDeleteAction implements ActionInterface
 {
     public function __construct(
         private DashboardServiceInterface $dashboardService,

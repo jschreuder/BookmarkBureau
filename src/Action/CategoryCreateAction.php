@@ -4,16 +4,17 @@ namespace jschreuder\BookmarkBureau\Action;
 
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
-use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
+use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
+use Ramsey\Uuid\Uuid;
 
 /**
- * Expects the DashboardInputSpec, but it can be replaced to modify filtering
+ * Expects the CategoryInputSpec, but it can be replaced to modify filtering
  * and validation.
  */
-final readonly class CreateDashboardAction implements ActionInterface
+final readonly class CategoryCreateAction implements ActionInterface
 {
     public function __construct(
-        private DashboardServiceInterface $dashboardService,
+        private CategoryServiceInterface $categoryService,
         private InputSpecInterface $inputSpec
     ) {}
 
@@ -33,18 +34,20 @@ final readonly class CreateDashboardAction implements ActionInterface
 
     public function execute(array $data): array
     {
-        $dashboard = $this->dashboardService->createDashboard(
+        $dashboardId = Uuid::fromString($data['dashboard_id']);
+        $category = $this->categoryService->createCategory(
+            dashboardId: $dashboardId,
             title: $data['title'],
-            description: $data['description'],
-            icon: $data['icon']
+            color: $data['color']
         );
         return [
-            'id' => $dashboard->dashboardId->toString(),
-            'title' => $dashboard->title->value,
-            'description' => $dashboard->description,
-            'icon' => $dashboard->icon?->value,
-            'created_at' => $dashboard->createdAt->format(DateTimeInterface::ATOM),
-            'updated_at' => $dashboard->updatedAt->format(DateTimeInterface::ATOM),
+            'id' => $category->categoryId->toString(),
+            'dashboard_id' => $category->dashboard->dashboardId->toString(),
+            'title' => $category->title->value,
+            'color' => $category->color?->value,
+            'sort_order' => $category->sortOrder,
+            'created_at' => $category->createdAt->format(DateTimeInterface::ATOM),
+            'updated_at' => $category->updatedAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

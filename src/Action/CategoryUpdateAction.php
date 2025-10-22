@@ -11,7 +11,7 @@ use Ramsey\Uuid\Uuid;
  * Expects the CategoryInputSpec, but it can be replaced to modify filtering
  * and validation.
  */
-final readonly class CreateCategoryAction implements ActionInterface
+final readonly class CategoryUpdateAction implements ActionInterface
 {
     public function __construct(
         private CategoryServiceInterface $categoryService,
@@ -20,23 +20,19 @@ final readonly class CreateCategoryAction implements ActionInterface
 
     public function filter(array $rawData): array
     {
-        // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
-        return $this->inputSpec->filter($rawData, $fields);
+        return $this->inputSpec->filter($rawData);
     }
 
     public function validate(array $data): void
     {
-        // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
-        $this->inputSpec->validate($data, $fields);
+        $this->inputSpec->validate($data);
     }
 
     public function execute(array $data): array
     {
-        $dashboardId = Uuid::fromString($data['dashboard_id']);
-        $category = $this->categoryService->createCategory(
-            dashboardId: $dashboardId,
+        $categoryId = Uuid::fromString($data['id']);
+        $category = $this->categoryService->updateCategory(
+            categoryId: $categoryId,
             title: $data['title'],
             color: $data['color']
         );

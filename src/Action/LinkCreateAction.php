@@ -10,7 +10,7 @@ use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
  * Expects the LinkInputSpec, but it can be replaced to modify filtering and 
  * validation.
  */
-final readonly class CreateLinkAction implements ActionInterface
+final readonly class LinkCreateAction implements ActionInterface
 {
     public function __construct(
         private LinkServiceInterface $linkService,

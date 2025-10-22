@@ -1,38 +1,40 @@
 <?php
 
-use jschreuder\BookmarkBureau\Action\CreateCategoryAction;
+use jschreuder\BookmarkBureau\Action\CategoryUpdateAction;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
-describe('CreateCategoryAction', function () {
+describe('CategoryUpdateAction', function () {
     describe('filter method', function () {
-        test('trims whitespace from dashboard_id', function () {
+        test('trims whitespace from id', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $categoryId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'dashboard_id' => "  {$dashboardId->toString()}  ",
+                'id' => "  {$categoryId->toString()}  ",
+                'dashboard_id' => UuidV4::uuid4()->toString(),
                 'title' => 'Test Category',
                 'color' => null,
                 'sort_order' => 1
             ]);
 
-            expect($filtered['dashboard_id'])->toBe($dashboardId->toString());
+            expect($filtered['id'])->toBe($categoryId->toString());
         });
 
         test('trims whitespace from title', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $categoryId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'dashboard_id' => $dashboardId->toString(),
+                'id' => $categoryId->toString(),
+                'dashboard_id' => UuidV4::uuid4()->toString(),
                 'title' => '  Test Category  ',
                 'color' => null,
                 'sort_order' => 1
@@ -44,11 +46,12 @@ describe('CreateCategoryAction', function () {
         test('trims whitespace from color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $categoryId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'dashboard_id' => $dashboardId->toString(),
+                'id' => $categoryId->toString(),
+                'dashboard_id' => UuidV4::uuid4()->toString(),
                 'title' => 'Test Category',
                 'color' => '  #FF0000  ',
                 'sort_order' => 1
@@ -60,10 +63,11 @@ describe('CreateCategoryAction', function () {
         test('handles missing keys with appropriate defaults', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
 
             $filtered = $action->filter([]);
 
+            expect($filtered['id'])->toBe('');
             expect($filtered['dashboard_id'])->toBe('');
             expect($filtered['title'])->toBe('');
             expect($filtered['color'])->toBeNull();
@@ -73,11 +77,12 @@ describe('CreateCategoryAction', function () {
         test('preserves null color as null', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $categoryId = UuidV4::uuid4();
 
             $filtered = $action->filter([
-                'dashboard_id' => $dashboardId->toString(),
+                'id' => $categoryId->toString(),
+                'dashboard_id' => UuidV4::uuid4()->toString(),
                 'title' => 'Test Category',
                 'color' => null,
                 'sort_order' => 1
@@ -85,33 +90,18 @@ describe('CreateCategoryAction', function () {
 
             expect($filtered['color'])->toBeNull();
         });
-
-        test('excludes id field from filter', function () {
-            $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
-
-            $filtered = $action->filter([
-                'id' => UuidV4::uuid4()->toString(),
-                'dashboard_id' => $dashboardId->toString(),
-                'title' => 'Test Category',
-                'color' => null,
-                'sort_order' => 1
-            ]);
-
-            expect($filtered)->not->toHaveKey('id');
-        });
     });
 
     describe('validate method', function () {
         test('passes validation with valid data', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $categoryId = UuidV4::uuid4();
             $dashboardId = UuidV4::uuid4();
 
             $data = [
+                'id' => $categoryId->toString(),
                 'dashboard_id' => $dashboardId->toString(),
                 'title' => 'Test Category',
                 'color' => '#FF0000',
@@ -129,10 +119,12 @@ describe('CreateCategoryAction', function () {
         test('passes validation with null color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $categoryId = UuidV4::uuid4();
             $dashboardId = UuidV4::uuid4();
 
             $data = [
+                'id' => $categoryId->toString(),
                 'dashboard_id' => $dashboardId->toString(),
                 'title' => 'Test Category',
                 'color' => null,
@@ -147,14 +139,49 @@ describe('CreateCategoryAction', function () {
             }
         });
 
+        test('throws validation error for invalid id UUID', function () {
+            $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $inputSpec = new CategoryInputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+
+            $data = [
+                'id' => 'not-a-uuid',
+                'dashboard_id' => UuidV4::uuid4()->toString(),
+                'title' => 'Test Category',
+                'color' => null,
+                'sort_order' => 1
+            ];
+
+            expect(fn() => $action->validate($data))
+                ->toThrow(ValidationFailedException::class);
+        });
+
+        test('throws validation error for empty id', function () {
+            $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $inputSpec = new CategoryInputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+
+            $data = [
+                'id' => '',
+                'dashboard_id' => UuidV4::uuid4()->toString(),
+                'title' => 'Test Category',
+                'color' => null,
+                'sort_order' => 1
+            ];
+
+            expect(fn() => $action->validate($data))
+                ->toThrow(ValidationFailedException::class);
+        });
+
         test('throws validation error for empty title', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $categoryId = UuidV4::uuid4();
 
             $data = [
-                'dashboard_id' => $dashboardId->toString(),
+                'id' => $categoryId->toString(),
+                'dashboard_id' => UuidV4::uuid4()->toString(),
                 'title' => '',
                 'color' => null,
                 'sort_order' => 1
@@ -167,28 +194,13 @@ describe('CreateCategoryAction', function () {
         test('throws validation error for title exceeding max length', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $categoryId = UuidV4::uuid4();
 
             $data = [
-                'dashboard_id' => $dashboardId->toString(),
+                'id' => $categoryId->toString(),
+                'dashboard_id' => UuidV4::uuid4()->toString(),
                 'title' => str_repeat('a', 257),
-                'color' => null,
-                'sort_order' => 1
-            ];
-
-            expect(fn() => $action->validate($data))
-                ->toThrow(ValidationFailedException::class);
-        });
-
-        test('throws validation error for invalid dashboard_id', function () {
-            $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
-
-            $data = [
-                'dashboard_id' => 'not-a-uuid',
-                'title' => 'Test Category',
                 'color' => null,
                 'sort_order' => 1
             ];
@@ -200,11 +212,12 @@ describe('CreateCategoryAction', function () {
         test('throws validation error for invalid color format', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $categoryId = UuidV4::uuid4();
 
             $data = [
-                'dashboard_id' => $dashboardId->toString(),
+                'id' => $categoryId->toString(),
+                'dashboard_id' => UuidV4::uuid4()->toString(),
                 'title' => 'Test Category',
                 'color' => 'invalid-color',
                 'sort_order' => 1
@@ -214,31 +227,14 @@ describe('CreateCategoryAction', function () {
                 ->toThrow(ValidationFailedException::class);
         });
 
-        test('includes title error in validation exceptions', function () {
-            $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
-            $dashboardId = UuidV4::uuid4();
-
-            $data = [
-                'dashboard_id' => $dashboardId->toString(),
-                'title' => '',
-                'color' => null,
-                'sort_order' => 1
-            ];
-
-            expect(function() use ($action, $data) {
-                $action->validate($data);
-            })->toThrow(ValidationFailedException::class);
-        });
-
         test('includes multiple validation errors', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
 
             $data = [
-                'dashboard_id' => 'invalid',
+                'id' => 'not-uuid',
+                'dashboard_id' => 'not-uuid',
                 'title' => '',
                 'color' => null,
                 'sort_order' => 1
@@ -257,20 +253,23 @@ describe('CreateCategoryAction', function () {
     describe('execute method', function () {
         test('executes with valid data and returns formatted category', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $categoryId = UuidV4::uuid4();
             $dashboardId = UuidV4::uuid4();
             $category = TestEntityFactory::createCategory(
+                id: $categoryId,
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: new HexColor('#FF0000')
             );
 
-            $categoryService->shouldReceive('createCategory')
+            $categoryService->shouldReceive('updateCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Category', '#FF0000')
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
 
             $result = $action->execute([
+                'id' => $categoryId->toString(),
                 'dashboard_id' => $dashboardId->toString(),
                 'title' => 'Test Category',
                 'color' => '#FF0000',
@@ -288,19 +287,22 @@ describe('CreateCategoryAction', function () {
 
         test('returns created_at and updated_at in ISO 8601 format', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $categoryId = UuidV4::uuid4();
             $dashboardId = UuidV4::uuid4();
             $category = TestEntityFactory::createCategory(
+                id: $categoryId,
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: new HexColor('#FF0000')
             );
 
-            $categoryService->shouldReceive('createCategory')
+            $categoryService->shouldReceive('updateCategory')
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
 
             $result = $action->execute([
+                'id' => $categoryId->toString(),
                 'dashboard_id' => $dashboardId->toString(),
                 'title' => 'Test Category',
                 'color' => '#FF0000',
@@ -313,20 +315,23 @@ describe('CreateCategoryAction', function () {
 
         test('returns correct category service parameters with color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $categoryId = UuidV4::uuid4();
             $dashboardId = UuidV4::uuid4();
             $category = TestEntityFactory::createCategory(
+                id: $categoryId,
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: new HexColor('#FF0000')
             );
 
-            $categoryService->shouldReceive('createCategory')
+            $categoryService->shouldReceive('updateCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Category', '#FF0000')
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
 
             $action->execute([
+                'id' => $categoryId->toString(),
                 'dashboard_id' => $dashboardId->toString(),
                 'title' => 'Test Category',
                 'color' => '#FF0000',
@@ -338,20 +343,23 @@ describe('CreateCategoryAction', function () {
 
         test('returns correct category service parameters with null color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $categoryId = UuidV4::uuid4();
             $dashboardId = UuidV4::uuid4();
             $category = TestEntityFactory::createCategory(
+                id: $categoryId,
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: null
             );
 
-            $categoryService->shouldReceive('createCategory')
+            $categoryService->shouldReceive('updateCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Category', null)
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
 
             $action->execute([
+                'id' => $categoryId->toString(),
                 'dashboard_id' => $dashboardId->toString(),
                 'title' => 'Test Category',
                 'color' => null,
@@ -361,22 +369,21 @@ describe('CreateCategoryAction', function () {
             expect(true)->toBeTrue();
         });
 
-        test('converts string dashboard_id to UUID before passing to service', function () {
+        test('converts string id to UUID before passing to service', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
-            $category = TestEntityFactory::createCategory(
-                dashboard: TestEntityFactory::createDashboard(id: $dashboardId)
-            );
+            $categoryId = UuidV4::uuid4();
+            $category = TestEntityFactory::createCategory(id: $categoryId);
 
-            $categoryService->shouldReceive('createCategory')
+            $categoryService->shouldReceive('updateCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), \Mockery::any(), \Mockery::any())
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
 
             $action->execute([
-                'dashboard_id' => $dashboardId->toString(),
+                'id' => $categoryId->toString(),
+                'dashboard_id' => UuidV4::uuid4()->toString(),
                 'title' => 'Test Category',
                 'color' => null,
                 'sort_order' => 1
@@ -389,20 +396,23 @@ describe('CreateCategoryAction', function () {
     describe('integration scenarios', function () {
         test('full workflow: filter, validate, and execute', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $categoryId = UuidV4::uuid4();
             $dashboardId = UuidV4::uuid4();
             $category = TestEntityFactory::createCategory(
+                id: $categoryId,
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: new HexColor('#FF0000')
             );
 
-            $categoryService->shouldReceive('createCategory')
+            $categoryService->shouldReceive('updateCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Category', '#FF0000')
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
 
             $rawData = [
+                'id' => "  {$categoryId->toString()}  ",
                 'dashboard_id' => "  {$dashboardId->toString()}  ",
                 'title' => '  Test Category  ',
                 'color' => '  #FF0000  ',
@@ -423,20 +433,23 @@ describe('CreateCategoryAction', function () {
 
         test('full workflow with null color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $categoryId = UuidV4::uuid4();
             $dashboardId = UuidV4::uuid4();
             $category = TestEntityFactory::createCategory(
+                id: $categoryId,
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: null
             );
 
-            $categoryService->shouldReceive('createCategory')
+            $categoryService->shouldReceive('updateCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Category', null)
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CreateCategoryAction($categoryService, $inputSpec);
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
 
             $rawData = [
+                'id' => $categoryId->toString(),
                 'dashboard_id' => $dashboardId->toString(),
                 'title' => 'Test Category',
                 'color' => null,
@@ -453,6 +466,35 @@ describe('CreateCategoryAction', function () {
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
+        });
+
+        test('full workflow filters and validates id correctly', function () {
+            $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $categoryId = UuidV4::uuid4();
+            $dashboardId = UuidV4::uuid4();
+            $category = TestEntityFactory::createCategory(id: $categoryId);
+
+            $categoryService->shouldReceive('updateCategory')
+                ->andReturn($category);
+
+            $inputSpec = new CategoryInputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+
+            $rawData = [
+                'id' => "  {$categoryId->toString()}  ",
+                'dashboard_id' => $dashboardId->toString(),
+                'title' => 'Test Category',
+                'color' => null,
+                'sort_order' => 1
+            ];
+
+            $filtered = $action->filter($rawData);
+            expect($filtered['id'])->toBe($categoryId->toString());
+
+            $action->validate($filtered);
+            $action->execute($filtered);
+
+            expect(true)->toBeTrue();
         });
     });
 });

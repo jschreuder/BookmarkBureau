@@ -11,7 +11,7 @@ use Ramsey\Uuid\Uuid;
  * Expects the DashboardInputSpec, but it can be replaced to modify filtering
  * and validation.
  */
-final readonly class UpdateDashboardAction implements ActionInterface
+final readonly class DashboardUpdateAction implements ActionInterface
 {
     public function __construct(
         private DashboardServiceInterface $dashboardService,

@@ -3,17 +3,17 @@
 namespace jschreuder\BookmarkBureau\Action;
 
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
-use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
+use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use Ramsey\Uuid\Uuid;
 
 /**
- * Expects the IdInputSpec, but it can be replaced to modify filtering and 
+ * Expects the IdInputSpec, but it can be replaced to modify filtering and
  * validation.
  */
-final readonly class DeleteLinkAction implements ActionInterface
+final readonly class CategoryDeleteAction implements ActionInterface
 {
     public function __construct(
-        private LinkServiceInterface $linkService,
+        private CategoryServiceInterface $categoryService,
         private InputSpecInterface $inputSpec
     ) {}
 
@@ -29,8 +29,8 @@ final readonly class DeleteLinkAction implements ActionInterface
 
     public function execute(array $data): array
     {
-        $linkId = Uuid::fromString($data['id']);
-        $this->linkService->deleteLink($linkId);
+        $categoryId = Uuid::fromString($data['id']);
+        $this->categoryService->deleteCategory($categoryId);
 
         return [];
     }
