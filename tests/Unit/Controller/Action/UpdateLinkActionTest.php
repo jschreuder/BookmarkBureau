@@ -3,6 +3,7 @@
 use jschreuder\BookmarkBureau\Controller\Action\UpdateLinkAction;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\InputSpec\LinkInputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
@@ -10,7 +11,8 @@ describe('UpdateLinkAction', function () {
     describe('filter method', function () {
         test('trims whitespace from id', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -26,7 +28,8 @@ describe('UpdateLinkAction', function () {
 
         test('trims whitespace from URL', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -42,7 +45,8 @@ describe('UpdateLinkAction', function () {
 
         test('trims whitespace from title', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -58,7 +62,8 @@ describe('UpdateLinkAction', function () {
 
         test('trims whitespace from description', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -74,7 +79,8 @@ describe('UpdateLinkAction', function () {
 
         test('trims whitespace from icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -90,7 +96,8 @@ describe('UpdateLinkAction', function () {
 
         test('handles missing keys with empty strings', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $filtered = $action->filter([]);
 
@@ -103,7 +110,8 @@ describe('UpdateLinkAction', function () {
 
         test('preserves null icon as null', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -121,7 +129,8 @@ describe('UpdateLinkAction', function () {
     describe('validate method', function () {
         test('passes validation with valid data', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $data = [
@@ -142,7 +151,8 @@ describe('UpdateLinkAction', function () {
 
         test('passes validation with empty description', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $data = [
@@ -163,7 +173,8 @@ describe('UpdateLinkAction', function () {
 
         test('passes validation with null icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $data = [
@@ -184,7 +195,8 @@ describe('UpdateLinkAction', function () {
 
         test('throws validation error for invalid UUID', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $data = [
                 'id' => 'not-a-uuid',
@@ -200,7 +212,8 @@ describe('UpdateLinkAction', function () {
 
         test('throws validation error for empty id', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $data = [
                 'id' => '',
@@ -216,7 +229,8 @@ describe('UpdateLinkAction', function () {
 
         test('throws validation error for invalid URL', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $data = [
@@ -233,7 +247,8 @@ describe('UpdateLinkAction', function () {
 
         test('throws validation error for empty URL', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $data = [
@@ -250,7 +265,8 @@ describe('UpdateLinkAction', function () {
 
         test('throws validation error for empty title', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $data = [
@@ -267,7 +283,8 @@ describe('UpdateLinkAction', function () {
 
         test('throws validation error for title exceeding max length', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $data = [
@@ -284,7 +301,8 @@ describe('UpdateLinkAction', function () {
 
         test('throws validation error for missing description', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
             $linkId = UuidV4::uuid4();
 
             $data = [
@@ -300,7 +318,8 @@ describe('UpdateLinkAction', function () {
 
         test('includes ID error in validation exceptions', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $data = [
                 'id' => 'invalid-uuid',
@@ -317,7 +336,8 @@ describe('UpdateLinkAction', function () {
 
         test('includes multiple validation errors', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $data = [
                 'id' => 'not-uuid',
@@ -349,7 +369,8 @@ describe('UpdateLinkAction', function () {
                 ->with(Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'https://example.com', 'Test Title', 'Test Description', 'test-icon')
                 ->andReturn($link);
 
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $result = $action->execute([
                 'id' => $linkId->toString(),
@@ -376,7 +397,8 @@ describe('UpdateLinkAction', function () {
             $linkService->shouldReceive('updateLink')
                 ->andReturn($link);
 
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $result = $action->execute([
                 'id' => $linkId->toString(),
@@ -399,7 +421,8 @@ describe('UpdateLinkAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'https://example.com', 'Test Title', 'Long description', 'test-icon')
                 ->andReturn($link);
 
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $action->execute([
                 'id' => $linkId->toString(),
@@ -421,7 +444,8 @@ describe('UpdateLinkAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'https://example.com', 'Test Title', 'Test Description', null)
                 ->andReturn($link);
 
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $action->execute([
                 'id' => $linkId->toString(),
@@ -443,7 +467,8 @@ describe('UpdateLinkAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), \Mockery::any(), \Mockery::any(), \Mockery::any(), \Mockery::any())
                 ->andReturn($link);
 
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $action->execute([
                 'id' => $linkId->toString(),
@@ -467,7 +492,8 @@ describe('UpdateLinkAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'https://example.com', 'Test Title', 'Test Description', 'test-icon')
                 ->andReturn($link);
 
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $rawData = [
                 'id' => "  {$linkId->toString()}  ",
@@ -499,7 +525,8 @@ describe('UpdateLinkAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'https://example.com', 'Test Title', 'Test Description', null)
                 ->andReturn($link);
 
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $rawData = [
                 'id' => $linkId->toString(),
@@ -529,7 +556,8 @@ describe('UpdateLinkAction', function () {
             $linkService->shouldReceive('updateLink')
                 ->andReturn($link);
 
-            $action = new UpdateLinkAction($linkService);
+            $inputSpec = new LinkInputSpec();
+            $action = new UpdateLinkAction($linkService, $inputSpec);
 
             $rawData = [
                 'id' => "  {$linkId->toString()}  ",
