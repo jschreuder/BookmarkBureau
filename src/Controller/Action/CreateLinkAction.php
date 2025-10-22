@@ -6,6 +6,10 @@ use DateTimeInterface;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 
+/**
+ * Expects the LinkInputSpec, but it can be replaced to modify filtering and 
+ * validation.
+ */
 final readonly class CreateLinkAction implements ActionInterface
 {
     public function __construct(
@@ -15,12 +19,14 @@ final readonly class CreateLinkAction implements ActionInterface
 
     public function filter(array $rawData): array
     {
+        // Create operations need all fields except 'id', since it doesn't exist yet
         $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
         return $this->inputSpec->filter($rawData, $fields);
     }
 
     public function validate(array $data): void
     {
+        // Create operations need all fields except 'id', since it doesn't exist yet
         $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
         $this->inputSpec->validate($data, $fields);
     }

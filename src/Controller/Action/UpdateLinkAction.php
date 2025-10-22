@@ -7,6 +7,10 @@ use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use Ramsey\Uuid\Uuid;
 
+/**
+ * Expects the LinkInputSpec, but it can be replaced to modify filtering and 
+ * validation.
+ */
 final readonly class UpdateLinkAction implements ActionInterface
 {
     public function __construct(

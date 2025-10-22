@@ -6,6 +6,10 @@ use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use Ramsey\Uuid\Uuid;
 
+/**
+ * Expects the IdInputSpec, but it can be replaced to modify filtering and 
+ * validation.
+ */
 final readonly class DeleteDashboardAction implements ActionInterface
 {
     public function __construct(
