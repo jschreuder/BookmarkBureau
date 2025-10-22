@@ -3,13 +3,15 @@
 use jschreuder\BookmarkBureau\Controller\Action\CreateDashboardAction;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 
 describe('CreateDashboardAction', function () {
     describe('filter method', function () {
         test('trims whitespace from title', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $filtered = $action->filter([
                 'title' => '  Test Dashboard  ',
@@ -22,7 +24,8 @@ describe('CreateDashboardAction', function () {
 
         test('trims whitespace from description', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $filtered = $action->filter([
                 'title' => 'Test Dashboard',
@@ -35,7 +38,8 @@ describe('CreateDashboardAction', function () {
 
         test('trims whitespace from icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $filtered = $action->filter([
                 'title' => 'Test Dashboard',
@@ -48,7 +52,8 @@ describe('CreateDashboardAction', function () {
 
         test('handles missing keys with empty strings', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $filtered = $action->filter([]);
 
@@ -59,7 +64,8 @@ describe('CreateDashboardAction', function () {
 
         test('preserves null icon as null', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $filtered = $action->filter([
                 'title' => 'Test Dashboard',
@@ -74,7 +80,8 @@ describe('CreateDashboardAction', function () {
     describe('validate method', function () {
         test('passes validation with valid data', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'title' => 'Test Dashboard',
@@ -92,7 +99,8 @@ describe('CreateDashboardAction', function () {
 
         test('passes validation with empty description', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'title' => 'Test Dashboard',
@@ -110,7 +118,8 @@ describe('CreateDashboardAction', function () {
 
         test('passes validation with null icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'title' => 'Test Dashboard',
@@ -128,7 +137,8 @@ describe('CreateDashboardAction', function () {
 
         test('throws validation error for empty title', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'title' => '',
@@ -142,7 +152,8 @@ describe('CreateDashboardAction', function () {
 
         test('throws validation error for title exceeding max length', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'title' => str_repeat('a', 257),
@@ -156,7 +167,8 @@ describe('CreateDashboardAction', function () {
 
         test('throws validation error for missing description', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'title' => 'Test Dashboard',
@@ -169,7 +181,8 @@ describe('CreateDashboardAction', function () {
 
         test('includes title error in validation exceptions', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'title' => '',
@@ -184,7 +197,8 @@ describe('CreateDashboardAction', function () {
 
         test('includes multiple validation errors', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'title' => '',
@@ -211,7 +225,8 @@ describe('CreateDashboardAction', function () {
                 ->with('Test Dashboard', 'Test Description', 'test-icon')
                 ->andReturn($dashboard);
 
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $result = $action->execute([
                 'title' => 'Test Dashboard',
@@ -234,7 +249,8 @@ describe('CreateDashboardAction', function () {
             $dashboardService->shouldReceive('createDashboard')
                 ->andReturn($dashboard);
 
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $result = $action->execute([
                 'title' => 'Test Dashboard',
@@ -254,7 +270,8 @@ describe('CreateDashboardAction', function () {
                 ->with('Test Dashboard', 'Long description', 'test-icon')
                 ->andReturn($dashboard);
 
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $action->execute([
                 'title' => 'Test Dashboard',
@@ -273,7 +290,8 @@ describe('CreateDashboardAction', function () {
                 ->with('Test Dashboard', 'Test Description', null)
                 ->andReturn($dashboard);
 
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $action->execute([
                 'title' => 'Test Dashboard',
@@ -294,7 +312,8 @@ describe('CreateDashboardAction', function () {
                 ->with('Test Dashboard', 'Test Description', 'test-icon')
                 ->andReturn($dashboard);
 
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
                 'title' => '  Test Dashboard  ',
@@ -322,7 +341,8 @@ describe('CreateDashboardAction', function () {
                 ->with('Test Dashboard', 'Test Description', null)
                 ->andReturn($dashboard);
 
-            $action = new CreateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new CreateDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
                 'title' => 'Test Dashboard',

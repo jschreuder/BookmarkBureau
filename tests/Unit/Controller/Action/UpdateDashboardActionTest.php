@@ -3,6 +3,7 @@
 use jschreuder\BookmarkBureau\Controller\Action\UpdateDashboardAction;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
@@ -10,7 +11,8 @@ describe('UpdateDashboardAction', function () {
     describe('filter method', function () {
         test('trims whitespace from id', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -25,7 +27,8 @@ describe('UpdateDashboardAction', function () {
 
         test('trims whitespace from title', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -40,7 +43,8 @@ describe('UpdateDashboardAction', function () {
 
         test('trims whitespace from description', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -55,7 +59,8 @@ describe('UpdateDashboardAction', function () {
 
         test('trims whitespace from icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -70,7 +75,8 @@ describe('UpdateDashboardAction', function () {
 
         test('handles missing keys with empty strings', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $filtered = $action->filter([]);
 
@@ -82,7 +88,8 @@ describe('UpdateDashboardAction', function () {
 
         test('preserves null icon as null', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -99,7 +106,8 @@ describe('UpdateDashboardAction', function () {
     describe('validate method', function () {
         test('passes validation with valid data', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -119,7 +127,8 @@ describe('UpdateDashboardAction', function () {
 
         test('passes validation with empty description', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -139,7 +148,8 @@ describe('UpdateDashboardAction', function () {
 
         test('passes validation with null icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -159,7 +169,8 @@ describe('UpdateDashboardAction', function () {
 
         test('throws validation error for invalid UUID', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'id' => 'not-a-uuid',
@@ -174,7 +185,8 @@ describe('UpdateDashboardAction', function () {
 
         test('throws validation error for empty id', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'id' => '',
@@ -189,7 +201,8 @@ describe('UpdateDashboardAction', function () {
 
         test('throws validation error for empty title', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -205,7 +218,8 @@ describe('UpdateDashboardAction', function () {
 
         test('throws validation error for title exceeding max length', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -221,7 +235,8 @@ describe('UpdateDashboardAction', function () {
 
         test('throws validation error for missing description', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -236,7 +251,8 @@ describe('UpdateDashboardAction', function () {
 
         test('includes ID error in validation exceptions', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'id' => 'invalid-uuid',
@@ -252,7 +268,8 @@ describe('UpdateDashboardAction', function () {
 
         test('includes multiple validation errors', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $data = [
                 'id' => 'not-uuid',
@@ -282,7 +299,8 @@ describe('UpdateDashboardAction', function () {
                 ->with(Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Title', 'Test Description', 'test-icon')
                 ->andReturn($dashboard);
 
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $result = $action->execute([
                 'id' => $dashboardId->toString(),
@@ -307,7 +325,8 @@ describe('UpdateDashboardAction', function () {
             $dashboardService->shouldReceive('updateDashboard')
                 ->andReturn($dashboard);
 
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $result = $action->execute([
                 'id' => $dashboardId->toString(),
@@ -329,7 +348,8 @@ describe('UpdateDashboardAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Title', 'Long description', 'test-icon')
                 ->andReturn($dashboard);
 
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $action->execute([
                 'id' => $dashboardId->toString(),
@@ -350,7 +370,8 @@ describe('UpdateDashboardAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Title', 'Test Description', null)
                 ->andReturn($dashboard);
 
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $action->execute([
                 'id' => $dashboardId->toString(),
@@ -371,7 +392,8 @@ describe('UpdateDashboardAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), \Mockery::any(), \Mockery::any(), \Mockery::any())
                 ->andReturn($dashboard);
 
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $action->execute([
                 'id' => $dashboardId->toString(),
@@ -394,7 +416,8 @@ describe('UpdateDashboardAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Title', 'Test Description', 'test-icon')
                 ->andReturn($dashboard);
 
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
                 'id' => "  {$dashboardId->toString()}  ",
@@ -424,7 +447,8 @@ describe('UpdateDashboardAction', function () {
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), 'Test Title', 'Test Description', null)
                 ->andReturn($dashboard);
 
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
                 'id' => $dashboardId->toString(),
@@ -453,7 +477,8 @@ describe('UpdateDashboardAction', function () {
             $dashboardService->shouldReceive('updateDashboard')
                 ->andReturn($dashboard);
 
-            $action = new UpdateDashboardAction($dashboardService);
+            $inputSpec = new DashboardInputSpec();
+            $action = new UpdateDashboardAction($dashboardService, $inputSpec);
 
             $rawData = [
                 'id' => "  {$dashboardId->toString()}  ",
