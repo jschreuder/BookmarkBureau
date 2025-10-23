@@ -9,7 +9,7 @@ use Ramsey\Uuid\Rfc4122\UuidV4;
 
 describe('PdoLinkRepository', function () {
 
-    function createDatabase(): PDO {
+    function createLinkDatabase(): PDO {
         $pdo = new PDO('sqlite::memory:');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->exec('PRAGMA foreign_keys = ON');
@@ -72,7 +72,7 @@ describe('PdoLinkRepository', function () {
         return $pdo;
     }
 
-    function insertLink(PDO $pdo, $link): void {
+    function insertTestLink(PDO $pdo, $link): void {
         $stmt = $pdo->prepare(
             'INSERT INTO links (link_id, url, title, description, icon, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)'
@@ -90,11 +90,11 @@ describe('PdoLinkRepository', function () {
 
     describe('findById', function () {
         test('finds and returns a link by ID', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
             $link = TestEntityFactory::createLink();
 
-            insertLink($pdo, $link);
+            insertTestLink($pdo, $link);
 
             $found = $repo->findById($link->linkId);
 
@@ -105,7 +105,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('throws LinkNotFoundException when link does not exist', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
             $nonExistentId = UuidV4::uuid4();
 
@@ -114,11 +114,11 @@ describe('PdoLinkRepository', function () {
         });
 
         test('correctly maps nullable icon field', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
             $linkWithoutIcon = TestEntityFactory::createLink(icon: null);
 
-            insertLink($pdo, $linkWithoutIcon);
+            insertTestLink($pdo, $linkWithoutIcon);
 
             $found = $repo->findById($linkWithoutIcon->linkId);
 
@@ -128,16 +128,16 @@ describe('PdoLinkRepository', function () {
 
     describe('findAll', function () {
         test('returns all links ordered by created_at descending', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $link1 = TestEntityFactory::createLink(createdAt: new DateTimeImmutable('2024-01-01 10:00:00'));
             $link2 = TestEntityFactory::createLink(createdAt: new DateTimeImmutable('2024-01-02 10:00:00'));
             $link3 = TestEntityFactory::createLink(createdAt: new DateTimeImmutable('2024-01-03 10:00:00'));
 
-            insertLink($pdo, $link1);
-            insertLink($pdo, $link2);
-            insertLink($pdo, $link3);
+            insertTestLink($pdo, $link1);
+            insertTestLink($pdo, $link2);
+            insertTestLink($pdo, $link3);
 
             $collection = $repo->findAll();
 
@@ -149,11 +149,11 @@ describe('PdoLinkRepository', function () {
         });
 
         test('respects limit parameter', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             for ($i = 0; $i < 5; $i++) {
-                insertLink($pdo, TestEntityFactory::createLink());
+                insertTestLink($pdo, TestEntityFactory::createLink());
             }
 
             $collection = $repo->findAll(limit: 2);
@@ -162,16 +162,16 @@ describe('PdoLinkRepository', function () {
         });
 
         test('respects offset parameter', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $link1 = TestEntityFactory::createLink();
             $link2 = TestEntityFactory::createLink();
             $link3 = TestEntityFactory::createLink();
 
-            insertLink($pdo, $link1);
-            insertLink($pdo, $link2);
-            insertLink($pdo, $link3);
+            insertTestLink($pdo, $link1);
+            insertTestLink($pdo, $link2);
+            insertTestLink($pdo, $link3);
 
             $collection = $repo->findAll(limit: 10, offset: 1);
 
@@ -179,7 +179,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('returns empty collection when no links exist', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $collection = $repo->findAll();
@@ -190,7 +190,7 @@ describe('PdoLinkRepository', function () {
 
     describe('save', function () {
         test('inserts a new link', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
             $link = TestEntityFactory::createLink();
 
@@ -202,7 +202,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('updates an existing link', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
             $link = TestEntityFactory::createLink();
 
@@ -218,7 +218,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('preserves timestamps on insert', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
             $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
             $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
@@ -232,7 +232,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('saves links with null icon', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
             $link = TestEntityFactory::createLink(icon: null);
 
@@ -245,7 +245,7 @@ describe('PdoLinkRepository', function () {
 
     describe('delete', function () {
         test('deletes a link by ID', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
             $link = TestEntityFactory::createLink();
 
@@ -257,7 +257,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('cascades delete to link_tags', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
             $link = TestEntityFactory::createLink();
 
@@ -283,18 +283,18 @@ describe('PdoLinkRepository', function () {
 
     describe('count', function () {
         test('returns the total number of links', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
-            insertLink($pdo, TestEntityFactory::createLink());
-            insertLink($pdo, TestEntityFactory::createLink());
-            insertLink($pdo, TestEntityFactory::createLink());
+            insertTestLink($pdo, TestEntityFactory::createLink());
+            insertTestLink($pdo, TestEntityFactory::createLink());
+            insertTestLink($pdo, TestEntityFactory::createLink());
 
             expect($repo->count())->toBe(3);
         });
 
         test('returns 0 when no links exist', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             expect($repo->count())->toBe(0);
@@ -303,7 +303,7 @@ describe('PdoLinkRepository', function () {
 
     describe('findByTags', function () {
         test('returns empty collection when given empty tag list', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $collection = $repo->findByTags([]);
@@ -312,11 +312,11 @@ describe('PdoLinkRepository', function () {
         });
 
         test('returns empty collection when no tags match', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $link = TestEntityFactory::createLink();
-            insertLink($pdo, $link);
+            insertTestLink($pdo, $link);
 
             $collection = $repo->findByTags(['nonexistent']);
 
@@ -324,16 +324,16 @@ describe('PdoLinkRepository', function () {
         });
 
         test('returns links matching all specified tags with AND condition', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $link1 = TestEntityFactory::createLink();
             $link2 = TestEntityFactory::createLink();
             $link3 = TestEntityFactory::createLink();
 
-            insertLink($pdo, $link1);
-            insertLink($pdo, $link2);
-            insertLink($pdo, $link3);
+            insertTestLink($pdo, $link1);
+            insertTestLink($pdo, $link2);
+            insertTestLink($pdo, $link3);
 
             // Create tags
             $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['php']);
@@ -371,14 +371,14 @@ describe('PdoLinkRepository', function () {
         });
 
         test('finds links with single tag', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $link1 = TestEntityFactory::createLink();
             $link2 = TestEntityFactory::createLink();
 
-            insertLink($pdo, $link1);
-            insertLink($pdo, $link2);
+            insertTestLink($pdo, $link1);
+            insertTestLink($pdo, $link2);
 
             $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['php']);
             $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
@@ -394,7 +394,7 @@ describe('PdoLinkRepository', function () {
 
     describe('findByCategoryId', function () {
         test('returns links in a category ordered by sort_order', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $dashboardId = UuidV4::uuid4();
@@ -411,9 +411,9 @@ describe('PdoLinkRepository', function () {
             $pdo->prepare('INSERT INTO categories (category_id, dashboard_id, title) VALUES (?, ?, ?)')
                 ->execute([$categoryId->getBytes(), $dashboardId->getBytes(), 'Test Category']);
 
-            insertLink($pdo, $link1);
-            insertLink($pdo, $link2);
-            insertLink($pdo, $link3);
+            insertTestLink($pdo, $link1);
+            insertTestLink($pdo, $link2);
+            insertTestLink($pdo, $link3);
 
             // Add links to category with different sort orders
             $pdo->prepare('INSERT INTO category_links (category_id, link_id, sort_order) VALUES (?, ?, ?)')
@@ -433,7 +433,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('throws CategoryNotFoundException when category does not exist', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
             $nonExistentCategoryId = UuidV4::uuid4();
 
@@ -442,7 +442,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('returns empty collection for category with no links', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $dashboardId = UuidV4::uuid4();
@@ -463,7 +463,7 @@ describe('PdoLinkRepository', function () {
 
     describe('search', function () {
         test('searches links by title using LIKE', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $link1 = TestEntityFactory::createLink(
@@ -479,9 +479,9 @@ describe('PdoLinkRepository', function () {
                 description: 'Build web apps with PHP'
             );
 
-            insertLink($pdo, $link1);
-            insertLink($pdo, $link2);
-            insertLink($pdo, $link3);
+            insertTestLink($pdo, $link1);
+            insertTestLink($pdo, $link2);
+            insertTestLink($pdo, $link3);
 
             // Search for "PHP" should find link1 and link3
             $collection = $repo->search('PHP');
@@ -494,7 +494,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('searches links by description using LIKE', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $link1 = TestEntityFactory::createLink(
@@ -506,8 +506,8 @@ describe('PdoLinkRepository', function () {
                 description: 'Learn JavaScript'
             );
 
-            insertLink($pdo, $link1);
-            insertLink($pdo, $link2);
+            insertTestLink($pdo, $link1);
+            insertTestLink($pdo, $link2);
 
             $collection = $repo->search('Laravel');
 
@@ -517,7 +517,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('search is case-insensitive', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $link = TestEntityFactory::createLink(
@@ -525,7 +525,7 @@ describe('PdoLinkRepository', function () {
                 description: 'Learn PHP'
             );
 
-            insertLink($pdo, $link);
+            insertTestLink($pdo, $link);
 
             // Search with different casing
             $collection = $repo->search('php');
@@ -534,7 +534,7 @@ describe('PdoLinkRepository', function () {
         });
 
         test('returns empty collection when no matches found', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             $link = TestEntityFactory::createLink(
@@ -542,7 +542,7 @@ describe('PdoLinkRepository', function () {
                 description: 'Learn PHP'
             );
 
-            insertLink($pdo, $link);
+            insertTestLink($pdo, $link);
 
             $collection = $repo->search('Python');
 
@@ -550,11 +550,11 @@ describe('PdoLinkRepository', function () {
         });
 
         test('respects limit parameter', function () {
-            $pdo = createDatabase();
+            $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
             for ($i = 0; $i < 5; $i++) {
-                insertLink($pdo, TestEntityFactory::createLink(
+                insertTestLink($pdo, TestEntityFactory::createLink(
                     title: new Title('Test Link ' . $i),
                     description: 'Test content'
                 ));
