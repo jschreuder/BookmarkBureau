@@ -22,6 +22,8 @@ build:
               format: 'php-clover'
 filter:
   excluded_paths:
+    - config/*
+    - migrations/*
     - tests/*
     - vendor/*
 
