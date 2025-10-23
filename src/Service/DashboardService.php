@@ -8,6 +8,7 @@ use jschreuder\BookmarkBureau\Collection\CategoryWithLinksCollection;
 use jschreuder\BookmarkBureau\Collection\DashboardCollection;
 use jschreuder\BookmarkBureau\Collection\DashboardWithCategoriesAndFavorites;
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
@@ -43,10 +44,7 @@ final class DashboardService implements DashboardServiceInterface
         $categoriesWithLinks = [];
         foreach ($categories as $category) {
             $categoryLinks = $this->categoryRepository->findCategoryLinksForCategoryId($category->categoryId);
-            $links = new LinkCollection();
-            foreach ($categoryLinks as $categoryLink) {
-                $links = new LinkCollection(...array_merge(iterator_to_array($links), [$categoryLink->link]));
-            }
+            $links = new LinkCollection(...array_map(fn(CategoryLink $cl) => $cl->link, $categoryLinks->toArray()));
             $categoriesWithLinks[] = new CategoryWithLinks($category, $links);
         }
 
