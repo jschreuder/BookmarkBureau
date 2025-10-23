@@ -13,7 +13,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 
-final class PdoLinkRepository implements LinkRepositoryInterface
+final readonly class PdoLinkRepository implements LinkRepositoryInterface
 {
     public function __construct(
         private readonly PDO $pdo
