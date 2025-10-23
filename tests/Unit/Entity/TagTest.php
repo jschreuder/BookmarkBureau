@@ -2,11 +2,12 @@
 
 use jschreuder\BookmarkBureau\Entity\Tag;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
+use jschreuder\BookmarkBureau\Entity\Value\TagName;
 
 describe('Tag Entity', function () {
     describe('construction', function () {
         test('creates a tag with all properties', function () {
-            $tagName = 'important';
+            $tagName = new TagName('important');
             $color = new HexColor('#FF0000');
 
             $tag = new Tag($tagName, $color);
@@ -15,7 +16,7 @@ describe('Tag Entity', function () {
         });
 
         test('stores all properties correctly during construction', function () {
-            $tagName = 'important';
+            $tagName = new TagName('important');
             $color = new HexColor('#FF0000');
 
             $tag = new Tag($tagName, $color);
@@ -27,19 +28,19 @@ describe('Tag Entity', function () {
 
     describe('tagName getter', function () {
         test('getTagName returns the tag name', function () {
-            $tagName = 'important';
+            $tagName = new TagName('important');
             $tag = TestEntityFactory::createTag(tagName: $tagName);
 
             expect($tag->tagName)->toBe($tagName);
-            expect($tag->tagName)->toBeString();
+            expect($tag->tagName)->toBeInstanceOf(TagName::class);
         });
 
         test('getTagName returns the exact tag name provided', function () {
             $tagNames = [
-                'todo',
-                'bug-fix',
-                'documentation',
-                'feature-request',
+                new TagName('todo'),
+                new TagName('bug-fix'),
+                new TagName('documentation'),
+                new TagName('feature-request'),
             ];
 
             foreach ($tagNames as $tagName) {
@@ -51,7 +52,7 @@ describe('Tag Entity', function () {
         test('tagName is readonly and cannot be modified', function () {
             $tag = TestEntityFactory::createTag();
 
-            expect(fn() => $tag->tagName = 'modified-tag')
+            expect(fn() => $tag->tagName = new TagName('modified-tag'))
                 ->toThrow(Error::class);
         });
     });
@@ -112,35 +113,34 @@ describe('Tag Entity', function () {
         test('tagName cannot be modified directly', function () {
             $tag = TestEntityFactory::createTag();
 
-            expect(fn() => $tag->tagName = 'different-tag')
+            expect(fn() => $tag->tagName = new TagName('different-tag'))
                 ->toThrow(Error::class);
         });
     });
 
     describe('edge cases', function () {
         test('can create tag with single character tag name', function () {
-            $tag = TestEntityFactory::createTag(tagName: 'a');
+            $tag = TestEntityFactory::createTag(tagName: new TagName('a'));
 
-            expect($tag->tagName)->toBe('a');
+            expect($tag->tagName->value)->toBe('a');
         });
 
         test('can create tag with long tag name', function () {
-            $longTagName = str_repeat('tag', 30);
+            $longTagName = new TagName(str_repeat('tag', 30));
             $tag = TestEntityFactory::createTag(tagName: $longTagName);
 
             expect($tag->tagName)->toBe($longTagName);
         });
 
-        test('can create tag with tag name containing special characters', function () {
-            $tag = TestEntityFactory::createTag(tagName: 'tag-with-dashes_and_underscores');
-
-            expect($tag->tagName)->toBe('tag-with-dashes_and_underscores');
+        test('cannot create tag with tag name containing special characters', function () {
+            expect(fn() => TestEntityFactory::createTag(tagName: new TagName('tag-with-dashes_and_underscores')))
+                ->toThrow(InvalidArgumentException::class);
         });
 
         test('can create tag with tag name containing numbers', function () {
-            $tag = TestEntityFactory::createTag(tagName: 'tag123');
+            $tag = TestEntityFactory::createTag(tagName: new TagName('tag123'));
 
-            expect($tag->tagName)->toBe('tag123');
+            expect($tag->tagName->value)->toBe('tag123');
         });
     });
 });

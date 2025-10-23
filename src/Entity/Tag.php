@@ -5,7 +5,7 @@ namespace jschreuder\BookmarkBureau\Entity;
 final class Tag
 {
     public function __construct(
-        public readonly string $tagName,
+        public readonly Value\TagName $tagName,
         public ?Value\HexColor $color
     ) {}
 }

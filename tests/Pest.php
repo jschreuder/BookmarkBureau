@@ -47,6 +47,7 @@ use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Tag;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use Ramsey\Uuid\Rfc4122\UuidV4;
@@ -117,11 +118,11 @@ class TestEntityFactory
     }
 
     public static function createTag(
-        ?string $tagName = null,
+        ?TagName $tagName = null,
         ?HexColor $color = null
     ): Tag {
         return new Tag(
-            tagName: $tagName ?? 'example-tag',
+            tagName: $tagName ?? new TagName('example-tag'),
             color: $color
         );
     }
