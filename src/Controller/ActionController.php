@@ -3,10 +3,10 @@
 namespace jschreuder\BookmarkBureau\Controller;
 
 use jschreuder\BookmarkBureau\Action\ActionInterface;
+use jschreuder\BookmarkBureau\Response\ResponseTransformerInterface;
 use jschreuder\Middle\Controller\ControllerInterface;
 use jschreuder\Middle\Controller\RequestFilterInterface;
 use jschreuder\Middle\Controller\RequestValidatorInterface;
-use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -22,6 +22,7 @@ final readonly class ActionController implements
 {
     public function __construct(
         private ActionInterface $action,
+        private ResponseTransformerInterface $responseTransformer,
         private int $successStatus = 200
     ) {}
 
@@ -54,9 +55,12 @@ final readonly class ActionController implements
         $data = (array) $request->getParsedBody();
         $result = $this->action->execute($data);
         
-        return new JsonResponse([
-            'success' => true,
-            'data' => $result
-        ], $this->successStatus);
+        return $this->responseTransformer->transform(
+            data: [
+                'success' => true,
+                'data' => $result
+            ],
+            statusCode: $this->successStatus
+        );
     }
 }

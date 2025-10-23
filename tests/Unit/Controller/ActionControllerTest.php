@@ -2,20 +2,23 @@
 
 use jschreuder\BookmarkBureau\Action\ActionInterface;
 use jschreuder\BookmarkBureau\Controller\ActionController;
+use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
 use Laminas\Diactoros\ServerRequest;
 
 describe('ActionController', function () {
     describe('initialization', function () {
         test('creates controller with action and default success status', function () {
             $action = Mockery::mock(ActionInterface::class);
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
 
             expect($controller)->toBeInstanceOf(ActionController::class);
         });
 
         test('creates controller with action and custom success status', function () {
             $action = Mockery::mock(ActionInterface::class);
-            $controller = new ActionController($action, 201);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer, 201);
 
             expect($controller)->toBeInstanceOf(ActionController::class);
         });
@@ -28,7 +31,8 @@ describe('ActionController', function () {
                 ->with(['name' => 'test', 'value' => '123'])
                 ->andReturn(['name' => 'test', 'value' => 123]);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api?name=test&value=123',
                 method: 'GET',
@@ -47,7 +51,8 @@ describe('ActionController', function () {
                 ->with(['name' => 'test'])
                 ->andReturn(['name' => 'test']);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -66,7 +71,8 @@ describe('ActionController', function () {
                 ->with([])
                 ->andReturn([]);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -85,7 +91,8 @@ describe('ActionController', function () {
                 ->with(['id' => '123', 'name' => 'test'])
                 ->andReturn(['id' => '123', 'name' => 'test']);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api/123',
                 method: 'GET',
@@ -105,7 +112,8 @@ describe('ActionController', function () {
                 ->with(['name' => 'test'])
                 ->andReturn(['name' => 'test']);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'GET',
@@ -124,7 +132,8 @@ describe('ActionController', function () {
                 ->with(['email' => 'test@example.com', 'age' => '30'])
                 ->andReturn(['email' => 'test@example.com', 'age' => 30]);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -151,7 +160,8 @@ describe('ActionController', function () {
                     $validatedData = $data;
                 });
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -175,7 +185,8 @@ describe('ActionController', function () {
                     $validatedData = $data;
                 });
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -193,7 +204,8 @@ describe('ActionController', function () {
             $action->shouldReceive('validate')
                 ->andThrow(new Exception('Validation failed'));
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -213,7 +225,8 @@ describe('ActionController', function () {
                 ->with(['name' => 'test'])
                 ->andReturn(['id' => 1, 'name' => 'test']);
 
-            $controller = new ActionController($action, 200);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer, 200);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -233,7 +246,8 @@ describe('ActionController', function () {
                 ->with(['name' => 'test'])
                 ->andReturn(['id' => 1, 'name' => 'test']);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -251,7 +265,8 @@ describe('ActionController', function () {
             $action->shouldReceive('execute')
                 ->andReturn(['id' => 1]);
 
-            $controller = new ActionController($action, 201);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer, 201);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -270,7 +285,8 @@ describe('ActionController', function () {
             $action->shouldReceive('execute')
                 ->andReturn($expectedData);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -290,7 +306,8 @@ describe('ActionController', function () {
             $action->shouldReceive('execute')
                 ->andReturn([]);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'DELETE',
@@ -311,7 +328,8 @@ describe('ActionController', function () {
                 ->with([])
                 ->andReturn(['result' => 'ok']);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'GET',
@@ -330,7 +348,8 @@ describe('ActionController', function () {
             $action->shouldReceive('execute')
                 ->andReturn(['status' => 'ok']);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api',
                 method: 'POST',
@@ -347,21 +366,24 @@ describe('ActionController', function () {
     describe('interface implementation', function () {
         test('implements ControllerInterface', function () {
             $action = Mockery::mock(ActionInterface::class);
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
 
             expect($controller)->toBeInstanceOf(jschreuder\Middle\Controller\ControllerInterface::class);
         });
 
         test('implements RequestFilterInterface', function () {
             $action = Mockery::mock(ActionInterface::class);
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
 
             expect($controller)->toBeInstanceOf(jschreuder\Middle\Controller\RequestFilterInterface::class);
         });
 
         test('implements RequestValidatorInterface', function () {
             $action = Mockery::mock(ActionInterface::class);
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
 
             expect($controller)->toBeInstanceOf(jschreuder\Middle\Controller\RequestValidatorInterface::class);
         });
@@ -380,7 +402,8 @@ describe('ActionController', function () {
                 ->with(['search' => 'test'])
                 ->andReturn(['results' => []]);
 
-            $controller = new ActionController($action);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer);
             $request = new ServerRequest(
                 uri: 'http://example.com/api?search=test',
                 method: 'GET',
@@ -409,7 +432,8 @@ describe('ActionController', function () {
                 ->with(['id' => 'abc-123', 'name' => 'Updated'])
                 ->andReturn(['id' => 'abc-123', 'name' => 'Updated']);
 
-            $controller = new ActionController($action, 201);
+            $responseTransformer = new JsonResponseTransformer();
+            $controller = new ActionController($action, $responseTransformer, 201);
             $request = new ServerRequest(
                 uri: 'http://example.com/api/abc-123',
                 method: 'POST',
