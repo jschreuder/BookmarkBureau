@@ -10,11 +10,16 @@ use jschreuder\BookmarkBureau\Collection\CategoryLinkCollection;
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
+use jschreuder\BookmarkBureau\Entity\Dashboard;
+use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
+use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use Ramsey\Uuid\Uuid;
 
 final readonly class PdoCategoryRepository implements CategoryRepositoryInterface
 {
@@ -48,8 +53,8 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
      */
     public function findByDashboardId(UuidInterface $dashboardId): CategoryCollection
     {
-        // Verify dashboard exists first
-        $this->dashboardRepository->findById($dashboardId);
+        // Verify dashboard exists and reuse it for all categories
+        $dashboard = $this->dashboardRepository->findById($dashboardId);
 
         $statement = $this->pdo->prepare(
             'SELECT * FROM categories WHERE dashboard_id = :dashboard_id ORDER BY sort_order ASC'
@@ -58,7 +63,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
 
         $categories = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $categories[] = $this->mapRowToCategory($row);
+            $categories[] = $this->mapRowToCategory($row, $dashboard);
         }
 
         return new CategoryCollection(...$categories);
@@ -342,14 +347,18 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
 
     /**
      * Map a database row to a Category entity
+     * When called from findByDashboardId, the dashboard is passed to avoid redundant lookups
      */
-    private function mapRowToCategory(array $row): Category
+    private function mapRowToCategory(array $row, ?Dashboard $dashboard = null): Category
     {
-        $dashboardId = \Ramsey\Uuid\Uuid::fromBytes($row['dashboard_id']);
-        $dashboard = $this->dashboardRepository->findById($dashboardId);
+        // Get dashboard if not provided (fallback for other methods)
+        if ($dashboard === null) {
+            $dashboardId = Uuid::fromBytes($row['dashboard_id']);
+            $dashboard = $this->dashboardRepository->findById($dashboardId);
+        }
 
         return new Category(
-            categoryId: \Ramsey\Uuid\Uuid::fromBytes($row['category_id']),
+            categoryId: Uuid::fromBytes($row['category_id']),
             dashboard: $dashboard,
             title: new Title($row['title']),
             color: $row['color'] !== null ? new HexColor($row['color']) : null,
@@ -360,10 +369,19 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
     }
 
     /**
-     * Map a database row to a Link entity (helper for CategoryLink mapping)
+     * Map a database row to a Link entity (constructs directly from row data)
+     * Avoids repository lookups for better performance
      */
-    private function mapRowToLink(array $row): \jschreuder\BookmarkBureau\Entity\Link
+    private function mapRowToLink(array $row): Link
     {
-        return $this->linkRepository->findById(\Ramsey\Uuid\Uuid::fromBytes($row['link_id']));
+        return new Link(
+            linkId: Uuid::fromBytes($row['link_id']),
+            url: new Url($row['url']),
+            title: new Title($row['title']),
+            description: $row['description'],
+            icon: $row['icon'] !== null ? new Icon($row['icon']) : null,
+            createdAt: new DateTimeImmutable($row['created_at']),
+            updatedAt: new DateTimeImmutable($row['updated_at']),
+        );
     }
 }
