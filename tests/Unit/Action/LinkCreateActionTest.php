@@ -102,6 +102,72 @@ describe('LinkCreateAction', function () {
 
             expect($filtered['icon'])->toBeNull();
         });
+
+        test('strips HTML tags from title', function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $inputSpec = new LinkInputSpec();
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
+
+            $filtered = $action->filter([
+                'url' => 'https://example.com',
+                'title' => 'Link <script>alert("xss")</script> Title',
+                'description' => 'Test Description',
+                'icon' => null
+            ]);
+
+            expect($filtered['title'])->toBe('Link alert("xss") Title');
+        });
+
+        test('strips HTML tags from description', function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $inputSpec = new LinkInputSpec();
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
+
+            $filtered = $action->filter([
+                'url' => 'https://example.com',
+                'title' => 'Test',
+                'description' => 'Description with <b>bold</b> and <i>italic</i> tags',
+                'icon' => null
+            ]);
+
+            expect($filtered['description'])->toBe('Description with bold and italic tags');
+        });
+
+        test('strips dangerous HTML from both title and description', function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $inputSpec = new LinkInputSpec();
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
+
+            $filtered = $action->filter([
+                'url' => 'https://example.com',
+                'title' => '<a href="evil.com">Click me</a>',
+                'description' => '<iframe src="malicious.com"></iframe><p>Content</p>',
+                'icon' => null
+            ]);
+
+            expect($filtered['title'])->toBe('Click me');
+            expect($filtered['description'])->toBe('Content');
+        });
+
+        test('preserves URL without stripping tags', function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $inputSpec = new LinkInputSpec();
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
+
+            // URLs should NOT have striptags applied (they're validated separately)
+            $filtered = $action->filter([
+                'url' => 'https://example.com/path?param=value',
+                'title' => 'Test',
+                'description' => 'Test Description',
+                'icon' => null
+            ]);
+
+            expect($filtered['url'])->toBe('https://example.com/path?param=value');
+        });
     });
 
     describe('validate method', function () {

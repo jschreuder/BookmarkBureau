@@ -92,6 +92,41 @@ describe('CategoryCreateAction', function () {
             expect($filtered['color'])->toBeNull();
         });
 
+        test('strips HTML tags from title', function () {
+            $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $inputSpec = new CategoryInputSpec();
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
+            $dashboardId = Uuid::uuid4();
+
+            $filtered = $action->filter([
+                'dashboard_id' => $dashboardId->toString(),
+                'title' => 'Category <script>alert("xss")</script> Title',
+                'color' => null,
+                'sort_order' => 1
+            ]);
+
+            expect($filtered['title'])->toBe('Category alert("xss") Title');
+        });
+
+        test('strips complex HTML attacks from title', function () {
+            $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $inputSpec = new CategoryInputSpec();
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
+            $dashboardId = Uuid::uuid4();
+
+            $filtered = $action->filter([
+                'dashboard_id' => $dashboardId->toString(),
+                'title' => '<img src=x onerror=alert(1)> <a href="javascript:alert(2)">Click</a>',
+                'color' => null,
+                'sort_order' => 1
+            ]);
+
+            // Note: strip_tags leaves a space before "Click" from the img tag
+            expect($filtered['title'])->toBe(' Click');
+        });
+
         test('excludes id field from filter', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();

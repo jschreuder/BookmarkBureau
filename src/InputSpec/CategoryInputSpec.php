@@ -34,7 +34,7 @@ final class CategoryInputSpec implements InputSpecInterface
                 'dashboard_id' => Filter::start($rawData, 'dashboard_id', '')
                     ->string(allowNull: false)->trim()->done(),
                 'title' => Filter::start($rawData, 'title', '')
-                    ->string(allowNull: false)->trim()->done(),
+                    ->string(allowNull: false)->trim()->striptags()->done(),
                 'color' => Filter::start($rawData, 'color', null)
                     ->string()->trim()->done(),
                 'sort_order' => Filter::start($rawData, 'sort_order', 1)

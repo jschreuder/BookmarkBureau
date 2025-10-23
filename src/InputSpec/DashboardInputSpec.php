@@ -31,9 +31,9 @@ final class DashboardInputSpec implements InputSpecInterface
                 'id' => Filter::start($rawData, 'id', '')
                     ->string(allowNull: false)->trim()->done(),
                 'title' => Filter::start($rawData, 'title', '')
-                    ->string(allowNull: false)->trim()->done(),
+                    ->string(allowNull: false)->trim()->striptags()->done(),
                 'description' => Filter::start($rawData, 'description', '')
-                    ->string(allowNull: false)->trim()->done(),
+                    ->string(allowNull: false)->trim()->striptags()->done(),
                 'icon' => Filter::start($rawData, 'icon', null)
                     ->string()->trim()->done(),
                 default => throw new InvalidArgumentException("Unknown field: {$field}"),

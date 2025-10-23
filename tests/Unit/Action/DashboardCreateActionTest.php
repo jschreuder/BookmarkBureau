@@ -81,6 +81,52 @@ describe('DashboardCreateAction', function () {
 
             expect($filtered['icon'])->toBeNull();
         });
+
+        test('strips HTML tags from title', function () {
+            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $inputSpec = new DashboardInputSpec();
+            $outputSpec = new DashboardOutputSpec();
+            $action = new DashboardCreateAction($dashboardService, $inputSpec, $outputSpec);
+
+            $filtered = $action->filter([
+                'title' => 'Test <script>alert("xss")</script> Dashboard',
+                'description' => 'Test Description',
+                'icon' => null
+            ]);
+
+            expect($filtered['title'])->toBe('Test alert("xss") Dashboard');
+        });
+
+        test('strips HTML tags from description', function () {
+            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $inputSpec = new DashboardInputSpec();
+            $outputSpec = new DashboardOutputSpec();
+            $action = new DashboardCreateAction($dashboardService, $inputSpec, $outputSpec);
+
+            $filtered = $action->filter([
+                'title' => 'Test Dashboard',
+                'description' => 'Description with <b>HTML</b> and <img src=x onerror=alert(1)> tags',
+                'icon' => null
+            ]);
+
+            expect($filtered['description'])->toBe('Description with HTML and  tags');
+        });
+
+        test('strips multiple HTML tags from both title and description', function () {
+            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $inputSpec = new DashboardInputSpec();
+            $outputSpec = new DashboardOutputSpec();
+            $action = new DashboardCreateAction($dashboardService, $inputSpec, $outputSpec);
+
+            $filtered = $action->filter([
+                'title' => '<a href="evil.com">Click</a> Dashboard',
+                'description' => '<p>Test</p> <div>nested</div> content',
+                'icon' => null
+            ]);
+
+            expect($filtered['title'])->toBe('Click Dashboard');
+            expect($filtered['description'])->toBe('Test nested content');
+        });
     });
 
     describe('validate method', function () {
