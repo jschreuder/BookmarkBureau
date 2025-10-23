@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
+use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
@@ -64,9 +65,10 @@ interface CategoryServiceInterface
 
     /**
      * Reorder links within a category
-     * 
+     * The index (position) of each link in the collection becomes its sort order
+     *
      * @param UuidInterface $categoryId
-     * @param array<string, int> $linkIdToSortOrder Map of link UUID strings to sort orders
+     * @param LinkCollection $links Links in the desired order
      */
-    public function reorderLinksInCategory(UuidInterface $categoryId, array $linkIdToSortOrder): void;
+    public function reorderLinksInCategory(UuidInterface $categoryId, LinkCollection $links): void;
 }

@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Repository;
 
 use jschreuder\BookmarkBureau\Collection\CategoryCollection;
 use jschreuder\BookmarkBureau\Collection\CategoryLinkCollection;
+use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
@@ -62,6 +63,8 @@ interface CategoryRepositoryInterface
 
     /**
      * Remove a link from a category
+     * @throws CategoryNotFoundException when category doesn't exist
+     * @throws LinkNotFoundException when link doesn't exist
      */
     public function removeLink(UuidInterface $categoryId, UuidInterface $linkId): void;
 
@@ -79,9 +82,10 @@ interface CategoryRepositoryInterface
 
     /**
      * Reorder links in a category
-     * @param array<string, int> $linkIdToSortOrder Map of link UUID strings to sort orders
+     * The index (position) of each link in the collection becomes its sort order
+     * @throws CategoryNotFoundException when category doesn't exist
      */
-    public function reorderLinks(UuidInterface $categoryId, array $linkIdToSortOrder): void;
+    public function reorderLinks(UuidInterface $categoryId, LinkCollection $links): void;
 
     /**
      * Count total number of categories
