@@ -15,6 +15,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
+use Ramsey\Uuid\Nonstandard\Uuid;
 
 final readonly class PdoLinkRepository implements LinkRepositoryInterface
 {
@@ -216,7 +217,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     private function mapRowToLink(array $row): Link
     {
         return new Link(
-            linkId: \Ramsey\Uuid\Uuid::fromBytes($row['link_id']),
+            linkId: Uuid::fromBytes($row['link_id']),
             url: new Url($row['url']),
             title: new Title($row['title']),
             description: $row['description'],

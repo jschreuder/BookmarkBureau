@@ -220,7 +220,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
         $dashboards = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $dashboards[] = $this->dashboardRepository->findById(
-                \Ramsey\Uuid\Uuid::fromBytes($row['dashboard_id'])
+                Uuid::fromBytes($row['dashboard_id'])
             );
         }
 
@@ -254,7 +254,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * Map a database row to a Link entity (helper for Favorite mapping)
      * Constructs Link directly from row data instead of calling repository
      */
-    private function mapRowToLink(array $row): \jschreuder\BookmarkBureau\Entity\Link
+    private function mapRowToLink(array $row): Link
     {
         return new Link(
             linkId: Uuid::fromBytes($row['link_id']),

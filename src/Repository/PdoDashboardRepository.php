@@ -10,6 +10,7 @@ use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
+use Ramsey\Uuid\Uuid;
 
 final readonly class PdoDashboardRepository implements DashboardRepositoryInterface
 {
@@ -124,7 +125,7 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     private function mapRowToDashboard(array $row): Dashboard
     {
         return new Dashboard(
-            dashboardId: \Ramsey\Uuid\Uuid::fromBytes($row['dashboard_id']),
+            dashboardId: Uuid::fromBytes($row['dashboard_id']),
             title: new Title($row['title']),
             description: $row['description'],
             icon: $row['icon'] !== null ? new Icon($row['icon']) : null,
