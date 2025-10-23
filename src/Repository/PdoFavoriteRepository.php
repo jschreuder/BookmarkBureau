@@ -219,9 +219,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
 
         $dashboards = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $dashboards[] = $this->dashboardRepository->findById(
-                Uuid::fromBytes($row['dashboard_id'])
-            );
+            $dashboards[] = $this->mapRowToDashboard($row);
         }
 
         return new DashboardCollection(...$dashboards);
@@ -259,6 +257,21 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
         return new Link(
             linkId: Uuid::fromBytes($row['link_id']),
             url: new Url($row['url']),
+            title: new Title($row['title']),
+            description: $row['description'],
+            icon: $row['icon'] !== null ? new Icon($row['icon']) : null,
+            createdAt: new DateTimeImmutable($row['created_at']),
+            updatedAt: new DateTimeImmutable($row['updated_at']),
+        );
+    }
+
+    /**
+     * Map a database row to a Dashboard entity
+     */
+    private function mapRowToDashboard(array $row): Dashboard
+    {
+        return new Dashboard(
+            dashboardId: Uuid::fromBytes($row['dashboard_id']),
             title: new Title($row['title']),
             description: $row['description'],
             icon: $row['icon'] !== null ? new Icon($row['icon']) : null,
