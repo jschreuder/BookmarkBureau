@@ -2,7 +2,6 @@
 
 namespace jschreuder\BookmarkBureau\Action;
 
-use DateTimeInterface;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
