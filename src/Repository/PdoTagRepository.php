@@ -128,7 +128,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
                 );
                 $statement->execute([
                     ':tag_name' => $tagNameValue,
-                    ':color' => $tag->color ? ltrim($tag->color->value, '#') : null,
+                    ':color' => $tag->color ? $tag->color->value : null,
                 ]);
             } catch (\PDOException $e) {
                 if (str_contains($e->getMessage(), 'Duplicate entry') ||
@@ -144,7 +144,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             );
             $statement->execute([
                 ':tag_name' => $tagNameValue,
-                ':color' => $tag->color ? ltrim($tag->color->value, '#') : null,
+                ':color' => $tag->color ? $tag->color->value : null,
             ]);
         }
     }
@@ -249,7 +249,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     {
         return new Tag(
             tagName: new TagName($row['tag_name']),
-            color: $row['color'] !== null ? new HexColor('#' . $row['color']) : null,
+            color: $row['color'] !== null ? new HexColor($row['color']) : null,
         );
     }
 }

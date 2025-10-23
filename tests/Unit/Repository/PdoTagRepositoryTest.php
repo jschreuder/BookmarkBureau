@@ -48,7 +48,7 @@ describe('PdoTagRepository', function () {
         $stmt = $pdo->prepare('INSERT INTO tags (tag_name, color) VALUES (?, ?)');
         $stmt->execute([
             $tag->tagName->value,
-            $tag->color ? ltrim((string) $tag->color, '#') : null,
+            $tag->color ? $tag->color->value : null,
         ]);
     }
 

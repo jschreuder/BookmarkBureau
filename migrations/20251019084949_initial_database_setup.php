@@ -39,7 +39,7 @@ final class InitialDatabaseSetup extends AbstractMigration
             'collation' => 'utf8mb4_unicode_ci'
         ]);
         $tags->addColumn('tag_name', 'string', ['limit' => 100])
-             ->addColumn('color', 'string', ['limit' => 6, 'null' => true])
+             ->addColumn('color', 'string', ['limit' => 7, 'null' => true])
              ->create();
 
         // Link-Tags junction table: many-to-many relationship
@@ -93,7 +93,7 @@ final class InitialDatabaseSetup extends AbstractMigration
         $categories->addColumn('category_id', 'char', ['limit' => 16])
                    ->addColumn('dashboard_id', 'char', ['limit' => 16])
                    ->addColumn('title', 'string', ['limit' => 255])
-                   ->addColumn('color', 'string', ['limit' => 6, 'null' => true])
+                   ->addColumn('color', 'string', ['limit' => 7, 'null' => true])
                    ->addColumn('sort_order', 'integer', ['default' => 0])
                    ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
                    ->addColumn('updated_at', 'timestamp', [
