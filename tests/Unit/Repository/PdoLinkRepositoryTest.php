@@ -1,5 +1,7 @@
 <?php
 
+use jschreuder\BookmarkBureau\Collection\TagNameCollection;
+use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
@@ -306,7 +308,7 @@ describe('PdoLinkRepository', function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
-            $collection = $repo->findByTags([]);
+            $collection = $repo->findByTags(new TagNameCollection());
 
             expect($collection)->toHaveCount(0);
         });
@@ -318,7 +320,7 @@ describe('PdoLinkRepository', function () {
             $link = TestEntityFactory::createLink();
             insertTestLink($pdo, $link);
 
-            $collection = $repo->findByTags(['nonexistent']);
+            $collection = $repo->findByTags(new TagNameCollection(new TagName('nonexistent')));
 
             expect($collection)->toHaveCount(0);
         });
@@ -337,14 +339,14 @@ describe('PdoLinkRepository', function () {
 
             // Create tags
             $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['php']);
-            $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['laravel']);
+            $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['middle']);
             $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['testing']);
 
-            // Link 1: php, laravel
+            // Link 1: php, middle
             $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
                 ->execute([$link1->linkId->getBytes(), 'php']);
             $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
-                ->execute([$link1->linkId->getBytes(), 'laravel']);
+                ->execute([$link1->linkId->getBytes(), 'middle']);
 
             // Link 2: php, testing
             $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
@@ -352,16 +354,16 @@ describe('PdoLinkRepository', function () {
             $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
                 ->execute([$link2->linkId->getBytes(), 'testing']);
 
-            // Link 3: php, laravel, testing
+            // Link 3: php, middle, testing
             $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
                 ->execute([$link3->linkId->getBytes(), 'php']);
             $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
-                ->execute([$link3->linkId->getBytes(), 'laravel']);
+                ->execute([$link3->linkId->getBytes(), 'middle']);
             $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
                 ->execute([$link3->linkId->getBytes(), 'testing']);
 
-            // Find links with both 'php' and 'laravel' (AND condition)
-            $collection = $repo->findByTags(['php', 'laravel']);
+            // Find links with both 'php' and 'middle' (AND condition)
+            $collection = $repo->findByTags(new TagNameCollection(new TagName('php'), new TagName('middle')));
 
             expect($collection)->toHaveCount(2);
             $links = iterator_to_array($collection);
@@ -384,7 +386,7 @@ describe('PdoLinkRepository', function () {
             $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
                 ->execute([$link1->linkId->getBytes(), 'php']);
 
-            $collection = $repo->findByTags(['php']);
+            $collection = $repo->findByTags(new TagNameCollection(new TagName('php')));
 
             expect($collection)->toHaveCount(1);
             $links = iterator_to_array($collection);
@@ -475,7 +477,7 @@ describe('PdoLinkRepository', function () {
                 description: 'Learn JavaScript'
             );
             $link3 = TestEntityFactory::createLink(
-                title: new Title('Laravel Framework'),
+                title: new Title('Middle Framework'),
                 description: 'Build web apps with PHP'
             );
 
@@ -499,7 +501,7 @@ describe('PdoLinkRepository', function () {
 
             $link1 = TestEntityFactory::createLink(
                 title: new Title('Tutorial 1'),
-                description: 'Learn Laravel framework'
+                description: 'Learn Middle framework'
             );
             $link2 = TestEntityFactory::createLink(
                 title: new Title('Tutorial 2'),
@@ -509,7 +511,7 @@ describe('PdoLinkRepository', function () {
             insertTestLink($pdo, $link1);
             insertTestLink($pdo, $link2);
 
-            $collection = $repo->search('Laravel');
+            $collection = $repo->search('Middle');
 
             expect($collection)->toHaveCount(1);
             $links = iterator_to_array($collection);

@@ -3,11 +3,14 @@
 namespace jschreuder\BookmarkBureau\Repository;
 
 use DateTimeImmutable;
+use InvalidArgumentException;
 use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Collection\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
@@ -81,24 +84,23 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     /**
      * Find links that match any number of tags (using AND condition)
      * Uses INTERSECT queries for cross-database compatibility (MySQL 8.0+ and SQLite)
-     * @param string[] $tagNames
      */
-    public function findByTags(array $tagNames): LinkCollection
+    public function findByTags(TagNameCollection $tagNames): LinkCollection
     {
-        if (empty($tagNames)) {
+        if ($tagNames->isEmpty()) {
             return new LinkCollection();
         }
 
         // Build INTERSECT query that works in both MySQL 8.0+ and SQLite
         // For each tag, we select link_ids that have that tag,
         // then intersect all results to get links with ALL tags
-        $intersectQueries = array_map(fn() => 'SELECT link_id FROM link_tags WHERE tag_name = ?', $tagNames);
+        $intersectQueries = array_map(fn() => 'SELECT link_id FROM link_tags WHERE tag_name = ?', $tagNames->toArray());
         $query = 'SELECT l.* FROM links l WHERE l.link_id IN (' .
                  implode(' INTERSECT ', $intersectQueries) .
                  ') ORDER BY l.created_at DESC';
 
         $statement = $this->pdo->prepare($query);
-        $statement->execute($tagNames);
+        $statement->execute(array_map(fn (TagName $value) => $value->value, $tagNames->toArray()));
 
         $links = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {

@@ -3,6 +3,7 @@
 namespace jschreuder\BookmarkBureau\Repository;
 
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Collection\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use Ramsey\Uuid\UuidInterface;
@@ -23,9 +24,8 @@ interface LinkRepositoryInterface
 
     /**
      * Find links that match any number of tags (using AND condition)
-     * @param string[] $tagNames
      */
-    public function findByTags(array $tagNames): LinkCollection;
+    public function findByTags(TagNameCollection $tagNames): LinkCollection;
 
     /**
      * Get all links by category, ordered by sort_order
