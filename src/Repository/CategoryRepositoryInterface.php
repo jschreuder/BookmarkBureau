@@ -19,6 +19,7 @@ interface CategoryRepositoryInterface
 
     /**
      * Get all categories for a dashboard, ordered by sort_order
+     * @throws DashboardNotFoundException when dashboard doesn't exist (FK violation)
      */
     public function findByDashboardId(UuidInterface $dashboardId): CategoryCollection;
 
@@ -43,6 +44,7 @@ interface CategoryRepositoryInterface
 
     /**
      * Save a new category or update existing one
+     * @throws DashboardNotFoundException when dashboard doesn't exist (FK violation on insert)
      */
     public function save(Category $category): void;
 

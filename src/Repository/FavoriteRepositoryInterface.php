@@ -23,6 +23,8 @@ interface FavoriteRepositoryInterface
 
     /**
      * Add a link as favorite to a dashboard
+     * @throws DashboardNotFoundException when dashboard doesn't exist (FK violation)
+     * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
     public function addFavorite(UuidInterface $dashboardId, UuidInterface $linkId, int $sortOrder): Favorite;
 
@@ -56,6 +58,7 @@ interface FavoriteRepositoryInterface
 
     /**
      * Get all dashboards where a link is favorited
+     * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
     public function findDashboardsWithLinkAsFavorite(UuidInterface $linkId): DashboardCollection;
 }

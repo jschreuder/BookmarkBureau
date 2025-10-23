@@ -22,6 +22,7 @@ interface TagRepositoryInterface
 
     /**
      * Get all tags for a specific link
+     * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
     public function findTagsForLinkId(UuidInterface $link): TagCollection;
 
@@ -50,6 +51,8 @@ interface TagRepositoryInterface
 
     /**
      * Remove a tag from a link
+     * @throws LinkNotFoundException when link doesn't exist (FK violation)
+     * @throws TagNotFoundException when tag doesn't exist (FK violation)
      */
     public function removeFromLinkId(UuidInterface $linkId, string $tagName): void;
 
