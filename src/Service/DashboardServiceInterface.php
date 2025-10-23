@@ -3,9 +3,9 @@
 namespace jschreuder\BookmarkBureau\Service;
 
 use jschreuder\BookmarkBureau\Collection\DashboardCollection;
+use jschreuder\BookmarkBureau\Collection\DashboardWithCategoriesAndFavorites;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
-use jschreuder\BookmarkBureau\View\DashboardView;
 use Ramsey\Uuid\UuidInterface;
 
 interface DashboardServiceInterface
@@ -17,7 +17,7 @@ interface DashboardServiceInterface
      * 
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
-    public function getDashboardView(UuidInterface $dashboardId): DashboardView;
+    public function getDashboardView(UuidInterface $dashboardId): DashboardWithCategoriesAndFavorites;
 
     /**
      * List all dashboards (without detailed data)

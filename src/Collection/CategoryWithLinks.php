@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace jschreuder\BookmarkBureau\View;
+namespace jschreuder\BookmarkBureau\Collection;
 
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
