@@ -1,0 +1,569 @@
+<?php
+
+use jschreuder\BookmarkBureau\Entity\Value\Url;
+use jschreuder\BookmarkBureau\Entity\Value\Title;
+use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
+use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
+use Ramsey\Uuid\Rfc4122\UuidV4;
+
+describe('PdoLinkRepository', function () {
+
+    function createDatabase(): PDO {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec('PRAGMA foreign_keys = ON');
+
+        // Create schema
+        $pdo->exec('
+            CREATE TABLE links (
+                link_id BLOB PRIMARY KEY,
+                url TEXT NOT NULL,
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                icon TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE tags (
+                tag_name TEXT PRIMARY KEY
+            );
+
+            CREATE TABLE link_tags (
+                link_id BLOB NOT NULL,
+                tag_name TEXT NOT NULL,
+                PRIMARY KEY (link_id, tag_name),
+                FOREIGN KEY (link_id) REFERENCES links(link_id) ON DELETE CASCADE,
+                FOREIGN KEY (tag_name) REFERENCES tags(tag_name) ON DELETE CASCADE
+            );
+
+            CREATE TABLE dashboards (
+                dashboard_id BLOB PRIMARY KEY,
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                icon TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE categories (
+                category_id BLOB PRIMARY KEY,
+                dashboard_id BLOB NOT NULL,
+                title TEXT NOT NULL,
+                color TEXT,
+                sort_order INTEGER DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (dashboard_id) REFERENCES dashboards(dashboard_id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE category_links (
+                category_id BLOB NOT NULL,
+                link_id BLOB NOT NULL,
+                sort_order INTEGER DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (category_id, link_id),
+                FOREIGN KEY (link_id) REFERENCES links(link_id) ON DELETE CASCADE,
+                FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+            );
+        ');
+
+        return $pdo;
+    }
+
+    function insertLink(PDO $pdo, $link): void {
+        $stmt = $pdo->prepare(
+            'INSERT INTO links (link_id, url, title, description, icon, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([
+            $link->linkId->getBytes(),
+            (string) $link->url,
+            (string) $link->title,
+            $link->description,
+            $link->icon ? (string) $link->icon : null,
+            $link->createdAt->format('Y-m-d H:i:s'),
+            $link->updatedAt->format('Y-m-d H:i:s'),
+        ]);
+    }
+
+    describe('findById', function () {
+        test('finds and returns a link by ID', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+            $link = TestEntityFactory::createLink();
+
+            insertLink($pdo, $link);
+
+            $found = $repo->findById($link->linkId);
+
+            expect($found->linkId->toString())->toBe($link->linkId->toString());
+            expect((string) $found->url)->toBe((string) $link->url);
+            expect((string) $found->title)->toBe((string) $link->title);
+            expect($found->description)->toBe($link->description);
+        });
+
+        test('throws LinkNotFoundException when link does not exist', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+            $nonExistentId = UuidV4::uuid4();
+
+            expect(fn() => $repo->findById($nonExistentId))
+                ->toThrow(LinkNotFoundException::class);
+        });
+
+        test('correctly maps nullable icon field', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+            $linkWithoutIcon = TestEntityFactory::createLink(icon: null);
+
+            insertLink($pdo, $linkWithoutIcon);
+
+            $found = $repo->findById($linkWithoutIcon->linkId);
+
+            expect($found->icon)->toBeNull();
+        });
+    });
+
+    describe('findAll', function () {
+        test('returns all links ordered by created_at descending', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $link1 = TestEntityFactory::createLink(createdAt: new DateTimeImmutable('2024-01-01 10:00:00'));
+            $link2 = TestEntityFactory::createLink(createdAt: new DateTimeImmutable('2024-01-02 10:00:00'));
+            $link3 = TestEntityFactory::createLink(createdAt: new DateTimeImmutable('2024-01-03 10:00:00'));
+
+            insertLink($pdo, $link1);
+            insertLink($pdo, $link2);
+            insertLink($pdo, $link3);
+
+            $collection = $repo->findAll();
+
+            expect($collection)->toHaveCount(3);
+            $links = iterator_to_array($collection);
+            expect($links[0]->linkId->toString())->toBe($link3->linkId->toString());
+            expect($links[1]->linkId->toString())->toBe($link2->linkId->toString());
+            expect($links[2]->linkId->toString())->toBe($link1->linkId->toString());
+        });
+
+        test('respects limit parameter', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            for ($i = 0; $i < 5; $i++) {
+                insertLink($pdo, TestEntityFactory::createLink());
+            }
+
+            $collection = $repo->findAll(limit: 2);
+
+            expect($collection)->toHaveCount(2);
+        });
+
+        test('respects offset parameter', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $link1 = TestEntityFactory::createLink();
+            $link2 = TestEntityFactory::createLink();
+            $link3 = TestEntityFactory::createLink();
+
+            insertLink($pdo, $link1);
+            insertLink($pdo, $link2);
+            insertLink($pdo, $link3);
+
+            $collection = $repo->findAll(limit: 10, offset: 1);
+
+            expect($collection)->toHaveCount(2);
+        });
+
+        test('returns empty collection when no links exist', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $collection = $repo->findAll();
+
+            expect($collection)->toHaveCount(0);
+        });
+    });
+
+    describe('save', function () {
+        test('inserts a new link', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+            $link = TestEntityFactory::createLink();
+
+            $repo->save($link);
+
+            $found = $repo->findById($link->linkId);
+            expect((string) $found->url)->toBe((string) $link->url);
+            expect((string) $found->title)->toBe((string) $link->title);
+        });
+
+        test('updates an existing link', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+            $link = TestEntityFactory::createLink();
+
+            $repo->save($link);
+
+            $link->url = new Url('https://updated.com');
+            $link->title = new Title('Updated Title');
+            $repo->save($link);
+
+            $found = $repo->findById($link->linkId);
+            expect((string) $found->url)->toBe('https://updated.com');
+            expect((string) $found->title)->toBe('Updated Title');
+        });
+
+        test('preserves timestamps on insert', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+            $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
+            $updatedAt = new DateTimeImmutable('2024-01-01 12:00:00');
+            $link = TestEntityFactory::createLink(createdAt: $createdAt, updatedAt: $updatedAt);
+
+            $repo->save($link);
+
+            $found = $repo->findById($link->linkId);
+            expect($found->createdAt->format('Y-m-d H:i:s'))->toBe('2024-01-01 10:00:00');
+            expect($found->updatedAt->format('Y-m-d H:i:s'))->toBe('2024-01-01 12:00:00');
+        });
+
+        test('saves links with null icon', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+            $link = TestEntityFactory::createLink(icon: null);
+
+            $repo->save($link);
+
+            $found = $repo->findById($link->linkId);
+            expect($found->icon)->toBeNull();
+        });
+    });
+
+    describe('delete', function () {
+        test('deletes a link by ID', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+            $link = TestEntityFactory::createLink();
+
+            $repo->save($link);
+            $repo->delete($link);
+
+            expect(fn() => $repo->findById($link->linkId))
+                ->toThrow(LinkNotFoundException::class);
+        });
+
+        test('cascades delete to link_tags', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+            $link = TestEntityFactory::createLink();
+
+            $repo->save($link);
+            $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['test-tag']);
+            $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
+                ->execute([$link->linkId->getBytes(), 'test-tag']);
+
+            // Verify the tag was inserted
+            $checkStmt = $pdo->prepare('SELECT COUNT(*) as count FROM link_tags WHERE link_id = ?');
+            $checkStmt->execute([$link->linkId->getBytes()]);
+            $beforeDelete = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            expect($beforeDelete['count'])->toBe(1);
+
+            $repo->delete($link);
+
+            $stmt = $pdo->prepare('SELECT COUNT(*) as count FROM link_tags WHERE link_id = ?');
+            $stmt->execute([$link->linkId->getBytes()]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            expect($result['count'])->toBe(0);
+        });
+    });
+
+    describe('count', function () {
+        test('returns the total number of links', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            insertLink($pdo, TestEntityFactory::createLink());
+            insertLink($pdo, TestEntityFactory::createLink());
+            insertLink($pdo, TestEntityFactory::createLink());
+
+            expect($repo->count())->toBe(3);
+        });
+
+        test('returns 0 when no links exist', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            expect($repo->count())->toBe(0);
+        });
+    });
+
+    describe('findByTags', function () {
+        test('returns empty collection when given empty tag list', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $collection = $repo->findByTags([]);
+
+            expect($collection)->toHaveCount(0);
+        });
+
+        test('returns empty collection when no tags match', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $link = TestEntityFactory::createLink();
+            insertLink($pdo, $link);
+
+            $collection = $repo->findByTags(['nonexistent']);
+
+            expect($collection)->toHaveCount(0);
+        });
+
+        test('returns links matching all specified tags with AND condition', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $link1 = TestEntityFactory::createLink();
+            $link2 = TestEntityFactory::createLink();
+            $link3 = TestEntityFactory::createLink();
+
+            insertLink($pdo, $link1);
+            insertLink($pdo, $link2);
+            insertLink($pdo, $link3);
+
+            // Create tags
+            $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['php']);
+            $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['laravel']);
+            $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['testing']);
+
+            // Link 1: php, laravel
+            $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
+                ->execute([$link1->linkId->getBytes(), 'php']);
+            $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
+                ->execute([$link1->linkId->getBytes(), 'laravel']);
+
+            // Link 2: php, testing
+            $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
+                ->execute([$link2->linkId->getBytes(), 'php']);
+            $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
+                ->execute([$link2->linkId->getBytes(), 'testing']);
+
+            // Link 3: php, laravel, testing
+            $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
+                ->execute([$link3->linkId->getBytes(), 'php']);
+            $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
+                ->execute([$link3->linkId->getBytes(), 'laravel']);
+            $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
+                ->execute([$link3->linkId->getBytes(), 'testing']);
+
+            // Find links with both 'php' and 'laravel' (AND condition)
+            $collection = $repo->findByTags(['php', 'laravel']);
+
+            expect($collection)->toHaveCount(2);
+            $links = iterator_to_array($collection);
+            $ids = array_map(fn($link) => $link->linkId->toString(), $links);
+            expect(in_array($link1->linkId->toString(), $ids))->toBeTrue();
+            expect(in_array($link3->linkId->toString(), $ids))->toBeTrue();
+        });
+
+        test('finds links with single tag', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $link1 = TestEntityFactory::createLink();
+            $link2 = TestEntityFactory::createLink();
+
+            insertLink($pdo, $link1);
+            insertLink($pdo, $link2);
+
+            $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)')->execute(['php']);
+            $pdo->prepare('INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)')
+                ->execute([$link1->linkId->getBytes(), 'php']);
+
+            $collection = $repo->findByTags(['php']);
+
+            expect($collection)->toHaveCount(1);
+            $links = iterator_to_array($collection);
+            expect($links[0]->linkId->toString())->toBe($link1->linkId->toString());
+        });
+    });
+
+    describe('findByCategoryId', function () {
+        test('returns links in a category ordered by sort_order', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $dashboardId = UuidV4::uuid4();
+            $categoryId = UuidV4::uuid4();
+            $link1 = TestEntityFactory::createLink();
+            $link2 = TestEntityFactory::createLink();
+            $link3 = TestEntityFactory::createLink();
+
+            // Create dashboard first
+            $pdo->prepare('INSERT INTO dashboards (dashboard_id, title, description) VALUES (?, ?, ?)')
+                ->execute([$dashboardId->getBytes(), 'Test Dashboard', 'Test']);
+
+            // Create category
+            $pdo->prepare('INSERT INTO categories (category_id, dashboard_id, title) VALUES (?, ?, ?)')
+                ->execute([$categoryId->getBytes(), $dashboardId->getBytes(), 'Test Category']);
+
+            insertLink($pdo, $link1);
+            insertLink($pdo, $link2);
+            insertLink($pdo, $link3);
+
+            // Add links to category with different sort orders
+            $pdo->prepare('INSERT INTO category_links (category_id, link_id, sort_order) VALUES (?, ?, ?)')
+                ->execute([$categoryId->getBytes(), $link1->linkId->getBytes(), 3]);
+            $pdo->prepare('INSERT INTO category_links (category_id, link_id, sort_order) VALUES (?, ?, ?)')
+                ->execute([$categoryId->getBytes(), $link2->linkId->getBytes(), 1]);
+            $pdo->prepare('INSERT INTO category_links (category_id, link_id, sort_order) VALUES (?, ?, ?)')
+                ->execute([$categoryId->getBytes(), $link3->linkId->getBytes(), 2]);
+
+            $collection = $repo->findByCategoryId($categoryId);
+
+            expect($collection)->toHaveCount(3);
+            $links = iterator_to_array($collection);
+            expect($links[0]->linkId->toString())->toBe($link2->linkId->toString());
+            expect($links[1]->linkId->toString())->toBe($link3->linkId->toString());
+            expect($links[2]->linkId->toString())->toBe($link1->linkId->toString());
+        });
+
+        test('throws CategoryNotFoundException when category does not exist', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+            $nonExistentCategoryId = UuidV4::uuid4();
+
+            expect(fn() => $repo->findByCategoryId($nonExistentCategoryId))
+                ->toThrow(CategoryNotFoundException::class);
+        });
+
+        test('returns empty collection for category with no links', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $dashboardId = UuidV4::uuid4();
+            $categoryId = UuidV4::uuid4();
+
+            // Create dashboard first
+            $pdo->prepare('INSERT INTO dashboards (dashboard_id, title, description) VALUES (?, ?, ?)')
+                ->execute([$dashboardId->getBytes(), 'Test Dashboard', 'Test']);
+
+            $pdo->prepare('INSERT INTO categories (category_id, dashboard_id, title) VALUES (?, ?, ?)')
+                ->execute([$categoryId->getBytes(), $dashboardId->getBytes(), 'Empty Category']);
+
+            $collection = $repo->findByCategoryId($categoryId);
+
+            expect($collection)->toHaveCount(0);
+        });
+    });
+
+    describe('search', function () {
+        test('searches links by title using LIKE', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $link1 = TestEntityFactory::createLink(
+                title: new Title('PHP Tutorial'),
+                description: 'Learn programming'
+            );
+            $link2 = TestEntityFactory::createLink(
+                title: new Title('JavaScript Guide'),
+                description: 'Learn JavaScript'
+            );
+            $link3 = TestEntityFactory::createLink(
+                title: new Title('Laravel Framework'),
+                description: 'Build web apps with PHP'
+            );
+
+            insertLink($pdo, $link1);
+            insertLink($pdo, $link2);
+            insertLink($pdo, $link3);
+
+            // Search for "PHP" should find link1 and link3
+            $collection = $repo->search('PHP');
+
+            expect($collection)->toHaveCount(2);
+            $links = iterator_to_array($collection);
+            $ids = array_map(fn($link) => $link->linkId->toString(), $links);
+            expect(in_array($link1->linkId->toString(), $ids))->toBeTrue();
+            expect(in_array($link3->linkId->toString(), $ids))->toBeTrue();
+        });
+
+        test('searches links by description using LIKE', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $link1 = TestEntityFactory::createLink(
+                title: new Title('Tutorial 1'),
+                description: 'Learn Laravel framework'
+            );
+            $link2 = TestEntityFactory::createLink(
+                title: new Title('Tutorial 2'),
+                description: 'Learn JavaScript'
+            );
+
+            insertLink($pdo, $link1);
+            insertLink($pdo, $link2);
+
+            $collection = $repo->search('Laravel');
+
+            expect($collection)->toHaveCount(1);
+            $links = iterator_to_array($collection);
+            expect($links[0]->linkId->toString())->toBe($link1->linkId->toString());
+        });
+
+        test('search is case-insensitive', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $link = TestEntityFactory::createLink(
+                title: new Title('PHP Tutorial'),
+                description: 'Learn PHP'
+            );
+
+            insertLink($pdo, $link);
+
+            // Search with different casing
+            $collection = $repo->search('php');
+
+            expect($collection)->toHaveCount(1);
+        });
+
+        test('returns empty collection when no matches found', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            $link = TestEntityFactory::createLink(
+                title: new Title('PHP Tutorial'),
+                description: 'Learn PHP'
+            );
+
+            insertLink($pdo, $link);
+
+            $collection = $repo->search('Python');
+
+            expect($collection)->toHaveCount(0);
+        });
+
+        test('respects limit parameter', function () {
+            $pdo = createDatabase();
+            $repo = new PdoLinkRepository($pdo);
+
+            for ($i = 0; $i < 5; $i++) {
+                insertLink($pdo, TestEntityFactory::createLink(
+                    title: new Title('Test Link ' . $i),
+                    description: 'Test content'
+                ));
+            }
+
+            $collection = $repo->search('Test', limit: 2);
+
+            expect($collection)->toHaveCount(2);
+        });
+    });
+
+});
