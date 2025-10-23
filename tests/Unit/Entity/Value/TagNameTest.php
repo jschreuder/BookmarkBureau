@@ -84,7 +84,7 @@ describe('TagName Value Object', function () {
             $tooLongName = str_repeat('a', 101);
 
             expect(fn() => new TagName($tooLongName))
-                ->toThrow(InvalidArgumentException::class, 'Tag name cannot exceed 50 characters');
+                ->toThrow(InvalidArgumentException::class, 'Tag name cannot exceed 100 characters');
         });
 
         test('throws exception for uppercase letters', function () {
