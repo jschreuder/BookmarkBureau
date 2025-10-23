@@ -6,7 +6,7 @@ use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('CategoryCreateAction', function () {
     describe('filter method', function () {
@@ -15,7 +15,7 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'dashboard_id' => "  {$dashboardId->toString()}  ",
@@ -32,7 +32,7 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'dashboard_id' => $dashboardId->toString(),
@@ -49,7 +49,7 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'dashboard_id' => $dashboardId->toString(),
@@ -80,7 +80,7 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'dashboard_id' => $dashboardId->toString(),
@@ -97,10 +97,10 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                'id' => UuidV4::uuid4()->toString(),
+                'id' => Uuid::uuid4()->toString(),
                 'dashboard_id' => $dashboardId->toString(),
                 'title' => 'Test Category',
                 'color' => null,
@@ -117,7 +117,7 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'dashboard_id' => $dashboardId->toString(),
@@ -139,7 +139,7 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'dashboard_id' => $dashboardId->toString(),
@@ -161,7 +161,7 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'dashboard_id' => $dashboardId->toString(),
@@ -179,7 +179,7 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'dashboard_id' => $dashboardId->toString(),
@@ -214,7 +214,7 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'dashboard_id' => $dashboardId->toString(),
@@ -232,7 +232,7 @@ describe('CategoryCreateAction', function () {
             $inputSpec = new CategoryInputSpec();
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'dashboard_id' => $dashboardId->toString(),
@@ -272,7 +272,7 @@ describe('CategoryCreateAction', function () {
     describe('execute method', function () {
         test('executes with valid data and returns formatted category', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $category = TestEntityFactory::createCategory(
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: new HexColor('#FF0000')
@@ -304,7 +304,7 @@ describe('CategoryCreateAction', function () {
 
         test('returns created_at and updated_at in ISO 8601 format', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $category = TestEntityFactory::createCategory(
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: new HexColor('#FF0000')
@@ -330,7 +330,7 @@ describe('CategoryCreateAction', function () {
 
         test('returns correct category service parameters with color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $category = TestEntityFactory::createCategory(
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: new HexColor('#FF0000')
@@ -356,7 +356,7 @@ describe('CategoryCreateAction', function () {
 
         test('returns correct category service parameters with null color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $category = TestEntityFactory::createCategory(
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: null
@@ -382,7 +382,7 @@ describe('CategoryCreateAction', function () {
 
         test('converts string dashboard_id to UUID before passing to service', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $category = TestEntityFactory::createCategory(
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId)
             );
@@ -409,7 +409,7 @@ describe('CategoryCreateAction', function () {
     describe('integration scenarios', function () {
         test('full workflow: filter, validate, and execute', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $category = TestEntityFactory::createCategory(
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: new HexColor('#FF0000')
@@ -444,7 +444,7 @@ describe('CategoryCreateAction', function () {
 
         test('full workflow with null color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $category = TestEntityFactory::createCategory(
                 dashboard: TestEntityFactory::createDashboard(id: $dashboardId),
                 color: null

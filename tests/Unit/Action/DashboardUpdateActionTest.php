@@ -6,7 +6,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('DashboardUpdateAction', function () {
     describe('filter method', function () {
@@ -15,7 +15,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => "  {$dashboardId->toString()}  ",
@@ -32,7 +32,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $dashboardId->toString(),
@@ -49,7 +49,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $dashboardId->toString(),
@@ -66,7 +66,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $dashboardId->toString(),
@@ -97,7 +97,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $dashboardId->toString(),
@@ -116,7 +116,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'id' => $dashboardId->toString(),
@@ -138,7 +138,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'id' => $dashboardId->toString(),
@@ -160,7 +160,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'id' => $dashboardId->toString(),
@@ -216,7 +216,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'id' => $dashboardId->toString(),
@@ -234,7 +234,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'id' => $dashboardId->toString(),
@@ -252,7 +252,7 @@ describe('DashboardUpdateAction', function () {
             $inputSpec = new DashboardInputSpec();
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardUpdateAction($dashboardService, $inputSpec, $outputSpec);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             $data = [
                 'id' => $dashboardId->toString(),
@@ -309,7 +309,7 @@ describe('DashboardUpdateAction', function () {
     describe('execute method', function () {
         test('executes with valid data and returns formatted dashboard', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: new Icon('test-icon'));
 
             $dashboardService->shouldReceive('updateDashboard')
@@ -337,7 +337,7 @@ describe('DashboardUpdateAction', function () {
 
         test('returns created_at and updated_at in ISO 8601 format', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: new Icon('test-icon'));
 
             $dashboardService->shouldReceive('updateDashboard')
@@ -360,7 +360,7 @@ describe('DashboardUpdateAction', function () {
 
         test('returns correct dashboard service parameters with icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: new Icon('test-icon'));
 
             $dashboardService->shouldReceive('updateDashboard')
@@ -383,7 +383,7 @@ describe('DashboardUpdateAction', function () {
 
         test('returns correct dashboard service parameters with null icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: null);
 
             $dashboardService->shouldReceive('updateDashboard')
@@ -406,7 +406,7 @@ describe('DashboardUpdateAction', function () {
 
         test('converts string id to UUID before passing to service', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
 
             $dashboardService->shouldReceive('updateDashboard')
@@ -431,7 +431,7 @@ describe('DashboardUpdateAction', function () {
     describe('integration scenarios', function () {
         test('full workflow: filter, validate, and execute', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: new Icon('test-icon'));
 
             $dashboardService->shouldReceive('updateDashboard')
@@ -463,7 +463,7 @@ describe('DashboardUpdateAction', function () {
 
         test('full workflow with null icon', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId, icon: null);
 
             $dashboardService->shouldReceive('updateDashboard')
@@ -495,7 +495,7 @@ describe('DashboardUpdateAction', function () {
 
         test('full workflow filters and validates id correctly', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
 
             $dashboardService->shouldReceive('updateDashboard')

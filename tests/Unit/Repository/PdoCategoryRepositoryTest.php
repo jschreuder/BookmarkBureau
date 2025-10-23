@@ -9,7 +9,7 @@ use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Repository\PdoCategoryRepository;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('PdoCategoryRepository', function () {
 
@@ -161,7 +161,7 @@ describe('PdoCategoryRepository', function () {
         test('throws CategoryNotFoundException when category does not exist', function () {
             $pdo = createCategoryDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
-            $nonExistentId = UuidV4::uuid4();
+            $nonExistentId = Uuid::uuid4();
 
             expect(fn() => $repo->findById($nonExistentId))
                 ->toThrow(CategoryNotFoundException::class);
@@ -171,7 +171,7 @@ describe('PdoCategoryRepository', function () {
             $pdo = createCategoryDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
             $dashboard = TestEntityFactory::createDashboard();
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             insertTestDashboardForCategory($pdo, $dashboard);
             $pdo->prepare('INSERT INTO categories (category_id, dashboard_id, title, created_at, updated_at)
@@ -246,7 +246,7 @@ describe('PdoCategoryRepository', function () {
         test('throws DashboardNotFoundException when dashboard does not exist', function () {
             $pdo = createCategoryDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
-            $nonExistentId = UuidV4::uuid4();
+            $nonExistentId = Uuid::uuid4();
 
             expect(fn() => $repo->findByDashboardId($nonExistentId))
                 ->toThrow(DashboardNotFoundException::class);
@@ -306,7 +306,7 @@ describe('PdoCategoryRepository', function () {
         test('throws DashboardNotFoundException on FK violation', function () {
             $pdo = createCategoryDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
-            $nonExistentDashboard = TestEntityFactory::createDashboard(id: UuidV4::uuid4());
+            $nonExistentDashboard = TestEntityFactory::createDashboard(id: Uuid::uuid4());
             $category = TestEntityFactory::createCategory(dashboard: $nonExistentDashboard);
 
             expect(fn() => $repo->save($category))
@@ -408,7 +408,7 @@ describe('PdoCategoryRepository', function () {
             $pdo = createCategoryDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
             $link = TestEntityFactory::createLink();
-            $nonExistentCategoryId = UuidV4::uuid4();
+            $nonExistentCategoryId = Uuid::uuid4();
 
             insertTestLinkForCategory($pdo, $link);
 
@@ -421,7 +421,7 @@ describe('PdoCategoryRepository', function () {
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
             $dashboard = TestEntityFactory::createDashboard();
             $category = TestEntityFactory::createCategory(dashboard: $dashboard);
-            $nonExistentLinkId = UuidV4::uuid4();
+            $nonExistentLinkId = Uuid::uuid4();
 
             insertTestDashboardForCategory($pdo, $dashboard);
             $repo->save($category);
@@ -453,7 +453,7 @@ describe('PdoCategoryRepository', function () {
             $pdo = createCategoryDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
             $link = TestEntityFactory::createLink();
-            $nonExistentCategoryId = UuidV4::uuid4();
+            $nonExistentCategoryId = Uuid::uuid4();
 
             insertTestLinkForCategory($pdo, $link);
 
@@ -466,7 +466,7 @@ describe('PdoCategoryRepository', function () {
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
             $dashboard = TestEntityFactory::createDashboard();
             $category = TestEntityFactory::createCategory(dashboard: $dashboard);
-            $nonExistentLinkId = UuidV4::uuid4();
+            $nonExistentLinkId = Uuid::uuid4();
 
             insertTestDashboardForCategory($pdo, $dashboard);
             $repo->save($category);
@@ -548,7 +548,7 @@ describe('PdoCategoryRepository', function () {
             $pdo = createCategoryDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
             $link = TestEntityFactory::createLink();
-            $nonExistentCategoryId = UuidV4::uuid4();
+            $nonExistentCategoryId = Uuid::uuid4();
 
             insertTestLinkForCategory($pdo, $link);
 
@@ -561,7 +561,7 @@ describe('PdoCategoryRepository', function () {
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
             $dashboard = TestEntityFactory::createDashboard();
             $category = TestEntityFactory::createCategory(dashboard: $dashboard);
-            $nonExistentLinkId = UuidV4::uuid4();
+            $nonExistentLinkId = Uuid::uuid4();
 
             insertTestDashboardForCategory($pdo, $dashboard);
             $repo->save($category);
@@ -610,7 +610,7 @@ describe('PdoCategoryRepository', function () {
             $pdo = createCategoryDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
             $link = TestEntityFactory::createLink();
-            $nonExistentCategoryId = UuidV4::uuid4();
+            $nonExistentCategoryId = Uuid::uuid4();
 
             insertTestLinkForCategory($pdo, $link);
 
@@ -779,7 +779,7 @@ describe('PdoCategoryRepository', function () {
         test('throws CategoryNotFoundException when category does not exist', function () {
             $pdo = createCategoryDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories($pdo);
-            $nonExistentId = UuidV4::uuid4();
+            $nonExistentId = Uuid::uuid4();
 
             expect(fn() => $repo->findCategoryLinksForCategoryId($nonExistentId))
                 ->toThrow(CategoryNotFoundException::class);

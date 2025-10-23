@@ -4,7 +4,7 @@ use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe('Category Entity', function () {
@@ -12,7 +12,7 @@ describe('Category Entity', function () {
 
     describe('construction', function () {
         test('creates a category with all properties', function () {
-            $id = UuidV4::uuid4();
+            $id = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard();
             $title = new Title('Test Category');
             $color = new HexColor('#FF5733');
@@ -26,7 +26,7 @@ describe('Category Entity', function () {
         });
 
         test('stores all properties correctly during construction', function () {
-            $id = UuidV4::uuid4();
+            $id = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard();
             $title = new Title('Test Category');
             $color = new HexColor('#FF5733');
@@ -48,7 +48,7 @@ describe('Category Entity', function () {
 
     describe('ID getter', function () {
         test('getting categoryId returns the UUID', function () {
-            $id = UuidV4::uuid4();
+            $id = Uuid::uuid4();
             $category = TestEntityFactory::createCategory(id: $id);
 
             expect($category->categoryId)->toBe($id);
@@ -276,7 +276,7 @@ describe('Category Entity', function () {
         test('categoryId cannot be modified', function () {
             $category = TestEntityFactory::createCategory();
 
-            expect(fn() => $category->categoryId = UuidV4::uuid4())
+            expect(fn() => $category->categoryId = Uuid::uuid4())
                 ->toThrow(Error::class);
         });
     });

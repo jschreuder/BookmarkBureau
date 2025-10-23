@@ -1,13 +1,13 @@
 <?php
 
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('LinkNotFoundException', function () {
 
     describe('forId factory method', function () {
         test('creates exception with correct message', function () {
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             $exception = LinkNotFoundException::forId($linkId);
 
             expect($exception)->toBeInstanceOf(LinkNotFoundException::class);
@@ -15,29 +15,29 @@ describe('LinkNotFoundException', function () {
         });
 
         test('creates exception with 404 status code', function () {
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             $exception = LinkNotFoundException::forId($linkId);
 
             expect($exception->getCode())->toBe(404);
         });
 
         test('exception is throwable', function () {
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             expect(function () use ($linkId) {
                 throw LinkNotFoundException::forId($linkId);
             })->toThrow(LinkNotFoundException::class);
         });
 
         test('exception can be caught as RuntimeException', function () {
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             expect(function () use ($linkId) {
                 throw LinkNotFoundException::forId($linkId);
             })->toThrow(RuntimeException::class);
         });
 
         test('multiple calls with different IDs create independent exceptions', function () {
-            $id1 = UuidV4::uuid4();
-            $id2 = UuidV4::uuid4();
+            $id1 = Uuid::uuid4();
+            $id2 = Uuid::uuid4();
             $exception1 = LinkNotFoundException::forId($id1);
             $exception2 = LinkNotFoundException::forId($id2);
 

@@ -3,7 +3,6 @@
 namespace jschreuder\BookmarkBureau\Repository;
 
 use DateTimeImmutable;
-use InvalidArgumentException;
 use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
@@ -15,7 +14,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
-use Ramsey\Uuid\Nonstandard\Uuid;
+use Ramsey\Uuid\Uuid;
 
 final readonly class PdoLinkRepository implements LinkRepositoryInterface
 {

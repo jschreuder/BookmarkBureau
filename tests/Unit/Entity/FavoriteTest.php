@@ -3,15 +3,8 @@
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Entity\Link;
-use jschreuder\BookmarkBureau\Entity\Value\Icon;
-use jschreuder\BookmarkBureau\Entity\Value\Title;
-use jschreuder\BookmarkBureau\Entity\Value\Url;
-use Ramsey\Uuid\Rfc4122\UuidV4;
 
 describe('Favorite Entity', function () {
-
-
-
     describe('construction', function () {
         test('creates a favorite with all properties', function () {
             $dashboard = TestEntityFactory::createDashboard();

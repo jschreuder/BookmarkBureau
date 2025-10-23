@@ -3,13 +3,13 @@
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe('Dashboard Entity', function () {
     describe('construction', function () {
         test('creates a dashboard with all properties', function () {
-            $id = UuidV4::uuid4();
+            $id = Uuid::uuid4();
             $title = new Title('Test Dashboard');
             $description = 'Test Description';
             $icon = new Icon('test-icon');
@@ -22,7 +22,7 @@ describe('Dashboard Entity', function () {
         });
 
         test('stores all properties correctly during construction', function () {
-            $id = UuidV4::uuid4();
+            $id = Uuid::uuid4();
             $title = new Title('Test Dashboard');
             $description = 'Test Description';
             $icon = new Icon('test-icon');
@@ -42,7 +42,7 @@ describe('Dashboard Entity', function () {
 
     describe('ID getter', function () {
         test('getting dashboardId returns the UUID', function () {
-            $id = UuidV4::uuid4();
+            $id = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $id);
 
             expect($dashboard->dashboardId)->toBe($id);
@@ -263,7 +263,7 @@ describe('Dashboard Entity', function () {
         test('dashboardId cannot be modified', function () {
             $dashboard = TestEntityFactory::createDashboard();
 
-            expect(fn() => $dashboard->dashboardId = UuidV4::uuid4())
+            expect(fn() => $dashboard->dashboardId = Uuid::uuid4())
                 ->toThrow(Error::class);
         });
     });

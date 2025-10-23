@@ -7,7 +7,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('PdoLinkRepository', function () {
 
@@ -109,7 +109,7 @@ describe('PdoLinkRepository', function () {
         test('throws LinkNotFoundException when link does not exist', function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
-            $nonExistentId = UuidV4::uuid4();
+            $nonExistentId = Uuid::uuid4();
 
             expect(fn() => $repo->findById($nonExistentId))
                 ->toThrow(LinkNotFoundException::class);
@@ -399,8 +399,8 @@ describe('PdoLinkRepository', function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
-            $dashboardId = UuidV4::uuid4();
-            $categoryId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
+            $categoryId = Uuid::uuid4();
             $link1 = TestEntityFactory::createLink();
             $link2 = TestEntityFactory::createLink();
             $link3 = TestEntityFactory::createLink();
@@ -437,7 +437,7 @@ describe('PdoLinkRepository', function () {
         test('throws CategoryNotFoundException when category does not exist', function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
-            $nonExistentCategoryId = UuidV4::uuid4();
+            $nonExistentCategoryId = Uuid::uuid4();
 
             expect(fn() => $repo->findByCategoryId($nonExistentCategoryId))
                 ->toThrow(CategoryNotFoundException::class);
@@ -447,8 +447,8 @@ describe('PdoLinkRepository', function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository($pdo);
 
-            $dashboardId = UuidV4::uuid4();
-            $categoryId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
+            $categoryId = Uuid::uuid4();
 
             // Create dashboard first
             $pdo->prepare('INSERT INTO dashboards (dashboard_id, title, description) VALUES (?, ?, ?)')

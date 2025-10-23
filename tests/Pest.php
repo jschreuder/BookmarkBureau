@@ -50,7 +50,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
@@ -68,7 +68,7 @@ class TestEntityFactory
         ?DateTimeInterface $updatedAt = null
     ): Dashboard {
         return new Dashboard(
-            dashboardId: $id ?? UuidV4::uuid4(),
+            dashboardId: $id ?? Uuid::uuid4(),
             title: $title ?? new Title('Test Dashboard'),
             description: $description ?? 'Test Description',
             icon: $icon ?? new Icon('dashboard-icon'),
@@ -87,7 +87,7 @@ class TestEntityFactory
         ?DateTimeInterface $updatedAt = null
     ): Link {
         return new Link(
-            linkId: $id ?? UuidV4::uuid4(),
+            linkId: $id ?? Uuid::uuid4(),
             url: $url ?? new Url('https://example.com'),
             title: $title ?? new Title('Example Title'),
             description: $description ?? 'Example Description',
@@ -107,7 +107,7 @@ class TestEntityFactory
         ?DateTimeInterface $updatedAt = null
     ): Category {
         return new Category(
-            categoryId: $id ?? UuidV4::uuid4(),
+            categoryId: $id ?? Uuid::uuid4(),
             dashboard: $dashboard ?? self::createDashboard(),
             title: $title ?? new Title('Test Category'),
             color: $color,

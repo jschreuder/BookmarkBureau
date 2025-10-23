@@ -6,7 +6,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\InputSpec\LinkInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('LinkUpdateAction', function () {
     describe('filter method', function () {
@@ -15,7 +15,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => "  {$linkId->toString()}  ",
@@ -33,7 +33,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $linkId->toString(),
@@ -51,7 +51,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $linkId->toString(),
@@ -69,7 +69,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $linkId->toString(),
@@ -87,7 +87,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $linkId->toString(),
@@ -120,7 +120,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $linkId->toString(),
@@ -140,7 +140,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $data = [
                 'id' => $linkId->toString(),
@@ -163,7 +163,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $data = [
                 'id' => $linkId->toString(),
@@ -186,7 +186,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $data = [
                 'id' => $linkId->toString(),
@@ -245,7 +245,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $data = [
                 'id' => $linkId->toString(),
@@ -264,7 +264,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $data = [
                 'id' => $linkId->toString(),
@@ -283,7 +283,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $data = [
                 'id' => $linkId->toString(),
@@ -302,7 +302,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $data = [
                 'id' => $linkId->toString(),
@@ -321,7 +321,7 @@ describe('LinkUpdateAction', function () {
             $inputSpec = new LinkInputSpec();
             $outputSpec = new LinkOutputSpec();
             $action = new LinkUpdateAction($linkService, $inputSpec, $outputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $data = [
                 'id' => $linkId->toString(),
@@ -382,7 +382,7 @@ describe('LinkUpdateAction', function () {
     describe('execute method', function () {
         test('executes with valid data and returns formatted link', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(id: $linkId, icon: new Icon('test-icon'));
 
             $linkService->shouldReceive('updateLink')
@@ -412,7 +412,7 @@ describe('LinkUpdateAction', function () {
 
         test('returns created_at and updated_at in ISO 8601 format', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(id: $linkId, icon: new Icon('test-icon'));
 
             $linkService->shouldReceive('updateLink')
@@ -436,7 +436,7 @@ describe('LinkUpdateAction', function () {
 
         test('returns correct link service parameters with icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(id: $linkId, icon: new Icon('test-icon'));
 
             $linkService->shouldReceive('updateLink')
@@ -460,7 +460,7 @@ describe('LinkUpdateAction', function () {
 
         test('returns correct link service parameters with null icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(id: $linkId, icon: null);
 
             $linkService->shouldReceive('updateLink')
@@ -484,7 +484,7 @@ describe('LinkUpdateAction', function () {
 
         test('converts string id to UUID before passing to service', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(id: $linkId);
 
             $linkService->shouldReceive('updateLink')
@@ -510,7 +510,7 @@ describe('LinkUpdateAction', function () {
     describe('integration scenarios', function () {
         test('full workflow: filter, validate, and execute', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(id: $linkId, icon: new Icon('test-icon'));
 
             $linkService->shouldReceive('updateLink')
@@ -544,7 +544,7 @@ describe('LinkUpdateAction', function () {
 
         test('full workflow with null icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(id: $linkId, icon: null);
 
             $linkService->shouldReceive('updateLink')
@@ -577,7 +577,7 @@ describe('LinkUpdateAction', function () {
 
         test('full workflow filters and validates id correctly', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(id: $linkId);
 
             $linkService->shouldReceive('updateLink')

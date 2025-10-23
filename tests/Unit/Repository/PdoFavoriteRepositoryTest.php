@@ -6,7 +6,7 @@ use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
 use jschreuder\BookmarkBureau\Repository\PdoFavoriteRepository;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('PdoFavoriteRepository', function () {
 
@@ -177,7 +177,7 @@ describe('PdoFavoriteRepository', function () {
         test('throws DashboardNotFoundException when dashboard does not exist', function () {
             $pdo = createFavoriteDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories($pdo);
-            $nonExistentId = UuidV4::uuid4();
+            $nonExistentId = Uuid::uuid4();
 
             expect(fn() => $repo->findByDashboardId($nonExistentId))
                 ->toThrow(DashboardNotFoundException::class);
@@ -241,7 +241,7 @@ describe('PdoFavoriteRepository', function () {
             $pdo = createFavoriteDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories($pdo);
             $link = TestEntityFactory::createLink();
-            $nonExistentDashboardId = UuidV4::uuid4();
+            $nonExistentDashboardId = Uuid::uuid4();
 
             insertTestLinkForFavorite($pdo, $link);
 
@@ -253,7 +253,7 @@ describe('PdoFavoriteRepository', function () {
             $pdo = createFavoriteDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories($pdo);
             $dashboard = TestEntityFactory::createDashboard();
-            $nonExistentLinkId = UuidV4::uuid4();
+            $nonExistentLinkId = Uuid::uuid4();
 
             insertTestDashboardForFavorite($pdo, $dashboard);
 
@@ -449,7 +449,7 @@ describe('PdoFavoriteRepository', function () {
         test('throws LinkNotFoundException when link does not exist', function () {
             $pdo = createFavoriteDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories($pdo);
-            $nonExistentId = UuidV4::uuid4();
+            $nonExistentId = Uuid::uuid4();
 
             expect(fn() => $repo->findDashboardsWithLinkAsFavorite($nonExistentId))
                 ->toThrow(LinkNotFoundException::class);

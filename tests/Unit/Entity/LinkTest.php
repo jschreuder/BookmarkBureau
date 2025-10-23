@@ -4,14 +4,14 @@ use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe('Link Entity', function () {
 
     describe('construction', function () {
         test('creates a link with all properties', function () {
-            $id = UuidV4::uuid4();
+            $id = Uuid::uuid4();
             $url = new Url('https://example.com');
             $title = new Title('Test Title');
             $description = 'Test Description';
@@ -25,7 +25,7 @@ describe('Link Entity', function () {
         });
 
         test('stores all properties correctly during construction', function () {
-            $id = UuidV4::uuid4();
+            $id = Uuid::uuid4();
             $url = new Url('https://example.com');
             $title = new Title('Test Title');
             $description = 'Test Description';
@@ -47,7 +47,7 @@ describe('Link Entity', function () {
 
     describe('ID getter', function () {
         test('getId returns the UUID', function () {
-            $id = UuidV4::uuid4();
+            $id = Uuid::uuid4();
             $link = TestEntityFactory::createLink(id: $id);
 
             expect($link->linkId)->toBe($id);
@@ -302,7 +302,7 @@ describe('Link Entity', function () {
         test('linkId cannot be modified', function () {
             $link = TestEntityFactory::createLink();
 
-            expect(fn() => $link->linkId = UuidV4::uuid4())
+            expect(fn() => $link->linkId = Uuid::uuid4())
                 ->toThrow(Error::class);
         });
     });

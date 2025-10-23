@@ -4,9 +4,8 @@ use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
-use jschreuder\BookmarkBureau\Exception\DuplicateTagException;
 use jschreuder\BookmarkBureau\Repository\PdoTagRepository;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('PdoTagRepository', function () {
 
@@ -151,7 +150,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
 
             $tag1 = TestEntityFactory::createTag(tagName: new TagName('php'));
@@ -183,7 +182,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
 
             $collection = $repo->findTagsForLinkId($linkId);
@@ -195,7 +194,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $nonExistentLinkId = UuidV4::uuid4();
+            $nonExistentLinkId = Uuid::uuid4();
 
             expect(fn() => $repo->findTagsForLinkId($nonExistentLinkId))
                 ->toThrow(LinkNotFoundException::class);
@@ -335,7 +334,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
 
             $tag = TestEntityFactory::createTag(tagName: new TagName('cascadeable'));
@@ -363,7 +362,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
             $tag = TestEntityFactory::createTag(tagName: new TagName('assignable'));
             $repo->save($tag);
@@ -377,7 +376,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
 
             expect(fn() => $repo->assignToLinkId($linkId, 'nonexistent'))
@@ -391,7 +390,7 @@ describe('PdoTagRepository', function () {
             $tag = TestEntityFactory::createTag(tagName: new TagName('orphan'));
             $repo->save($tag);
 
-            $nonExistentLinkId = UuidV4::uuid4();
+            $nonExistentLinkId = Uuid::uuid4();
 
             expect(fn() => $repo->assignToLinkId($nonExistentLinkId, 'orphan'))
                 ->toThrow(LinkNotFoundException::class);
@@ -401,7 +400,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
             $tag = TestEntityFactory::createTag(tagName: new TagName('idempotent'));
             $repo->save($tag);
@@ -418,7 +417,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
             $tag = TestEntityFactory::createTag(tagName: new TagName('removable'));
             $repo->save($tag);
@@ -433,7 +432,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
             $tag = TestEntityFactory::createTag(tagName: new TagName('unassigned'));
             $repo->save($tag);
@@ -450,7 +449,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
             $tag = TestEntityFactory::createTag(tagName: new TagName('assigned'));
             $repo->save($tag);
@@ -463,7 +462,7 @@ describe('PdoTagRepository', function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo);
 
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
             $tag = TestEntityFactory::createTag(tagName: new TagName('unassigned'));
             $repo->save($tag);
@@ -478,7 +477,7 @@ describe('PdoTagRepository', function () {
             $tag = TestEntityFactory::createTag(tagName: new TagName('ghost'));
             $repo->save($tag);
 
-            $nonExistentLinkId = UuidV4::uuid4();
+            $nonExistentLinkId = Uuid::uuid4();
 
             expect($repo->isAssignedToLinkId($nonExistentLinkId, 'ghost'))->toBeFalse();
         });

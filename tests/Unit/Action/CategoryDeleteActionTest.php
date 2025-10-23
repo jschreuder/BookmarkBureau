@@ -4,7 +4,7 @@ use jschreuder\BookmarkBureau\Action\CategoryDeleteAction;
 use jschreuder\BookmarkBureau\InputSpec\IdInputSpec;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\Middle\Exception\ValidationFailedException;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('CategoryDeleteAction', function () {
     describe('filter method', function () {
@@ -12,7 +12,7 @@ describe('CategoryDeleteAction', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new IdInputSpec();
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => "  {$categoryId->toString()}  "
@@ -35,7 +35,7 @@ describe('CategoryDeleteAction', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new IdInputSpec();
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $categoryId->toString()
@@ -48,7 +48,7 @@ describe('CategoryDeleteAction', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new IdInputSpec();
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $categoryId->toString(),
@@ -69,7 +69,7 @@ describe('CategoryDeleteAction', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new IdInputSpec();
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $data = ['id' => $categoryId->toString()];
 
@@ -140,7 +140,7 @@ describe('CategoryDeleteAction', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new IdInputSpec();
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $data = ['id' => $categoryId->toString()];
 
@@ -156,7 +156,7 @@ describe('CategoryDeleteAction', function () {
     describe('execute method', function () {
         test('calls deleteCategory on service with correct UUID', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $categoryService->shouldReceive('deleteCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
@@ -174,7 +174,7 @@ describe('CategoryDeleteAction', function () {
 
         test('returns empty array after successful deletion', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $categoryService->shouldReceive('deleteCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class));
@@ -192,7 +192,7 @@ describe('CategoryDeleteAction', function () {
 
         test('converts string id to UUID before passing to service', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $categoryService->shouldReceive('deleteCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
@@ -210,7 +210,7 @@ describe('CategoryDeleteAction', function () {
 
         test('passes exact UUID to service', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $uuidCapture = null;
             $categoryService->shouldReceive('deleteCategory')
@@ -232,7 +232,7 @@ describe('CategoryDeleteAction', function () {
     describe('integration scenarios', function () {
         test('full workflow: filter, validate, and execute', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $categoryService->shouldReceive('deleteCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
@@ -258,7 +258,7 @@ describe('CategoryDeleteAction', function () {
 
         test('full workflow with extra fields in input', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $categoryService->shouldReceive('deleteCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
@@ -289,7 +289,7 @@ describe('CategoryDeleteAction', function () {
 
         test('full workflow filters and validates id correctly', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $categoryService->shouldReceive('deleteCategory')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class));

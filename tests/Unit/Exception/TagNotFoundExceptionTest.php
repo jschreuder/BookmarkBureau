@@ -1,7 +1,6 @@
 <?php
 
 use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
-use Ramsey\Uuid\Rfc4122\UuidV4;
 
 describe('TagNotFoundException', function () {
 

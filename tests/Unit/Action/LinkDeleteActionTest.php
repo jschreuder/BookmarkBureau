@@ -4,7 +4,7 @@ use jschreuder\BookmarkBureau\Action\LinkDeleteAction;
 use jschreuder\BookmarkBureau\InputSpec\IdInputSpec;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\Middle\Exception\ValidationFailedException;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('LinkDeleteAction', function () {
     describe('filter method', function () {
@@ -12,7 +12,7 @@ describe('LinkDeleteAction', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
             $action = new LinkDeleteAction($linkService, $inputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => "  {$linkId->toString()}  "
@@ -35,7 +35,7 @@ describe('LinkDeleteAction', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
             $action = new LinkDeleteAction($linkService, $inputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $linkId->toString()
@@ -48,7 +48,7 @@ describe('LinkDeleteAction', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
             $action = new LinkDeleteAction($linkService, $inputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
                 'id' => $linkId->toString(),
@@ -69,7 +69,7 @@ describe('LinkDeleteAction', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
             $action = new LinkDeleteAction($linkService, $inputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $data = ['id' => $linkId->toString()];
 
@@ -140,7 +140,7 @@ describe('LinkDeleteAction', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new IdInputSpec();
             $action = new LinkDeleteAction($linkService, $inputSpec);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $data = ['id' => $linkId->toString()];
 
@@ -156,7 +156,7 @@ describe('LinkDeleteAction', function () {
     describe('execute method', function () {
         test('calls deleteLink on service with correct UUID', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
@@ -174,7 +174,7 @@ describe('LinkDeleteAction', function () {
 
         test('returns empty array after successful deletion', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class));
@@ -192,7 +192,7 @@ describe('LinkDeleteAction', function () {
 
         test('converts string id to UUID before passing to service', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
@@ -210,7 +210,7 @@ describe('LinkDeleteAction', function () {
 
         test('passes exact UUID to service', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $uuidCapture = null;
             $linkService->shouldReceive('deleteLink')
@@ -232,7 +232,7 @@ describe('LinkDeleteAction', function () {
     describe('integration scenarios', function () {
         test('full workflow: filter, validate, and execute', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
@@ -258,7 +258,7 @@ describe('LinkDeleteAction', function () {
 
         test('full workflow with extra fields in input', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
@@ -289,7 +289,7 @@ describe('LinkDeleteAction', function () {
 
         test('full workflow filters and validates id correctly', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $linkService->shouldReceive('deleteLink')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class));

@@ -3,7 +3,7 @@
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
-use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 describe('PdoDashboardRepository', function () {
 
@@ -101,7 +101,7 @@ describe('PdoDashboardRepository', function () {
         test('throws DashboardNotFoundException when dashboard does not exist', function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository($pdo);
-            $nonExistentId = UuidV4::uuid4();
+            $nonExistentId = Uuid::uuid4();
 
             expect(fn() => $repo->findById($nonExistentId))
                 ->toThrow(DashboardNotFoundException::class);
@@ -110,7 +110,7 @@ describe('PdoDashboardRepository', function () {
         test('correctly maps nullable icon field', function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository($pdo);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             // Insert dashboard directly without icon
             $pdo->prepare('INSERT INTO dashboards (dashboard_id, title, description, created_at, updated_at)
@@ -244,7 +244,7 @@ describe('PdoDashboardRepository', function () {
         test('saves dashboards with null icon', function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository($pdo);
-            $dashboardId = UuidV4::uuid4();
+            $dashboardId = Uuid::uuid4();
 
             // Create dashboard and manually set icon to null before saving
             $dashboard = new \jschreuder\BookmarkBureau\Entity\Dashboard(
@@ -323,7 +323,7 @@ describe('PdoDashboardRepository', function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository($pdo);
             $dashboard = TestEntityFactory::createDashboard();
-            $categoryId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
 
             $repo->save($dashboard);
 
@@ -348,7 +348,7 @@ describe('PdoDashboardRepository', function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository($pdo);
             $dashboard = TestEntityFactory::createDashboard();
-            $linkId = UuidV4::uuid4();
+            $linkId = Uuid::uuid4();
 
             $repo->save($dashboard);
 
@@ -378,8 +378,8 @@ describe('PdoDashboardRepository', function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository($pdo);
             $dashboard = TestEntityFactory::createDashboard();
-            $categoryId = UuidV4::uuid4();
-            $linkId = UuidV4::uuid4();
+            $categoryId = Uuid::uuid4();
+            $linkId = Uuid::uuid4();
 
             $repo->save($dashboard);
 
