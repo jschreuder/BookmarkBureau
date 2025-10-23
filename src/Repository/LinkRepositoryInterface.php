@@ -3,6 +3,7 @@
 namespace jschreuder\BookmarkBureau\Repository;
 
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use Ramsey\Uuid\UuidInterface;
@@ -22,15 +23,16 @@ interface LinkRepositoryInterface
     public function search(string $query, int $limit = 100): LinkCollection;
 
     /**
-     * Find links by tag name
-     */
-    public function findByTag(string $tagName): LinkCollection;
-
-    /**
-     * Find links that match multiple tags (AND condition)
+     * Find links that match any number of tags (using AND condition)
      * @param string[] $tagNames
      */
     public function findByTags(array $tagNames): LinkCollection;
+
+    /**
+     * Get all links by category, ordered by sort_order
+     * @throws CategoryNotFoundException when category doesn't exist
+     */
+    public function findByCategory(Category $category): LinkCollection;
 
     /**
      * Save a new link or update existing one
@@ -41,11 +43,6 @@ interface LinkRepositoryInterface
      * Delete a link (cascades to link_tags, category_links, favorites)
      */
     public function delete(Link $link): void;
-
-    /**
-     * Check if a URL already exists in the database
-     */
-    public function urlExists(string $url): bool;
 
     /**
      * Count total number of links

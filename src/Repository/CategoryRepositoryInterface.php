@@ -4,12 +4,12 @@ namespace jschreuder\BookmarkBureau\Repository;
 
 use jschreuder\BookmarkBureau\Collection\CategoryCollection;
 use jschreuder\BookmarkBureau\Collection\CategoryLinkCollection;
-use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
+use jschreuder\BookmarkBureau\Entity\Dashboard;
+use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
-use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use Ramsey\Uuid\UuidInterface;
 
 interface CategoryRepositoryInterface
@@ -21,34 +21,27 @@ interface CategoryRepositoryInterface
 
     /**
      * Get all categories for a dashboard, ordered by sort_order
-     * @throws DashboardNotFoundException when dashboard doesn't exist
      */
-    public function findByDashboard(UuidInterface $dashboardId): CategoryCollection;
-
-    /**
-     * Get all links in a category, ordered by sort_order
-     * @throws CategoryNotFoundException when category doesn't exist
-     */
-    public function findLinksForCategory(UuidInterface $categoryId): LinkCollection;
+    public function findByDashboard(Dashboard $dashboard): CategoryCollection;
 
     /**
      * Get all CategoryLink associations for a category, ordered by sort_order
      * Useful when you need the CategoryLink entity with sort_order info
      * @throws CategoryNotFoundException when category doesn't exist
      */
-    public function findCategoryLinksForCategory(UuidInterface $categoryId): CategoryLinkCollection;
+    public function findCategoryLinksForCategory(Category $category): CategoryLinkCollection;
 
     /**
      * Get the highest sort_order value for categories in a dashboard
      * Returns -1 if dashboard has no categories
      */
-    public function getMaxSortOrderForDashboard(UuidInterface $dashboardId): int;
+    public function getMaxSortOrderForDashboard(Dashboard $dashboard): int;
 
     /**
      * Get the highest sort_order value for links in a category
      * Returns -1 if category has no links
      */
-    public function getMaxSortOrderForLinks(UuidInterface $categoryId): int;
+    public function getMaxSortOrderForLinks(Category $category): int;
 
     /**
      * Save a new category or update existing one
@@ -65,30 +58,30 @@ interface CategoryRepositoryInterface
      * @throws CategoryNotFoundException when category doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
-    public function addLink(UuidInterface $categoryId, UuidInterface $linkId, int $sortOrder): CategoryLink;
+    public function addLink(Category $category, Link $link, int $sortOrder): CategoryLink;
 
     /**
      * Remove a link from a category
      */
-    public function removeLink(UuidInterface $categoryId, UuidInterface $linkId): void;
+    public function removeLink(Category $category, Link $link): void;
 
     /**
      * Check if a link is in a category
      */
-    public function hasLink(UuidInterface $categoryId, UuidInterface $linkId): bool;
+    public function hasLink(Category $category, Link $link): bool;
 
     /**
      * Update sort order for a link in a category
      * @throws CategoryNotFoundException when category doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
-    public function updateLinkSortOrder(UuidInterface $categoryId, UuidInterface $linkId, int $sortOrder): void;
+    public function updateLinkSortOrder(Category $category, Link $link, int $sortOrder): void;
 
     /**
      * Reorder links in a category
      * @param array<string, int> $linkIdToSortOrder Map of link UUID strings to sort orders
      */
-    public function reorderLinks(UuidInterface $categoryId, array $linkIdToSortOrder): void;
+    public function reorderLinks(Category $category, array $linkIdToSortOrder): void;
 
     /**
      * Count total number of categories
@@ -98,5 +91,5 @@ interface CategoryRepositoryInterface
     /**
      * Count links in a category
      */
-    public function countLinksInCategory(UuidInterface $categoryId): int;
+    public function countLinksInCategory(Category $category): int;
 }
