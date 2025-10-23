@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace jschreuder\Middle\Response;
+namespace jschreuder\BookmarkBureau\Response;
 
 use jschreuder\BookmarkBureau\Exception\ResponseTransformerException;
 use Psr\Http\Message\ResponseInterface;
