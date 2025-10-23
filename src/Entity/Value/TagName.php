@@ -19,7 +19,7 @@ final readonly class TagName
         }
 
         if (mb_strlen($value) > 100) {
-            throw new InvalidArgumentException('Tag name cannot exceed 50 characters');
+            throw new InvalidArgumentException('Tag name cannot exceed 100 characters');
         }
 
         if (!preg_match(self::PATTERN, $value)) {
