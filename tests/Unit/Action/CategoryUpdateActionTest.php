@@ -4,6 +4,7 @@ use jschreuder\BookmarkBureau\Action\CategoryUpdateAction;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
@@ -12,7 +13,8 @@ describe('CategoryUpdateAction', function () {
         test('trims whitespace from id', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
             $categoryId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -29,7 +31,8 @@ describe('CategoryUpdateAction', function () {
         test('trims whitespace from title', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
             $categoryId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -46,7 +49,8 @@ describe('CategoryUpdateAction', function () {
         test('trims whitespace from color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
             $categoryId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -63,7 +67,8 @@ describe('CategoryUpdateAction', function () {
         test('handles missing keys with appropriate defaults', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([]);
 
@@ -77,7 +82,8 @@ describe('CategoryUpdateAction', function () {
         test('preserves null color as null', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
             $categoryId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -96,7 +102,8 @@ describe('CategoryUpdateAction', function () {
         test('passes validation with valid data', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
             $categoryId = UuidV4::uuid4();
             $dashboardId = UuidV4::uuid4();
 
@@ -119,7 +126,8 @@ describe('CategoryUpdateAction', function () {
         test('passes validation with null color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
             $categoryId = UuidV4::uuid4();
             $dashboardId = UuidV4::uuid4();
 
@@ -142,7 +150,8 @@ describe('CategoryUpdateAction', function () {
         test('throws validation error for invalid id UUID', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $data = [
                 'id' => 'not-a-uuid',
@@ -159,7 +168,8 @@ describe('CategoryUpdateAction', function () {
         test('throws validation error for empty id', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $data = [
                 'id' => '',
@@ -176,7 +186,8 @@ describe('CategoryUpdateAction', function () {
         test('throws validation error for empty title', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
             $categoryId = UuidV4::uuid4();
 
             $data = [
@@ -194,7 +205,8 @@ describe('CategoryUpdateAction', function () {
         test('throws validation error for title exceeding max length', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
             $categoryId = UuidV4::uuid4();
 
             $data = [
@@ -212,7 +224,8 @@ describe('CategoryUpdateAction', function () {
         test('throws validation error for invalid color format', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
             $categoryId = UuidV4::uuid4();
 
             $data = [
@@ -230,7 +243,8 @@ describe('CategoryUpdateAction', function () {
         test('includes multiple validation errors', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $data = [
                 'id' => 'not-uuid',
@@ -266,7 +280,8 @@ describe('CategoryUpdateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
                 'id' => $categoryId->toString(),
@@ -299,7 +314,8 @@ describe('CategoryUpdateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
                 'id' => $categoryId->toString(),
@@ -328,7 +344,8 @@ describe('CategoryUpdateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $action->execute([
                 'id' => $categoryId->toString(),
@@ -356,7 +373,8 @@ describe('CategoryUpdateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $action->execute([
                 'id' => $categoryId->toString(),
@@ -379,7 +397,8 @@ describe('CategoryUpdateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $action->execute([
                 'id' => $categoryId->toString(),
@@ -409,7 +428,8 @@ describe('CategoryUpdateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $rawData = [
                 'id' => "  {$categoryId->toString()}  ",
@@ -446,7 +466,8 @@ describe('CategoryUpdateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $rawData = [
                 'id' => $categoryId->toString(),
@@ -478,7 +499,8 @@ describe('CategoryUpdateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryUpdateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction($categoryService, $inputSpec, $outputSpec);
 
             $rawData = [
                 'id' => "  {$categoryId->toString()}  ",

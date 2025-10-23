@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Action;
 
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
+use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use Ramsey\Uuid\Uuid;
 
@@ -15,7 +16,8 @@ final readonly class LinkUpdateAction implements ActionInterface
 {
     public function __construct(
         private LinkServiceInterface $linkService,
-        private InputSpecInterface $inputSpec
+        private InputSpecInterface $inputSpec,
+        private OutputSpecInterface $outputSpec
     ) {}
 
     public function filter(array $rawData): array
@@ -38,14 +40,6 @@ final readonly class LinkUpdateAction implements ActionInterface
             description: $data['description'],
             icon: $data['icon']
         );
-        return [
-            'id' => $link->linkId->toString(),
-            'url' => $link->url->value,
-            'title' => $link->title->value,
-            'description' => $link->description,
-            'icon' => $link->icon?->value,
-            'created_at' => $link->createdAt->format(DateTimeInterface::ATOM),
-            'updated_at' => $link->updatedAt->format(DateTimeInterface::ATOM),
-        ];
+        return $this->outputSpec->transform($link);
     }
 }

@@ -4,6 +4,7 @@ use jschreuder\BookmarkBureau\Action\CategoryCreateAction;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
@@ -12,7 +13,8 @@ describe('CategoryCreateAction', function () {
         test('trims whitespace from dashboard_id', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -28,7 +30,8 @@ describe('CategoryCreateAction', function () {
         test('trims whitespace from title', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -44,7 +47,8 @@ describe('CategoryCreateAction', function () {
         test('trims whitespace from color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -60,7 +64,8 @@ describe('CategoryCreateAction', function () {
         test('handles missing keys with appropriate defaults', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([]);
 
@@ -73,7 +78,8 @@ describe('CategoryCreateAction', function () {
         test('preserves null color as null', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -89,7 +95,8 @@ describe('CategoryCreateAction', function () {
         test('excludes id field from filter', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $filtered = $action->filter([
@@ -108,7 +115,8 @@ describe('CategoryCreateAction', function () {
         test('passes validation with valid data', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -129,7 +137,8 @@ describe('CategoryCreateAction', function () {
         test('passes validation with null color', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -150,7 +159,8 @@ describe('CategoryCreateAction', function () {
         test('throws validation error for empty title', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -167,7 +177,8 @@ describe('CategoryCreateAction', function () {
         test('throws validation error for title exceeding max length', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -184,7 +195,8 @@ describe('CategoryCreateAction', function () {
         test('throws validation error for invalid dashboard_id', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
 
             $data = [
                 'dashboard_id' => 'not-a-uuid',
@@ -200,7 +212,8 @@ describe('CategoryCreateAction', function () {
         test('throws validation error for invalid color format', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -217,7 +230,8 @@ describe('CategoryCreateAction', function () {
         test('includes title error in validation exceptions', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
             $dashboardId = UuidV4::uuid4();
 
             $data = [
@@ -235,7 +249,8 @@ describe('CategoryCreateAction', function () {
         test('includes multiple validation errors', function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
 
             $data = [
                 'dashboard_id' => 'invalid',
@@ -268,7 +283,8 @@ describe('CategoryCreateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
                 'dashboard_id' => $dashboardId->toString(),
@@ -298,7 +314,8 @@ describe('CategoryCreateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
                 'dashboard_id' => $dashboardId->toString(),
@@ -324,7 +341,8 @@ describe('CategoryCreateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
 
             $action->execute([
                 'dashboard_id' => $dashboardId->toString(),
@@ -349,7 +367,8 @@ describe('CategoryCreateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
 
             $action->execute([
                 'dashboard_id' => $dashboardId->toString(),
@@ -373,7 +392,8 @@ describe('CategoryCreateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
 
             $action->execute([
                 'dashboard_id' => $dashboardId->toString(),
@@ -400,7 +420,8 @@ describe('CategoryCreateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
 
             $rawData = [
                 'dashboard_id' => "  {$dashboardId->toString()}  ",
@@ -434,7 +455,8 @@ describe('CategoryCreateAction', function () {
                 ->andReturn($category);
 
             $inputSpec = new CategoryInputSpec();
-            $action = new CategoryCreateAction($categoryService, $inputSpec);
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryCreateAction($categoryService, $inputSpec, $outputSpec);
 
             $rawData = [
                 'dashboard_id' => $dashboardId->toString(),

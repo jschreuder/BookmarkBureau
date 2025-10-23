@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Action;
 
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
+use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use Ramsey\Uuid\Uuid;
 
@@ -15,7 +16,8 @@ final readonly class CategoryUpdateAction implements ActionInterface
 {
     public function __construct(
         private CategoryServiceInterface $categoryService,
-        private InputSpecInterface $inputSpec
+        private InputSpecInterface $inputSpec,
+        private OutputSpecInterface $outputSpec
     ) {}
 
     public function filter(array $rawData): array
@@ -36,14 +38,6 @@ final readonly class CategoryUpdateAction implements ActionInterface
             title: $data['title'],
             color: $data['color']
         );
-        return [
-            'id' => $category->categoryId->toString(),
-            'dashboard_id' => $category->dashboard->dashboardId->toString(),
-            'title' => $category->title->value,
-            'color' => $category->color?->value,
-            'sort_order' => $category->sortOrder,
-            'created_at' => $category->createdAt->format(DateTimeInterface::ATOM),
-            'updated_at' => $category->updatedAt->format(DateTimeInterface::ATOM),
-        ];
+        return $this->outputSpec->transform($category);
     }
 }

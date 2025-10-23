@@ -4,6 +4,7 @@ use jschreuder\BookmarkBureau\Action\LinkCreateAction;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\InputSpec\LinkInputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 
 describe('LinkCreateAction', function () {
@@ -11,7 +12,8 @@ describe('LinkCreateAction', function () {
         test('trims whitespace from URL', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([
                 'url' => '  https://example.com  ',
@@ -26,7 +28,8 @@ describe('LinkCreateAction', function () {
         test('trims whitespace from title', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([
                 'url' => 'https://example.com',
@@ -41,7 +44,8 @@ describe('LinkCreateAction', function () {
         test('trims whitespace from description', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([
                 'url' => 'https://example.com',
@@ -56,7 +60,8 @@ describe('LinkCreateAction', function () {
         test('trims whitespace from icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([
                 'url' => 'https://example.com',
@@ -71,7 +76,8 @@ describe('LinkCreateAction', function () {
         test('handles missing keys with empty strings', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([]);
 
@@ -84,7 +90,8 @@ describe('LinkCreateAction', function () {
         test('preserves null icon as null', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([
                 'url' => 'https://example.com',
@@ -101,7 +108,8 @@ describe('LinkCreateAction', function () {
         test('passes validation with valid data', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => 'https://example.com',
@@ -121,7 +129,8 @@ describe('LinkCreateAction', function () {
         test('passes validation with empty description', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => 'https://example.com',
@@ -141,7 +150,8 @@ describe('LinkCreateAction', function () {
         test('passes validation with null icon', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => 'https://example.com',
@@ -161,7 +171,8 @@ describe('LinkCreateAction', function () {
         test('throws validation error for invalid URL', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => '  ht!tp://invalid',
@@ -177,7 +188,8 @@ describe('LinkCreateAction', function () {
         test('throws validation error for empty URL', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => '',
@@ -193,7 +205,8 @@ describe('LinkCreateAction', function () {
         test('throws validation error for empty title', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => 'https://example.com',
@@ -209,7 +222,8 @@ describe('LinkCreateAction', function () {
         test('throws validation error for title exceeding max length', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => 'https://example.com',
@@ -225,7 +239,8 @@ describe('LinkCreateAction', function () {
         test('throws validation error for missing description', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => 'https://example.com',
@@ -240,7 +255,8 @@ describe('LinkCreateAction', function () {
         test('includes URL error in validation exceptions', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => 'ht!tp://in-valid',
@@ -257,7 +273,8 @@ describe('LinkCreateAction', function () {
         test('includes title error in validation exceptions', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => 'https://example.com',
@@ -274,7 +291,8 @@ describe('LinkCreateAction', function () {
         test('includes multiple validation errors', function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
             $inputSpec = new LinkInputSpec();
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $outputSpec = new LinkOutputSpec();
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $data = [
                 'url' => 'ht!tp://inv',
@@ -303,8 +321,9 @@ describe('LinkCreateAction', function () {
                 ->with('https://example.com', 'Test Title', 'Test Description', 'test-icon')
                 ->andReturn($link);
             $inputSpec = new LinkInputSpec();
+            $outputSpec = new LinkOutputSpec();
 
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
                 'url' => 'https://example.com',
@@ -329,8 +348,9 @@ describe('LinkCreateAction', function () {
             $linkService->shouldReceive('createLink')
                 ->andReturn($link);
             $inputSpec = new LinkInputSpec();
+            $outputSpec = new LinkOutputSpec();
 
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
                 'url' => 'https://example.com',
@@ -351,8 +371,9 @@ describe('LinkCreateAction', function () {
                 ->with('https://example.com', 'Test Title', 'Long description', 'test-icon')
                 ->andReturn($link);
             $inputSpec = new LinkInputSpec();
+            $outputSpec = new LinkOutputSpec();
 
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $action->execute([
                 'url' => 'https://example.com',
@@ -372,8 +393,9 @@ describe('LinkCreateAction', function () {
                 ->with('https://example.com', 'Test Title', 'Test Description', null)
                 ->andReturn($link);
             $inputSpec = new LinkInputSpec();
+            $outputSpec = new LinkOutputSpec();
 
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $action->execute([
                 'url' => 'https://example.com',
@@ -395,8 +417,9 @@ describe('LinkCreateAction', function () {
                 ->with('https://example.com', 'Test Title', 'Test Description', 'test-icon')
                 ->andReturn($link);
             $inputSpec = new LinkInputSpec();
+            $outputSpec = new LinkOutputSpec();
 
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $rawData = [
                 'url' => '  https://example.com  ',
@@ -426,8 +449,9 @@ describe('LinkCreateAction', function () {
                 ->with('https://example.com', 'Test Title', 'Test Description', null)
                 ->andReturn($link);
             $inputSpec = new LinkInputSpec();
+            $outputSpec = new LinkOutputSpec();
 
-            $action = new LinkCreateAction($linkService, $inputSpec);
+            $action = new LinkCreateAction($linkService, $inputSpec, $outputSpec);
 
             $rawData = [
                 'url' => 'https://example.com',

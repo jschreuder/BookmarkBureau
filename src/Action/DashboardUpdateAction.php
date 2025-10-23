@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Action;
 
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
+use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use Ramsey\Uuid\Uuid;
 
@@ -15,7 +16,8 @@ final readonly class DashboardUpdateAction implements ActionInterface
 {
     public function __construct(
         private DashboardServiceInterface $dashboardService,
-        private InputSpecInterface $inputSpec
+        private InputSpecInterface $inputSpec,
+        private OutputSpecInterface $outputSpec
     ) {}
 
     public function filter(array $rawData): array
@@ -37,13 +39,6 @@ final readonly class DashboardUpdateAction implements ActionInterface
             description: $data['description'],
             icon: $data['icon']
         );
-        return [
-            'id' => $dashboard->dashboardId->toString(),
-            'title' => $dashboard->title->value,
-            'description' => $dashboard->description,
-            'icon' => $dashboard->icon?->value,
-            'created_at' => $dashboard->createdAt->format(DateTimeInterface::ATOM),
-            'updated_at' => $dashboard->updatedAt->format(DateTimeInterface::ATOM),
-        ];
+        return $this->outputSpec->transform($dashboard);
     }
 }
