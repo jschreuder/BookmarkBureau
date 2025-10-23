@@ -3,7 +3,6 @@
 namespace jschreuder\BookmarkBureau\Repository;
 
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
-use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use Ramsey\Uuid\UuidInterface;
@@ -32,7 +31,7 @@ interface LinkRepositoryInterface
      * Get all links by category, ordered by sort_order
      * @throws CategoryNotFoundException when category doesn't exist
      */
-    public function findByCategory(Category $category): LinkCollection;
+    public function findByCategoryId(UuidInterface $categoryId): LinkCollection;
 
     /**
      * Save a new link or update existing one
