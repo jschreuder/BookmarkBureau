@@ -4,7 +4,10 @@ namespace jschreuder\BookmarkBureau;
 
 use jschreuder\Middle\Router\RouterInterface;
 use jschreuder\Middle\Router\RoutingProviderInterface;
-use jschreuder\BookmarkBureau\Controller\ExampleController;
+use jschreuder\Middle\Controller\ControllerInterface;
+use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 class GeneralRoutingProvider implements RoutingProviderInterface
 {
@@ -17,8 +20,11 @@ class GeneralRoutingProvider implements RoutingProviderInterface
 
     public function registerRoutes(RouterInterface $router): void
     {
-        $router->get('home', '/', function () {
-            return new ExampleController();
+        $router->get('home', '/', fn () => new class implements ControllerInterface {
+            public function execute(ServerRequestInterface $request): ResponseInterface
+            {
+                return new JsonResponse(['message' => 'Hello world!']);
+            }
         });
     }
 }
