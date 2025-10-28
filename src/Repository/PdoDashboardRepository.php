@@ -10,6 +10,7 @@ use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
+use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 
 final readonly class PdoDashboardRepository implements DashboardRepositoryInterface
@@ -76,8 +77,8 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
                 ':title' => (string) $dashboard->title,
                 ':description' => $dashboard->description,
                 ':icon' => $dashboard->icon ? (string) $dashboard->icon : null,
-                ':created_at' => $dashboard->createdAt->format('Y-m-d H:i:s'),
-                ':updated_at' => $dashboard->updatedAt->format('Y-m-d H:i:s'),
+                ':created_at' => $dashboard->createdAt->format(SqlFormat::TIMESTAMP),
+                ':updated_at' => $dashboard->updatedAt->format(SqlFormat::TIMESTAMP),
             ]);
         } else {
             // Update existing dashboard
@@ -92,7 +93,7 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
                 ':title' => (string) $dashboard->title,
                 ':description' => $dashboard->description,
                 ':icon' => $dashboard->icon ? (string) $dashboard->icon : null,
-                ':updated_at' => $dashboard->updatedAt->format('Y-m-d H:i:s'),
+                ':updated_at' => $dashboard->updatedAt->format(SqlFormat::TIMESTAMP),
             ]);
         }
     }

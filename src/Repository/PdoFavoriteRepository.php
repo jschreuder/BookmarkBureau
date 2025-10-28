@@ -16,6 +16,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 
 final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterface
@@ -88,7 +89,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
                 ':dashboard_id' => $dashboardId->getBytes(),
                 ':link_id' => $linkId->getBytes(),
                 ':sort_order' => $sortOrder,
-                ':created_at' => $now->format('Y-m-d H:i:s'),
+                ':created_at' => $now->format(SqlFormat::TIMESTAMP),
             ]);
 
             return new Favorite(

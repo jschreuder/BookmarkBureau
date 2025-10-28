@@ -14,6 +14,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
+use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 
 final readonly class PdoLinkRepository implements LinkRepositoryInterface
@@ -166,8 +167,8 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
                 ':title' => (string) $link->title,
                 ':description' => $link->description,
                 ':icon' => $link->icon ? (string) $link->icon : null,
-                ':created_at' => $link->createdAt->format('Y-m-d H:i:s'),
-                ':updated_at' => $link->updatedAt->format('Y-m-d H:i:s'),
+                ':created_at' => $link->createdAt->format(SqlFormat::TIMESTAMP),
+                ':updated_at' => $link->updatedAt->format(SqlFormat::TIMESTAMP),
             ]);
         } else {
             // Update existing link
@@ -183,7 +184,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
                 ':title' => (string) $link->title,
                 ':description' => $link->description,
                 ':icon' => $link->icon ? (string) $link->icon : null,
-                ':updated_at' => $link->updatedAt->format('Y-m-d H:i:s'),
+                ':updated_at' => $link->updatedAt->format(SqlFormat::TIMESTAMP),
             ]);
         }
     }

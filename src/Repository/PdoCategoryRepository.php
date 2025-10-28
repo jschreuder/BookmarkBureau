@@ -19,6 +19,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 
 final readonly class PdoCategoryRepository implements CategoryRepositoryInterface
@@ -159,8 +160,8 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
                     ':title' => (string) $category->title,
                     ':color' => $category->color ? (string) $category->color : null,
                     ':sort_order' => $category->sortOrder,
-                    ':created_at' => $category->createdAt->format('Y-m-d H:i:s'),
-                    ':updated_at' => $category->updatedAt->format('Y-m-d H:i:s'),
+                    ':created_at' => $category->createdAt->format(SqlFormat::TIMESTAMP),
+                    ':updated_at' => $category->updatedAt->format(SqlFormat::TIMESTAMP),
                 ]);
             } catch (\PDOException $e) {
                 if (str_contains($e->getMessage(), 'FOREIGN KEY constraint failed') ||
@@ -181,7 +182,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
                 ':title' => (string) $category->title,
                 ':color' => $category->color ? (string) $category->color : null,
                 ':sort_order' => $category->sortOrder,
-                ':updated_at' => $category->updatedAt->format('Y-m-d H:i:s'),
+                ':updated_at' => $category->updatedAt->format(SqlFormat::TIMESTAMP),
             ]);
         }
     }
@@ -217,7 +218,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
                 ':category_id' => $categoryId->getBytes(),
                 ':link_id' => $linkId->getBytes(),
                 ':sort_order' => $sortOrder,
-                ':created_at' => $now->format('Y-m-d H:i:s'),
+                ':created_at' => $now->format(SqlFormat::TIMESTAMP),
             ]);
 
             return new CategoryLink(
