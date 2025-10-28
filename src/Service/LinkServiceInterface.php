@@ -11,7 +11,7 @@ interface LinkServiceInterface
 {
     /**
      * Get a link by ID
-     * 
+     *
      * @throws LinkNotFoundException when link doesn't exist
      */
     public function getLink(UuidInterface $linkId): Link;
@@ -28,7 +28,7 @@ interface LinkServiceInterface
 
     /**
      * Update an existing link
-     * 
+     *
      * @throws LinkNotFoundException when link doesn't exist
      */
     public function updateLink(
@@ -41,7 +41,7 @@ interface LinkServiceInterface
 
     /**
      * Delete a link (cascades to tags, category links, and favorites)
-     * 
+     *
      * @throws LinkNotFoundException when link doesn't exist
      */
     public function deleteLink(UuidInterface $linkId): void;

@@ -12,10 +12,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Generic controller for simple CRUD operations
- * 
+ *
  * The Closure must always return an array that can be safely converted to JSON
  */
-final readonly class ActionController implements 
+final readonly class ActionController implements
     ControllerInterface,
     RequestFilterInterface,
     RequestValidatorInterface
@@ -39,7 +39,7 @@ final readonly class ActionController implements
         if (!is_null($id)) {
             $rawData['id'] = $id;
         }
-        
+
         // Return request with filtered body data
         return $request->withParsedBody($this->action->filter($rawData));
     }
@@ -54,7 +54,7 @@ final readonly class ActionController implements
     {
         $data = (array) $request->getParsedBody();
         $result = $this->action->execute($data);
-        
+
         return $this->responseTransformer->transform(
             data: [
                 'success' => true,

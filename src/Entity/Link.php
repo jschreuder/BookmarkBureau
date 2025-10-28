@@ -10,7 +10,7 @@ final class Link
 {
 
     public readonly UuidInterface $linkId;
-    
+
     public Value\Url $url {
         set {
             $this->url = $value;
@@ -24,14 +24,14 @@ final class Link
             $this->markAsUpdated();
         }
     }
-    
+
     public string $description {
         set {
             $this->description = $value;
             $this->markAsUpdated();
         }
     }
-    
+
     public ?Value\Icon $icon {
         set {
             $this->icon = $value;

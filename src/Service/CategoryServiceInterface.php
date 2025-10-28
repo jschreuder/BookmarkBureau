@@ -18,7 +18,7 @@ interface CategoryServiceInterface
 
     /**
      * Create a new category in a dashboard
-     * 
+     *
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     public function createCategory(
@@ -29,7 +29,7 @@ interface CategoryServiceInterface
 
     /**
      * Update an existing category
-     * 
+     *
      * @throws CategoryNotFoundException when category doesn't exist
      */
     public function updateCategory(
@@ -40,14 +40,14 @@ interface CategoryServiceInterface
 
     /**
      * Delete a category (cascades to category links)
-     * 
+     *
      * @throws CategoryNotFoundException when category doesn't exist
      */
     public function deleteCategory(UuidInterface $categoryId): void;
 
     /**
      * Reorder categories within a dashboard
-     * 
+     *
      * @param UuidInterface $dashboardId
      * @param array<string, int> $categoryIdToSortOrder Map of category UUID strings to sort orders
      */
@@ -55,7 +55,7 @@ interface CategoryServiceInterface
 
     /**
      * Add a link to a category
-     * 
+     *
      * @throws CategoryNotFoundException when category doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
@@ -63,7 +63,7 @@ interface CategoryServiceInterface
 
     /**
      * Remove a link from a category
-     * 
+     *
      * @throws CategoryNotFoundException when category doesn't exist
      */
     public function removeLinkFromCategory(UuidInterface $categoryId, UuidInterface $linkId): void;

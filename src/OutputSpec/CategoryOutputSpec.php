@@ -8,7 +8,7 @@ use jschreuder\BookmarkBureau\Entity\Category;
 final readonly class CategoryOutputSpec implements OutputSpecInterface
 {
     use OutputSpecTrait;
-    
+
     public function supports(object $data): bool
     {
         return $data instanceof Category;

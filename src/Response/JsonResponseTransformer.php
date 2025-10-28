@@ -9,7 +9,7 @@ use Throwable;
 
 /**
  * Transforms arrays into JSON HTTP responses
- * 
+ *
  * This is the primary ResponseTransformer for REST APIs, converting
  * array data into JSON-formatted HTTP responses with appropriate headers.
  */
@@ -17,7 +17,7 @@ final readonly class JsonResponseTransformer implements ResponseTransformerInter
 {
     /**
      * Transform array into JSON response
-     * 
+     *
      * @param array $data Array to serialize as JSON
      * @param int $statusCode HTTP status code
      * @param array<string, string> $headers Additional headers
@@ -31,7 +31,7 @@ final readonly class JsonResponseTransformer implements ResponseTransformerInter
     ): ResponseInterface {
         try {
             $response = new JsonResponse($data, $statusCode);
-            
+
             foreach ($headers as $name => $value) {
                 $response = $response->withHeader($name, $value);
             }
@@ -42,7 +42,7 @@ final readonly class JsonResponseTransformer implements ResponseTransformerInter
                 $exception
             );
         }
-        
+
         return $response;
     }
 }

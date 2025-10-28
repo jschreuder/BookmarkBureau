@@ -69,8 +69,8 @@ final class Filter
 
     public function htmlspecialchars(int $flags = ENT_QUOTES | ENT_HTML5, string $encoding = 'UTF-8'): self
     {
-        $this->value = is_string($this->value) 
-            ? htmlspecialchars($this->value, $flags, $encoding) 
+        $this->value = is_string($this->value)
+            ? htmlspecialchars($this->value, $flags, $encoding)
             : $this->value;
         return $this;
     }

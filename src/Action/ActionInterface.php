@@ -4,12 +4,12 @@ namespace jschreuder\BookmarkBureau\Action;
 
 /**
  * Application-layer component for processing input and executing operations
- * 
+ *
  * Defines a three-phase pattern:
  * 1. Filter - Transform raw input into clean data
  * 2. Validate - Check data against constraints
  * 3. Execute - Perform the business operation
- * 
+ *
  * Actions are composable and can be used from any context:
  * HTTP controllers, CLI commands or background jobs.
  */

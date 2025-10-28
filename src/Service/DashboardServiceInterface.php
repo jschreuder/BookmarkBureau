@@ -12,9 +12,9 @@ interface DashboardServiceInterface
 {
     /**
      * Get complete dashboard data for rendering
-     * 
+     *
      * Returns the dashboard with all categories (and their links) plus favorites
-     * 
+     *
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     public function getDashboardView(UuidInterface $dashboardId): DashboardWithCategoriesAndFavorites;
@@ -35,7 +35,7 @@ interface DashboardServiceInterface
 
     /**
      * Update an existing dashboard
-     * 
+     *
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     public function updateDashboard(
@@ -47,7 +47,7 @@ interface DashboardServiceInterface
 
     /**
      * Delete a dashboard (cascades to categories and favorites)
-     * 
+     *
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     public function deleteDashboard(UuidInterface $dashboardId): void;

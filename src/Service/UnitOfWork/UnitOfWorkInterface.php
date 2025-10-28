@@ -6,7 +6,7 @@ use Closure;
 
 /**
  * Units of work control transactions and allow them to be managed. These are
- * part of the service layer and should only be controlled from the service 
+ * part of the service layer and should only be controlled from the service
  * layer as no other layer has the necessary control or knowledge of any
  * transaction.
  */

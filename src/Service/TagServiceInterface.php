@@ -18,35 +18,35 @@ interface TagServiceInterface
 
     /**
      * Get tags for a specific link
-     * 
+     *
      * @throws LinkNotFoundException when link doesn't exist
      */
     public function getTagsForLink(UuidInterface $linkId): TagCollection;
 
     /**
      * Create a new tag
-     * 
+     *
      * @throws DuplicateTagException when tag name already exists
      */
     public function createTag(string $tagName, ?string $color = null): Tag;
 
     /**
      * Update an existing tag's color
-     * 
+     *
      * @throws TagNotFoundException when tag doesn't exist
      */
     public function updateTag(string $tagName, ?string $color = null): Tag;
 
     /**
      * Delete a tag (cascades to link associations)
-     * 
+     *
      * @throws TagNotFoundException when tag doesn't exist
      */
     public function deleteTag(string $tagName): void;
 
     /**
      * Assign a tag to a link (creates tag if it doesn't exist)
-     * 
+     *
      * @throws LinkNotFoundException when link doesn't exist
      */
     public function assignTagToLink(UuidInterface $linkId, string $tagName, ?string $color = null): void;

@@ -7,7 +7,7 @@ use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 
 /**
- * Expects the LinkInputSpec, but it can be replaced to modify filtering and 
+ * Expects the LinkInputSpec, but it can be replaced to modify filtering and
  * validation.
  */
 final readonly class LinkCreateAction implements ActionInterface
@@ -35,9 +35,9 @@ final readonly class LinkCreateAction implements ActionInterface
     public function execute(array $data): array
     {
         $link = $this->linkService->createLink(
-            url: $data['url'], 
-            title: $data['title'], 
-            description: $data['description'], 
+            url: $data['url'],
+            title: $data['title'],
+            description: $data['description'],
             icon: $data['icon']
         );
         return $this->outputSpec->transform($link);
