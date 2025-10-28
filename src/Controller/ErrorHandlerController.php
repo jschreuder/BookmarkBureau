@@ -49,18 +49,12 @@ final readonly class ErrorHandlerController implements ControllerInterface
 
     private function getMessage(int $code) : string
     {
-        switch ($code) {
-            case 400:
-                return 'Bad input';
-            case 401:
-                return 'Unauthenticated';
-            case 403:
-                return 'Unauthorized';
-            case 503:
-                return 'Storage engine error';
-            case 500:
-            default:
-                return 'Server error';
-        }
+        return match ($code) {
+            400 => 'Bad input',
+            401 => 'Unauthenticated',
+            403 => 'Unauthorized',
+            503 => 'Storage engine error',
+            default => 'Server error'
+        };
     }
 }
