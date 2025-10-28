@@ -46,7 +46,10 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             }
         });
 
-        $router->get('link-read', '/link/:id', fn() => new ActionController(
+        $idSegment = '/:id';
+
+        $linkSegment = '/link';
+        $router->get('link-read', $linkSegment . $idSegment, fn() => new ActionController(
             new LinkReadAction(
                 $this->container->getLinkService(),
                 new LinkInputSpec(),
@@ -54,7 +57,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             ),
             new JsonResponseTransformer()
         ));
-        $router->post('link-create', '/link', fn() => new ActionController(
+        $router->post('link-create', $linkSegment, fn() => new ActionController(
             new LinkCreateAction(
                 $this->container->getLinkService(),
                 new LinkInputSpec(),
@@ -62,7 +65,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             ),
             new JsonResponseTransformer()
         ));
-        $router->put('link-update', '/link/:id', fn() => new ActionController(
+        $router->put('link-update', $linkSegment . $idSegment, fn() => new ActionController(
             new LinkUpdateAction(
                 $this->container->getLinkService(),
                 new LinkInputSpec(),
@@ -70,7 +73,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             ),
             new JsonResponseTransformer()
         ));
-        $router->delete('link-delete', '/link/:id', fn() => new ActionController(
+        $router->delete('link-delete', $linkSegment . $idSegment, fn() => new ActionController(
             new LinkDeleteAction(
                 $this->container->getLinkService(),
                 new LinkInputSpec()
@@ -78,7 +81,8 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             new JsonResponseTransformer()
         ));
 
-        $router->get('category-read', '/category/:id', fn() => new ActionController(
+        $categorySegment = '/category';
+        $router->get('category-read', $categorySegment . $idSegment, fn() => new ActionController(
             new CategoryReadAction(
                 $this->container->getCategoryService(),
                 new CategoryInputSpec(),
@@ -86,7 +90,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             ),
             new JsonResponseTransformer()
         ));
-        $router->post('category-create', '/category', fn() => new ActionController(
+        $router->post('category-create', $categorySegment, fn() => new ActionController(
             new CategoryCreateAction(
                 $this->container->getCategoryService(),
                 new CategoryInputSpec(),
@@ -94,7 +98,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             ),
             new JsonResponseTransformer()
         ));
-        $router->put('category-update', '/category/:id', fn() => new ActionController(
+        $router->put('category-update', $categorySegment . $idSegment, fn() => new ActionController(
             new CategoryUpdateAction(
                 $this->container->getCategoryService(),
                 new CategoryInputSpec(),
@@ -102,7 +106,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             ),
             new JsonResponseTransformer()
         ));
-        $router->delete('category-delete', '/category/:id', fn() => new ActionController(
+        $router->delete('category-delete', $categorySegment . $idSegment, fn() => new ActionController(
             new CategoryDeleteAction(
                 $this->container->getCategoryService(),
                 new CategoryInputSpec()
@@ -110,7 +114,8 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             new JsonResponseTransformer()
         ));
 
-        $router->post('dashboard-create', '/dashboard', fn() => new ActionController(
+        $dashboardSegment = '/dashboard';
+        $router->post('dashboard-create', $dashboardSegment, fn() => new ActionController(
             new DashboardCreateAction(
                 $this->container->getDashboardService(),
                 new DashboardInputSpec(),
@@ -118,7 +123,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             ),
             new JsonResponseTransformer()
         ));
-        $router->put('dashboard-update', '/dashboard/:id', fn() => new ActionController(
+        $router->put('dashboard-update', $dashboardSegment . $idSegment, fn() => new ActionController(
             new DashboardUpdateAction(
                 $this->container->getDashboardService(),
                 new DashboardInputSpec(),
@@ -126,7 +131,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             ),
             new JsonResponseTransformer()
         ));
-        $router->delete('dashboard-delete', '/dashboard/:id', fn() => new ActionController(
+        $router->delete('dashboard-delete', $dashboardSegment . $idSegment, fn() => new ActionController(
             new DashboardDeleteAction(
                 $this->container->getDashboardService(),
                 new DashboardInputSpec()
