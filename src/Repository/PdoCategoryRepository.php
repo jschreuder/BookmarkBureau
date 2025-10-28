@@ -41,7 +41,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
-            throw new CategoryNotFoundException('Category not found: ' . $categoryId->toString());
+            throw CategoryNotFoundException::forId($categoryId);
         }
 
         return $this->mapRowToCategory($row);
@@ -230,9 +230,9 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
             if (str_contains($e->getMessage(), 'FOREIGN KEY constraint failed') ||
                 str_contains($e->getMessage(), 'foreign key constraint fails')) {
                 if (str_contains($e->getMessage(), 'category_id')) {
-                    throw new CategoryNotFoundException('Category not found: ' . $categoryId->toString());
+                    throw CategoryNotFoundException::forId($categoryId);
                 } else {
-                    throw new LinkNotFoundException('Link not found: ' . $linkId->toString());
+                    throw LinkNotFoundException::forId($linkId);
                 }
             }
             throw $e;
@@ -252,7 +252,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
 
         // Verify the link is actually in the category
         if (!$this->hasLink($categoryId, $linkId)) {
-            throw new LinkNotFoundException('Link not found in category: ' . $linkId->toString());
+            throw LinkNotFoundException::forId($linkId);
         }
 
         $statement = $this->pdo->prepare(

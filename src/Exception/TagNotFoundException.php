@@ -2,7 +2,6 @@
 
 namespace jschreuder\BookmarkBureau\Exception;
 
-use Ramsey\Uuid\UuidInterface;
 use RuntimeException;
 
 final class TagNotFoundException extends RuntimeException

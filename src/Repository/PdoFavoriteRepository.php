@@ -103,7 +103,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
                 if (str_contains($e->getMessage(), 'dashboard_id')) {
                     throw new DashboardNotFoundException('Dashboard not found: ' . $dashboardId->toString());
                 } else {
-                    throw new LinkNotFoundException('Link not found: ' . $linkId->toString());
+                    throw LinkNotFoundException::forId($linkId);
                 }
             }
             throw $e;

@@ -30,7 +30,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
-            throw new TagNotFoundException('Tag not found: ' . $tagName);
+            throw TagNotFoundException::forName($tagName);
         }
 
         return $this->mapRowToTag($row);
@@ -65,7 +65,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         $linkCheck->execute([':link_id' => $link->getBytes()]);
 
         if ($linkCheck->fetch() === false) {
-            throw new LinkNotFoundException('Link not found: ' . $link->toString());
+            throw LinkNotFoundException::forId($link);
         }
 
         $statement = $this->pdo->prepare(
@@ -170,14 +170,14 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         $tagCheck = $this->pdo->prepare('SELECT 1 FROM tags WHERE tag_name = :tag_name LIMIT 1');
         $tagCheck->execute([':tag_name' => $tagName]);
         if ($tagCheck->fetch() === false) {
-            throw new TagNotFoundException('Tag not found: ' . $tagName);
+            throw TagNotFoundException::forName($tagName);
         }
 
         // Verify link exists
         $linkCheck = $this->pdo->prepare('SELECT 1 FROM links WHERE link_id = :link_id LIMIT 1');
         $linkCheck->execute([':link_id' => $linkId->getBytes()]);
         if ($linkCheck->fetch() === false) {
-            throw new LinkNotFoundException('Link not found: ' . $linkId->toString());
+            throw LinkNotFoundException::forId($linkId);
         }
 
         try {
@@ -217,9 +217,9 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             if (str_contains($e->getMessage(), 'FOREIGN KEY constraint failed') ||
                 str_contains($e->getMessage(), 'foreign key constraint fails')) {
                 if (str_contains($e->getMessage(), 'link_id')) {
-                    throw new LinkNotFoundException('Link not found: ' . $linkId->toString());
+                    throw LinkNotFoundException::forId($linkId);
                 } else {
-                    throw new TagNotFoundException('Tag not found: ' . $tagName);
+                    throw TagNotFoundException::forName($tagName);
                 }
             }
             throw $e;

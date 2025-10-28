@@ -34,7 +34,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
-            throw new LinkNotFoundException('Link not found: ' . $linkId->toString());
+            throw LinkNotFoundException::forId($linkId);
         }
 
         return $this->mapRowToLink($row);
@@ -131,7 +131,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             );
             $categoryCheck->execute([':category_id' => $categoryId->getBytes()]);
             if ($categoryCheck->fetch() === false) {
-                throw new CategoryNotFoundException('Category not found: ' . $categoryId->toString());
+                throw CategoryNotFoundException::forId($categoryId);
             }
         }
 
