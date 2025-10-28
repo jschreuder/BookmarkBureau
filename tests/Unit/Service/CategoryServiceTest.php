@@ -13,6 +13,46 @@ use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
 use Ramsey\Uuid\Uuid;
 
 describe('CategoryService', function () {
+    describe('getCategory method', function () {
+        test('retrieves an existing category', function () {
+            $categoryId = Uuid::uuid4();
+            $category = TestEntityFactory::createCategory(id: $categoryId);
+
+            $categoryRepository = Mockery::mock(CategoryRepositoryInterface::class);
+            $categoryRepository->shouldReceive('findById')
+                ->with($categoryId)
+                ->andReturn($category)
+                ->once();
+
+            $dashboardRepository = Mockery::mock(DashboardRepositoryInterface::class);
+            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+
+            $service = new CategoryService($categoryRepository, $dashboardRepository, $unitOfWork);
+
+            $result = $service->getCategory($categoryId);
+
+            expect($result)->toBe($category);
+            expect($result->categoryId)->toEqual($categoryId);
+        });
+
+        test('throws CategoryNotFoundException when category does not exist', function () {
+            $categoryId = Uuid::uuid4();
+
+            $categoryRepository = Mockery::mock(CategoryRepositoryInterface::class);
+            $categoryRepository->shouldReceive('findById')
+                ->with($categoryId)
+                ->andThrow(CategoryNotFoundException::forId($categoryId));
+
+            $dashboardRepository = Mockery::mock(DashboardRepositoryInterface::class);
+            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+
+            $service = new CategoryService($categoryRepository, $dashboardRepository, $unitOfWork);
+
+            expect(fn() => $service->getCategory($categoryId))
+                ->toThrow(CategoryNotFoundException::class);
+        });
+    });
+
     describe('createCategory method', function () {
         test('creates a new category with title and color', function () {
             $dashboardId = Uuid::uuid4();

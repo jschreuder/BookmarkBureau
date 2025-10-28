@@ -25,6 +25,14 @@ final class CategoryService implements CategoryServiceInterface
     }
 
     /**
+     * @throws CategoryNotFoundException when category doesn't exist
+     */
+    public function getCategory(UuidInterface $categoryId): Category
+    {
+        return $this->categoryRepository->findById($categoryId);
+    }
+
+    /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     public function createCategory(

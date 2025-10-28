@@ -12,6 +12,11 @@ use Ramsey\Uuid\UuidInterface;
 interface CategoryServiceInterface
 {
     /**
+     * @throws CategoryNotFoundException when category doesn't exist
+     */
+    public function getCategory(UuidInterface $categoryId): Category;
+
+    /**
      * Create a new category in a dashboard
      * 
      * @throws DashboardNotFoundException when dashboard doesn't exist
