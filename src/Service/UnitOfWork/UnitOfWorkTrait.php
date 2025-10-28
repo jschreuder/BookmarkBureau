@@ -3,6 +3,7 @@
 namespace jschreuder\BookmarkBureau\Service\UnitOfWork;
 
 use Closure;
+use jschreuder\BookmarkBureau\Exception\InactiveUnitOfWorkException;
 
 trait UnitOfWorkTrait
 {
@@ -23,11 +24,11 @@ trait UnitOfWorkTrait
     public function commit(): void
     {
         if ($this->transactionLevel === 0) {
-            throw new \RuntimeException('No active transaction to commit');
+            throw new InactiveUnitOfWorkException('No active transaction to commit');
         }
 
         $this->transactionLevel--;
-        
+
         if ($this->transactionLevel === 0) {
             $this->doCommit();
         }
@@ -36,7 +37,7 @@ trait UnitOfWorkTrait
     public function rollback(): void
     {
         if ($this->transactionLevel === 0) {
-            throw new \RuntimeException('No active transaction to rollback');
+            throw new InactiveUnitOfWorkException('No active transaction to rollback');
         }
 
         $this->transactionLevel = 0;
@@ -46,7 +47,7 @@ trait UnitOfWorkTrait
     public function transactional(Closure $operation): mixed
     {
         $this->begin();
-        
+
         try {
             $result = $operation();
             $this->commit();

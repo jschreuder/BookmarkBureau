@@ -1,5 +1,6 @@
 <?php
 
+use jschreuder\BookmarkBureau\Exception\InactiveUnitOfWorkException;
 use jschreuder\BookmarkBureau\Service\UnitOfWork\PdoUnitOfWork;
 
 describe('PdoUnitOfWork', function () {
@@ -108,7 +109,7 @@ describe('PdoUnitOfWork', function () {
             $unitOfWork = new PdoUnitOfWork($pdo);
 
             expect(fn() => $unitOfWork->commit())
-                ->toThrow(RuntimeException::class);
+                ->toThrow(InactiveUnitOfWorkException::class);
         });
     });
 
@@ -144,7 +145,7 @@ describe('PdoUnitOfWork', function () {
             $unitOfWork = new PdoUnitOfWork($pdo);
 
             expect(fn() => $unitOfWork->rollback())
-                ->toThrow(RuntimeException::class);
+                ->toThrow(InactiveUnitOfWorkException::class);
         });
 
         test('can rollback mid-nested transaction', function () {
