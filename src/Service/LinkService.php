@@ -12,8 +12,6 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
-use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
-use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -22,9 +20,7 @@ final class LinkService implements LinkServiceInterface
 {
     public function __construct(
         private readonly LinkRepositoryInterface $linkRepository,
-        private readonly TagRepositoryInterface $tagRepository,
-        private readonly FavoriteRepositoryInterface $favoriteRepository,
-        private readonly UnitOfWorkInterface $unitOfWork,
+        private readonly UnitOfWorkInterface $unitOfWork
     ) {
     }
 
