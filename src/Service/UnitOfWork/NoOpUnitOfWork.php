@@ -13,13 +13,16 @@ final class NoOpUnitOfWork implements UnitOfWorkInterface
 
     private function doBegin(): void
     {
+        // NoOp does nothing for backends that don't support Units of Work
     }
 
     private function doCommit(): void
     {
+        // NoOp does nothing for backends that don't support Units of Work
     }
 
     private function doRollback(): void
     {
+        // NoOp does nothing for backends that don't support Units of Work
     }
 }
