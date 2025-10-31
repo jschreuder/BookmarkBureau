@@ -2,8 +2,6 @@
 
 namespace jschreuder\BookmarkBureau;
 
-use jschreuder\BookmarkBureau\Command\ExampleCommand;
-use jschreuder\BookmarkBureau\Command\StartWebserverCommand;
 use Symfony\Component\Console\Application;
 
 class ConsoleCommandsProvider
@@ -16,6 +14,6 @@ class ConsoleCommandsProvider
 
     public function registerCommands(Application $application): void
     {
-        $application->add(new StartWebserverCommand());
+        // Example: $application->add(new StartWebserverCommand());
     }
 }
