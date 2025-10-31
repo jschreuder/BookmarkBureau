@@ -101,14 +101,31 @@ class ServiceContainer
 
     public function getDb(): PDO
     {
+        $baseDsn = $this->config('db.dsn');
+        $dbname = $this->config('db.dbname');
+
+        // For SQLite, the dbname is part of the DSN directly (e.g., "sqlite::memory:" or "sqlite:/path/to/db")
+        // For other databases like MySQL, we need to append ";dbname=" separator
+        if (str_starts_with($baseDsn, 'sqlite:')) {
+            $dsn = $baseDsn . $dbname;
+        } else {
+            $dsn = $baseDsn . ';dbname=' . $dbname;
+        }
+
+        $options = [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+        ];
+
+        // Only set MySQL-specific attributes if the MySQL driver is available
+        if (defined('\PDO::MYSQL_ATTR_INIT_COMMAND')) {
+            $options[\PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES utf8';
+        }
+
         return new PDO(
-            $this->config('db.dsn') . ';dbname=' . $this->config('db.dbname'),
+            $dsn,
             $this->config('db.user'),
             $this->config('db.pass'),
-            [
-                \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            ]
+            $options
         );
     }
 
@@ -154,8 +171,6 @@ class ServiceContainer
     {
         return new LinkService(
             $this->getLinkRepository(),
-            $this->getTagRepository(),
-            $this->getFavoriteRepository(),
             $this->getUnitOfWork()
         );
     }
