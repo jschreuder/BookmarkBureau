@@ -16,7 +16,6 @@ use jschreuder\BookmarkBureau\Action\LinkCreateAction;
 use jschreuder\BookmarkBureau\Action\LinkDeleteAction;
 use jschreuder\BookmarkBureau\Action\LinkReadAction;
 use jschreuder\BookmarkBureau\Action\LinkUpdateAction;
-use jschreuder\BookmarkBureau\Controller\ActionController;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\FavoriteInputSpec;
@@ -26,7 +25,7 @@ use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\FavoriteOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
-use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
+use jschreuder\BookmarkBureau\Util\ResourceRouteBuilder;
 use jschreuder\Middle\Router\RouterInterface;
 use jschreuder\Middle\Router\RoutingProviderInterface;
 use jschreuder\Middle\Controller\ControllerInterface;
@@ -53,122 +52,34 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             }
         });
 
-        $idSegment = '/:id';
+        $linkService = $this->container->getLinkService();
+        (new ResourceRouteBuilder($router, 'link', '/link'))
+            ->registerRead(new LinkReadAction($linkService, new LinkInputSpec(), new LinkOutputSpec()))
+            ->registerCreate(new LinkCreateAction($linkService, new LinkInputSpec(), new LinkOutputSpec()))
+            ->registerUpdate(new LinkUpdateAction($linkService, new LinkInputSpec(), new LinkOutputSpec()))
+            ->registerDelete(new LinkDeleteAction($linkService, new LinkInputSpec()));
 
-        $linkSegment = '/link';
-        $router->get('link-read', $linkSegment . $idSegment, fn() => new ActionController(
-            new LinkReadAction(
-                $this->container->getLinkService(),
-                new LinkInputSpec(),
-                new LinkOutputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-        $router->post('link-create', $linkSegment, fn() => new ActionController(
-            new LinkCreateAction(
-                $this->container->getLinkService(),
-                new LinkInputSpec(),
-                new LinkOutputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-        $router->put('link-update', $linkSegment . $idSegment, fn() => new ActionController(
-            new LinkUpdateAction(
-                $this->container->getLinkService(),
-                new LinkInputSpec(),
-                new LinkOutputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-        $router->delete('link-delete', $linkSegment . $idSegment, fn() => new ActionController(
-            new LinkDeleteAction(
-                $this->container->getLinkService(),
-                new LinkInputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
+        $categoryService = $this->container->getCategoryService();
+        (new ResourceRouteBuilder($router, 'category', '/category'))
+            ->registerRead(new CategoryReadAction($categoryService, new CategoryInputSpec(), new CategoryOutputSpec()))
+            ->registerCreate(new CategoryCreateAction($categoryService, new CategoryInputSpec(), new CategoryOutputSpec()))
+            ->registerUpdate(new CategoryUpdateAction($categoryService, new CategoryInputSpec(), new CategoryOutputSpec()))
+            ->registerDelete(new CategoryDeleteAction($categoryService, new CategoryInputSpec()));
 
-        $categorySegment = '/category';
-        $router->get('category-read', $categorySegment . $idSegment, fn() => new ActionController(
-            new CategoryReadAction(
-                $this->container->getCategoryService(),
-                new CategoryInputSpec(),
-                new CategoryOutputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-        $router->post('category-create', $categorySegment, fn() => new ActionController(
-            new CategoryCreateAction(
-                $this->container->getCategoryService(),
-                new CategoryInputSpec(),
-                new CategoryOutputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-        $router->put('category-update', $categorySegment . $idSegment, fn() => new ActionController(
-            new CategoryUpdateAction(
-                $this->container->getCategoryService(),
-                new CategoryInputSpec(),
-                new CategoryOutputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-        $router->delete('category-delete', $categorySegment . $idSegment, fn() => new ActionController(
-            new CategoryDeleteAction(
-                $this->container->getCategoryService(),
-                new CategoryInputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
+        $dashboardService = $this->container->getDashboardService();
+        (new ResourceRouteBuilder($router, 'dashboard', '/dashboard'))
+            ->registerCreate(new DashboardCreateAction($dashboardService, new DashboardInputSpec(), new DashboardOutputSpec()))
+            ->registerUpdate(new DashboardUpdateAction($dashboardService, new DashboardInputSpec(), new DashboardOutputSpec()))
+            ->registerDelete(new DashboardDeleteAction($dashboardService, new DashboardInputSpec()));
 
-        $dashboardSegment = '/dashboard';
-        $router->post('dashboard-create', $dashboardSegment, fn() => new ActionController(
-            new DashboardCreateAction(
-                $this->container->getDashboardService(),
-                new DashboardInputSpec(),
-                new DashboardOutputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-        $router->put('dashboard-update', $dashboardSegment . $idSegment, fn() => new ActionController(
-            new DashboardUpdateAction(
-                $this->container->getDashboardService(),
-                new DashboardInputSpec(),
-                new DashboardOutputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-        $router->delete('dashboard-delete', $dashboardSegment . $idSegment, fn() => new ActionController(
-            new DashboardDeleteAction(
-                $this->container->getDashboardService(),
-                new DashboardInputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-
-        $favoritesSegment = $dashboardSegment . $idSegment . '/favorites';
-        $router->post('favorite-create', $favoritesSegment, fn() => new ActionController(
-            new FavoriteCreateAction(
-                $this->container->getFavoriteService(),
-                new FavoriteInputSpec(),
-                new FavoriteOutputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-        $router->delete('favorite-delete', $favoritesSegment, fn() => new ActionController(
-            new FavoriteDeleteAction(
-                $this->container->getFavoriteService(),
-                new FavoriteInputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
-        $router->put('favorite-reorder', $favoritesSegment, fn() => new ActionController(
-            new FavoriteReorderAction(
-                $this->container->getFavoriteService(),
+        $favoriteService = $this->container->getFavoriteService();
+        (new ResourceRouteBuilder($router, 'favorite', '/dashboard/:id/favorites'))
+            ->registerCreate(new FavoriteCreateAction($favoriteService, new FavoriteInputSpec(), new FavoriteOutputSpec()))
+            ->registerCustom('DELETE', 'delete', '', new FavoriteDeleteAction($favoriteService, new FavoriteInputSpec()))
+            ->registerCustom('PUT', 'reorder', '', new FavoriteReorderAction(
+                $favoriteService,
                 new ReorderFavoritesInputSpec(),
                 new FavoriteOutputSpec()
-            ),
-            new JsonResponseTransformer()
-        ));
+            ));
     }
 }
