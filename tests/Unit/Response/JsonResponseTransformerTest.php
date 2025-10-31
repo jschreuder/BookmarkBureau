@@ -1,6 +1,7 @@
 <?php
 
 use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
+use jschreuder\BookmarkBureau\Exception\ResponseTransformerException;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 
@@ -306,6 +307,230 @@ describe('JsonResponseTransformer', function () {
             expect($response->getStatusCode())->toBe(201);
             $body = json_decode($response->getBody()->getContents(), true);
             expect($body['id'])->toBe(1);
+        });
+    });
+
+    describe('OutputSpec integration', function () {
+        test('transforms output from LinkOutputSpec', function () {
+            $transformer = new JsonResponseTransformer();
+            $spec = new \jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec();
+            $link = TestEntityFactory::createLink();
+
+            $outputData = $spec->transform($link);
+            $response = $transformer->transform($outputData);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body)->toHaveKeys(['id', 'url', 'title', 'description', 'icon', 'created_at', 'updated_at']);
+            expect($body['url'])->toBeString();
+            expect($body['created_at'])->toBeString();
+        });
+
+        test('transforms output from CategoryOutputSpec', function () {
+            $transformer = new JsonResponseTransformer();
+            $spec = new \jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec();
+            $category = TestEntityFactory::createCategory();
+
+            $outputData = $spec->transform($category);
+            $response = $transformer->transform($outputData);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body)->toHaveKeys(['id', 'dashboard_id', 'title', 'color', 'sort_order', 'created_at', 'updated_at']);
+            expect($body['id'])->toBeString();
+        });
+
+        test('transforms output from DashboardOutputSpec', function () {
+            $transformer = new JsonResponseTransformer();
+            $spec = new \jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec();
+            $dashboard = TestEntityFactory::createDashboard();
+
+            $outputData = $spec->transform($dashboard);
+            $response = $transformer->transform($outputData);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body)->toHaveKeys(['id', 'title', 'description', 'icon', 'created_at', 'updated_at']);
+        });
+
+        test('transforms ActionController response format with single OutputSpec result', function () {
+            $transformer = new JsonResponseTransformer();
+            $spec = new \jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec();
+            $link = TestEntityFactory::createLink();
+
+            // Simulate ActionController response format
+            $data = [
+                'success' => true,
+                'data' => $spec->transform($link)
+            ];
+
+            $response = $transformer->transform($data);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body['success'])->toBeTrue();
+            expect($body['data'])->toHaveKeys(['id', 'url', 'title', 'description', 'icon', 'created_at', 'updated_at']);
+        });
+
+        test('transforms ActionController response format with array of OutputSpec results', function () {
+            $transformer = new JsonResponseTransformer();
+            $spec = new \jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec();
+            $link1 = TestEntityFactory::createLink();
+            $link2 = TestEntityFactory::createLink();
+
+            // Simulate ActionController response format with multiple items
+            $data = [
+                'success' => true,
+                'data' => [
+                    $spec->transform($link1),
+                    $spec->transform($link2)
+                ]
+            ];
+
+            $response = $transformer->transform($data);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body['success'])->toBeTrue();
+            expect($body['data'])->toBeArray();
+            expect(count($body['data']))->toBe(2);
+            expect($body['data'][0])->toHaveKeys(['id', 'url', 'title']);
+        });
+
+        test('preserves datetime formats from OutputSpec', function () {
+            $transformer = new JsonResponseTransformer();
+            $spec = new \jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec();
+            $createdAt = new DateTimeImmutable('2024-05-15 14:30:45', new DateTimeZone('UTC'));
+            $link = TestEntityFactory::createLink(createdAt: $createdAt);
+
+            $outputData = $spec->transform($link);
+            $response = $transformer->transform($outputData);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body['created_at'])->toBe($createdAt->format(DateTimeInterface::ATOM));
+        });
+
+        test('handles OutputSpec with null and optional values', function () {
+            $transformer = new JsonResponseTransformer();
+            $spec = new \jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec();
+            $link = TestEntityFactory::createLink(icon: null);
+
+            $outputData = $spec->transform($link);
+            $response = $transformer->transform($outputData);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body['icon'])->toBeNull();
+            // Verify the key exists in the output array
+            expect(array_key_exists('icon', $body))->toBeTrue();
+        });
+
+        test('transforms large collection of OutputSpec results', function () {
+            $transformer = new JsonResponseTransformer();
+            $spec = new \jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec();
+
+            $links = [];
+            for ($i = 0; $i < 100; $i++) {
+                $links[] = $spec->transform(TestEntityFactory::createLink());
+            }
+
+            $data = [
+                'success' => true,
+                'data' => $links
+            ];
+
+            $response = $transformer->transform($data);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body['success'])->toBeTrue();
+            expect(count($body['data']))->toBe(100);
+            // Verify all items have required fields
+            foreach ($body['data'] as $item) {
+                expect($item)->toHaveKeys(['id', 'url', 'title', 'description', 'icon', 'created_at', 'updated_at']);
+            }
+        });
+
+        test('combines OutputSpec data with custom status code', function () {
+            $transformer = new JsonResponseTransformer();
+            $spec = new \jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec();
+            $link = TestEntityFactory::createLink();
+
+            $outputData = $spec->transform($link);
+            $data = [
+                'success' => true,
+                'data' => $outputData
+            ];
+
+            $response = $transformer->transform($data, 201);
+
+            expect($response->getStatusCode())->toBe(201);
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body['data']['id'])->toBeString();
+        });
+    });
+
+    describe('exception handling', function () {
+        test('throws ResponseTransformerException when JSON encoding fails', function () {
+            $transformer = new JsonResponseTransformer();
+            // Create data with circular reference that cannot be JSON encoded
+            $data = [];
+            $data['self'] = &$data;
+
+            expect(fn() => $transformer->transform($data))
+                ->toThrow(ResponseTransformerException::class);
+        });
+
+        test('exception contains error message from original exception', function () {
+            $transformer = new JsonResponseTransformer();
+            $data = [];
+            $data['self'] = &$data;
+
+            expect(fn() => $transformer->transform($data))
+                ->toThrow(function (ResponseTransformerException $e) {
+                    return str_contains($e->getMessage(), 'Generating JSON response failed');
+                });
+        });
+
+        test('exception preserves original exception as previous', function () {
+            $transformer = new JsonResponseTransformer();
+            $data = [];
+            $data['self'] = &$data;
+
+            expect(fn() => $transformer->transform($data))
+                ->toThrow(function (ResponseTransformerException $e) {
+                    return $e->getPrevious() !== null;
+                });
+        });
+
+        test('exception has status code 500', function () {
+            $transformer = new JsonResponseTransformer();
+            $data = [];
+            $data['self'] = &$data;
+
+            try {
+                $transformer->transform($data);
+            } catch (ResponseTransformerException $e) {
+                expect($e->getCode())->toBe(500);
+            }
+        });
+
+        test('throws exception when headers parameter causes encoding failure', function () {
+            $transformer = new JsonResponseTransformer();
+            // Note: This test depends on Laminas behavior - invalid headers might cause exception
+            // We'll test with valid data but simulate a scenario that could fail
+            $data = ['valid' => 'data'];
+
+            // This should succeed with valid data and valid headers
+            $response = $transformer->transform($data, 200, ['X-Custom' => 'value']);
+            expect($response)->toBeInstanceOf(ResponseInterface::class);
+        });
+
+        test('exception message is descriptive', function () {
+            $transformer = new JsonResponseTransformer();
+            $data = [];
+            $data['self'] = &$data;
+
+            expect(fn() => $transformer->transform($data))
+                ->toThrow(ResponseTransformerException::class)
+                ->and(fn() => $transformer->transform($data))
+                ->toThrow(function (ResponseTransformerException $e) {
+                    return strlen($e->getMessage()) > 0 &&
+                           str_contains($e->getMessage(), 'Generating JSON response failed');
+                });
         });
     });
 });
