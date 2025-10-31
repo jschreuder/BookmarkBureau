@@ -9,6 +9,9 @@ use jschreuder\BookmarkBureau\Action\CategoryUpdateAction;
 use jschreuder\BookmarkBureau\Action\DashboardCreateAction;
 use jschreuder\BookmarkBureau\Action\DashboardDeleteAction;
 use jschreuder\BookmarkBureau\Action\DashboardUpdateAction;
+use jschreuder\BookmarkBureau\Action\FavoriteCreateAction;
+use jschreuder\BookmarkBureau\Action\FavoriteDeleteAction;
+use jschreuder\BookmarkBureau\Action\FavoriteReorderAction;
 use jschreuder\BookmarkBureau\Action\LinkCreateAction;
 use jschreuder\BookmarkBureau\Action\LinkDeleteAction;
 use jschreuder\BookmarkBureau\Action\LinkReadAction;
@@ -16,9 +19,12 @@ use jschreuder\BookmarkBureau\Action\LinkUpdateAction;
 use jschreuder\BookmarkBureau\Controller\ActionController;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
+use jschreuder\BookmarkBureau\InputSpec\FavoriteInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\LinkInputSpec;
+use jschreuder\BookmarkBureau\InputSpec\ReorderFavoritesInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\FavoriteOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
 use jschreuder\Middle\Router\RouterInterface;
@@ -135,6 +141,31 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             new DashboardDeleteAction(
                 $this->container->getDashboardService(),
                 new DashboardInputSpec()
+            ),
+            new JsonResponseTransformer()
+        ));
+
+        $favoritesSegment = $dashboardSegment . $idSegment . '/favorites';
+        $router->post('favorite-create', $favoritesSegment, fn() => new ActionController(
+            new FavoriteCreateAction(
+                $this->container->getFavoriteService(),
+                new FavoriteInputSpec(),
+                new FavoriteOutputSpec()
+            ),
+            new JsonResponseTransformer()
+        ));
+        $router->delete('favorite-delete', $favoritesSegment, fn() => new ActionController(
+            new FavoriteDeleteAction(
+                $this->container->getFavoriteService(),
+                new FavoriteInputSpec()
+            ),
+            new JsonResponseTransformer()
+        ));
+        $router->put('favorite-reorder', $favoritesSegment, fn() => new ActionController(
+            new FavoriteReorderAction(
+                $this->container->getFavoriteService(),
+                new ReorderFavoritesInputSpec(),
+                new FavoriteOutputSpec()
             ),
             new JsonResponseTransformer()
         ));

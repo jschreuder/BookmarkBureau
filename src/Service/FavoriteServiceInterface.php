@@ -2,6 +2,8 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
+use jschreuder\BookmarkBureau\Collection\FavoriteCollection;
+use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
@@ -15,7 +17,7 @@ interface FavoriteServiceInterface
      * @throws DashboardNotFoundException when dashboard doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
-    public function addFavorite(UuidInterface $dashboardId, UuidInterface $linkId): void;
+    public function addFavorite(UuidInterface $dashboardId, UuidInterface $linkId): Favorite;
 
     /**
      * Remove a favorite from a dashboard
@@ -29,6 +31,7 @@ interface FavoriteServiceInterface
      *
      * @param UuidInterface $dashboardId
      * @param array<string, int> $linkIdToSortOrder Map of link UUID strings to sort orders
+     * @return FavoriteCollection The reordered favorites
      */
-    public function reorderFavorites(UuidInterface $dashboardId, array $linkIdToSortOrder): void;
+    public function reorderFavorites(UuidInterface $dashboardId, array $linkIdToSortOrder): FavoriteCollection;
 }

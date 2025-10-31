@@ -2,6 +2,8 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
+use jschreuder\BookmarkBureau\Collection\FavoriteCollection;
+use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
@@ -24,10 +26,11 @@ final class FavoriteService implements FavoriteServiceInterface
     /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
+     * @throws FavoriteNotFoundException when link is already favorited
      */
-    public function addFavorite(UuidInterface $dashboardId, UuidInterface $linkId): void
+    public function addFavorite(UuidInterface $dashboardId, UuidInterface $linkId): Favorite
     {
-        $this->unitOfWork->transactional(function () use ($dashboardId, $linkId): void {
+        return $this->unitOfWork->transactional(function () use ($dashboardId, $linkId): Favorite {
             // Verify dashboard exists
             $this->dashboardRepository->findById($dashboardId);
 
@@ -35,13 +38,15 @@ final class FavoriteService implements FavoriteServiceInterface
             $this->linkRepository->findById($linkId);
 
             // Check if already favorited
-            if (!$this->favoriteRepository->isFavorite($dashboardId, $linkId)) {
-                // Get the next sort order
-                $sortOrder = $this->favoriteRepository->getMaxSortOrderForDashboardId($dashboardId) + 1;
-
-                // Add the favorite
-                $this->favoriteRepository->addFavorite($dashboardId, $linkId, $sortOrder);
+            if ($this->favoriteRepository->isFavorite($dashboardId, $linkId)) {
+                throw FavoriteNotFoundException::forDashboardAndLink($dashboardId, $linkId);
             }
+
+            // Get the next sort order
+            $sortOrder = $this->favoriteRepository->getMaxSortOrderForDashboardId($dashboardId) + 1;
+
+            // Add the favorite and return it
+            return $this->favoriteRepository->addFavorite($dashboardId, $linkId, $sortOrder);
         });
     }
 
@@ -55,10 +60,11 @@ final class FavoriteService implements FavoriteServiceInterface
         });
     }
 
-    public function reorderFavorites(UuidInterface $dashboardId, array $linkIdToSortOrder): void
+    public function reorderFavorites(UuidInterface $dashboardId, array $linkIdToSortOrder): FavoriteCollection
     {
-        $this->unitOfWork->transactional(function () use ($dashboardId, $linkIdToSortOrder): void {
+        return $this->unitOfWork->transactional(function () use ($dashboardId, $linkIdToSortOrder): FavoriteCollection {
             $this->favoriteRepository->reorderFavorites($dashboardId, $linkIdToSortOrder);
+            return $this->favoriteRepository->findByDashboardId($dashboardId);
         });
     }
 }
