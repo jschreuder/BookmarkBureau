@@ -158,7 +158,7 @@ describe('GeneralRoutingProvider', function () {
             expect($registeredRoutes['category-delete'])->toBe(['method' => 'DELETE', 'path' => '/category/:id']);
 
             // Dashboard routes
-            expect($registeredRoutes['dashboard-view'])->toBe(['method' => 'GET', 'path' => '/dashboard/:id']);
+            expect($registeredRoutes['dashboard-view'])->toBe(['method' => 'GET', 'path' => '/:id']);
             expect($registeredRoutes['dashboard-create'])->toBe(['method' => 'POST', 'path' => '/dashboard']);
             expect($registeredRoutes['dashboard-update'])->toBe(['method' => 'PUT', 'path' => '/dashboard/:id']);
             expect($registeredRoutes['dashboard-delete'])->toBe(['method' => 'DELETE', 'path' => '/dashboard/:id']);

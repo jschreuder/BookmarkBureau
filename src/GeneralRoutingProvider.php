@@ -33,7 +33,6 @@ use jschreuder\BookmarkBureau\InputSpec\TagInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\TagNameInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
-use jschreuder\BookmarkBureau\OutputSpec\DashboardWithCategoriesAndFavoritesOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\FavoriteOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
@@ -64,15 +63,6 @@ class GeneralRoutingProvider implements RoutingProviderInterface
                 return new JsonResponse(['message' => 'Hello world!']);
             }
         });
-
-        // Dashboard view (complex operation with categories and favorites)
-        $router->get('dashboard-view', '/dashboard/:id', fn () => new DashboardViewController(
-            $this->container->getDashboardService(),
-            new JsonResponseTransformer(),
-            new DashboardOutputSpec(),
-            new CategoryOutputSpec(),
-            new LinkOutputSpec()
-        ));
 
         // Links
         (new ResourceRouteBuilder($router, 'link', '/link'))
@@ -184,5 +174,21 @@ class GeneralRoutingProvider implements RoutingProviderInterface
                 $this->container->getCategoryService(),
                 new CategoryInputSpec()
             ));
+
+        // Dashboard view (complex operation with categories and favorites)
+        // This route must be last as it uses a catch-all /:id pattern with UUID validation
+        $router->get(
+            'dashboard-view',
+            '/:id',
+            fn () => new DashboardViewController(
+                $this->container->getDashboardService(),
+                new JsonResponseTransformer(),
+                new DashboardOutputSpec(),
+                new CategoryOutputSpec(),
+                new LinkOutputSpec()
+            ),
+            [],
+            ['id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}']
+        );
     }
 }
