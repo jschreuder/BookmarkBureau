@@ -33,6 +33,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
     /**
      * @throws CategoryNotFoundException when category doesn't exist
      */
+    #[\Override]
     public function findById(UuidInterface $categoryId): Category
     {
         $statement = $this->pdo->prepare(
@@ -52,6 +53,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
      * Get all categories for a dashboard, ordered by sort_order
      * @throws DashboardNotFoundException when dashboard doesn't exist (FK violation)
      */
+    #[\Override]
     public function findByDashboardId(UuidInterface $dashboardId): CategoryCollection
     {
         // Verify dashboard exists and reuse it for all categories
@@ -75,6 +77,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
      * Useful when you need the CategoryLink entity with sort_order info
      * @throws CategoryNotFoundException when category doesn't exist
      */
+    #[\Override]
     public function findCategoryLinksForCategoryId(UuidInterface $categoryId): CategoryLinkCollection
     {
         // Verify category exists
@@ -107,6 +110,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
      * Get the highest sort_order value for categories in a dashboard
      * Returns -1 if dashboard has no categories
      */
+    #[\Override]
     public function getMaxSortOrderForDashboardId(UuidInterface $dashboardId): int
     {
         $statement = $this->pdo->prepare(
@@ -123,6 +127,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
      * Get the highest sort_order value for links in a category
      * Returns -1 if category has no links
      */
+    #[\Override]
     public function getMaxSortOrderForCategoryId(UuidInterface $categoryId): int
     {
         $statement = $this->pdo->prepare(
@@ -139,6 +144,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
      * Save a new category or update existing one
      * @throws DashboardNotFoundException when dashboard doesn't exist (FK violation on insert)
      */
+    #[\Override]
     public function save(Category $category): void
     {
         $categoryIdBytes = $category->categoryId->getBytes();
@@ -190,6 +196,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
     /**
      * Delete a category (cascades to category_links)
      */
+    #[\Override]
     public function delete(Category $category): void
     {
         // Delete cascades are handled by database constraints
@@ -202,6 +209,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
      * @throws CategoryNotFoundException when category doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
+    #[\Override]
     public function addLink(UuidInterface $categoryId, UuidInterface $linkId, int $sortOrder): CategoryLink
     {
         // Verify both category and link exist
@@ -245,6 +253,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
      * @throws CategoryNotFoundException when category doesn't exist
      * @throws LinkNotFoundException when link is not in category
      */
+    #[\Override]
     public function removeLink(UuidInterface $categoryId, UuidInterface $linkId): void
     {
         // Verify both category and link exist
@@ -268,6 +277,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
     /**
      * Check if a link is in a category
      */
+    #[\Override]
     public function hasLink(UuidInterface $categoryId, UuidInterface $linkId): bool
     {
         $statement = $this->pdo->prepare(
@@ -286,6 +296,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
      * @throws CategoryNotFoundException when category doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
+    #[\Override]
     public function updateLinkSortOrder(UuidInterface $categoryId, UuidInterface $linkId, int $sortOrder): void
     {
         // Verify both category and link exist
@@ -308,6 +319,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
      * The index (position) of each link in the collection becomes its sort order
      * @throws CategoryNotFoundException when category doesn't exist
      */
+    #[\Override]
     public function reorderLinks(UuidInterface $categoryId, LinkCollection $links): void
     {
         // Verify category exists
@@ -323,6 +335,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
     /**
      * Count total number of categories
      */
+    #[\Override]
     public function count(): int
     {
         $statement = $this->pdo->prepare('SELECT COUNT(*) as count FROM categories');
@@ -335,6 +348,7 @@ final readonly class PdoCategoryRepository implements CategoryRepositoryInterfac
     /**
      * Count links in a category
      */
+    #[\Override]
     public function countLinksInCategory(UuidInterface $categoryId): int
     {
         $statement = $this->pdo->prepare(

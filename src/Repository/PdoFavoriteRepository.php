@@ -31,6 +31,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * Get all favorites for a dashboard, ordered by sort_order
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
+    #[\Override]
     public function findByDashboardId(UuidInterface $dashboardId): FavoriteCollection
     {
         // Verify dashboard exists and reuse it for all favorites
@@ -56,6 +57,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * Get the highest sort_order value for favorites in a dashboard
      * Returns -1 if dashboard has no favorites
      */
+    #[\Override]
     public function getMaxSortOrderForDashboardId(UuidInterface $dashboardId): int
     {
         $statement = $this->pdo->prepare(
@@ -73,6 +75,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * @throws DashboardNotFoundException when dashboard doesn't exist (FK violation)
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
+    #[\Override]
     public function addFavorite(UuidInterface $dashboardId, UuidInterface $linkId, int $sortOrder): Favorite
     {
         // Verify both dashboard and link exist
@@ -115,6 +118,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * Remove a favorite from a dashboard
      * @throws FavoriteNotFoundException when favorite doesn't exist
      */
+    #[\Override]
     public function removeFavorite(UuidInterface $dashboardId, UuidInterface $linkId): void
     {
         // Check if the favorite exists
@@ -137,6 +141,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
     /**
      * Check if a link is favorited on a dashboard
      */
+    #[\Override]
     public function isFavorite(UuidInterface $dashboardId, UuidInterface $linkId): bool
     {
         $statement = $this->pdo->prepare(
@@ -154,6 +159,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * Update sort order for a favorite
      * @throws FavoriteNotFoundException when favorite doesn't exist
      */
+    #[\Override]
     public function updateSortOrder(UuidInterface $dashboardId, UuidInterface $linkId, int $sortOrder): void
     {
         // Check if the favorite exists
@@ -179,6 +185,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * Reorder favorites in a dashboard
      * @param array<string, int> $linkIdToSortOrder Map of link UUID strings to sort orders
      */
+    #[\Override]
     public function reorderFavorites(UuidInterface $dashboardId, array $linkIdToSortOrder): void
     {
         foreach ($linkIdToSortOrder as $linkIdString => $sortOrder) {
@@ -190,6 +197,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
     /**
      * Count favorites in a dashboard
      */
+    #[\Override]
     public function countForDashboardId(UuidInterface $dashboardId): int
     {
         $statement = $this->pdo->prepare(
@@ -205,6 +213,7 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * Get all dashboards where a link is favorited
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
+    #[\Override]
     public function findDashboardsWithLinkAsFavorite(UuidInterface $linkId): DashboardCollection
     {
         // Verify link exists

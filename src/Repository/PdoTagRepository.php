@@ -21,6 +21,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     /**
      * @throws TagNotFoundException when tag doesn't exist
      */
+    #[\Override]
     public function findByName(string $tagName): Tag
     {
         $statement = $this->pdo->prepare(
@@ -39,6 +40,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     /**
      * Get all tags ordered alphabetically
      */
+    #[\Override]
     public function findAll(): TagCollection
     {
         $statement = $this->pdo->prepare(
@@ -58,6 +60,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * Get all tags for a specific link
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
+    #[\Override]
     public function findTagsForLinkId(UuidInterface $link): TagCollection
     {
         // Verify that the link exists
@@ -87,6 +90,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     /**
      * Get tags that match a search query (prefix search)
      */
+    #[\Override]
     public function searchByName(string $query, int $limit = 20): TagCollection
     {
         $searchTerm = $query . '%';
@@ -111,6 +115,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * Save a new tag or update existing one
      * @throws DuplicateTagException when tag name already exists (on insert)
      */
+    #[\Override]
     public function save(Tag $tag): void
     {
         $tagNameValue = $tag->tagName->value;
@@ -152,6 +157,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     /**
      * Delete a tag (cascades to link_tags)
      */
+    #[\Override]
     public function delete(Tag $tag): void
     {
         // Delete cascades are handled by database constraints
@@ -164,6 +170,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * @throws TagNotFoundException when tag doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
+    #[\Override]
     public function assignToLinkId(UuidInterface $linkId, string $tagName): void
     {
         // Verify tag exists
@@ -203,6 +210,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      * @throws TagNotFoundException when tag doesn't exist (FK violation)
      */
+    #[\Override]
     public function removeFromLinkId(UuidInterface $linkId, string $tagName): void
     {
         try {
@@ -229,6 +237,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     /**
      * Check if a tag is assigned to a link
      */
+    #[\Override]
     public function isAssignedToLinkId(UuidInterface $linkId, string $tagName): bool
     {
         $statement = $this->pdo->prepare(

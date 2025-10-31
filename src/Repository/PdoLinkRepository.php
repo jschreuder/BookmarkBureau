@@ -26,6 +26,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     /**
      * @throws LinkNotFoundException when link doesn't exist
      */
+    #[\Override]
     public function findById(UuidInterface $linkId): Link
     {
         $statement = $this->pdo->prepare(
@@ -41,6 +42,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
         return $this->mapRowToLink($row);
     }
 
+    #[\Override]
     public function findAll(int $limit = 100, int $offset = 0): LinkCollection
     {
         $statement = $this->pdo->prepare(
@@ -62,6 +64,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
      * Search links using fulltext index on title and description
      * Uses LIKE queries for cross-database compatibility (MySQL and SQLite)
      */
+    #[\Override]
     public function search(string $query, int $limit = 100): LinkCollection
     {
         $searchTerm = '%' . $query . '%';
@@ -86,6 +89,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
      * Find links that match any number of tags (using AND condition)
      * Uses INTERSECT queries for cross-database compatibility (MySQL 8.0+ and SQLite)
      */
+    #[\Override]
     public function findByTags(TagNameCollection $tagNames): LinkCollection
     {
         if ($tagNames->isEmpty()) {
@@ -115,6 +119,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
      * Get all links by category, ordered by sort_order
      * @throws CategoryNotFoundException when category doesn't exist
      */
+    #[\Override]
     public function findByCategoryId(UuidInterface $categoryId): LinkCollection
     {
         $statement = $this->pdo->prepare(
@@ -147,6 +152,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     /**
      * Save a new link or update existing one
      */
+    #[\Override]
     public function save(Link $link): void
     {
         $linkIdBytes = $link->linkId->getBytes();
@@ -192,6 +198,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     /**
      * Delete a link (cascades to link_tags, category_links, favorites)
      */
+    #[\Override]
     public function delete(Link $link): void
     {
         // Delete cascades are handled by database constraints
@@ -202,6 +209,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     /**
      * Count total number of links
      */
+    #[\Override]
     public function count(): int
     {
         $statement = $this->pdo->prepare('SELECT COUNT(*) as count FROM links');

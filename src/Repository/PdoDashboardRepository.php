@@ -22,6 +22,7 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
+    #[\Override]
     public function findById(UuidInterface $dashboardId): Dashboard
     {
         $statement = $this->pdo->prepare(
@@ -40,6 +41,7 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     /**
      * Get all dashboards ordered by title
      */
+    #[\Override]
     public function findAll(): DashboardCollection
     {
         $statement = $this->pdo->prepare(
@@ -58,6 +60,7 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     /**
      * Save a new dashboard or update existing one
      */
+    #[\Override]
     public function save(Dashboard $dashboard): void
     {
         $dashboardIdBytes = $dashboard->dashboardId->getBytes();
@@ -101,6 +104,7 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     /**
      * Delete a dashboard (cascades to categories, favorites)
      */
+    #[\Override]
     public function delete(Dashboard $dashboard): void
     {
         // Delete cascades are handled by database constraints
@@ -111,6 +115,7 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     /**
      * Count total number of dashboards
      */
+    #[\Override]
     public function count(): int
     {
         $statement = $this->pdo->prepare('SELECT COUNT(*) as count FROM dashboards');
