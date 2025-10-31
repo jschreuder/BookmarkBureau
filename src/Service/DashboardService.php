@@ -33,6 +33,7 @@ final class DashboardService implements DashboardServiceInterface
     /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
+    #[\Override]
     public function getDashboardView(UuidInterface $dashboardId): DashboardWithCategoriesAndFavorites
     {
         $dashboard = $this->dashboardRepository->findById($dashboardId);
@@ -58,11 +59,13 @@ final class DashboardService implements DashboardServiceInterface
         );
     }
 
+    #[\Override]
     public function listAllDashboards(): DashboardCollection
     {
         return $this->dashboardRepository->findAll();
     }
 
+    #[\Override]
     public function createDashboard(
         string $title,
         string $description,
@@ -87,6 +90,7 @@ final class DashboardService implements DashboardServiceInterface
     /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
+    #[\Override]
     public function updateDashboard(
         UuidInterface $dashboardId,
         string $title,
@@ -109,6 +113,7 @@ final class DashboardService implements DashboardServiceInterface
     /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
+    #[\Override]
     public function deleteDashboard(UuidInterface $dashboardId): void
     {
         $this->unitOfWork->transactional(function () use ($dashboardId): void {

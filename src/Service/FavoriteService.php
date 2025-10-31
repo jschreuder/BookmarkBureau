@@ -28,6 +28,7 @@ final class FavoriteService implements FavoriteServiceInterface
      * @throws LinkNotFoundException when link doesn't exist
      * @throws FavoriteNotFoundException when link is already favorited
      */
+    #[\Override]
     public function addFavorite(UuidInterface $dashboardId, UuidInterface $linkId): Favorite
     {
         return $this->unitOfWork->transactional(function () use ($dashboardId, $linkId): Favorite {
@@ -53,6 +54,7 @@ final class FavoriteService implements FavoriteServiceInterface
     /**
      * @throws FavoriteNotFoundException when favorite doesn't exist
      */
+    #[\Override]
     public function removeFavorite(UuidInterface $dashboardId, UuidInterface $linkId): void
     {
         $this->unitOfWork->transactional(function () use ($dashboardId, $linkId): void {
@@ -60,6 +62,7 @@ final class FavoriteService implements FavoriteServiceInterface
         });
     }
 
+    #[\Override]
     public function reorderFavorites(UuidInterface $dashboardId, array $linkIdToSortOrder): FavoriteCollection
     {
         return $this->unitOfWork->transactional(function () use ($dashboardId, $linkIdToSortOrder): FavoriteCollection {

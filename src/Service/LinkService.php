@@ -27,11 +27,13 @@ final class LinkService implements LinkServiceInterface
     /**
      * @throws LinkNotFoundException when link doesn't exist
      */
+    #[\Override]
     public function getLink(UuidInterface $linkId): Link
     {
         return $this->linkRepository->findById($linkId);
     }
 
+    #[\Override]
     public function createLink(
         string $url,
         string $title,
@@ -58,6 +60,7 @@ final class LinkService implements LinkServiceInterface
     /**
      * @throws LinkNotFoundException when link doesn't exist
      */
+    #[\Override]
     public function updateLink(
         UuidInterface $linkId,
         string $url,
@@ -82,6 +85,7 @@ final class LinkService implements LinkServiceInterface
     /**
      * @throws LinkNotFoundException when link doesn't exist
      */
+    #[\Override]
     public function deleteLink(UuidInterface $linkId): void
     {
         $this->unitOfWork->transactional(function () use ($linkId): void {
@@ -90,17 +94,20 @@ final class LinkService implements LinkServiceInterface
         });
     }
 
+    #[\Override]
     public function searchLinks(string $query, int $limit = 100): LinkCollection
     {
         return $this->linkRepository->search($query, $limit);
     }
 
+    #[\Override]
     public function findLinksByTag(string $tagName): LinkCollection
     {
         $tagNames = new TagNameCollection(new TagName($tagName));
         return $this->linkRepository->findByTags($tagNames);
     }
 
+    #[\Override]
     public function listLinks(int $limit = 100, int $offset = 0): LinkCollection
     {
         return $this->linkRepository->findAll($limit, $offset);

@@ -23,6 +23,7 @@ final class TagService implements TagServiceInterface
     ) {
     }
 
+    #[\Override]
     public function listAllTags(): TagCollection
     {
         return $this->tagRepository->findAll();
@@ -31,6 +32,7 @@ final class TagService implements TagServiceInterface
     /**
      * @throws LinkNotFoundException when link doesn't exist
      */
+    #[\Override]
     public function getTagsForLink(UuidInterface $linkId): TagCollection
     {
         // Verify link exists before fetching tags
@@ -42,6 +44,7 @@ final class TagService implements TagServiceInterface
     /**
      * @throws DuplicateTagException when tag name already exists
      */
+    #[\Override]
     public function createTag(string $tagName, ?string $color = null): Tag
     {
         return $this->unitOfWork->transactional(function () use ($tagName, $color): Tag {
@@ -59,6 +62,7 @@ final class TagService implements TagServiceInterface
     /**
      * @throws TagNotFoundException when tag doesn't exist
      */
+    #[\Override]
     public function updateTag(string $tagName, ?string $color = null): Tag
     {
         return $this->unitOfWork->transactional(function () use ($tagName, $color): Tag {
@@ -75,6 +79,7 @@ final class TagService implements TagServiceInterface
     /**
      * @throws TagNotFoundException when tag doesn't exist
      */
+    #[\Override]
     public function deleteTag(string $tagName): void
     {
         $this->unitOfWork->transactional(function () use ($tagName): void {
@@ -86,6 +91,7 @@ final class TagService implements TagServiceInterface
     /**
      * @throws LinkNotFoundException when link doesn't exist
      */
+    #[\Override]
     public function assignTagToLink(UuidInterface $linkId, string $tagName, ?string $color = null): void
     {
         $this->unitOfWork->transactional(function () use ($linkId, $tagName, $color): void {
@@ -111,6 +117,7 @@ final class TagService implements TagServiceInterface
         });
     }
 
+    #[\Override]
     public function removeTagFromLink(UuidInterface $linkId, string $tagName): void
     {
         $this->unitOfWork->transactional(function () use ($linkId, $tagName): void {
@@ -118,6 +125,7 @@ final class TagService implements TagServiceInterface
         });
     }
 
+    #[\Override]
     public function searchTags(string $query, int $limit = 20): TagCollection
     {
         return $this->tagRepository->searchByName($query, $limit);

@@ -27,6 +27,7 @@ final class CategoryService implements CategoryServiceInterface
     /**
      * @throws CategoryNotFoundException when category doesn't exist
      */
+    #[\Override]
     public function getCategory(UuidInterface $categoryId): Category
     {
         return $this->categoryRepository->findById($categoryId);
@@ -35,6 +36,7 @@ final class CategoryService implements CategoryServiceInterface
     /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
+    #[\Override]
     public function createCategory(
         UuidInterface $dashboardId,
         string $title,
@@ -66,6 +68,7 @@ final class CategoryService implements CategoryServiceInterface
     /**
      * @throws CategoryNotFoundException when category doesn't exist
      */
+    #[\Override]
     public function updateCategory(
         UuidInterface $categoryId,
         string $title,
@@ -86,6 +89,7 @@ final class CategoryService implements CategoryServiceInterface
     /**
      * @throws CategoryNotFoundException when category doesn't exist
      */
+    #[\Override]
     public function deleteCategory(UuidInterface $categoryId): void
     {
         $this->unitOfWork->transactional(function () use ($categoryId): void {
@@ -94,6 +98,7 @@ final class CategoryService implements CategoryServiceInterface
         });
     }
 
+    #[\Override]
     public function reorderCategories(UuidInterface $dashboardId, array $categoryIdToSortOrder): void
     {
         $this->unitOfWork->transactional(function () use ($dashboardId, $categoryIdToSortOrder): void {
@@ -115,6 +120,7 @@ final class CategoryService implements CategoryServiceInterface
      * @throws CategoryNotFoundException when category doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
+    #[\Override]
     public function addLinkToCategory(UuidInterface $categoryId, UuidInterface $linkId): void
     {
         $this->unitOfWork->transactional(function () use ($categoryId, $linkId): void {
@@ -132,6 +138,7 @@ final class CategoryService implements CategoryServiceInterface
     /**
      * @throws CategoryNotFoundException when category doesn't exist
      */
+    #[\Override]
     public function removeLinkFromCategory(UuidInterface $categoryId, UuidInterface $linkId): void
     {
         $this->unitOfWork->transactional(function () use ($categoryId, $linkId): void {
@@ -139,6 +146,7 @@ final class CategoryService implements CategoryServiceInterface
         });
     }
 
+    #[\Override]
     public function reorderLinksInCategory(UuidInterface $categoryId, LinkCollection $links): void
     {
         $this->unitOfWork->transactional(function () use ($categoryId, $links): void {
