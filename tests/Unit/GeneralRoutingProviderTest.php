@@ -6,6 +6,7 @@ use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use jschreuder\BookmarkBureau\Service\FavoriteServiceInterface;
+use jschreuder\BookmarkBureau\Service\TagServiceInterface;
 use jschreuder\Middle\Router\RouterInterface;
 use jschreuder\Middle\Controller\ControllerInterface;
 
@@ -16,6 +17,7 @@ describe('GeneralRoutingProvider', function () {
         $container->shouldReceive('getCategoryService')->andReturn(Mockery::mock(CategoryServiceInterface::class));
         $container->shouldReceive('getDashboardService')->andReturn(Mockery::mock(DashboardServiceInterface::class));
         $container->shouldReceive('getFavoriteService')->andReturn(Mockery::mock(FavoriteServiceInterface::class));
+        $container->shouldReceive('getTagService')->andReturn(Mockery::mock(TagServiceInterface::class));
         return $container;
     }
 
@@ -145,6 +147,16 @@ describe('GeneralRoutingProvider', function () {
             expect($registeredRoutes['favorite-delete'])->toBe(['method' => 'DELETE', 'path' => '/dashboard/:id/favorites']);
             expect($registeredRoutes['favorite-reorder'])->toBe(['method' => 'PUT', 'path' => '/dashboard/:id/favorites']);
 
+            // Tag routes
+            expect($registeredRoutes['tag-read'])->toBe(['method' => 'GET', 'path' => '/tag/:id']);
+            expect($registeredRoutes['tag-create'])->toBe(['method' => 'POST', 'path' => '/tag']);
+            expect($registeredRoutes['tag-update'])->toBe(['method' => 'PUT', 'path' => '/tag/:id']);
+            expect($registeredRoutes['tag-delete'])->toBe(['method' => 'DELETE', 'path' => '/tag/:id']);
+
+            // Link-Tag routes
+            expect($registeredRoutes['link_tag-create'])->toBe(['method' => 'POST', 'path' => '/link/:id/tag']);
+            expect($registeredRoutes['link_tag-delete'])->toBe(['method' => 'DELETE', 'path' => '/link/:id/tag/:tag_name']);
+
             // Home route
             expect($registeredRoutes['home'])->toBe(['method' => 'GET', 'path' => '/']);
         });
@@ -168,6 +180,9 @@ describe('GeneralRoutingProvider', function () {
             $container->shouldReceive('getFavoriteService')
                 ->once()
                 ->andReturn(Mockery::mock(FavoriteServiceInterface::class));
+            $container->shouldReceive('getTagService')
+                ->once()
+                ->andReturn(Mockery::mock(TagServiceInterface::class));
 
             $provider = new GeneralRoutingProvider($container);
             $provider->registerRoutes($router);

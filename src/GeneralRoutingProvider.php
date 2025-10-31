@@ -16,15 +16,25 @@ use jschreuder\BookmarkBureau\Action\LinkCreateAction;
 use jschreuder\BookmarkBureau\Action\LinkDeleteAction;
 use jschreuder\BookmarkBureau\Action\LinkReadAction;
 use jschreuder\BookmarkBureau\Action\LinkUpdateAction;
+use jschreuder\BookmarkBureau\Action\LinkTagCreateAction;
+use jschreuder\BookmarkBureau\Action\LinkTagDeleteAction;
+use jschreuder\BookmarkBureau\Action\TagCreateAction;
+use jschreuder\BookmarkBureau\Action\TagDeleteAction;
+use jschreuder\BookmarkBureau\Action\TagReadAction;
+use jschreuder\BookmarkBureau\Action\TagUpdateAction;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\FavoriteInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\LinkInputSpec;
+use jschreuder\BookmarkBureau\InputSpec\LinkTagInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\ReorderFavoritesInputSpec;
+use jschreuder\BookmarkBureau\InputSpec\TagInputSpec;
+use jschreuder\BookmarkBureau\InputSpec\TagNameInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\FavoriteOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
 use jschreuder\BookmarkBureau\Util\ResourceRouteBuilder;
 use jschreuder\Middle\Router\RouterInterface;
 use jschreuder\Middle\Router\RoutingProviderInterface;
@@ -81,5 +91,16 @@ class GeneralRoutingProvider implements RoutingProviderInterface
                 new ReorderFavoritesInputSpec(),
                 new FavoriteOutputSpec()
             ));
+
+        $tagService = $this->container->getTagService();
+        (new ResourceRouteBuilder($router, 'tag', '/tag'))
+            ->registerRead(new TagReadAction($tagService, new TagNameInputSpec(), new TagOutputSpec()))
+            ->registerCreate(new TagCreateAction($tagService, new TagInputSpec(), new TagOutputSpec()))
+            ->registerUpdate(new TagUpdateAction($tagService, new TagInputSpec(), new TagOutputSpec()))
+            ->registerDelete(new TagDeleteAction($tagService, new TagNameInputSpec()));
+
+        (new ResourceRouteBuilder($router, 'link_tag', '/link/:id/tag'))
+            ->registerCreate(new LinkTagCreateAction($tagService, new LinkTagInputSpec()))
+            ->registerCustom('DELETE', 'delete', '/:tag_name', new LinkTagDeleteAction($tagService, new LinkTagInputSpec()));
     }
 }
