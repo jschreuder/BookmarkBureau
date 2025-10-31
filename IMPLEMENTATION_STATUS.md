@@ -547,17 +547,101 @@ All services wrap business logic in `transactional()` callbacks for ACID guarant
 3. **API Documentation** - No Swagger/OpenAPI spec
 4. **Frontend** - Pure API backend, no UI (intentional)
 
+### New Requirements Identified:
+
+#### 1. Dashboard Entity Retrieval
+**Issue:** Currently only have FullDashboardOutputSpec for complete dashboard views with all nested data.
+**Need:** Simple dashboard-only retrieval endpoint (GET /dashboard/:id) for basic dashboard entity without categories/favorites.
+**Status:** ❌ Not implemented
+**Details:**
+- Create `DashboardReadAction` (following pattern of CategoryReadAction, LinkReadAction)
+- Use existing `DashboardOutputSpec` (already implemented)
+- Add route: `GET /dashboard/:id` → DashboardReadAction
+- Currently GET /:id returns full dashboard view via DashboardViewController; need separate endpoint for entity-only
+
+#### 2. Tags in Dashboard View
+**Issue:** DashboardViewController returns complete dashboard with categories and favorites, but links don't include their tags.
+**Need:** Include tags array for each link (both in categories and in favorites) in the FullDashboardOutputSpec output.
+**Status:** ❌ Not implemented
+**Details:**
+- Links currently output: id, url, title, description, icon, created_at, updated_at
+- Missing: `tags` array (should contain tag objects with tag_name and color)
+- Need to modify FullDashboardOutputSpec to fetch and include tags for each link
+- Service layer already has `TagService.getTagsForLink(linkId)` method available
+- Consider performance: may need to optimize to avoid N+1 queries
+- Options:
+  1. Modify FullDashboardOutputSpec to call TagService for each link (simple but potentially slow)
+  2. Add tags fetching to DashboardService.getDashboardView() method (more efficient)
+  3. Create new composite method that fetches all tags in bulk for all links in one query
+
+#### 3. Frontend Admin Panel Requirements Analysis
+**Status:** 🔍 Needs analysis
+**Context:** Building a front-end admin panel using Angular Material or similar framework
+**Considerations:**
+
+**Current API Capabilities:**
+- ✅ Full CRUD for all entities (Dashboard, Category, Link, Tag, Favorite)
+- ✅ Reordering support (categories, links in categories, favorites)
+- ✅ Complex dashboard view with nested data
+- ✅ Search capabilities (links by text, links by tag, tag search)
+- ✅ Pagination support in LinkService (listLinks with limit/offset)
+- ❌ No authentication/authorization (users, sessions, tokens)
+- ❌ No dashboard listing endpoint
+- ❌ Missing tags in dashboard view responses
+
+**Potential Missing Features for Admin UI:**
+1. **Bulk Operations**
+   - Bulk link delete/move
+   - Bulk tag assignment/removal
+   - Bulk category operations
+
+2. **Statistics/Metadata**
+   - Link count per category
+   - Link count per tag
+   - Total counts for dashboard summaries
+   - Recently added/modified items
+   - Most used tags
+
+3. **API Response Enhancements**
+   - Consistent pagination format across all list endpoints
+   - HATEOAS links for resource navigation
+   - Partial response fields (only request needed fields)
+   - ETag support for caching
+   - CORS configuration for frontend app
+
+**Recommended Next Steps:**
+1. Create detailed API requirements document based on UI/UX wireframes
+2. Identify which features are nice-to-have vs. critical for MVP
+3. Plan API versioning strategy for future changes
+4. Design consistent error response format
+5. Plan authentication strategy (JWT, OAuth, session-based)
+6. Consider rate limiting and API quotas
+7. Plan database indexes for query performance
+
 ### To Reach Production (if desired):
-1. Add dashboard list route/controller (trivial - service method exists)
-2. Implement authentication middleware and user entity
-3. Add authorization/access control layer
-4. Create comprehensive API documentation (OpenAPI/Swagger)
-5. Add integration/E2E API tests
-6. Configure error handling/logging for production environments
-7. Add rate limiting middleware
-8. Implement pagination for list endpoints
-9. Add filtering/sorting query parameters
-10. Consider caching layer (Redis) for read operations
+
+**Critical for Frontend Admin Panel:**
+1. ⚠️ Add dashboard entity-only retrieval endpoint (GET /dashboard/:id → DashboardReadAction)
+2. ⚠️ Include tags in dashboard view responses (modify FullDashboardOutputSpec or service layer)
+3. ⚠️ Add dashboard list route/controller (trivial - service method exists)
+4. Implement authentication middleware and user entity
+5. Add authorization/access control layer
+
+**Important for Production:**
+6. Create comprehensive API documentation (OpenAPI/Swagger)
+7. Add integration/E2E API tests
+8. Configure error handling/logging for production environments
+9. Add rate limiting middleware
+10. Implement consistent pagination format for all list endpoints
+11. Add filtering/sorting query parameters
+12. Consider caching layer (Redis) for read operations
+13. Configure CORS for frontend application
+
+**Nice-to-Have for Enhanced Admin UI:**
+14. Bulk operations endpoints (bulk delete, bulk tag assignment, etc.)
+15. Statistics/metadata endpoints (counts, recently modified, etc.)
+16. Link validation/checking functionality
+17. Autocomplete endpoints for tags
 
 ### Estimated Completion:
 Current: ~85% complete
