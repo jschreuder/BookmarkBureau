@@ -113,12 +113,12 @@ class ServiceContainer
         }
 
         $options = [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ];
 
-        // Only set MySQL-specific attributes if the MySQL driver is available
-        if (defined('\PDO::MYSQL_ATTR_INIT_COMMAND')) {
-            $options[\PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES utf8';
+        // Only set MySQL-specific attributes if using MySQL driver
+        if (!str_starts_with($baseDsn, 'sqlite:') && defined('PDO::MYSQL_ATTR_INIT_COMMAND')) {
+            $options[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES utf8';
         }
 
         // Convert empty values to null for PDO compatibility
