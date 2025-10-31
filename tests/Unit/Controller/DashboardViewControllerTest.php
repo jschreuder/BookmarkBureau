@@ -7,7 +7,7 @@ use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Controller\DashboardViewController;
 use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
-use jschreuder\BookmarkBureau\OutputSpec\DashboardWithCategoriesAndFavoritesOutputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\FullDashboardOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
@@ -22,7 +22,7 @@ describe('DashboardViewController', function () {
         $dashboardOutputSpec = new DashboardOutputSpec();
         $categoryOutputSpec = new CategoryOutputSpec();
         $linkOutputSpec = new LinkOutputSpec();
-        $compositeOutputSpec = new DashboardWithCategoriesAndFavoritesOutputSpec(
+        $compositeOutputSpec = new FullDashboardOutputSpec(
             $dashboardOutputSpec,
             $categoryOutputSpec,
             $linkOutputSpec

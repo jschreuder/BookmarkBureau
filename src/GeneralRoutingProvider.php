@@ -33,7 +33,7 @@ use jschreuder\BookmarkBureau\InputSpec\TagInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\TagNameInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
-use jschreuder\BookmarkBureau\OutputSpec\DashboardWithCategoriesAndFavoritesOutputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\FullDashboardOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\FavoriteOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
@@ -184,7 +184,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             fn () => new DashboardViewController(
                 $this->container->getDashboardService(),
                 new JsonResponseTransformer(),
-                new DashboardWithCategoriesAndFavoritesOutputSpec(
+                new FullDashboardOutputSpec(
                     new DashboardOutputSpec(),
                     new CategoryOutputSpec(),
                     new LinkOutputSpec()

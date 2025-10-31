@@ -14,7 +14,7 @@ use jschreuder\BookmarkBureau\Collection\DashboardWithCategoriesAndFavorites;
  * This is an example of OutputSpec composition pattern, where a complex object is transformed
  * by delegating to simpler, single-responsibility OutputSpecs.
  */
-final readonly class DashboardWithCategoriesAndFavoritesOutputSpec implements OutputSpecInterface
+final readonly class FullDashboardOutputSpec implements OutputSpecInterface
 {
     use OutputSpecTrait;
 

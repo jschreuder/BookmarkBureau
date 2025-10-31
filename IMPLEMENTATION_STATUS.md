@@ -82,7 +82,7 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Controller/`
 2. **DashboardViewController** - Complex dashboard retrieval
    - Fetches complete dashboard with all categories (including their links) and favorites
    - Uses DashboardService.getDashboardView() for optimized data fetching
-   - Returns nested JSON structure via DashboardWithCategoriesAndFavoritesOutputSpec
+   - Returns nested JSON structure via FullDashboardOutputSpec
    - Validates UUID format from route parameters
 
 3. **ErrorHandlerController** - Global error handler
@@ -396,7 +396,7 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/OutputSpec/`
 - Transforms Favorite entity to JSON array
 - Outputs: dashboard_id, link_id, sort_order, created_at
 
-**DashboardWithCategoriesAndFavoritesOutputSpec:**
+**FullDashboardOutputSpec:**
 - Transforms complete dashboard view to nested JSON structure
 - Outputs: dashboard (id, title, description, icon, dates), categories (with links), favorites
 

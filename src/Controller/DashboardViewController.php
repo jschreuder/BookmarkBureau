@@ -2,7 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Controller;
 
-use jschreuder\BookmarkBureau\OutputSpec\DashboardWithCategoriesAndFavoritesOutputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\FullDashboardOutputSpec;
 use jschreuder\BookmarkBureau\Response\ResponseTransformerInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use jschreuder\Middle\Controller\ControllerInterface;
@@ -27,7 +27,7 @@ final readonly class DashboardViewController implements
     public function __construct(
         private DashboardServiceInterface $dashboardService,
         private ResponseTransformerInterface $responseTransformer,
-        private DashboardWithCategoriesAndFavoritesOutputSpec $outputSpec,
+        private FullDashboardOutputSpec $outputSpec,
     ) {}
 
     #[\Override]
