@@ -43,6 +43,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
         $this->container = $container;
     }
 
+    #[\Override]
     public function registerRoutes(RouterInterface $router): void
     {
         $router->get('home', '/', fn () => new class implements ControllerInterface {
