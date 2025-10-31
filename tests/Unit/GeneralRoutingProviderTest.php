@@ -163,29 +163,50 @@ describe('GeneralRoutingProvider', function () {
     });
 
     describe('service container interaction', function () {
-        test('fetches all services during route registration', function () {
+        test('does not fetch services during route registration (lazy loading)', function () {
             $router = Mockery::mock(RouterInterface::class);
             $router->shouldReceive('get', 'post', 'put', 'delete')->andReturnNull();
 
             $container = Mockery::mock(ServiceContainer::class);
-            $container->shouldReceive('getLinkService')
-                ->once()
-                ->andReturn(Mockery::mock(LinkServiceInterface::class));
-            $container->shouldReceive('getCategoryService')
-                ->once()
-                ->andReturn(Mockery::mock(CategoryServiceInterface::class));
-            $container->shouldReceive('getDashboardService')
-                ->once()
-                ->andReturn(Mockery::mock(DashboardServiceInterface::class));
-            $container->shouldReceive('getFavoriteService')
-                ->once()
-                ->andReturn(Mockery::mock(FavoriteServiceInterface::class));
-            $container->shouldReceive('getTagService')
-                ->once()
-                ->andReturn(Mockery::mock(TagServiceInterface::class));
+            $container->shouldReceive('getLinkService')->never();
+            $container->shouldReceive('getCategoryService')->never();
+            $container->shouldReceive('getDashboardService')->never();
+            $container->shouldReceive('getFavoriteService')->never();
+            $container->shouldReceive('getTagService')->never();
 
             $provider = new GeneralRoutingProvider($container);
             $provider->registerRoutes($router);
+        });
+
+        test('fetches services when route handler is invoked', function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $capturedFactory = null;
+
+            $router->shouldReceive('get')
+                ->andReturnUsing(function($name, $_path, $factory) use (&$capturedFactory, $router) {
+                    if ($name === 'link-read') {
+                        $capturedFactory = $factory;
+                    }
+                    return $router;
+                });
+            $router->shouldReceive('post', 'put', 'delete')->andReturn($router);
+
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $container = Mockery::mock(ServiceContainer::class);
+            $container->shouldReceive('getLinkService')
+                ->andReturn($linkService);
+            $container->shouldReceive('getCategoryService')->andReturn(Mockery::mock(CategoryServiceInterface::class));
+            $container->shouldReceive('getDashboardService')->andReturn(Mockery::mock(DashboardServiceInterface::class));
+            $container->shouldReceive('getFavoriteService')->andReturn(Mockery::mock(FavoriteServiceInterface::class));
+            $container->shouldReceive('getTagService')->andReturn(Mockery::mock(TagServiceInterface::class));
+
+            $provider = new GeneralRoutingProvider($container);
+            $provider->registerRoutes($router);
+
+            // Now invoke the route handler - should return a controller
+            expect($capturedFactory)->not->toBeNull();
+            $controller = $capturedFactory();
+            expect($controller)->toBeInstanceOf(ControllerInterface::class);
         });
     });
 });

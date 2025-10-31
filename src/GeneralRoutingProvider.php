@@ -63,63 +63,114 @@ class GeneralRoutingProvider implements RoutingProviderInterface
         });
 
         // Links
-        $linkService = $this->container->getLinkService();
-        $linkInput = new LinkInputSpec();
-        $linkOutput = new LinkOutputSpec();
         (new ResourceRouteBuilder($router, 'link', '/link'))
-            ->registerRead(new LinkReadAction($linkService, $linkInput, $linkOutput))
-            ->registerCreate(new LinkCreateAction($linkService, $linkInput, $linkOutput))
-            ->registerUpdate(new LinkUpdateAction($linkService, $linkInput, $linkOutput))
-            ->registerDelete(new LinkDeleteAction($linkService, $linkInput));
+            ->registerRead(fn() => new LinkReadAction(
+                $this->container->getLinkService(),
+                new LinkInputSpec(),
+                new LinkOutputSpec()
+            ))
+            ->registerCreate(fn() => new LinkCreateAction(
+                $this->container->getLinkService(),
+                new LinkInputSpec(),
+                new LinkOutputSpec()
+            ))
+            ->registerUpdate(fn() => new LinkUpdateAction(
+                $this->container->getLinkService(),
+                new LinkInputSpec(),
+                new LinkOutputSpec()
+            ))
+            ->registerDelete(fn() => new LinkDeleteAction(
+                $this->container->getLinkService(),
+                new LinkInputSpec()
+            ));
 
         // Tags
-        $tagService = $this->container->getTagService();
-        $tagInput = new TagInputSpec();
-        $tagNameInput = new TagNameInputSpec();
-        $tagOutput = new TagOutputSpec();
         (new ResourceRouteBuilder($router, 'tag', '/tag'))
-            ->registerRead(new TagReadAction($tagService, $tagNameInput, $tagOutput))
-            ->registerCreate(new TagCreateAction($tagService, $tagInput, $tagOutput))
-            ->registerUpdate(new TagUpdateAction($tagService, $tagInput, $tagOutput))
-            ->registerDelete(new TagDeleteAction($tagService, $tagNameInput));
+            ->registerRead(fn() => new TagReadAction(
+                $this->container->getTagService(),
+                new TagNameInputSpec(),
+                new TagOutputSpec()
+            ))
+            ->registerCreate(fn() => new TagCreateAction(
+                $this->container->getTagService(),
+                new TagInputSpec(),
+                new TagOutputSpec()
+            ))
+            ->registerUpdate(fn() => new TagUpdateAction(
+                $this->container->getTagService(),
+                new TagInputSpec(),
+                new TagOutputSpec()
+            ))
+            ->registerDelete(fn() => new TagDeleteAction(
+                $this->container->getTagService(),
+                new TagNameInputSpec()
+            ));
 
         // Link-Tag associations
-        $linkTagInput = new LinkTagInputSpec();
         (new ResourceRouteBuilder($router, 'link_tag', '/link/:id/tag'))
-            ->registerCreate(new LinkTagCreateAction($tagService, $linkTagInput))
-            ->registerCustom('DELETE', 'delete', '/:tag_name', new LinkTagDeleteAction($tagService, $linkTagInput));
+            ->registerCreate(fn() => new LinkTagCreateAction(
+                $this->container->getTagService(),
+                new LinkTagInputSpec()
+            ))
+            ->registerCustom('DELETE', 'delete', '/:tag_name', fn() => new LinkTagDeleteAction(
+                $this->container->getTagService(),
+                new LinkTagInputSpec()
+            ));
 
         // Dashboards
-        $dashboardService = $this->container->getDashboardService();
-        $dashboardInput = new DashboardInputSpec();
-        $dashboardOutput = new DashboardOutputSpec();
         (new ResourceRouteBuilder($router, 'dashboard', '/dashboard'))
-            ->registerCreate(new DashboardCreateAction($dashboardService, $dashboardInput, $dashboardOutput))
-            ->registerUpdate(new DashboardUpdateAction($dashboardService, $dashboardInput, $dashboardOutput))
-            ->registerDelete(new DashboardDeleteAction($dashboardService, $dashboardInput));
+            ->registerCreate(fn() => new DashboardCreateAction(
+                $this->container->getDashboardService(),
+                new DashboardInputSpec(),
+                new DashboardOutputSpec()
+            ))
+            ->registerUpdate(fn() => new DashboardUpdateAction(
+                $this->container->getDashboardService(),
+                new DashboardInputSpec(),
+                new DashboardOutputSpec()
+            ))
+            ->registerDelete(fn() => new DashboardDeleteAction(
+                $this->container->getDashboardService(),
+                new DashboardInputSpec()
+            ));
 
         // Favorites
-        $favoriteService = $this->container->getFavoriteService();
-        $favoriteInput = new FavoriteInputSpec();
-        $favoriteOutput = new FavoriteOutputSpec();
-        $reorderFavoritesInput = new ReorderFavoritesInputSpec();
         (new ResourceRouteBuilder($router, 'favorite', '/dashboard/:id/favorites'))
-            ->registerCreate(new FavoriteCreateAction($favoriteService, $favoriteInput, $favoriteOutput))
-            ->registerCustom('DELETE', 'delete', '', new FavoriteDeleteAction($favoriteService, $favoriteInput))
-            ->registerCustom('PUT', 'reorder', '', new FavoriteReorderAction(
-                $favoriteService,
-                $reorderFavoritesInput,
-                $favoriteOutput
+            ->registerCreate(fn() => new FavoriteCreateAction(
+                $this->container->getFavoriteService(),
+                new FavoriteInputSpec(),
+                new FavoriteOutputSpec()
+            ))
+            ->registerCustom('DELETE', 'delete', '', fn() => new FavoriteDeleteAction(
+                $this->container->getFavoriteService(),
+                new FavoriteInputSpec()
+            ))
+            ->registerCustom('PUT', 'reorder', '', fn() => new FavoriteReorderAction(
+                $this->container->getFavoriteService(),
+                new ReorderFavoritesInputSpec(),
+                new FavoriteOutputSpec()
             ));
 
         // Categories
-        $categoryService = $this->container->getCategoryService();
-        $categoryInput = new CategoryInputSpec();
-        $categoryOutput = new CategoryOutputSpec();
         (new ResourceRouteBuilder($router, 'category', '/category'))
-            ->registerRead(new CategoryReadAction($categoryService, $categoryInput, $categoryOutput))
-            ->registerCreate(new CategoryCreateAction($categoryService, $categoryInput, $categoryOutput))
-            ->registerUpdate(new CategoryUpdateAction($categoryService, $categoryInput, $categoryOutput))
-            ->registerDelete(new CategoryDeleteAction($categoryService, $categoryInput));
+            ->registerRead(fn() => new CategoryReadAction(
+                $this->container->getCategoryService(),
+                new CategoryInputSpec(),
+                new CategoryOutputSpec()
+            ))
+            ->registerCreate(fn() => new CategoryCreateAction(
+                $this->container->getCategoryService(),
+                new CategoryInputSpec(),
+                new CategoryOutputSpec()
+            ))
+            ->registerUpdate(fn() => new CategoryUpdateAction(
+                $this->container->getCategoryService(),
+                new CategoryInputSpec(),
+                new CategoryOutputSpec()
+            ))
+            ->registerDelete(fn() => new CategoryDeleteAction(
+                $this->container->getCategoryService(),
+                new CategoryInputSpec()
+            ));
     }
 }

@@ -7,6 +7,7 @@ use jschreuder\BookmarkBureau\Controller\ActionController;
 use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
 use jschreuder\Middle\Controller\ControllerInterface;
 use jschreuder\Middle\Router\RouterInterface;
+use Closure;
 
 /**
  * Helper for registering groups of CRUD routes with reduced verbosity.
@@ -28,14 +29,14 @@ final readonly class ResourceRouteBuilder
     /**
      * Register a GET route for reading a single resource.
      *
-     * @param ActionInterface $action The action to execute (explicitly constructed)
+     * @param Closure(): ActionInterface $actionFactory Closure that creates the action when needed
      */
-    public function registerRead(ActionInterface $action): self
+    public function registerRead(Closure $actionFactory): self
     {
         $this->router->get(
             $this->resourceName . '-read',
             $this->pathSegment . self::ID_SEGMENT,
-            fn(): ControllerInterface => new ActionController($action, new JsonResponseTransformer())
+            fn(): ControllerInterface => new ActionController($actionFactory(), new JsonResponseTransformer())
         );
         return $this;
     }
@@ -43,14 +44,14 @@ final readonly class ResourceRouteBuilder
     /**
      * Register a POST route for creating a resource.
      *
-     * @param ActionInterface $action The action to execute (explicitly constructed)
+     * @param Closure(): ActionInterface $actionFactory Closure that creates the action when needed
      */
-    public function registerCreate(ActionInterface $action): self
+    public function registerCreate(Closure $actionFactory): self
     {
         $this->router->post(
             $this->resourceName . '-create',
             $this->pathSegment,
-            fn(): ControllerInterface => new ActionController($action, new JsonResponseTransformer())
+            fn(): ControllerInterface => new ActionController($actionFactory(), new JsonResponseTransformer())
         );
         return $this;
     }
@@ -58,14 +59,14 @@ final readonly class ResourceRouteBuilder
     /**
      * Register a PUT route for updating a resource.
      *
-     * @param ActionInterface $action The action to execute (explicitly constructed)
+     * @param Closure(): ActionInterface $actionFactory Closure that creates the action when needed
      */
-    public function registerUpdate(ActionInterface $action): self
+    public function registerUpdate(Closure $actionFactory): self
     {
         $this->router->put(
             $this->resourceName . '-update',
             $this->pathSegment . self::ID_SEGMENT,
-            fn(): ControllerInterface => new ActionController($action, new JsonResponseTransformer())
+            fn(): ControllerInterface => new ActionController($actionFactory(), new JsonResponseTransformer())
         );
         return $this;
     }
@@ -73,14 +74,14 @@ final readonly class ResourceRouteBuilder
     /**
      * Register a DELETE route for deleting a resource.
      *
-     * @param ActionInterface $action The action to execute (explicitly constructed)
+     * @param Closure(): ActionInterface $actionFactory Closure that creates the action when needed
      */
-    public function registerDelete(ActionInterface $action): self
+    public function registerDelete(Closure $actionFactory): self
     {
         $this->router->delete(
             $this->resourceName . '-delete',
             $this->pathSegment . self::ID_SEGMENT,
-            fn(): ControllerInterface => new ActionController($action, new JsonResponseTransformer())
+            fn(): ControllerInterface => new ActionController($actionFactory(), new JsonResponseTransformer())
         );
         return $this;
     }
@@ -93,13 +94,13 @@ final readonly class ResourceRouteBuilder
      * @param string $method HTTP method (GET, POST, PUT, DELETE, etc.)
      * @param string $suffix Route name suffix (e.g., 'reorder' for 'favorite-reorder')
      * @param string $pathSuffix Additional path segment (can be empty string)
-     * @param ActionInterface $action The action to execute (explicitly constructed)
+     * @param Closure(): ActionInterface $actionFactory Closure that creates the action when needed
      */
     public function registerCustom(
         string $method,
         string $suffix,
         string $pathSuffix,
-        ActionInterface $action
+        Closure $actionFactory
     ): self {
         $routeName = $suffix !== ''
             ? $this->resourceName . '-' . $suffix
@@ -108,7 +109,7 @@ final readonly class ResourceRouteBuilder
         $path = $this->pathSegment . $pathSuffix;
 
         $controller = fn(): ControllerInterface => new ActionController(
-            $action,
+            $actionFactory(),
             new JsonResponseTransformer()
         );
 
