@@ -121,10 +121,14 @@ class ServiceContainer
             $options[\PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES utf8';
         }
 
+        // Convert empty values to null for PDO compatibility
+        $user = $this->config('db.user') ?: null;
+        $pass = $this->config('db.pass') ?: null;
+
         return new PDO(
             $dsn,
-            $this->config('db.user'),
-            $this->config('db.pass'),
+            $user,
+            $pass,
             $options
         );
     }
