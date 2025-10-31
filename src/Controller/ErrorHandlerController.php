@@ -17,6 +17,7 @@ final readonly class ErrorHandlerController implements ControllerInterface
         $this->logger = $logger;
     }
 
+    #[\Override]
     public function execute(ServerRequestInterface $request) : ResponseInterface
     {
         /** @var  \Throwable $exception */

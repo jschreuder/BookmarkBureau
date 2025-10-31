@@ -26,6 +26,7 @@ final readonly class ActionController implements
         private int $successStatus = 200
     ) {}
 
+    #[\Override]
     public function filterRequest(ServerRequestInterface $request): ServerRequestInterface
     {
         // Fetch input data, query parameters for GET request, the (parsed) body parameters for all others
@@ -44,12 +45,14 @@ final readonly class ActionController implements
         return $request->withParsedBody($this->action->filter($rawData));
     }
 
+    #[\Override]
     public function validateRequest(ServerRequestInterface $request): void
     {
         $data = (array) $request->getParsedBody();
         $this->action->validate($data);
     }
 
+    #[\Override]
     public function execute(ServerRequestInterface $request): ResponseInterface
     {
         $data = (array) $request->getParsedBody();

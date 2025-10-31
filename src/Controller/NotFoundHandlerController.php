@@ -9,6 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final readonly class NotFoundHandlerController implements ControllerInterface
 {
+    #[\Override]
     public function execute(ServerRequestInterface $request) : ResponseInterface
     {
         return new JsonResponse(
