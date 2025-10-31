@@ -19,16 +19,19 @@ final readonly class CategoryReadAction implements ActionInterface
         private OutputSpecInterface $outputSpec
     ) {}
 
+    #[\Override]
     public function filter(array $rawData): array
     {
         return $this->inputSpec->filter($rawData);
     }
 
+    #[\Override]
     public function validate(array $data): void
     {
         $this->inputSpec->validate($data);
     }
 
+    #[\Override]
     public function execute(array $data): array
     {
         $categoryId = Uuid::fromString($data['id']);

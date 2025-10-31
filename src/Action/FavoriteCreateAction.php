@@ -19,6 +19,7 @@ final readonly class FavoriteCreateAction implements ActionInterface
         private OutputSpecInterface $outputSpec
     ) {}
 
+    #[\Override]
     public function filter(array $rawData): array
     {
         // Create operations need dashboard_id and link_id, but not sort_order
@@ -26,6 +27,7 @@ final readonly class FavoriteCreateAction implements ActionInterface
         return $this->inputSpec->filter($rawData, $fields);
     }
 
+    #[\Override]
     public function validate(array $data): void
     {
         // Create operations need dashboard_id and link_id, but not sort_order
@@ -33,6 +35,7 @@ final readonly class FavoriteCreateAction implements ActionInterface
         $this->inputSpec->validate($data, $fields);
     }
 
+    #[\Override]
     public function execute(array $data): array
     {
         $favorite = $this->favoriteService->addFavorite(

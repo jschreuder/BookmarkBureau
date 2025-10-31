@@ -19,16 +19,19 @@ final readonly class FavoriteReorderAction implements ActionInterface
         private OutputSpecInterface $outputSpec
     ) {}
 
+    #[\Override]
     public function filter(array $rawData): array
     {
         return $this->inputSpec->filter($rawData);
     }
 
+    #[\Override]
     public function validate(array $data): void
     {
         $this->inputSpec->validate($data);
     }
 
+    #[\Override]
     public function execute(array $data): array
     {
         // Transform the links array into a map of link_id => sort_order

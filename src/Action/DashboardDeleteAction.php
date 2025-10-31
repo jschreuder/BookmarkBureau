@@ -17,16 +17,19 @@ final readonly class DashboardDeleteAction implements ActionInterface
         private InputSpecInterface $inputSpec
     ) {}
 
+    #[\Override]
     public function filter(array $rawData): array
     {
         return $this->inputSpec->filter($rawData);
     }
 
+    #[\Override]
     public function validate(array $data): void
     {
         $this->inputSpec->validate($data);
     }
 
+    #[\Override]
     public function execute(array $data): array
     {
         $dashboardId = Uuid::fromString($data['id']);

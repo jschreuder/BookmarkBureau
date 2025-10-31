@@ -17,18 +17,21 @@ final readonly class FavoriteDeleteAction implements ActionInterface
         private InputSpecInterface $inputSpec
     ) {}
 
+    #[\Override]
     public function filter(array $rawData): array
     {
         $fields = ['dashboard_id', 'link_id'];
         return $this->inputSpec->filter($rawData, $fields);
     }
 
+    #[\Override]
     public function validate(array $data): void
     {
         $fields = ['dashboard_id', 'link_id'];
         $this->inputSpec->validate($data, $fields);
     }
 
+    #[\Override]
     public function execute(array $data): array
     {
         $this->favoriteService->removeFavorite(

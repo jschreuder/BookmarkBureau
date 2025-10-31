@@ -19,6 +19,7 @@ final readonly class CategoryCreateAction implements ActionInterface
         private OutputSpecInterface $outputSpec
     ) {}
 
+    #[\Override]
     public function filter(array $rawData): array
     {
         // Create operations need all fields except 'id', since it doesn't exist yet
@@ -26,6 +27,7 @@ final readonly class CategoryCreateAction implements ActionInterface
         return $this->inputSpec->filter($rawData, $fields);
     }
 
+    #[\Override]
     public function validate(array $data): void
     {
         // Create operations need all fields except 'id', since it doesn't exist yet
@@ -33,6 +35,7 @@ final readonly class CategoryCreateAction implements ActionInterface
         $this->inputSpec->validate($data, $fields);
     }
 
+    #[\Override]
     public function execute(array $data): array
     {
         $dashboardId = Uuid::fromString($data['dashboard_id']);

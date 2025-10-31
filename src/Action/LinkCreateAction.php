@@ -18,6 +18,7 @@ final readonly class LinkCreateAction implements ActionInterface
         private OutputSpecInterface $outputSpec
     ) {}
 
+    #[\Override]
     public function filter(array $rawData): array
     {
         // Create operations need all fields except 'id', since it doesn't exist yet
@@ -25,6 +26,7 @@ final readonly class LinkCreateAction implements ActionInterface
         return $this->inputSpec->filter($rawData, $fields);
     }
 
+    #[\Override]
     public function validate(array $data): void
     {
         // Create operations need all fields except 'id', since it doesn't exist yet
@@ -32,6 +34,7 @@ final readonly class LinkCreateAction implements ActionInterface
         $this->inputSpec->validate($data, $fields);
     }
 
+    #[\Override]
     public function execute(array $data): array
     {
         $link = $this->linkService->createLink(
