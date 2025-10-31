@@ -44,7 +44,7 @@ Want similar explicitness and type safety in PHP? Performance without complexity
 
 ## The Action Pattern
 
-A layer build on top of the common Controller pattern, BookmarkBureau uses a three-phase action pattern throughout:
+A layer built on top of the common Controller pattern, BookmarkBureau uses a three-phase action pattern throughout:
 
 ```php
 // One line to wire up a complete CRUD operation
