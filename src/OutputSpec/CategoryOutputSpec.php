@@ -9,6 +9,7 @@ final readonly class CategoryOutputSpec implements OutputSpecInterface
 {
     use OutputSpecTrait;
 
+    #[\Override]
     public function supports(object $data): bool
     {
         return $data instanceof Category;

@@ -8,7 +8,8 @@ use jschreuder\BookmarkBureau\Entity\Dashboard;
 final readonly class DashboardOutputSpec implements OutputSpecInterface
 {
     use OutputSpecTrait;
-    
+
+    #[\Override]
     public function supports(object $data): bool
     {
         return $data instanceof Dashboard;

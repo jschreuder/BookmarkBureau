@@ -16,11 +16,13 @@ final class FavoriteInputSpec implements InputSpecInterface
         'sort_order',
     ];
 
+    #[\Override]
     public function getAvailableFields(): array
     {
         return self::FIELDS;
     }
 
+    #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
         $filtered = [];
@@ -40,6 +42,7 @@ final class FavoriteInputSpec implements InputSpecInterface
         return $filtered;
     }
 
+    #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
         $validator = Validator::arrayType();

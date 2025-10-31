@@ -16,16 +16,18 @@ final class IdInputSpec implements InputSpecInterface
 {
     private const FIELDS = ['id'];
 
+    #[\Override]
     public function getAvailableFields(): array
     {
         return self::FIELDS;
     }
 
+    #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
         $filtered = [];
         $fields ??= $this->getAvailableFields();
-        
+
         foreach ($fields as $field) {
             $filtered[$field] = match($field) {
                 'id' => Filter::start($rawData, 'id', '')
@@ -37,11 +39,12 @@ final class IdInputSpec implements InputSpecInterface
         return $filtered;
     }
 
+    #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
         $validator = Validator::arrayType();
         $fields ??= $this->getAvailableFields();
-        
+
         foreach ($fields as $field) {
             $validator = match ($field) {
                 'id' => $validator->key('id', Validator::notEmpty()->uuid()),

@@ -15,11 +15,13 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
         'links',
     ];
 
+    #[\Override]
     public function getAvailableFields(): array
     {
         return self::FIELDS;
     }
 
+    #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
         $filtered = [];
@@ -57,6 +59,7 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
         return $filtered;
     }
 
+    #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
         $validator = Validator::arrayType();
