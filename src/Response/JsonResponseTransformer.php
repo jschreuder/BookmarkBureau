@@ -24,6 +24,7 @@ final readonly class JsonResponseTransformer implements ResponseTransformerInter
      * @return ResponseInterface JSON response with Content-Type: application/json
      * @throws \RuntimeException When JSON encoding fails
      */
+    #[\Override]
     public function transform(
         array $data,
         int $statusCode = 200,
