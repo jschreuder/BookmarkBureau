@@ -340,6 +340,78 @@ describe('PdoCategoryRepository', function () {
             expect($found->color)->not->toBeNull();
             expect((string) $found->color)->toBe('#0000FF');
         });
+
+        test('throws DashboardNotFoundException when dashboard foreign key constraint fails on insert', function () {
+            $mockPdo = \Mockery::mock(PDO::class);
+            $checkStmt = \Mockery::mock(\PDOStatement::class);
+            $insertStmt = \Mockery::mock(\PDOStatement::class);
+
+            $dashboard = TestEntityFactory::createDashboard();
+            $category = TestEntityFactory::createCategory(dashboard: $dashboard);
+
+            // Check statement returns false (category doesn't exist)
+            $checkStmt->shouldReceive('execute')->andReturn(true);
+            $checkStmt->shouldReceive('fetch')->andReturn(false);
+
+            // INSERT statement throws foreign key constraint error
+            $fkException = new \PDOException('FOREIGN KEY constraint failed: dashboard_id');
+            $insertStmt->shouldReceive('execute')->andThrow($fkException);
+
+            // Mock PDO to return statements
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('SELECT 1 FROM categories WHERE category_id = :category_id LIMIT 1')
+                ->andReturn($checkStmt);
+
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('INSERT INTO categories (category_id, dashboard_id, title, color, sort_order, created_at, updated_at)
+                     VALUES (:category_id, :dashboard_id, :title, :color, :sort_order, :created_at, :updated_at)')
+                ->andReturn($insertStmt);
+
+            $mockDashboardRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class);
+            $mockLinkRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class);
+            $repo = new PdoCategoryRepository($mockPdo, $mockDashboardRepo, $mockLinkRepo);
+
+            expect(fn() => $repo->save($category))
+                ->toThrow(DashboardNotFoundException::class);
+        });
+
+        test('re-throws PDOException when not a foreign key constraint error on insert', function () {
+            $mockPdo = \Mockery::mock(PDO::class);
+            $checkStmt = \Mockery::mock(\PDOStatement::class);
+            $insertStmt = \Mockery::mock(\PDOStatement::class);
+
+            $dashboard = TestEntityFactory::createDashboard();
+            $category = TestEntityFactory::createCategory(dashboard: $dashboard);
+
+            // Check statement returns false (category doesn't exist)
+            $checkStmt->shouldReceive('execute')->andReturn(true);
+            $checkStmt->shouldReceive('fetch')->andReturn(false);
+
+            // INSERT statement throws unexpected error
+            $unexpectedException = new \PDOException('Disk I/O error');
+            $insertStmt->shouldReceive('execute')->andThrow($unexpectedException);
+
+            // Mock PDO to return statements
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('SELECT 1 FROM categories WHERE category_id = :category_id LIMIT 1')
+                ->andReturn($checkStmt);
+
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('INSERT INTO categories (category_id, dashboard_id, title, color, sort_order, created_at, updated_at)
+                     VALUES (:category_id, :dashboard_id, :title, :color, :sort_order, :created_at, :updated_at)')
+                ->andReturn($insertStmt);
+
+            $mockDashboardRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class);
+            $mockLinkRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class);
+            $repo = new PdoCategoryRepository($mockPdo, $mockDashboardRepo, $mockLinkRepo);
+
+            expect(fn() => $repo->save($category))
+                ->toThrow(\PDOException::class);
+        });
     });
 
     describe('delete', function () {
@@ -428,6 +500,34 @@ describe('PdoCategoryRepository', function () {
 
             expect(fn() => $repo->addLink($category->categoryId, $nonExistentLinkId, 0))
                 ->toThrow(LinkNotFoundException::class);
+        });
+
+        test('re-throws PDOException when not a foreign key constraint error', function () {
+            $mockPdo = \Mockery::mock(PDO::class);
+            $mockDashboardRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class);
+            $mockLinkRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class);
+            $insertStmt = \Mockery::mock(\PDOStatement::class);
+
+            $category = TestEntityFactory::createCategory();
+            $link = TestEntityFactory::createLink();
+            $categoryId = $category->categoryId;
+            $linkId = $link->linkId;
+
+            // Mock repository lookups to succeed
+            $mockDashboardRepo->shouldReceive('findById')->andReturn($category->dashboard);
+            $mockLinkRepo->shouldReceive('findById')->andReturn($link);
+
+            // INSERT statement throws unexpected error
+            $unexpectedException = new \PDOException('Disk I/O error');
+            $insertStmt->shouldReceive('execute')->andThrow($unexpectedException);
+
+            $mockPdo->shouldReceive('prepare')
+                ->andReturn($insertStmt);
+
+            $repo = new PdoCategoryRepository($mockPdo, $mockDashboardRepo, $mockLinkRepo);
+
+            expect(fn() => $repo->addLink($categoryId, $linkId, 0))
+                ->toThrow(\PDOException::class);
         });
     });
 
