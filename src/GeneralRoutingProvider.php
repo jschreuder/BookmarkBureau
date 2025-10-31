@@ -22,6 +22,7 @@ use jschreuder\BookmarkBureau\Action\TagCreateAction;
 use jschreuder\BookmarkBureau\Action\TagDeleteAction;
 use jschreuder\BookmarkBureau\Action\TagReadAction;
 use jschreuder\BookmarkBureau\Action\TagUpdateAction;
+use jschreuder\BookmarkBureau\Controller\DashboardViewController;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\FavoriteInputSpec;
@@ -32,9 +33,11 @@ use jschreuder\BookmarkBureau\InputSpec\TagInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\TagNameInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\DashboardWithCategoriesAndFavoritesOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\FavoriteOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
+use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
 use jschreuder\BookmarkBureau\Util\ResourceRouteBuilder;
 use jschreuder\Middle\Router\RouterInterface;
 use jschreuder\Middle\Router\RoutingProviderInterface;
@@ -61,6 +64,15 @@ class GeneralRoutingProvider implements RoutingProviderInterface
                 return new JsonResponse(['message' => 'Hello world!']);
             }
         });
+
+        // Dashboard view (complex operation with categories and favorites)
+        $router->get('dashboard-view', '/dashboard/:id', fn () => new DashboardViewController(
+            $this->container->getDashboardService(),
+            new JsonResponseTransformer(),
+            new DashboardOutputSpec(),
+            new CategoryOutputSpec(),
+            new LinkOutputSpec()
+        ));
 
         // Links
         (new ResourceRouteBuilder($router, 'link', '/link'))

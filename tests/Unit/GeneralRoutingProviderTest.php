@@ -98,6 +98,26 @@ describe('GeneralRoutingProvider', function () {
             $controller = $capturedFactory();
             expect($controller)->toBeInstanceOf(ControllerInterface::class);
         });
+
+        test('dashboard-view route handler returns DashboardViewController instance', function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $capturedFactory = null;
+
+            $router->shouldReceive('get')
+                ->andReturnUsing(function($name, $path, $factory) use (&$capturedFactory) {
+                    if ($name === 'dashboard-view') {
+                        $capturedFactory = $factory;
+                    }
+                });
+            $router->shouldReceive('post', 'put', 'delete')->andReturnNull();
+
+            $provider = new GeneralRoutingProvider(createMockContainer());
+            $provider->registerRoutes($router);
+
+            expect($capturedFactory)->not->toBeNull();
+            $controller = $capturedFactory();
+            expect($controller)->toBeInstanceOf(ControllerInterface::class);
+        });
     });
 
     describe('route registration paths and methods', function () {
@@ -137,7 +157,8 @@ describe('GeneralRoutingProvider', function () {
             expect($registeredRoutes['category-update'])->toBe(['method' => 'PUT', 'path' => '/category/:id']);
             expect($registeredRoutes['category-delete'])->toBe(['method' => 'DELETE', 'path' => '/category/:id']);
 
-            // Dashboard routes (no read)
+            // Dashboard routes
+            expect($registeredRoutes['dashboard-view'])->toBe(['method' => 'GET', 'path' => '/dashboard/:id']);
             expect($registeredRoutes['dashboard-create'])->toBe(['method' => 'POST', 'path' => '/dashboard']);
             expect($registeredRoutes['dashboard-update'])->toBe(['method' => 'PUT', 'path' => '/dashboard/:id']);
             expect($registeredRoutes['dashboard-delete'])->toBe(['method' => 'DELETE', 'path' => '/dashboard/:id']);
