@@ -7,6 +7,7 @@ use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Controller\DashboardViewController;
 use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\DashboardWithCategoriesAndFavoritesOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
@@ -14,41 +15,37 @@ use Laminas\Diactoros\ServerRequest;
 use Ramsey\Uuid\Uuid;
 
 describe('DashboardViewController', function () {
-    describe('initialization', function () {
-        test('creates controller with required dependencies', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
+    // Helper function to create the controller with proper dependencies
+    $createController = function (?DashboardServiceInterface $dashboardService = null) {
+        $dashboardService = $dashboardService ?? Mockery::mock(DashboardServiceInterface::class);
+        $responseTransformer = new JsonResponseTransformer();
+        $dashboardOutputSpec = new DashboardOutputSpec();
+        $categoryOutputSpec = new CategoryOutputSpec();
+        $linkOutputSpec = new LinkOutputSpec();
+        $compositeOutputSpec = new DashboardWithCategoriesAndFavoritesOutputSpec(
+            $dashboardOutputSpec,
+            $categoryOutputSpec,
+            $linkOutputSpec
+        );
 
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+        return new DashboardViewController(
+            $dashboardService,
+            $responseTransformer,
+            $compositeOutputSpec
+        );
+    };
+
+    describe('initialization', function () use ($createController) {
+        test('creates controller with required dependencies', function () use ($createController) {
+            $controller = $createController();
 
             expect($controller)->toBeInstanceOf(DashboardViewController::class);
         });
     });
 
-    describe('filterRequest method', function () {
-        test('extracts id from route attributes and sets as parsed body', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+    describe('filterRequest method', function () use ($createController) {
+        test('extracts id from route attributes and sets as parsed body', function () use ($createController) {
+            $controller = $createController();
 
             $dashboardId = Uuid::uuid4()->toString();
             $request = new ServerRequest(
@@ -63,20 +60,8 @@ describe('DashboardViewController', function () {
             expect($filtered->getParsedBody())->toBe(['id' => $dashboardId]);
         });
 
-        test('returns empty parsed body when id is not in route attributes', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+        test('returns empty parsed body when id is not in route attributes', function () use ($createController) {
+            $controller = $createController();
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard',
@@ -89,20 +74,8 @@ describe('DashboardViewController', function () {
             expect($filtered->getParsedBody())->toBe([]);
         });
 
-        test('handles null id attribute', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+        test('handles null id attribute', function () use ($createController) {
+            $controller = $createController();
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard',
@@ -117,21 +90,9 @@ describe('DashboardViewController', function () {
         });
     });
 
-    describe('validateRequest method', function () {
-        test('passes validation with valid UUID', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+    describe('validateRequest method', function () use ($createController) {
+        test('passes validation with valid UUID', function () use ($createController) {
+            $controller = $createController();
 
             $dashboardId = Uuid::uuid4()->toString();
             $request = new ServerRequest(
@@ -146,20 +107,8 @@ describe('DashboardViewController', function () {
             expect(true)->toBeTrue();
         });
 
-        test('throws InvalidArgumentException when id is missing', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+        test('throws InvalidArgumentException when id is missing', function () use ($createController) {
+            $controller = $createController();
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard',
@@ -172,20 +121,8 @@ describe('DashboardViewController', function () {
                 ->toThrow(InvalidArgumentException::class, 'Dashboard ID is required');
         });
 
-        test('throws InvalidArgumentException when id is not a valid UUID', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+        test('throws InvalidArgumentException when id is not a valid UUID', function () use ($createController) {
+            $controller = $createController();
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard/invalid-uuid',
@@ -198,20 +135,8 @@ describe('DashboardViewController', function () {
                 ->toThrow(InvalidArgumentException::class, 'Invalid dashboard ID format');
         });
 
-        test('handles null parsed body gracefully', function () {
-            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+        test('handles null parsed body gracefully', function () use ($createController) {
+            $controller = $createController();
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard',
@@ -225,8 +150,8 @@ describe('DashboardViewController', function () {
         });
     });
 
-    describe('execute method', function () {
-        test('returns complete dashboard view with categories and favorites', function () {
+    describe('execute method', function () use ($createController) {
+        test('returns complete dashboard view with categories and favorites', function () use ($createController) {
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
             $category1 = TestEntityFactory::createCategory(dashboard: $dashboard);
@@ -257,18 +182,7 @@ describe('DashboardViewController', function () {
                 ->with(Mockery::on(fn($uuid) => $uuid->toString() === $dashboardId->toString()))
                 ->andReturn($dashboardView);
 
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard/' . $dashboardId->toString(),
@@ -291,7 +205,7 @@ describe('DashboardViewController', function () {
             expect($body['data']['favorites'])->toHaveCount(2);
         });
 
-        test('returns dashboard with empty categories and favorites', function () {
+        test('returns dashboard with empty categories and favorites', function () use ($createController) {
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
 
@@ -306,18 +220,7 @@ describe('DashboardViewController', function () {
                 ->with(Mockery::on(fn($uuid) => $uuid->toString() === $dashboardId->toString()))
                 ->andReturn($dashboardView);
 
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard/' . $dashboardId->toString(),
@@ -336,7 +239,7 @@ describe('DashboardViewController', function () {
             expect($body['data']['favorites'])->toBe([]);
         });
 
-        test('includes links within categories in response', function () {
+        test('includes links within categories in response', function () use ($createController) {
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
             $category = TestEntityFactory::createCategory(dashboard: $dashboard);
@@ -359,18 +262,7 @@ describe('DashboardViewController', function () {
                 ->with(Mockery::on(fn($uuid) => $uuid->toString() === $dashboardId->toString()))
                 ->andReturn($dashboardView);
 
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard/' . $dashboardId->toString(),
@@ -386,7 +278,7 @@ describe('DashboardViewController', function () {
             expect($body['data']['categories'][0]['links'])->toHaveCount(2);
         });
 
-        test('handles category with no links', function () {
+        test('handles category with no links', function () use ($createController) {
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
             $category = TestEntityFactory::createCategory(dashboard: $dashboard);
@@ -407,18 +299,7 @@ describe('DashboardViewController', function () {
                 ->with(Mockery::on(fn($uuid) => $uuid->toString() === $dashboardId->toString()))
                 ->andReturn($dashboardView);
 
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard/' . $dashboardId->toString(),
@@ -433,7 +314,7 @@ describe('DashboardViewController', function () {
             expect($body['data']['categories'][0]['links'])->toBe([]);
         });
 
-        test('response is JsonResponse instance', function () {
+        test('response is JsonResponse instance', function () use ($createController) {
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
 
@@ -447,18 +328,7 @@ describe('DashboardViewController', function () {
             $dashboardService->shouldReceive('getDashboardView')
                 ->andReturn($dashboardView);
 
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard/' . $dashboardId->toString(),
@@ -473,64 +343,31 @@ describe('DashboardViewController', function () {
         });
     });
 
-    describe('interface implementation', function () {
-        test('implements ControllerInterface', function () {
+    describe('interface implementation', function () use ($createController) {
+        test('implements ControllerInterface', function () use ($createController) {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             expect($controller)->toBeInstanceOf(jschreuder\Middle\Controller\ControllerInterface::class);
         });
 
-        test('implements RequestFilterInterface', function () {
+        test('implements RequestFilterInterface', function () use ($createController) {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             expect($controller)->toBeInstanceOf(jschreuder\Middle\Controller\RequestFilterInterface::class);
         });
 
-        test('implements RequestValidatorInterface', function () {
+        test('implements RequestValidatorInterface', function () use ($createController) {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             expect($controller)->toBeInstanceOf(jschreuder\Middle\Controller\RequestValidatorInterface::class);
         });
     });
 
-    describe('integration scenarios', function () {
-        test('full request lifecycle for dashboard retrieval', function () {
+    describe('integration scenarios', function () use ($createController) {
+        test('full request lifecycle for dashboard retrieval', function () use ($createController) {
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
             $category = TestEntityFactory::createCategory(dashboard: $dashboard);
@@ -553,18 +390,7 @@ describe('DashboardViewController', function () {
                 ->with(Mockery::on(fn($uuid) => $uuid->toString() === $dashboardId->toString()))
                 ->andReturn($dashboardView);
 
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard/' . $dashboardId->toString(),
@@ -591,20 +417,9 @@ describe('DashboardViewController', function () {
             expect($body['data']['categories'][0]['links'])->toHaveCount(1);
         });
 
-        test('full request lifecycle with invalid UUID throws exception', function () {
+        test('full request lifecycle with invalid UUID throws exception', function () use ($createController) {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard/not-a-uuid',
@@ -619,20 +434,9 @@ describe('DashboardViewController', function () {
                 ->toThrow(InvalidArgumentException::class);
         });
 
-        test('full request lifecycle with missing ID throws exception', function () {
+        test('full request lifecycle with missing ID throws exception', function () use ($createController) {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $responseTransformer = new JsonResponseTransformer();
-            $dashboardOutputSpec = new DashboardOutputSpec();
-            $categoryOutputSpec = new CategoryOutputSpec();
-            $linkOutputSpec = new LinkOutputSpec();
-
-            $controller = new DashboardViewController(
-                $dashboardService,
-                $responseTransformer,
-                $dashboardOutputSpec,
-                $categoryOutputSpec,
-                $linkOutputSpec
-            );
+            $controller = $createController($dashboardService);
 
             $request = new ServerRequest(
                 uri: 'http://example.com/dashboard',

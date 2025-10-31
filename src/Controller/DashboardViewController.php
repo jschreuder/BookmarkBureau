@@ -2,9 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Controller;
 
-use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
-use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
-use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\DashboardWithCategoriesAndFavoritesOutputSpec;
 use jschreuder\BookmarkBureau\Response\ResponseTransformerInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use jschreuder\Middle\Controller\ControllerInterface;
@@ -29,9 +27,7 @@ final readonly class DashboardViewController implements
     public function __construct(
         private DashboardServiceInterface $dashboardService,
         private ResponseTransformerInterface $responseTransformer,
-        private DashboardOutputSpec $dashboardOutputSpec,
-        private CategoryOutputSpec $categoryOutputSpec,
-        private LinkOutputSpec $linkOutputSpec,
+        private DashboardWithCategoriesAndFavoritesOutputSpec $outputSpec,
     ) {}
 
     #[\Override]
@@ -70,31 +66,8 @@ final readonly class DashboardViewController implements
         // Fetch the complete dashboard view (dashboard + categories with links + favorites)
         $dashboardView = $this->dashboardService->getDashboardView($dashboardId);
 
-        // Build the output array
-        $dashboardArray = $this->dashboardOutputSpec->transform($dashboardView->dashboard);
-
-        // Transform categories with their links
-        $categoriesArray = [];
-        foreach ($dashboardView->categories as $categoryWithLinks) {
-            $categoryArray = $this->categoryOutputSpec->transform($categoryWithLinks->category);
-
-            // Add links to the category
-            $linksArray = [];
-            foreach ($categoryWithLinks->links as $link) {
-                $linksArray[] = $this->linkOutputSpec->transform($link);
-            }
-            $categoryArray['links'] = $linksArray;
-
-            $categoriesArray[] = $categoryArray;
-        }
-        $dashboardArray['categories'] = $categoriesArray;
-
-        // Transform favorites
-        $favoritesArray = [];
-        foreach ($dashboardView->favorites as $favorite) {
-            $favoritesArray[] = $this->linkOutputSpec->transform($favorite);
-        }
-        $dashboardArray['favorites'] = $favoritesArray;
+        // Transform using the composite OutputSpec
+        $dashboardArray = $this->outputSpec->transform($dashboardView);
 
         // Return the response
         return $this->responseTransformer->transform(
