@@ -2,15 +2,15 @@
 
 ## Executive Summary
 
-BookmarkBureau is a PHP-based bookmark management system built with a well-structured architecture featuring domain-driven design patterns. The project is moderately implemented with core CRUD operations available for Dashboards, Categories, and Links. Advanced features like Favorites and Tags have service/repository layers but lack Action classes for HTTP operations.
+BookmarkBureau is a PHP-based bookmark management system built with a well-structured architecture featuring domain-driven design patterns. The project is substantially implemented with comprehensive CRUD operations available for Dashboards, Categories, Links, Tags, and Favorites. All major features have complete service/repository layers, Action classes, and HTTP endpoints.
 
-**Implementation Status: ~70% Complete**
+**Implementation Status: ~85% Complete**
 - Foundation and Domain Layer: Complete
 - Service Layer: Complete
 - Repository/Persistence Layer: Complete
-- Action Layer (CRUD + Read): Partial (Missing Favorites/Tags operations)
-- Controllers: Minimal (Only generic ActionController)
-- Routes/API Endpoints: Implemented (All current actions registered)
+- Action Layer (CRUD + Read): Complete (All entity operations implemented)
+- Controllers: Good (ActionController, DashboardViewController, error handlers)
+- Routes/API Endpoints: Complete (All operations registered with RESTful routing)
 
 ---
 
@@ -18,7 +18,7 @@ BookmarkBureau is a PHP-based bookmark management system built with a well-struc
 
 Located in: `/home/jschreuder/Development/BookmarkBureau/src/Action/`
 
-### Implemented Actions (14 total):
+### Implemented Actions (20+ total):
 
 #### Dashboard Operations
 - **DashboardCreateAction** - Creates new dashboard (C)
@@ -27,15 +27,30 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Action/`
 
 #### Category Operations
 - **CategoryCreateAction** - Creates new category in dashboard (C)
+- **CategoryReadAction** - Retrieves category details (R)
 - **CategoryUpdateAction** - Updates existing category (U)
 - **CategoryDeleteAction** - Deletes category (D)
-- **CategoryReadAction** - Retrieves category details (R) - NEW
 
 #### Link Operations
 - **LinkCreateAction** - Creates new link/bookmark (C)
+- **LinkReadAction** - Retrieves link details (R)
 - **LinkUpdateAction** - Updates existing link (U)
 - **LinkDeleteAction** - Deletes link (D)
-- **LinkReadAction** - Retrieves link details (R) - NEW
+
+#### Tag Operations
+- **TagCreateAction** - Creates new tag (C)
+- **TagReadAction** - Retrieves tag details (R)
+- **TagUpdateAction** - Updates existing tag (U)
+- **TagDeleteAction** - Deletes tag (D)
+
+#### Link-Tag Association Operations
+- **LinkTagCreateAction** - Assigns tag to link
+- **LinkTagDeleteAction** - Removes tag from link
+
+#### Favorite Operations
+- **FavoriteCreateAction** - Adds link to dashboard favorites
+- **FavoriteDeleteAction** - Removes link from dashboard favorites
+- **FavoriteReorderAction** - Reorders favorites within dashboard
 
 ### Action Pattern Details:
 - All Actions implement `ActionInterface`
@@ -45,13 +60,10 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Action/`
 - Uses Ramsey UUID v4 for IDs
 - Transaction support via `UnitOfWorkInterface`
 
-### Missing Actions:
-- Dashboard Read action (DashboardReadAction - single entity only)
-- Favorite operations (add/remove/reorder)
-- Tag operations (assign/remove/create)
-
-### Note on List Operations:
-List operations and complex dashboard fetching (with categories and favorites) will be handled by dedicated Controllers rather than simple Actions, as these require more complex response structures and data aggregation.
+### Note on Read Operations:
+- Simple entity reads (Category, Link, Tag) use dedicated Read Actions
+- Complex dashboard view (with categories and favorites) uses DashboardViewController for sophisticated data aggregation
+- Dashboard list operations can leverage DashboardService.listAllDashboards() method but currently have no dedicated route
 
 ---
 
@@ -59,29 +71,31 @@ List operations and complex dashboard fetching (with categories and favorites) w
 
 Located in: `/home/jschreuder/Development/BookmarkBureau/src/Controller/`
 
-### Implemented Controllers (3):
+### Implemented Controllers (4):
 
 1. **ActionController** - Generic CRUD controller
    - Implements: `ControllerInterface`, `RequestFilterInterface`, `RequestValidatorInterface`
-   - Handles: Input filtering, validation, execution
+   - Handles: Input filtering, validation, execution for all Action classes
    - Returns: JSON responses with success/data wrapper
    - Configurable success HTTP status code
 
-2. **ErrorHandlerController** - Global error handler
+2. **DashboardViewController** - Complex dashboard retrieval
+   - Fetches complete dashboard with all categories (including their links) and favorites
+   - Uses DashboardService.getDashboardView() for optimized data fetching
+   - Returns nested JSON structure via DashboardWithCategoriesAndFavoritesOutputSpec
+   - Validates UUID format from route parameters
+
+3. **ErrorHandlerController** - Global error handler
    - Converts exceptions to JSON responses
    - Maps error codes: 400 (Bad input), 401 (Unauthenticated), 403 (Unauthorized), 503 (Storage error), 500 (Server error)
    - Logs errors via Monolog
 
-3. **NotFoundHandlerController** - 404 handler
-   - Returns 404 JSON response
+4. **NotFoundHandlerController** - 404 handler
+   - Returns standardized 404 JSON response
 
-### Missing Controllers:
-- **DashboardController** - Retrieves single dashboard with categories and favorites (complex read operation)
-- **DashboardListController** - Lists all dashboards with optional pagination/filtering
-- Category/Link list controllers (for list operations if needed)
-- Favorite operations controllers (if not using simple Actions)
-- Tag operations controllers (if not using simple Actions)
-- Authentication/Authorization controllers (referenced but not implemented)
+### Potential Future Controllers:
+- **DashboardListController** - Lists all dashboards (service method exists but no route/controller)
+- Authentication/Authorization controllers (not planned for this demo project)
 
 ---
 
@@ -195,42 +209,53 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Entity/Value/`
 Located in: `/home/jschreuder/Development/BookmarkBureau/src/GeneralRoutingProvider.php`
 
 ### Currently Defined Routes:
-- `GET /` → Home route (returns ExampleController - not implemented)
-- `POST /dashboards` → DashboardCreateAction - NEW
-- `PUT /dashboards/{id}` → DashboardUpdateAction - NEW
-- `DELETE /dashboards/{id}` → DashboardDeleteAction - NEW
-- `POST /dashboards/{dashboardId}/categories` → CategoryCreateAction - NEW
-- `GET /categories/{id}` → CategoryReadAction - NEW
-- `PUT /categories/{id}` → CategoryUpdateAction - NEW
-- `DELETE /categories/{id}` → CategoryDeleteAction - NEW
-- `POST /links` → LinkCreateAction - NEW
-- `GET /links/{id}` → LinkReadAction - NEW
-- `PUT /links/{id}` → LinkUpdateAction - NEW
-- `DELETE /links/{id}` → LinkDeleteAction - NEW
+
+**Home:**
+- `GET /` → Hello world test endpoint
+
+**Links:**
+- `GET /link/:id` → LinkReadAction
+- `POST /link` → LinkCreateAction
+- `PUT /link/:id` → LinkUpdateAction
+- `DELETE /link/:id` → LinkDeleteAction
+
+**Tags:**
+- `GET /tag/:tag_name` → TagReadAction
+- `POST /tag` → TagCreateAction
+- `PUT /tag/:tag_name` → TagUpdateAction
+- `DELETE /tag/:tag_name` → TagDeleteAction
+
+**Link-Tag Associations:**
+- `POST /link/:id/tag` → LinkTagCreateAction (assigns tag to link)
+- `DELETE /link/:id/tag/:tag_name` → LinkTagDeleteAction (removes tag from link)
+
+**Dashboards:**
+- `POST /dashboard` → DashboardCreateAction
+- `PUT /dashboard/:id` → DashboardUpdateAction
+- `DELETE /dashboard/:id` → DashboardDeleteAction
+- `GET /:id` → DashboardViewController (must be valid UUID, returns complete dashboard view)
+
+**Favorites:**
+- `POST /dashboard/:id/favorites` → FavoriteCreateAction
+- `DELETE /dashboard/:id/favorites` → FavoriteDeleteAction
+- `PUT /dashboard/:id/favorites` → FavoriteReorderAction
+
+**Categories:**
+- `GET /category/:id` → CategoryReadAction
+- `POST /category` → CategoryCreateAction
+- `PUT /category/:id` → CategoryUpdateAction
+- `DELETE /category/:id` → CategoryDeleteAction
 
 ### Architecture:
 - Uses Symfony Router wrapper via Middle framework
-- Route registration via `RoutingProviderInterface`
+- Route registration via `RoutingProviderInterface` with `ResourceRouteBuilder` for RESTful patterns
 - URL generation via `UrlGeneratorInterface`
-- Actions auto-registered and wired via ServiceContainer - NEW
+- Actions and controllers auto-registered and wired via ServiceContainer
+- UUID validation via regex constraints for dashboard view route
 
 ### Missing Routes:
-**Dashboard Routes (via Controllers):**
-- `GET /dashboards/{id}` → (DashboardController - retrieves dashboard with categories and favorites)
-- `GET /dashboards` → (DashboardListController - lists all dashboards)
-
-**Dashboard Single Entity Routes (via Action):**
-- `GET /dashboards/{id}/simple` → (DashboardReadAction - single entity only, optional)
-
-**Favorite Routes (via Actions):**
-- `POST /dashboards/{dashboardId}/favorites` → (FavoriteAddAction not implemented)
-- `DELETE /dashboards/{dashboardId}/favorites/{linkId}` → (FavoriteRemoveAction not implemented)
-- `PUT /dashboards/{dashboardId}/favorites/reorder` → (FavoriteReorderAction not implemented)
-
-**Tag Routes (via Actions):**
-- `POST /links/{linkId}/tags` → (TagAssignAction not implemented)
-- `DELETE /links/{linkId}/tags/{tagName}` → (TagRemoveAction not implemented)
-- `POST /tags` → (TagCreateAction not implemented)
+**Dashboard Routes:**
+- `GET /dashboard` → Dashboard list endpoint (service method exists but no route/controller yet)
 
 ---
 
@@ -329,8 +354,23 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/InputSpec/`
 **LinkInputSpec:**
 - Fields: id (UUID), url (valid URL), title (1-256 chars), description, icon
 
+**TagInputSpec:**
+- Fields: tag_name (string), color (hex RGB, optional)
+
+**LinkTagInputSpec:**
+- Fields: link_id (UUID), tag_name (string), color (hex RGB, optional)
+
+**FavoriteInputSpec:**
+- Fields: dashboard_id (UUID), link_id (UUID)
+
+**ReorderFavoritesInputSpec:**
+- Fields: dashboard_id (UUID), favorites (array of link_id to sort_order mappings)
+
 **IdInputSpec:**
 - Simple: just ID validation (UUID)
+
+**TagNameInputSpec:**
+- Simple: just tag_name validation (string)
 
 ### Output Specs (Serialization):
 
@@ -348,11 +388,23 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/OutputSpec/`
 - Transforms Link entity to JSON array
 - Outputs: id, url, title, description, icon, created_at, updated_at
 
+**TagOutputSpec:**
+- Transforms Tag entity to JSON array
+- Outputs: tag_name, color
+
+**FavoriteOutputSpec:**
+- Transforms Favorite entity to JSON array
+- Outputs: dashboard_id, link_id, sort_order, created_at
+
+**DashboardWithCategoriesAndFavoritesOutputSpec:**
+- Transforms complete dashboard view to nested JSON structure
+- Outputs: dashboard (id, title, description, icon, dates), categories (with links), favorites
+
 ### Framework:
 - Uses Filter utility for input sanitization
 - Respect/Validation for rules
 - Custom ValidationFailedException for errors
-- Polymorphic output transformation
+- Polymorphic output transformation via OutputSpecInterface
 
 ---
 
@@ -480,37 +532,43 @@ All services wrap business logic in `transactional()` callbacks for ACID guarant
 
 ## Implementation Gaps & Recommendations
 
-### Critical Missing Pieces:
-1. **Controllers for Complex Operations** - DashboardController and DashboardListController for rich dashboard data
-2. **Single Entity Read Actions** - DashboardReadAction (optional, for simple entity-only fetch)
-3. **No Favorite/Tag Actions** - No HTTP endpoints for these operations
-4. **Service Container Setup** - Repository and service definitions recently added to ServiceContainer
-5. **No Authentication** - Security layer completely absent
-6. **Missing ExampleController** - Referenced but not implemented
+### Completed Since Last Update:
+1. ✅ **DashboardViewController** - Implemented for complex dashboard retrieval with categories and favorites
+2. ✅ **All Favorite Actions** - FavoriteCreateAction, FavoriteDeleteAction, FavoriteReorderAction implemented
+3. ✅ **All Tag Actions** - TagCreateAction, TagReadAction, TagUpdateAction, TagDeleteAction implemented
+4. ✅ **Link-Tag Association Actions** - LinkTagCreateAction, LinkTagDeleteAction implemented
+5. ✅ **All Routes Registered** - Complete RESTful routing structure using ResourceRouteBuilder
+6. ✅ **Service Container Complete** - All repository and service definitions added
+7. ✅ **Input/Output Specs** - Complete set for all entities and operations
 
-### To Reach Production:
-1. Create DashboardController and DashboardListController for complex dashboard operations
-2. Create Dashboard Read action (DashboardReadAction - single entity only, optional)
-3. Create Actions for Favorite operations (FavoriteAddAction, FavoriteRemoveAction, FavoriteReorderAction)
-4. Create Actions for Tag operations (TagCreateAction, TagAssignAction, TagRemoveAction)
-5. Register controller routes in GeneralRoutingProvider
-6. Implement authentication middleware and user entity
-7. Add authorization/access control layer
-8. Create comprehensive API documentation
-9. Add integration/API tests
-10. Configure error handling/logging in production
-11. Add rate limiting, input sanitization enhancements
-12. Add missing InputSpec/OutputSpec for read operations and new entities
+### Minor Missing Pieces:
+1. **Dashboard List Endpoint** - Service method exists (listAllDashboards) but no route/controller
+2. **Authentication/Authorization** - Intentionally not implemented (demo project showcasing architecture)
+3. **API Documentation** - No Swagger/OpenAPI spec
+4. **Frontend** - Pure API backend, no UI (intentional)
+
+### To Reach Production (if desired):
+1. Add dashboard list route/controller (trivial - service method exists)
+2. Implement authentication middleware and user entity
+3. Add authorization/access control layer
+4. Create comprehensive API documentation (OpenAPI/Swagger)
+5. Add integration/E2E API tests
+6. Configure error handling/logging for production environments
+7. Add rate limiting middleware
+8. Implement pagination for list endpoints
+9. Add filtering/sorting query parameters
+10. Consider caching layer (Redis) for read operations
 
 ### Estimated Completion:
-Current: ~70% complete
+Current: ~85% complete
 - Domain & Services: 100%
 - Repositories: 100%
-- Actions: 55% (CRUD complete for most entities, partial Read for Category/Link, missing Dashboard Read and Favorite/Tag operations)
-- Controllers: 25% (only generic ActionController and error handlers; missing DashboardController, DashboardListController, and others)
-- Routes: 80% (all CRUD and basic Read actions registered, missing complex dashboard/list controller routes)
-- Authentication: 0%
-- Service Container: 95% (repository and service definitions added)
+- Actions: 100% (All CRUD and Read operations for all entities)
+- Controllers: 90% (ActionController, DashboardViewController, error handlers; only dashboard list missing)
+- Routes: 95% (All operations registered except dashboard list)
+- Authentication: 0% (intentional for demo)
+- Service Container: 100%
+- Input/Output Specs: 100%
 
 ---
 
@@ -518,21 +576,25 @@ Current: ~70% complete
 
 ```
 /src
-  /Action                    - CRUD operations (10 files, missing Read)
-  /Collection               - Type-safe collections (9 files)
-  /Controller               - HTTP controllers (3 files)
-  /Entity                   - Domain entities (6 files + 6 value objects)
+  /Action                    - CRUD operations (20+ files, all operations implemented)
+  /Collection               - Type-safe collections (10 files)
+  /Controller               - HTTP controllers (4 files)
+  /Entity                   - Domain entities (6 files + 5 value objects + 1 trait)
   /Exception                - Custom exceptions (7 files)
-  /InputSpec                - Request validation (5 files)
-  /OutputSpec               - Response serialization (4 files)
+  /InputSpec                - Request validation (9 files)
+  /OutputSpec               - Response serialization (6 files)
   /Repository               - Data access (10 files: 5 interfaces, 5 PDO implementations)
+  /Response                 - Response transformers (JsonResponseTransformer)
   /Service                  - Business logic (10 files: 5 interfaces, 5 implementations)
   /Service/UnitOfWork       - Transaction management (4 files)
-  /Util                     - Utilities
+  /Util                     - Utilities (Filter, SqlFormat, ResourceRouteBuilder)
   GeneralRoutingProvider.php - Route registration
   ServiceContainer.php       - DI container
 
 /migrations                 - Database (1 migration file)
+/tests
+  /Unit                    - Unit tests (77+ test files)
+  /Integration             - Integration tests (ServiceContainerIntegrationTest)
 /web
   /index.php               - Application entry point
 /config
@@ -550,17 +612,18 @@ Current: ~70% complete
 | Value Objects | Complete | 100% |
 | Services | Complete | 100% |
 | Repositories | Complete | 100% |
-| Actions (CRUD + Read) | Partial | 55% |
-| Controllers | Minimal | 25% |
-| Routes/Endpoints | Implemented | 80% |
-| Service Container | Nearly Complete | 95% |
-| Authentication | Missing | 0% |
-| Authorization | Missing | 0% |
+| Actions (CRUD + Read) | Complete | 100% |
+| Controllers | Nearly Complete | 90% |
+| Routes/Endpoints | Nearly Complete | 95% |
+| Service Container | Complete | 100% |
+| Authentication | Not Planned | 0% |
+| Authorization | Not Planned | 0% |
 | Database Schema | Complete | 100% |
-| Input Validation | Partial | 60% |
-| Error Handling | Partial | 70% |
+| Input/Output Specs | Complete | 100% |
+| Error Handling | Complete | 100% |
+| Unit Tests | Comprehensive | ~95% |
 
-**Overall: 70% Implementation Complete**
+**Overall: 85% Implementation Complete**
 
-**Note:** Complex operations like full dashboard retrieval and list operations are planned to use dedicated Controllers rather than simple Actions, allowing for more sophisticated response structures and data aggregation.
+**Note:** Complex dashboard retrieval uses DashboardViewController for sophisticated data aggregation. The only missing piece is a dashboard list endpoint, though the service method exists and could be easily exposed.
 
