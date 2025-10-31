@@ -4,6 +4,7 @@ use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Exception\DuplicateTagException;
 use jschreuder\BookmarkBureau\Repository\PdoTagRepository;
 use Ramsey\Uuid\Uuid;
 
@@ -315,6 +316,83 @@ describe('PdoTagRepository', function () {
             $found = $repo->findByName('duplicate');
             expect($found->tagName->value)->toBe('duplicate');
         });
+
+        test('inserts tag with null color', function () {
+            $pdo = createTagDatabase();
+            $repo = new PdoTagRepository($pdo);
+            $tag = TestEntityFactory::createTag(tagName: new TagName('no-color'), color: null);
+
+            $repo->save($tag);
+
+            $found = $repo->findByName('no-color');
+            expect($found->color)->toBeNull();
+        });
+
+        test('throws DuplicateTagException when tag insert violates unique constraint', function () {
+            // Use reflection to call save with a mocked PDO that simulates a race condition
+            // where the check passes but the insert fails with a duplicate constraint error
+            $mockPdo = \Mockery::mock(PDO::class);
+            $checkStmt = \Mockery::mock(\PDOStatement::class);
+            $insertStmt = \Mockery::mock(\PDOStatement::class);
+
+            // First prepare (check statement) - tag doesn't exist
+            $checkStmt->shouldReceive('execute')->andReturn(true);
+            $checkStmt->shouldReceive('fetch')->andReturn(false); // tag not found
+
+            // Second prepare (insert statement) - throws duplicate error
+            $insertException = new \PDOException('UNIQUE constraint failed: tags.tag_name');
+            $insertStmt->shouldReceive('execute')->andThrow($insertException);
+
+            // Mock PDO to return our mocked statements in order
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('SELECT 1 FROM tags WHERE tag_name = :tag_name LIMIT 1')
+                ->andReturn($checkStmt);
+
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('INSERT INTO tags (tag_name, color)
+                     VALUES (:tag_name, :color)')
+                ->andReturn($insertStmt);
+
+            $repoWithMock = new PdoTagRepository($mockPdo);
+            $tag = TestEntityFactory::createTag(tagName: new TagName('race-condition'));
+
+            expect(fn() => $repoWithMock->save($tag))
+                ->toThrow(DuplicateTagException::class);
+        });
+
+        test('re-throws PDOException when not a duplicate constraint error', function () {
+            $mockPdo = \Mockery::mock(PDO::class);
+            $checkStmt = \Mockery::mock(\PDOStatement::class);
+            $insertStmt = \Mockery::mock(\PDOStatement::class);
+
+            // First prepare (check statement) - tag doesn't exist
+            $checkStmt->shouldReceive('execute')->andReturn(true);
+            $checkStmt->shouldReceive('fetch')->andReturn(false); // tag not found
+
+            // Second prepare (insert statement) - throws unexpected error
+            $insertException = new \PDOException('Disk I/O error');
+            $insertStmt->shouldReceive('execute')->andThrow($insertException);
+
+            // Mock PDO to return our mocked statements in order
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('SELECT 1 FROM tags WHERE tag_name = :tag_name LIMIT 1')
+                ->andReturn($checkStmt);
+
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('INSERT INTO tags (tag_name, color)
+                     VALUES (:tag_name, :color)')
+                ->andReturn($insertStmt);
+
+            $repoWithMock = new PdoTagRepository($mockPdo);
+            $tag = TestEntityFactory::createTag(tagName: new TagName('error-case'));
+
+            expect(fn() => $repoWithMock->save($tag))
+                ->toThrow(\PDOException::class);
+        });
     });
 
     describe('delete', function () {
@@ -441,6 +519,66 @@ describe('PdoTagRepository', function () {
             $repo->removeFromLinkId($linkId, 'unassigned');
 
             expect($repo->isAssignedToLinkId($linkId, 'unassigned'))->toBeFalse();
+        });
+
+        test('throws LinkNotFoundException when link foreign key constraint fails', function () {
+            $mockPdo = \Mockery::mock(PDO::class);
+            $deleteStmt = \Mockery::mock(\PDOStatement::class);
+
+            // DELETE statement throws foreign key constraint error for link_id
+            $fkException = new \PDOException('FOREIGN KEY constraint failed: link_id');
+            $deleteStmt->shouldReceive('execute')->andThrow($fkException);
+
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('DELETE FROM link_tags WHERE link_id = :link_id AND tag_name = :tag_name')
+                ->andReturn($deleteStmt);
+
+            $repoWithMock = new PdoTagRepository($mockPdo);
+            $linkId = Uuid::uuid4();
+
+            expect(fn() => $repoWithMock->removeFromLinkId($linkId, 'some-tag'))
+                ->toThrow(LinkNotFoundException::class);
+        });
+
+        test('throws TagNotFoundException when tag foreign key constraint fails', function () {
+            $mockPdo = \Mockery::mock(PDO::class);
+            $deleteStmt = \Mockery::mock(\PDOStatement::class);
+
+            // DELETE statement throws foreign key constraint error for tag_name
+            $fkException = new \PDOException('FOREIGN KEY constraint failed: tag_name');
+            $deleteStmt->shouldReceive('execute')->andThrow($fkException);
+
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('DELETE FROM link_tags WHERE link_id = :link_id AND tag_name = :tag_name')
+                ->andReturn($deleteStmt);
+
+            $repoWithMock = new PdoTagRepository($mockPdo);
+            $linkId = Uuid::uuid4();
+
+            expect(fn() => $repoWithMock->removeFromLinkId($linkId, 'some-tag'))
+                ->toThrow(TagNotFoundException::class);
+        });
+
+        test('re-throws PDOException when not a foreign key constraint error', function () {
+            $mockPdo = \Mockery::mock(PDO::class);
+            $deleteStmt = \Mockery::mock(\PDOStatement::class);
+
+            // DELETE statement throws unexpected error
+            $unexpectedException = new \PDOException('Disk I/O error');
+            $deleteStmt->shouldReceive('execute')->andThrow($unexpectedException);
+
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('DELETE FROM link_tags WHERE link_id = :link_id AND tag_name = :tag_name')
+                ->andReturn($deleteStmt);
+
+            $repoWithMock = new PdoTagRepository($mockPdo);
+            $linkId = Uuid::uuid4();
+
+            expect(fn() => $repoWithMock->removeFromLinkId($linkId, 'some-tag'))
+                ->toThrow(\PDOException::class);
         });
     });
 
