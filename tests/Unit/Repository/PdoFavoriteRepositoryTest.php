@@ -260,6 +260,111 @@ describe('PdoFavoriteRepository', function () {
             expect(fn() => $repo->addFavorite($dashboard->dashboardId, $nonExistentLinkId, 0))
                 ->toThrow(LinkNotFoundException::class);
         });
+
+        test('throws DashboardNotFoundException when dashboard foreign key constraint fails', function () {
+            $mockPdo = \Mockery::mock(PDO::class);
+            $mockDashboardRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class);
+            $mockLinkRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class);
+            $insertStmt = \Mockery::mock(\PDOStatement::class);
+
+            $dashboard = TestEntityFactory::createDashboard();
+            $link = TestEntityFactory::createLink();
+            $dashboardId = $dashboard->dashboardId;
+            $linkId = $link->linkId;
+
+            // Mock repository lookups to succeed
+            $mockDashboardRepo->shouldReceive('findById')
+                ->with($dashboardId)
+                ->andReturn($dashboard);
+            $mockLinkRepo->shouldReceive('findById')
+                ->with($linkId)
+                ->andReturn($link);
+
+            // INSERT statement throws foreign key constraint error for dashboard_id
+            $fkException = new \PDOException('FOREIGN KEY constraint failed: dashboard_id');
+            $insertStmt->shouldReceive('execute')->andThrow($fkException);
+
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('INSERT INTO favorites (dashboard_id, link_id, sort_order, created_at)
+                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)')
+                ->andReturn($insertStmt);
+
+            $repo = new PdoFavoriteRepository($mockPdo, $mockDashboardRepo, $mockLinkRepo);
+
+            expect(fn() => $repo->addFavorite($dashboardId, $linkId, 0))
+                ->toThrow(DashboardNotFoundException::class);
+        });
+
+        test('throws LinkNotFoundException when link foreign key constraint fails', function () {
+            $mockPdo = \Mockery::mock(PDO::class);
+            $mockDashboardRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class);
+            $mockLinkRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class);
+            $insertStmt = \Mockery::mock(\PDOStatement::class);
+
+            $dashboard = TestEntityFactory::createDashboard();
+            $link = TestEntityFactory::createLink();
+            $dashboardId = $dashboard->dashboardId;
+            $linkId = $link->linkId;
+
+            // Mock repository lookups to succeed
+            $mockDashboardRepo->shouldReceive('findById')
+                ->with($dashboardId)
+                ->andReturn($dashboard);
+            $mockLinkRepo->shouldReceive('findById')
+                ->with($linkId)
+                ->andReturn($link);
+
+            // INSERT statement throws foreign key constraint error for link_id
+            $fkException = new \PDOException('FOREIGN KEY constraint failed: link_id');
+            $insertStmt->shouldReceive('execute')->andThrow($fkException);
+
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('INSERT INTO favorites (dashboard_id, link_id, sort_order, created_at)
+                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)')
+                ->andReturn($insertStmt);
+
+            $repo = new PdoFavoriteRepository($mockPdo, $mockDashboardRepo, $mockLinkRepo);
+
+            expect(fn() => $repo->addFavorite($dashboardId, $linkId, 0))
+                ->toThrow(LinkNotFoundException::class);
+        });
+
+        test('re-throws PDOException when not a foreign key constraint error', function () {
+            $mockPdo = \Mockery::mock(PDO::class);
+            $mockDashboardRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class);
+            $mockLinkRepo = \Mockery::mock(\jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class);
+            $insertStmt = \Mockery::mock(\PDOStatement::class);
+
+            $dashboard = TestEntityFactory::createDashboard();
+            $link = TestEntityFactory::createLink();
+            $dashboardId = $dashboard->dashboardId;
+            $linkId = $link->linkId;
+
+            // Mock repository lookups to succeed
+            $mockDashboardRepo->shouldReceive('findById')
+                ->with($dashboardId)
+                ->andReturn($dashboard);
+            $mockLinkRepo->shouldReceive('findById')
+                ->with($linkId)
+                ->andReturn($link);
+
+            // INSERT statement throws unexpected error
+            $unexpectedException = new \PDOException('Disk I/O error');
+            $insertStmt->shouldReceive('execute')->andThrow($unexpectedException);
+
+            $mockPdo->shouldReceive('prepare')
+                ->once()
+                ->with('INSERT INTO favorites (dashboard_id, link_id, sort_order, created_at)
+                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)')
+                ->andReturn($insertStmt);
+
+            $repo = new PdoFavoriteRepository($mockPdo, $mockDashboardRepo, $mockLinkRepo);
+
+            expect(fn() => $repo->addFavorite($dashboardId, $linkId, 0))
+                ->toThrow(\PDOException::class);
+        });
     });
 
     describe('removeFavorite', function () {
