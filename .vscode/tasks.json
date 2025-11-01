@@ -41,6 +41,33 @@
         }
       },
       "label": "npm: test (frontend)"
+    },
+    {
+      "type": "shell",
+      "command": "php -S localhost:8000 -t web",
+      "isBackground": true,
+      "problemMatcher": [],
+      "label": "PHP: Start Dev Server",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "type": "shell",
+      "command": "${workspaceFolder}/vendor/bin/pest",
+      "problemMatcher": [],
+      "label": "Pest: Run All Tests",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "shell",
+      "command": "${workspaceFolder}/vendor/bin/pest --filter",
+      "problemMatcher": [],
+      "label": "Pest: Run Filtered Tests"
     }
   ]
 }

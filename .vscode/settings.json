@@ -1,6 +1,5 @@
 {
     "sonarlint.connectedMode.project": {
-        "connectionId": "jschreuder",
         "projectKey": "jschreuder_BookmarkBureau"
     }
 }
