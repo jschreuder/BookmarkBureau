@@ -5,6 +5,7 @@
     {
       "type": "npm",
       "script": "start",
+      "path": "frontend/",
       "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
@@ -18,11 +19,13 @@
             "regexp": "bundle generation complete"
           }
         }
-      }
+      },
+      "label": "npm: start (frontend)"
     },
     {
       "type": "npm",
       "script": "test",
+      "path": "frontend/",
       "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
@@ -36,7 +39,8 @@
             "regexp": "bundle generation complete"
           }
         }
-      }
+      },
+      "label": "npm: test (frontend)"
     }
   ]
 }
