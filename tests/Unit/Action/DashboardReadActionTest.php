@@ -163,7 +163,7 @@ describe('DashboardReadAction', function () {
     });
 
     describe('execute method', function () {
-        test('calls getDashboardView on service with correct UUID', function () {
+        test('calls getFullDashboard on service with correct UUID', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
@@ -173,7 +173,7 @@ describe('DashboardReadAction', function () {
                 new LinkCollection()
             );
 
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once()
                 ->andReturn($dashboardView);
@@ -204,7 +204,7 @@ describe('DashboardReadAction', function () {
                 new LinkCollection()
             );
 
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->andReturn($dashboardView);
 
@@ -238,7 +238,7 @@ describe('DashboardReadAction', function () {
                 new LinkCollection()
             );
 
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->andReturn($dashboardView);
 
             $inputSpec = new IdInputSpec();
@@ -267,7 +267,7 @@ describe('DashboardReadAction', function () {
                 new LinkCollection()
             );
 
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once()
                 ->andReturn($dashboardView);
@@ -302,7 +302,7 @@ describe('DashboardReadAction', function () {
                 new LinkCollection()
             );
 
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->andReturn($dashboardView);
 
@@ -334,7 +334,7 @@ describe('DashboardReadAction', function () {
                 new LinkCollection()
             );
 
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->andReturn($dashboardView);
 
             $inputSpec = new IdInputSpec();
@@ -365,7 +365,7 @@ describe('DashboardReadAction', function () {
                 new LinkCollection()
             );
 
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once()
                 ->andReturn($dashboardView);
@@ -404,7 +404,7 @@ describe('DashboardReadAction', function () {
                 new LinkCollection()
             );
 
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
                 ->once()
                 ->andReturn($dashboardView);
@@ -441,7 +441,7 @@ describe('DashboardReadAction', function () {
         test('validation failure prevents service call', function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
 
-            $dashboardService->shouldNotReceive('getDashboardView');
+            $dashboardService->shouldNotReceive('getFullDashboard');
 
             $inputSpec = new IdInputSpec();
             $outputSpec = new FullDashboardOutputSpec(

@@ -34,7 +34,7 @@ final class DashboardService implements DashboardServiceInterface
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     #[\Override]
-    public function getDashboardView(UuidInterface $dashboardId): DashboardWithCategoriesAndFavorites
+    public function getFullDashboard(UuidInterface $dashboardId): DashboardWithCategoriesAndFavorites
     {
         $dashboard = $this->dashboardRepository->findById($dashboardId);
 

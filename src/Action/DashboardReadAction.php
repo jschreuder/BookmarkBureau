@@ -35,7 +35,7 @@ final readonly class DashboardReadAction implements ActionInterface
     public function execute(array $data): array
     {
         $dashboardId = Uuid::fromString($data['id']);
-        $dashboard = $this->dashboardService->getDashboardView($dashboardId);
+        $dashboard = $this->dashboardService->getFullDashboard($dashboardId);
         return $this->outputSpec->transform($dashboard);
     }
 }

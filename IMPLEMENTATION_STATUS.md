@@ -81,7 +81,7 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Controller/`
 
 2. **DashboardViewController** - Complex dashboard retrieval
    - Fetches complete dashboard with all categories (including their links) and favorites
-   - Uses DashboardService.getDashboardView() for optimized data fetching
+   - Uses DashboardService.getFullDashboard() for optimized data fetching
    - Returns nested JSON structure via FullDashboardOutputSpec
    - Validates UUID format from route parameters
 
@@ -107,7 +107,7 @@ All services implement corresponding interfaces and use `UnitOfWorkInterface` fo
 
 ### DashboardService (Fully Implemented)
 **Methods:**
-- `getDashboardView(UuidInterface)` - Get dashboard with categories and favorites
+- `getFullDashboard(UuidInterface)` - Get dashboard with categories and favorites
 - `listAllDashboards()` - List all dashboards
 - `createDashboard(string title, string description, ?string icon)` - Create
 - `updateDashboard(UuidInterface, string, string, ?string)` - Update
@@ -571,7 +571,7 @@ All services wrap business logic in `transactional()` callbacks for ACID guarant
 - Consider performance: may need to optimize to avoid N+1 queries
 - Options:
   1. Modify FullDashboardOutputSpec to call TagService for each link (simple but potentially slow)
-  2. Add tags fetching to DashboardService.getDashboardView() method (more efficient)
+  2. Add tags fetching to DashboardService.getFullDashboard() method (more efficient)
   3. Create new composite method that fetches all tags in bulk for all links in one query
 
 #### 3. Frontend Admin Panel Requirements Analysis

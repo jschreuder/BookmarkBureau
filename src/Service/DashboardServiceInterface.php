@@ -17,7 +17,7 @@ interface DashboardServiceInterface
      *
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
-    public function getDashboardView(UuidInterface $dashboardId): DashboardWithCategoriesAndFavorites;
+    public function getFullDashboard(UuidInterface $dashboardId): DashboardWithCategoriesAndFavorites;
 
     /**
      * List all dashboards (without detailed data)

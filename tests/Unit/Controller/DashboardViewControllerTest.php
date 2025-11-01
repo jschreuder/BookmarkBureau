@@ -178,7 +178,7 @@ describe('DashboardViewController', function () {
             );
 
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(Mockery::on(fn($uuid) => $uuid->toString() === $dashboardId->toString()))
                 ->andReturn($dashboardView);
 
@@ -216,7 +216,7 @@ describe('DashboardViewController', function () {
             );
 
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(Mockery::on(fn($uuid) => $uuid->toString() === $dashboardId->toString()))
                 ->andReturn($dashboardView);
 
@@ -258,7 +258,7 @@ describe('DashboardViewController', function () {
             );
 
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(Mockery::on(fn($uuid) => $uuid->toString() === $dashboardId->toString()))
                 ->andReturn($dashboardView);
 
@@ -295,7 +295,7 @@ describe('DashboardViewController', function () {
             );
 
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(Mockery::on(fn($uuid) => $uuid->toString() === $dashboardId->toString()))
                 ->andReturn($dashboardView);
 
@@ -325,7 +325,7 @@ describe('DashboardViewController', function () {
             );
 
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->andReturn($dashboardView);
 
             $controller = $createController($dashboardService);
@@ -386,7 +386,7 @@ describe('DashboardViewController', function () {
             );
 
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $dashboardService->shouldReceive('getDashboardView')
+            $dashboardService->shouldReceive('getFullDashboard')
                 ->with(Mockery::on(fn($uuid) => $uuid->toString() === $dashboardId->toString()))
                 ->andReturn($dashboardView);
 

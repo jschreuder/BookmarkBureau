@@ -64,7 +64,7 @@ final readonly class DashboardViewController implements
         $dashboardId = \Ramsey\Uuid\Uuid::fromString($data['id']);
 
         // Fetch the complete dashboard view (dashboard + categories with links + favorites)
-        $dashboardView = $this->dashboardService->getDashboardView($dashboardId);
+        $dashboardView = $this->dashboardService->getFullDashboard($dashboardId);
 
         // Transform using the composite OutputSpec
         $dashboardArray = $this->outputSpec->transform($dashboardView);

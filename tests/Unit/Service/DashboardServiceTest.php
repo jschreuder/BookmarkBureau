@@ -18,7 +18,7 @@ use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
 use Ramsey\Uuid\Uuid;
 
 describe('DashboardService', function () {
-    describe('getDashboardView method', function () {
+    describe('getFullDashboard method', function () {
         test('retrieves dashboard with categories and favorites', function () {
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
@@ -63,7 +63,7 @@ describe('DashboardService', function () {
 
             $service = new DashboardService($dashboardRepository, $categoryRepository, $favoriteRepository, $unitOfWork);
 
-            $result = $service->getDashboardView($dashboardId);
+            $result = $service->getFullDashboard($dashboardId);
 
             expect($result)->toBeInstanceOf(DashboardWithCategoriesAndFavorites::class);
             expect($result->dashboard)->toEqual($dashboard);
@@ -85,7 +85,7 @@ describe('DashboardService', function () {
 
             $service = new DashboardService($dashboardRepository, $categoryRepository, $favoriteRepository, $unitOfWork);
 
-            expect(fn() => $service->getDashboardView($dashboardId))
+            expect(fn() => $service->getFullDashboard($dashboardId))
                 ->toThrow(DashboardNotFoundException::class);
         });
 
@@ -115,7 +115,7 @@ describe('DashboardService', function () {
 
             $service = new DashboardService($dashboardRepository, $categoryRepository, $favoriteRepository, $unitOfWork);
 
-            $result = $service->getDashboardView($dashboardId);
+            $result = $service->getFullDashboard($dashboardId);
 
             expect(count($result->categories))->toBe(0);
             expect(count($result->favorites))->toBe(0);
@@ -152,7 +152,7 @@ describe('DashboardService', function () {
 
             $service = new DashboardService($dashboardRepository, $categoryRepository, $favoriteRepository, $unitOfWork);
 
-            $result = $service->getDashboardView($dashboardId);
+            $result = $service->getFullDashboard($dashboardId);
 
             expect(count($result->categories))->toBe(1);
             expect(count($result->favorites))->toBe(0);
@@ -528,7 +528,7 @@ describe('DashboardService', function () {
             expect(true)->toBeTrue();
         });
 
-        test('getDashboardView workflow with multiple categories and links', function () {
+        test('getFullDashboard workflow with multiple categories and links', function () {
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
 
@@ -577,7 +577,7 @@ describe('DashboardService', function () {
 
             $service = new DashboardService($dashboardRepository, $categoryRepository, $favoriteRepository, $unitOfWork);
 
-            $result = $service->getDashboardView($dashboardId);
+            $result = $service->getFullDashboard($dashboardId);
 
             expect($result->dashboard->dashboardId)->toEqual($dashboardId);
             expect(count($result->categories))->toBe(2);
