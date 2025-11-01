@@ -99,6 +99,46 @@ describe('GeneralRoutingProvider', function () {
             expect($controller)->toBeInstanceOf(ControllerInterface::class);
         });
 
+        test('dashboard-list route handler returns ActionController instance', function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $capturedFactory = null;
+
+            $router->shouldReceive('get')
+                ->andReturnUsing(function($name, $path, $factory) use (&$capturedFactory) {
+                    if ($name === 'dashboard-list') {
+                        $capturedFactory = $factory;
+                    }
+                });
+            $router->shouldReceive('post', 'put', 'delete')->andReturnNull();
+
+            $provider = new GeneralRoutingProvider(createMockContainer());
+            $provider->registerRoutes($router);
+
+            expect($capturedFactory)->not->toBeNull();
+            $controller = $capturedFactory();
+            expect($controller)->toBeInstanceOf(ControllerInterface::class);
+        });
+
+        test('dashboard-read route handler returns ActionController instance', function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $capturedFactory = null;
+
+            $router->shouldReceive('get')
+                ->andReturnUsing(function($name, $path, $factory) use (&$capturedFactory) {
+                    if ($name === 'dashboard-read') {
+                        $capturedFactory = $factory;
+                    }
+                });
+            $router->shouldReceive('post', 'put', 'delete')->andReturnNull();
+
+            $provider = new GeneralRoutingProvider(createMockContainer());
+            $provider->registerRoutes($router);
+
+            expect($capturedFactory)->not->toBeNull();
+            $controller = $capturedFactory();
+            expect($controller)->toBeInstanceOf(ControllerInterface::class);
+        });
+
         test('dashboard-view route handler returns DashboardViewController instance', function () {
             $router = Mockery::mock(RouterInterface::class);
             $capturedFactory = null;
@@ -158,10 +198,12 @@ describe('GeneralRoutingProvider', function () {
             expect($registeredRoutes['category-delete'])->toBe(['method' => 'DELETE', 'path' => '/category/:id']);
 
             // Dashboard routes
-            expect($registeredRoutes['dashboard-view'])->toBe(['method' => 'GET', 'path' => '/:id']);
+            expect($registeredRoutes['dashboard-list'])->toBe(['method' => 'GET', 'path' => '/dashboard']);
+            expect($registeredRoutes['dashboard-read'])->toBe(['method' => 'GET', 'path' => '/dashboard/:id']);
             expect($registeredRoutes['dashboard-create'])->toBe(['method' => 'POST', 'path' => '/dashboard']);
             expect($registeredRoutes['dashboard-update'])->toBe(['method' => 'PUT', 'path' => '/dashboard/:id']);
             expect($registeredRoutes['dashboard-delete'])->toBe(['method' => 'DELETE', 'path' => '/dashboard/:id']);
+            expect($registeredRoutes['dashboard-view'])->toBe(['method' => 'GET', 'path' => '/:id']);
 
             // Favorite routes
             expect($registeredRoutes['favorite-create'])->toBe(['method' => 'POST', 'path' => '/dashboard/:id/favorites']);

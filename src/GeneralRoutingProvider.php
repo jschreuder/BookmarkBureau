@@ -8,6 +8,8 @@ use jschreuder\BookmarkBureau\Action\CategoryReadAction;
 use jschreuder\BookmarkBureau\Action\CategoryUpdateAction;
 use jschreuder\BookmarkBureau\Action\DashboardCreateAction;
 use jschreuder\BookmarkBureau\Action\DashboardDeleteAction;
+use jschreuder\BookmarkBureau\Action\DashboardListAction;
+use jschreuder\BookmarkBureau\Action\DashboardReadAction;
 use jschreuder\BookmarkBureau\Action\DashboardUpdateAction;
 use jschreuder\BookmarkBureau\Action\FavoriteCreateAction;
 use jschreuder\BookmarkBureau\Action\FavoriteDeleteAction;
@@ -122,6 +124,19 @@ class GeneralRoutingProvider implements RoutingProviderInterface
 
         // Dashboards
         (new ResourceRouteBuilder($router, 'dashboard', '/dashboard'))
+            ->registerCustom('GET', 'list', '', fn() => new DashboardListAction(
+                $this->container->getDashboardService(),
+                new DashboardOutputSpec()
+            ))
+            ->registerRead(fn() => new DashboardReadAction(
+                $this->container->getDashboardService(),
+                new DashboardInputSpec(),
+                new FullDashboardOutputSpec(
+                    new DashboardOutputSpec(),
+                    new CategoryOutputSpec(),
+                    new LinkOutputSpec()
+                )
+            ))
             ->registerCreate(fn() => new DashboardCreateAction(
                 $this->container->getDashboardService(),
                 new DashboardInputSpec(),
