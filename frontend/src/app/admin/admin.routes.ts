@@ -15,7 +15,11 @@ export const ADMIN_ROUTES: Routes = [
         loadComponent: () => import('./dashboards/dashboard-list/dashboard-list.component').then(m => m.AdminDashboardListComponent)
       },
       {
-        path: 'dashboards/:id',
+        path: 'dashboards/new',
+        loadComponent: () => import('./dashboards/dashboard-form/dashboard-form.component').then(m => m.DashboardFormComponent)
+      },
+      {
+        path: 'dashboards/:id/edit',
         loadComponent: () => import('./dashboards/dashboard-form/dashboard-form.component').then(m => m.DashboardFormComponent)
       },
       {

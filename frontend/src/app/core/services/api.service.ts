@@ -27,8 +27,13 @@ export class ApiService {
   };
 
   // Dashboard endpoints
+  listDashboards(): Observable<Dashboard[]> {
+    return this.http.get<ApiResponse<{ dashboards: Dashboard[] }>>(`${this.API_BASE}/dashboard`)
+      .pipe(map(response => response.data?.dashboards || []));
+  }
+
   getDashboard(id: string): Observable<FullDashboard> {
-    return this.http.get<ApiResponse<FullDashboard>>(`${this.API_BASE}/${id}`)
+    return this.http.get<ApiResponse<FullDashboard>>(`${this.API_BASE}/dashboard/${id}`)
       .pipe(map(response => response.data!));
   }
 
