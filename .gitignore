@@ -9,3 +9,24 @@
 /vendor/
 composer.lock
 coverage.xml
+
+# Frontend build artifacts
+/web/browser/
+/web/server/
+/web/*.js
+/web/*.json
+/web/*.css
+/web/*.html
+/web/*.ico
+/web/*.txt
+/web/chunk-*
+/web/polyfills-*
+/web/main-*
+/web/styles-*
+/web/api.php
+/web/.htaccess
+
+# Angular/Node
+/frontend/node_modules/
+/frontend/.angular/
+/frontend/dist/

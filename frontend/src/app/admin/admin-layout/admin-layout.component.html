@@ -1,0 +1,37 @@
+<mat-sidenav-container class="admin-container">
+  <mat-sidenav mode="side" opened class="admin-sidenav">
+    <div class="sidenav-header">
+      <mat-icon class="logo-icon">bookmark</mat-icon>
+      <div class="logo-text">
+        <span class="app-name">Bookmark Bureau</span>
+        <span class="admin-label">Administration</span>
+      </div>
+    </div>
+
+    <mat-nav-list class="menu-list">
+      <a mat-list-item *ngFor="let item of menuItems" [routerLink]="item.path" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
+      </a>
+    </mat-nav-list>
+
+    <div class="sidenav-footer">
+      <mat-divider></mat-divider>
+      <a mat-list-item routerLink="/dashboard">
+        <mat-icon matListItemIcon>arrow_back</mat-icon>
+        <span matListItemTitle>Back to Dashboards</span>
+      </a>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar class="mat-elevation-z2">
+      <mat-icon>settings</mat-icon>
+      <span class="toolbar-title">Administration Panel</span>
+    </mat-toolbar>
+
+    <div class="admin-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
