@@ -17,7 +17,7 @@ $environment = require __DIR__ . '/env.php';
 $config = require __DIR__ . '/' . $environment . '.php';
 $config['environment'] = $environment;
 
-/** @var  \Middle\Skeleton\ServiceContainer $container */
+/** @var  jschreuder\BookmarkBureau\ServiceContainer $container */
 $container = (new DiCompiler(jschreuder\BookmarkBureau\ServiceContainer::class))->compile()->newInstance($config);
 
 // Have Monolog log all PHP errors

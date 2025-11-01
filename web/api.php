@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-/** @var  \Middle\Skeleton\ServiceContainer $container */
+/** @var  jschreuder\BookmarkBureau\ServiceContainer $container */
 $container = require __DIR__ . '/../config/app_init.php';
 
 /** @var  jschreuder\Middle\ApplicationStackInterface $app */
