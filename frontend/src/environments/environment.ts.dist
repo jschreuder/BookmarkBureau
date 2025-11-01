@@ -1,0 +1,10 @@
+/**
+ * Environment configuration template
+ *
+ * Copy this file to environment.ts and adjust settings for your local setup.
+ * The environment.ts file is gitignored to allow individual configuration.
+ */
+export const environment = {
+  production: false,
+  apiBaseUrl: 'http://localhost:8080/api.php?/'
+};

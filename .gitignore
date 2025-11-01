@@ -29,3 +29,4 @@ coverage.xml
 /frontend/node_modules/
 /frontend/.angular/
 /frontend/dist/
+/frontend/src/environments/environment.ts

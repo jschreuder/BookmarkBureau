@@ -11,13 +11,14 @@ import {
   FullDashboard,
   ApiResponse
 } from '../models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
   private http = inject(HttpClient);
-  private readonly API_BASE = '/api';
+  private readonly API_BASE = environment.apiBaseUrl;
 
   private httpOptions = {
     headers: new HttpHeaders({
