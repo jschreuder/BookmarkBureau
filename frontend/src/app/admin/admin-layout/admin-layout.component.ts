@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -11,6 +12,7 @@ import { MatDividerModule } from '@angular/material/divider';
   selector: 'app-admin-layout',
   standalone: true,
   imports: [
+    CommonModule,
     RouterModule,
     MatToolbarModule,
     MatSidenavModule,

@@ -3,7 +3,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { of, throwError } from 'rxjs';
+import { of, throwError, NEVER } from 'rxjs';
+import { vi } from 'vitest';
 import { AdminDashboardListComponent } from './dashboard-list.component';
 import { ApiService } from '../../../core/services/api.service';
 import { Dashboard } from '../../../core/models';
@@ -11,7 +12,10 @@ import { Dashboard } from '../../../core/models';
 describe('AdminDashboardListComponent', () => {
   let component: AdminDashboardListComponent;
   let fixture: ComponentFixture<AdminDashboardListComponent>;
-  let apiService: jasmine.SpyObj<ApiService>;
+  let apiService: {
+    listDashboards: ReturnType<typeof vi.fn>;
+    deleteDashboard: ReturnType<typeof vi.fn>;
+  };
 
   const mockDashboards: Dashboard[] = [
     {
@@ -33,10 +37,10 @@ describe('AdminDashboardListComponent', () => {
   ];
 
   beforeEach(async () => {
-    const apiServiceSpy = jasmine.createSpyObj('ApiService', [
-      'listDashboards',
-      'deleteDashboard'
-    ]);
+    const apiServiceSpy = {
+      listDashboards: vi.fn().mockReturnValue(of([])),
+      deleteDashboard: vi.fn()
+    };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -51,7 +55,7 @@ describe('AdminDashboardListComponent', () => {
       ]
     }).compileComponents();
 
-    apiService = TestBed.inject(ApiService) as jasmine.SpyObj<ApiService>;
+    apiService = TestBed.inject(ApiService) as any;
     fixture = TestBed.createComponent(AdminDashboardListComponent);
     component = fixture.componentInstance;
   });
@@ -61,7 +65,7 @@ describe('AdminDashboardListComponent', () => {
   });
 
   it('should load dashboards on init', () => {
-    apiService.listDashboards.and.returnValue(of(mockDashboards));
+    apiService.listDashboards.mockReturnValue(of(mockDashboards));
 
     fixture.detectChanges();
 
@@ -71,17 +75,22 @@ describe('AdminDashboardListComponent', () => {
   });
 
   it('should display loading spinner while loading', () => {
-    apiService.listDashboards.and.returnValue(of(mockDashboards));
-    component.loading = true;
+    // Mock API to return an observable that never completes (keeps loading)
+    apiService.listDashboards.mockReturnValue(NEVER);
 
+    // Trigger initial detection which will call ngOnInit and start loading
     fixture.detectChanges();
 
-    const spinner = fixture.nativeElement.querySelector('mat-spinner');
-    expect(spinner).toBeTruthy();
+    // At this point, loading should be true because the observable hasn't completed
+    expect(component.loading).toBe(true);
+
+    // And the loading spinner should be displayed
+    const html = fixture.nativeElement.innerHTML;
+    expect(html).toContain('loading-spinner');
   });
 
   it('should display empty state when no dashboards', () => {
-    apiService.listDashboards.and.returnValue(of([]));
+    apiService.listDashboards.mockReturnValue(of([]));
 
     fixture.detectChanges();
 
@@ -91,7 +100,7 @@ describe('AdminDashboardListComponent', () => {
   });
 
   it('should display table when dashboards exist', () => {
-    apiService.listDashboards.and.returnValue(of(mockDashboards));
+    apiService.listDashboards.mockReturnValue(of(mockDashboards));
 
     fixture.detectChanges();
 
@@ -100,7 +109,7 @@ describe('AdminDashboardListComponent', () => {
   });
 
   it('should display dashboard data in table', () => {
-    apiService.listDashboards.and.returnValue(of(mockDashboards));
+    apiService.listDashboards.mockReturnValue(of(mockDashboards));
     component.dashboards = mockDashboards;
 
     fixture.detectChanges();
@@ -113,18 +122,20 @@ describe('AdminDashboardListComponent', () => {
 
   it('should handle error loading dashboards', () => {
     const error = new Error('Load failed');
-    apiService.listDashboards.and.returnValue(throwError(() => error));
-    spyOn(console, 'error');
+    apiService.listDashboards.mockReturnValue(throwError(() => error));
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     component.loadDashboards();
     fixture.detectChanges();
 
-    expect(console.error).toHaveBeenCalledWith('Error loading dashboards:', error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error loading dashboards:', error);
     expect(component.loading).toBe(false);
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('should navigate to new dashboard form', () => {
-    spyOn(component['router'], 'navigate');
+    vi.spyOn(component['router'], 'navigate');
 
     component.navigateToNew();
 
@@ -132,7 +143,7 @@ describe('AdminDashboardListComponent', () => {
   });
 
   it('should navigate to edit dashboard form', () => {
-    spyOn(component['router'], 'navigate');
+    vi.spyOn(component['router'], 'navigate');
     const dashboardId = '123e4567-e89b-12d3-a456-426614174000';
 
     component.navigateToEdit(dashboardId);
@@ -141,7 +152,7 @@ describe('AdminDashboardListComponent', () => {
   });
 
   it('should display edit and delete buttons for each dashboard', () => {
-    apiService.listDashboards.and.returnValue(of(mockDashboards));
+    apiService.listDashboards.mockReturnValue(of(mockDashboards));
     component.dashboards = mockDashboards;
 
     fixture.detectChanges();

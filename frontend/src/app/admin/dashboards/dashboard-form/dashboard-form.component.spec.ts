@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -12,7 +13,11 @@ import { FullDashboard, Dashboard } from '../../../core/models';
 describe('DashboardFormComponent', () => {
   let component: DashboardFormComponent;
   let fixture: ComponentFixture<DashboardFormComponent>;
-  let apiService: jasmine.SpyObj<ApiService>;
+  let apiService: {
+    getDashboard: ReturnType<typeof vi.fn>;
+    createDashboard: ReturnType<typeof vi.fn>;
+    updateDashboard: ReturnType<typeof vi.fn>;
+  };
   let activatedRoute: ActivatedRoute;
 
   const mockDashboard: Dashboard = {
@@ -31,11 +36,11 @@ describe('DashboardFormComponent', () => {
   };
 
   beforeEach(async () => {
-    const apiServiceSpy = jasmine.createSpyObj('ApiService', [
-      'getDashboard',
-      'createDashboard',
-      'updateDashboard'
-    ]);
+    const apiServiceSpy = {
+      getDashboard: vi.fn(),
+      createDashboard: vi.fn(),
+      updateDashboard: vi.fn()
+    };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -50,7 +55,7 @@ describe('DashboardFormComponent', () => {
       ]
     }).compileComponents();
 
-    apiService = TestBed.inject(ApiService) as jasmine.SpyObj<ApiService>;
+    apiService = TestBed.inject(ApiService) as any;
     activatedRoute = TestBed.inject(ActivatedRoute);
     fixture = TestBed.createComponent(DashboardFormComponent);
     component = fixture.componentInstance;
@@ -108,8 +113,8 @@ describe('DashboardFormComponent', () => {
   });
 
   it('should create dashboard with valid form data', () => {
-    apiService.createDashboard.and.returnValue(of(mockDashboard));
-    spyOn(component['router'], 'navigate');
+    apiService.createDashboard.mockReturnValue(of(mockDashboard));
+    vi.spyOn(component['router'], 'navigate');
 
     component.form.patchValue({
       title: 'New Dashboard',
@@ -135,7 +140,7 @@ describe('DashboardFormComponent', () => {
   });
 
   it('should load dashboard in edit mode', () => {
-    apiService.getDashboard.and.returnValue(of(mockFullDashboard));
+    apiService.getDashboard.mockReturnValue(of(mockFullDashboard));
     component.isEditMode = true;
     component.dashboardId = mockDashboard.id;
 
@@ -148,8 +153,8 @@ describe('DashboardFormComponent', () => {
   });
 
   it('should update dashboard in edit mode', () => {
-    apiService.updateDashboard.and.returnValue(of(mockDashboard));
-    spyOn(component['router'], 'navigate');
+    apiService.updateDashboard.mockReturnValue(of(mockDashboard));
+    vi.spyOn(component['router'], 'navigate');
 
     component.isEditMode = true;
     component.dashboardId = mockDashboard.id;
@@ -167,8 +172,8 @@ describe('DashboardFormComponent', () => {
 
   it('should handle error on create', () => {
     const error = new Error('Create failed');
-    apiService.createDashboard.and.returnValue(throwError(() => error));
-    spyOn(console, 'error');
+    apiService.createDashboard.mockReturnValue(throwError(() => error));
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     component.form.patchValue({
       title: 'New Dashboard',
@@ -177,14 +182,16 @@ describe('DashboardFormComponent', () => {
 
     component.onSubmit();
 
-    expect(console.error).toHaveBeenCalledWith('Error creating dashboard:', error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error creating dashboard:', error);
     expect(component.loading).toBe(false);
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('should handle error on update', () => {
     const error = new Error('Update failed');
-    apiService.updateDashboard.and.returnValue(throwError(() => error));
-    spyOn(console, 'error');
+    apiService.updateDashboard.mockReturnValue(throwError(() => error));
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     component.isEditMode = true;
     component.dashboardId = mockDashboard.id;
@@ -195,12 +202,14 @@ describe('DashboardFormComponent', () => {
 
     component.onSubmit();
 
-    expect(console.error).toHaveBeenCalledWith('Error updating dashboard:', error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error updating dashboard:', error);
     expect(component.loading).toBe(false);
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('should navigate to list on cancel', () => {
-    spyOn(component['router'], 'navigate');
+    vi.spyOn(component['router'], 'navigate');
 
     component.onCancel();
 

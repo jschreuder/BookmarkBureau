@@ -2,11 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmDialogComponent, ConfirmDialogData } from './confirm-dialog.component';
+import { vi } from 'vitest';
 
 describe('ConfirmDialogComponent', () => {
   let component: ConfirmDialogComponent;
   let fixture: ComponentFixture<ConfirmDialogComponent>;
-  let mockDialogRef: jasmine.SpyObj<MatDialogRef<ConfirmDialogComponent>>;
+  let mockDialogRef: { close: ReturnType<typeof vi.fn> };
 
   const mockData: ConfirmDialogData = {
     title: 'Confirm Action',
@@ -14,7 +15,7 @@ describe('ConfirmDialogComponent', () => {
   };
 
   beforeEach(async () => {
-    mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
+    mockDialogRef = { close: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -70,7 +71,7 @@ describe('ConfirmDialogComponent', () => {
   });
 
   it('should call onCancel when cancel button clicked', () => {
-    spyOn(component, 'onCancel');
+    vi.spyOn(component, 'onCancel');
     const cancelButton = fixture.nativeElement.querySelectorAll('button')[0];
 
     cancelButton.click();
@@ -79,7 +80,7 @@ describe('ConfirmDialogComponent', () => {
   });
 
   it('should call onConfirm when delete button clicked', () => {
-    spyOn(component, 'onConfirm');
+    vi.spyOn(component, 'onConfirm');
     const deleteButton = fixture.nativeElement.querySelectorAll('button')[1];
 
     deleteButton.click();
