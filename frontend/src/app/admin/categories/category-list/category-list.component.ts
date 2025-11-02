@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
   template: `
     <div class="page-header">
       <h1>Categories</h1>
-      <button mat-raised-button color="primary">
+      <button mat-raised-button color="primary" data-testid="create-btn">
         <mat-icon>add</mat-icon>
         New Category
       </button>

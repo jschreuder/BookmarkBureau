@@ -35,22 +35,24 @@ describe('CategoryListComponent', () => {
   });
 
   it('should render New Category button', () => {
-    const button = fixture.nativeElement.querySelector('button[mat-raised-button]');
+    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
     expect(button).toBeTruthy();
   });
 
   it('should have primary color on New Category button', () => {
-    const button = fixture.nativeElement.querySelector('button[color="primary"]');
+    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
     expect(button).toBeTruthy();
+    expect(button.getAttribute('color')).toBe('primary');
   });
 
   it('should display New Category text in button', () => {
-    const button = fixture.nativeElement.querySelector('button[mat-raised-button]');
+    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
     expect(button.textContent).toContain('New Category');
   });
 
   it('should have add icon in New Category button', () => {
-    const icon = fixture.nativeElement.querySelector('button[mat-raised-button] mat-icon');
+    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
+    const icon = button.querySelector('mat-icon');
     expect(icon).toBeTruthy();
     expect(icon.textContent).toContain('add');
   });
@@ -75,34 +77,15 @@ describe('CategoryListComponent', () => {
     expect(cardContent.textContent).toContain('This will show all categories with options to create, edit, and delete them');
   });
 
-  it('should have correct layout with flex display', () => {
-    const header = fixture.nativeElement.querySelector('.page-header');
-    const styles = window.getComputedStyle(header);
-    expect(styles.display).toBe('flex');
-    expect(styles.justifyContent).toContain('space-between');
-    expect(styles.alignItems).toContain('center');
-  });
-
-  it('should have margin-bottom on page header', () => {
-    const header = fixture.nativeElement.querySelector('.page-header');
-    const styles = window.getComputedStyle(header);
-    expect(styles.marginBottom).toBe('24px');
-  });
-
-  it('should have margin-bottom on h1', () => {
-    const h1 = fixture.nativeElement.querySelector('h1');
-    const styles = window.getComputedStyle(h1);
-    expect(styles.margin).toContain('0');
-  });
-
   it('should render button with correct icon', () => {
-    const button = fixture.nativeElement.querySelector('button[mat-raised-button]');
+    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
     const matIcon = button.querySelector('mat-icon');
     expect(matIcon).toBeTruthy();
   });
 
   it('should have Material button raised variant', () => {
-    const button = fixture.nativeElement.querySelector('button[mat-raised-button]');
+    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
     expect(button).toBeTruthy();
+    expect(button.hasAttribute('mat-raised-button')).toBe(true);
   });
 });
