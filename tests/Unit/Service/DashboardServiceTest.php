@@ -2,12 +2,9 @@
 
 use jschreuder\BookmarkBureau\Collection\CategoryCollection;
 use jschreuder\BookmarkBureau\Collection\CategoryLinkCollection;
-use jschreuder\BookmarkBureau\Collection\CategoryWithLinks;
-use jschreuder\BookmarkBureau\Collection\CategoryWithLinksCollection;
 use jschreuder\BookmarkBureau\Collection\DashboardCollection;
 use jschreuder\BookmarkBureau\Collection\DashboardWithCategoriesAndFavorites;
 use jschreuder\BookmarkBureau\Collection\FavoriteCollection;
-use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
