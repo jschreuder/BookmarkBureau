@@ -1,5 +1,30 @@
 # Build Instructions
 
+## Prerequisites
+
+Before building, you must set up your environment configuration.
+
+### Required: Create environment.ts
+
+The project requires an environment configuration file that is gitignored for local customization.
+
+```bash
+cd frontend/src/environments
+cp environment.ts.dist environment.ts
+```
+
+Edit `environment.ts` to match your setup:
+```typescript
+export const environment = {
+  production: false,
+  apiBaseUrl: '/api'  // Adjust if needed
+};
+```
+
+**Note:** This file is gitignored to allow individual developer configurations. See `ENVIRONMENT_SETUP.md` for more details.
+
+---
+
 ## Quick Start
 
 ### Development
@@ -30,6 +55,8 @@ php -S localhost:8000 -t web
 
 Access at http://localhost:8000
 
+---
+
 ## Directory Structure After Build
 
 ```
@@ -43,6 +70,8 @@ web/
 └── 3rdpartylicenses.txt
 ```
 
+---
+
 ## Routing
 
 - `/` → Angular application (index.html)
@@ -52,6 +81,8 @@ web/
 
 The `.htaccess` file handles this routing automatically.
 
+---
+
 ## Important Files
 
 ### frontend/src/api.php
@@ -59,6 +90,11 @@ PHP backend entry point. This file is copied during build to `web/api.php`.
 
 ### frontend/src/.htaccess
 Apache configuration for routing. Copied to `web/.htaccess` during build.
+
+### frontend/src/environments/environment.ts
+Local environment configuration. **Must be created from environment.ts.dist before building.**
+
+---
 
 ## Build Process Details
 
@@ -69,6 +105,19 @@ The build process:
 
 This is automated in the `package.json` build script.
 
+---
+
+## Testing
+
+Run tests before building:
+```bash
+cd frontend
+npm test              # Interactive mode with watch
+npm run test:ci       # Single run with coverage
+```
+
+---
+
 ## Cleaning
 
 To clean the build output:
@@ -77,3 +126,37 @@ rm -rf web/*
 ```
 
 Then rebuild with `npm run build` from the frontend directory.
+
+---
+
+## Troubleshooting
+
+### "Cannot find module 'environment'"
+**Solution:** Create `environment.ts` from template:
+```bash
+cd frontend/src/environments
+cp environment.ts.dist environment.ts
+```
+
+### Build fails with module not found errors
+**Solution:** Reinstall dependencies:
+```bash
+cd frontend
+rm -rf node_modules
+npm install
+```
+
+### API calls return 404
+**Solution:**
+1. Verify backend PHP server is running
+2. Check that `api.php` exists in `web/` directory
+3. Verify `.htaccess` is present in `web/` directory
+4. Ensure Apache `mod_rewrite` is enabled
+
+### Tests fail after build
+**Solution:** Clear Angular cache and rebuild:
+```bash
+cd frontend
+rm -rf .angular
+npm run build
+```

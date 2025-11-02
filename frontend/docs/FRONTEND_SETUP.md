@@ -43,6 +43,32 @@ BookmarkBureau/
 - Communicates with backend via REST API at `/api/*`
 - Uses Angular Material for UI components
 
+## Environment Setup
+
+### Prerequisites
+
+Before building or running the frontend, you must set up your environment configuration.
+
+#### Required: Create environment.ts
+
+The project requires an environment configuration file that is gitignored for local customization.
+
+```bash
+cd frontend/src/environments
+cp environment.ts.dist environment.ts
+```
+
+Edit `environment.ts` to match your setup:
+
+```typescript
+export const environment = {
+  production: false,
+  apiBaseUrl: '/api'  // Adjust if needed
+};
+```
+
+**Note:** This file is gitignored to allow individual developer configurations. See `ENVIRONMENT_SETUP.md` for more details.
+
 ## Directory Structure
 
 ### Frontend Application Structure
