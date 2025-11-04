@@ -45,10 +45,14 @@ use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Tag;
+use jschreuder\BookmarkBureau\Entity\User;
+use jschreuder\BookmarkBureau\Entity\Value\Email;
+use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
+use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -65,15 +69,17 @@ class TestEntityFactory
         ?string $description = null,
         ?Icon $icon = null,
         ?DateTimeInterface $createdAt = null,
-        ?DateTimeInterface $updatedAt = null
+        ?DateTimeInterface $updatedAt = null,
     ): Dashboard {
         return new Dashboard(
             dashboardId: $id ?? Uuid::uuid4(),
-            title: $title ?? new Title('Test Dashboard'),
-            description: $description ?? 'Test Description',
-            icon: $icon ?? new Icon('dashboard-icon'),
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
-            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
+            title: $title ?? new Title("Test Dashboard"),
+            description: $description ?? "Test Description",
+            icon: $icon ?? new Icon("dashboard-icon"),
+            createdAt: $createdAt ??
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+            updatedAt: $updatedAt ??
+                new DateTimeImmutable("2024-01-01 12:00:00"),
         );
     }
 
@@ -84,16 +90,18 @@ class TestEntityFactory
         ?string $description = null,
         ?Icon $icon = null,
         ?DateTimeInterface $createdAt = null,
-        ?DateTimeInterface $updatedAt = null
+        ?DateTimeInterface $updatedAt = null,
     ): Link {
         return new Link(
             linkId: $id ?? Uuid::uuid4(),
-            url: $url ?? new Url('https://example.com'),
-            title: $title ?? new Title('Example Title'),
-            description: $description ?? 'Example Description',
+            url: $url ?? new Url("https://example.com"),
+            title: $title ?? new Title("Example Title"),
+            description: $description ?? "Example Description",
             icon: $icon,
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
-            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
+            createdAt: $createdAt ??
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+            updatedAt: $updatedAt ??
+                new DateTimeImmutable("2024-01-01 12:00:00"),
         );
     }
 
@@ -104,26 +112,28 @@ class TestEntityFactory
         ?HexColor $color = null,
         ?int $sortOrder = null,
         ?DateTimeInterface $createdAt = null,
-        ?DateTimeInterface $updatedAt = null
+        ?DateTimeInterface $updatedAt = null,
     ): Category {
         return new Category(
             categoryId: $id ?? Uuid::uuid4(),
             dashboard: $dashboard ?? self::createDashboard(),
-            title: $title ?? new Title('Test Category'),
+            title: $title ?? new Title("Test Category"),
             color: $color,
             sortOrder: $sortOrder ?? 0,
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00'),
-            updatedAt: $updatedAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
+            createdAt: $createdAt ??
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+            updatedAt: $updatedAt ??
+                new DateTimeImmutable("2024-01-01 12:00:00"),
         );
     }
 
     public static function createTag(
         ?TagName $tagName = null,
-        ?HexColor $color = null
+        ?HexColor $color = null,
     ): Tag {
         return new Tag(
-            tagName: $tagName ?? new TagName('example-tag'),
-            color: $color
+            tagName: $tagName ?? new TagName("example-tag"),
+            color: $color,
         );
     }
 
@@ -131,13 +141,14 @@ class TestEntityFactory
         ?Dashboard $dashboard = null,
         ?Link $link = null,
         ?int $sortOrder = null,
-        ?DateTimeInterface $createdAt = null
+        ?DateTimeInterface $createdAt = null,
     ): Favorite {
         return new Favorite(
             dashboard: $dashboard ?? self::createDashboard(),
             link: $link ?? self::createLink(),
             sortOrder: $sortOrder ?? 0,
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
+            createdAt: $createdAt ??
+                new DateTimeImmutable("2024-01-01 12:00:00"),
         );
     }
 
@@ -145,13 +156,31 @@ class TestEntityFactory
         ?Category $category = null,
         ?Link $link = null,
         ?int $sortOrder = null,
-        ?DateTimeInterface $createdAt = null
+        ?DateTimeInterface $createdAt = null,
     ): CategoryLink {
         return new CategoryLink(
             category: $category ?? self::createCategory(),
             link: $link ?? self::createLink(),
             sortOrder: $sortOrder ?? 0,
-            createdAt: $createdAt ?? new DateTimeImmutable('2024-01-01 12:00:00')
+            createdAt: $createdAt ??
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+        );
+    }
+
+    public static function createUser(
+        ?UuidInterface $id = null,
+        ?Email $email = null,
+        ?HashedPassword $passwordHash = null,
+        ?TotpSecret $totpSecret = null,
+    ): User {
+        return new User(
+            userId: $id ?? Uuid::uuid4(),
+            email: $email ?? new Email("test@example.com"),
+            passwordHash: $passwordHash ??
+                new HashedPassword(
+                    password_hash("password123", PASSWORD_BCRYPT),
+                ),
+            totpSecret: $totpSecret,
         );
     }
 }
