@@ -53,6 +53,10 @@ use PDO;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Extensible by design to allow overwriting service definitions and because
+ * Middle DI needs it to be.
+ */
 class ServiceContainer
 {
     use ConfigTrait;
