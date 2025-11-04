@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau;
 
+use Closure;
 use jschreuder\Middle\ApplicationStack;
 use jschreuder\Middle\Controller\ControllerInterface;
 use jschreuder\Middle\Controller\ControllerRunner;
@@ -60,15 +61,7 @@ class ServiceContainer
     {
         return new ApplicationStack(
             new ControllerRunner(),
-            new RequestValidatorMiddleware(function (
-                ServerRequestInterface $request,
-                ValidationFailedException $error,
-            ) {
-                return new JsonResponse(
-                    ["errors" => $error->getValidationErrors()],
-                    400,
-                );
-            }),
+            new RequestValidatorMiddleware($this->getValidationErrorHandler()),
             new RequestFilterMiddleware(),
             new JsonRequestParserMiddleware(),
             new RoutingMiddleware(
@@ -112,6 +105,14 @@ class ServiceContainer
     public function get500Handler(): ControllerInterface
     {
         return new ErrorHandlerController($this->getLogger());
+    }
+
+    public function getValidationErrorHandler(): Closure
+    {
+        return fn(
+            ServerRequestInterface $request,
+            ValidationFailedException $error,
+        ) => new JsonResponse(["errors" => $error->getValidationErrors()], 400);
     }
 
     public function getDb(): PDO
