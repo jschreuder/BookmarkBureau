@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace jschreuder\BookmarkBureau;
 
@@ -17,13 +17,16 @@ use jschreuder\BookmarkBureau\Controller\NotFoundHandlerController;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
+use jschreuder\BookmarkBureau\Repository\JsonUserRepository;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\PdoCategoryRepository;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
 use jschreuder\BookmarkBureau\Repository\PdoFavoriteRepository;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
 use jschreuder\BookmarkBureau\Repository\PdoTagRepository;
+use jschreuder\BookmarkBureau\Repository\PdoUserRepository;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
+use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\CategoryService;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Service\DashboardService;
@@ -36,6 +39,10 @@ use jschreuder\BookmarkBureau\Service\TagService;
 use jschreuder\BookmarkBureau\Service\TagServiceInterface;
 use jschreuder\BookmarkBureau\Service\UnitOfWork\PdoUnitOfWork;
 use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
+use jschreuder\BookmarkBureau\Service\UserService;
+use jschreuder\BookmarkBureau\Service\UserServiceInterface;
+use jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
+use jschreuder\BookmarkBureau\Service\PhpPasswordHasher;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use jschreuder\Middle\ServerMiddleware\RequestFilterMiddleware;
 use jschreuder\Middle\ServerMiddleware\RequestValidatorMiddleware;
@@ -53,38 +60,46 @@ class ServiceContainer
     {
         return new ApplicationStack(
             new ControllerRunner(),
-            new RequestValidatorMiddleware(function(ServerRequestInterface $request, ValidationFailedException $error) {
-                return new JsonResponse(['errors' => $error->getValidationErrors()], 400);
+            new RequestValidatorMiddleware(function (
+                ServerRequestInterface $request,
+                ValidationFailedException $error,
+            ) {
+                return new JsonResponse(
+                    ["errors" => $error->getValidationErrors()],
+                    400,
+                );
             }),
-            new RequestFilterMiddleware,
+            new RequestFilterMiddleware(),
             new JsonRequestParserMiddleware(),
             new RoutingMiddleware(
                 $this->getAppRouter(),
-                $this->get404Handler()
+                $this->get404Handler(),
             ),
             new ErrorHandlerMiddleware(
                 $this->getLogger(),
-                $this->get500Handler()
-            )
+                $this->get500Handler(),
+            ),
         );
     }
 
     public function getLogger(): LoggerInterface
     {
-        $logger = new \Monolog\Logger($this->config('logger.name'));
-        $logger->pushHandler((new \Monolog\Handler\StreamHandler(
-            $this->config('logger.path'),
-            Monolog\Level::Notice
-        ))->setFormatter(new \Monolog\Formatter\LineFormatter()));
+        $logger = new \Monolog\Logger($this->config("logger.name"));
+        $logger->pushHandler(
+            new \Monolog\Handler\StreamHandler(
+                $this->config("logger.path"),
+                Monolog\Level::Notice,
+            )->setFormatter(new \Monolog\Formatter\LineFormatter()),
+        );
         return $logger;
     }
 
     public function getAppRouter(): RouterInterface
     {
-        return new SymfonyRouter($this->config('site.url'));
+        return new SymfonyRouter($this->config("site.url"));
     }
 
-    public function getUrlGenerator() : UrlGeneratorInterface
+    public function getUrlGenerator(): UrlGeneratorInterface
     {
         return $this->getAppRouter()->getGenerator();
     }
@@ -101,15 +116,15 @@ class ServiceContainer
 
     public function getDb(): PDO
     {
-        $baseDsn = $this->config('db.dsn');
-        $dbname = $this->config('db.dbname');
+        $baseDsn = $this->config("db.dsn");
+        $dbname = $this->config("db.dbname");
 
         // For SQLite, the dbname is part of the DSN directly (e.g., "sqlite::memory:" or "sqlite:/path/to/db")
         // For other databases like MySQL, we need to append ";dbname=" separator
-        if (str_starts_with($baseDsn, 'sqlite:')) {
+        if (str_starts_with($baseDsn, "sqlite:")) {
             $dsn = $baseDsn . $dbname;
         } else {
-            $dsn = $baseDsn . ';dbname=' . $dbname;
+            $dsn = $baseDsn . ";dbname=" . $dbname;
         }
 
         $options = [
@@ -117,20 +132,18 @@ class ServiceContainer
         ];
 
         // Only set MySQL-specific attributes if using MySQL driver
-        if (!str_starts_with($baseDsn, 'sqlite:') && defined('PDO::MYSQL_ATTR_INIT_COMMAND')) {
-            $options[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES utf8';
+        if (
+            !str_starts_with($baseDsn, "sqlite:") &&
+            defined("PDO::MYSQL_ATTR_INIT_COMMAND")
+        ) {
+            $options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8";
         }
 
         // Convert empty values to null for PDO compatibility
-        $user = $this->config('db.user') ?: null;
-        $pass = $this->config('db.pass') ?: null;
+        $user = $this->config("db.user") ?: null;
+        $pass = $this->config("db.pass") ?: null;
 
-        return new PDO(
-            $dsn,
-            $user,
-            $pass,
-            $options
-        );
+        return new PDO($dsn, $user, $pass, $options);
     }
 
     public function getUnitOfWork(): UnitOfWorkInterface
@@ -153,7 +166,7 @@ class ServiceContainer
         return new PdoCategoryRepository(
             $this->getDb(),
             $this->getDashboardRepository(),
-            $this->getLinkRepository()
+            $this->getLinkRepository(),
         );
     }
 
@@ -167,7 +180,7 @@ class ServiceContainer
         return new PdoFavoriteRepository(
             $this->getDb(),
             $this->getDashboardRepository(),
-            $this->getLinkRepository()
+            $this->getLinkRepository(),
         );
     }
 
@@ -175,7 +188,7 @@ class ServiceContainer
     {
         return new LinkService(
             $this->getLinkRepository(),
-            $this->getUnitOfWork()
+            $this->getUnitOfWork(),
         );
     }
 
@@ -184,7 +197,7 @@ class ServiceContainer
         return new TagService(
             $this->getTagRepository(),
             $this->getLinkRepository(),
-            $this->getUnitOfWork()
+            $this->getUnitOfWork(),
         );
     }
 
@@ -193,7 +206,7 @@ class ServiceContainer
         return new CategoryService(
             $this->getCategoryRepository(),
             $this->getDashboardRepository(),
-            $this->getUnitOfWork()
+            $this->getUnitOfWork(),
         );
     }
 
@@ -203,7 +216,7 @@ class ServiceContainer
             $this->getDashboardRepository(),
             $this->getCategoryRepository(),
             $this->getFavoriteRepository(),
-            $this->getUnitOfWork()
+            $this->getUnitOfWork(),
         );
     }
 
@@ -213,7 +226,36 @@ class ServiceContainer
             $this->getFavoriteRepository(),
             $this->getDashboardRepository(),
             $this->getLinkRepository(),
-            $this->getUnitOfWork()
+            $this->getUnitOfWork(),
+        );
+    }
+
+    public function getPasswordHasher(): PasswordHasherInterface
+    {
+        return new PhpPasswordHasher();
+    }
+
+    public function getUserRepository(): UserRepositoryInterface
+    {
+        $storageType = $this->config("users.storage.type", "pdo");
+
+        return match ($storageType) {
+            "json" => new JsonUserRepository(
+                $this->config("users.storage.path"),
+            ),
+            "pdo" => new PdoUserRepository($this->getDb()),
+            default => throw new \RuntimeException(
+                "Unknown user storage type: " . $storageType,
+            ),
+        };
+    }
+
+    public function getUserService(): UserServiceInterface
+    {
+        return new UserService(
+            $this->getUserRepository(),
+            $this->getPasswordHasher(),
+            $this->getUnitOfWork(),
         );
     }
 }

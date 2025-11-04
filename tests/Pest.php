@@ -172,6 +172,8 @@ class TestEntityFactory
         ?Email $email = null,
         ?HashedPassword $passwordHash = null,
         ?TotpSecret $totpSecret = null,
+        ?DateTimeInterface $createdAt = null,
+        ?DateTimeInterface $updatedAt = null,
     ): User {
         return new User(
             userId: $id ?? Uuid::uuid4(),
@@ -181,6 +183,10 @@ class TestEntityFactory
                     password_hash("password123", PASSWORD_BCRYPT),
                 ),
             totpSecret: $totpSecret,
+            createdAt: $createdAt ??
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+            updatedAt: $updatedAt ??
+                new DateTimeImmutable("2024-01-01 12:00:00"),
         );
     }
 }

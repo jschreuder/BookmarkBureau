@@ -2,16 +2,54 @@
 
 namespace jschreuder\BookmarkBureau\Entity;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use Ramsey\Uuid\UuidInterface;
 
 final class User
 {
+    public readonly UuidInterface $userId;
+
+    public Value\Email $email {
+        set {
+            $this->email = $value;
+            $this->markAsUpdated();
+        }
+    }
+
+    public Value\HashedPassword $passwordHash {
+        set {
+            $this->passwordHash = $value;
+            $this->markAsUpdated();
+        }
+    }
+
+    public ?Value\TotpSecret $totpSecret {
+        set {
+            $this->totpSecret = $value;
+            $this->markAsUpdated();
+        }
+    }
+
+    public readonly DateTimeInterface $createdAt;
+
+    public private(set) DateTimeInterface $updatedAt;
+
     public function __construct(
-        public readonly UuidInterface $userId,
-        public private(set) Value\Email $email,
-        public private(set) Value\HashedPassword $passwordHash,
-        public private(set) ?Value\TotpSecret $totpSecret
-    ) {}
+        UuidInterface $userId,
+        Value\Email $email,
+        Value\HashedPassword $passwordHash,
+        ?Value\TotpSecret $totpSecret,
+        DateTimeInterface $createdAt,
+        DateTimeInterface $updatedAt,
+    ) {
+        $this->userId = $userId;
+        $this->email = $email;
+        $this->passwordHash = $passwordHash;
+        $this->totpSecret = $totpSecret;
+        $this->createdAt = $createdAt;
+        $this->updatedAt = $updatedAt;
+    }
 
     /**
      * Putting this in a function as it must never happen by accident
@@ -42,5 +80,10 @@ final class User
     public function requiresTotp(): bool
     {
         return !is_null($this->totpSecret);
+    }
+
+    private function markAsUpdated(): void
+    {
+        $this->updatedAt = new DateTimeImmutable();
     }
 }

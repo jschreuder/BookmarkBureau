@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
+use DateTimeImmutable;
 use jschreuder\BookmarkBureau\Collection\UserCollection;
 use jschreuder\BookmarkBureau\Entity\User;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
@@ -24,21 +25,29 @@ final readonly class UserService implements UserServiceInterface
     #[\Override]
     public function createUser(Email $email, string $plainPassword): User
     {
-        return $this->unitOfWork->transactional(function () use ($email, $plainPassword): User {
+        return $this->unitOfWork->transactional(function () use (
+            $email,
+            $plainPassword,
+        ): User {
             // Check if email already exists
             if ($this->userRepository->existsByEmail($email)) {
-                throw new DuplicateEmailException('Email already exists: ' . $email);
+                throw new DuplicateEmailException(
+                    "Email already exists: " . $email,
+                );
             }
 
             // Hash the password
             $passwordHash = $this->passwordHasher->hash($plainPassword);
 
             // Create new user without TOTP
+            $now = new DateTimeImmutable();
             $user = new User(
                 userId: Uuid::uuid4(),
                 email: $email,
                 passwordHash: $passwordHash,
                 totpSecret: null,
+                createdAt: $now,
+                updatedAt: $now,
             );
 
             // Persist to repository
@@ -87,9 +96,14 @@ final readonly class UserService implements UserServiceInterface
      * @throws UserNotFoundException when user doesn't exist
      */
     #[\Override]
-    public function changePassword(UuidInterface $userId, string $plainPassword): void
-    {
-        $this->unitOfWork->transactional(function () use ($userId, $plainPassword): void {
+    public function changePassword(
+        UuidInterface $userId,
+        string $plainPassword,
+    ): void {
+        $this->unitOfWork->transactional(function () use (
+            $userId,
+            $plainPassword,
+        ): void {
             $user = $this->userRepository->findById($userId);
 
             // Hash the new password
@@ -106,7 +120,10 @@ final readonly class UserService implements UserServiceInterface
     #[\Override]
     public function verifyPassword(User $user, string $plainPassword): bool
     {
-        return $this->passwordHasher->verify($plainPassword, $user->passwordHash);
+        return $this->passwordHasher->verify(
+            $plainPassword,
+            $user->passwordHash,
+        );
     }
 
     /**
@@ -115,7 +132,9 @@ final readonly class UserService implements UserServiceInterface
     #[\Override]
     public function enableTotp(UuidInterface $userId): TotpSecret
     {
-        return $this->unitOfWork->transactional(function () use ($userId): TotpSecret {
+        return $this->unitOfWork->transactional(function () use (
+            $userId,
+        ): TotpSecret {
             $user = $this->userRepository->findById($userId);
 
             // Generate a new TOTP secret
@@ -157,8 +176,8 @@ final readonly class UserService implements UserServiceInterface
     private function generateTotpSecret(): TotpSecret
     {
         // Base32 alphabet per RFC 4648
-        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-        $secret = '';
+        $alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+        $secret = "";
 
         // Generate 32 random Base32 characters (160 bits = 32 * 5 bits)
         for ($i = 0; $i < 32; $i++) {

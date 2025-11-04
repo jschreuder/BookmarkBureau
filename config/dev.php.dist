@@ -1,13 +1,23 @@
 <?php
 
 return [
-    'site.url' => 'http://localhost',
+    "site.url" => "http://localhost",
 
-    'logger.name' => 'middle-skeleton',
-    'logger.path' => __DIR__ . '/../var/logs/' . (php_sapi_name() === 'cli' ? 'cli' : 'web') . '-' . date('Ymd') . '.log',
+    "logger.name" => "middle-skeleton",
+    "logger.path" =>
+        __DIR__ .
+        "/../var/logs/" .
+        (php_sapi_name() === "cli" ? "cli" : "web") .
+        "-" .
+        date("Ymd") .
+        ".log",
+    "logger.enable_request_logging" => true, // Enable request/response logging in development
 
-    'db.dsn'    => 'mysql:host=localhost;charset=utf8',
-    'db.dbname' => 'db_dev',
-    'db.user'   => 'root',
-    'db.pass'   => 'root',
+    "db.dsn" => "sqlite:./var/bb_database",
+    "db.dbname" => null,
+    "db.user" => null,
+    "db.pass" => null,
+
+    "users.storage.type" => "file",
+    "users.storage.path" => __DIR__ . "/../var/users.json",
 ];
