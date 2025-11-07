@@ -121,28 +121,41 @@ class ServiceContainer
 
     public function getDb(): PDO
     {
-        $baseDsn = $this->config("db.dsn");
-        $dbname = $this->config("db.dbname");
+        // Extract database type from DSN
+        $dsn = $this->config("db.dsn");
+        $parts = explode(":", $dsn, 2);
+        $dbType = strtolower($parts[0]);
 
-        // For SQLite, the dbname is part of the DSN directly (e.g., "sqlite::memory:" or "sqlite:/path/to/db")
-        // For other databases like MySQL, we need to append ";dbname=" separator
-        if (str_starts_with($baseDsn, "sqlite:")) {
-            $dsn = $baseDsn . $dbname;
-        } else {
-            $dsn = $baseDsn . ";dbname=" . $dbname;
-        }
+        return match ($dbType) {
+            "sqlite" => $this->createSqliteDb($dsn),
+            "mysql" => $this->createMysqlDb($dsn),
+            default => throw new \RuntimeException(
+                "Unsupported database type: {$dbType}",
+            ),
+        };
+    }
+
+    private function createSqliteDb(string $dsn): PDO
+    {
+        $dsn .= $this->config("db.dbname");
+        // Convert empty values to null for PDO compatibility
+        $user = $this->config("db.user") ?: null;
+        $pass = $this->config("db.pass") ?: null;
+
+        return new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        ]);
+    }
+
+    private function createMysqlDb(string $baseDsn): PDO
+    {
+        $dbname = $this->config("db.dbname");
+        $dsn = $baseDsn . ";dbname={$dbname};charset=utf8mb4";
 
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
         ];
-
-        // Only set MySQL-specific attributes if using MySQL driver
-        if (
-            !str_starts_with($baseDsn, "sqlite:") &&
-            defined("PDO::MYSQL_ATTR_INIT_COMMAND")
-        ) {
-            $options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8";
-        }
 
         // Convert empty values to null for PDO compatibility
         $user = $this->config("db.user") ?: null;
@@ -242,7 +255,7 @@ class ServiceContainer
 
     public function getUserRepository(): UserRepositoryInterface
     {
-        $storageType = $this->config("users.storage.type", "pdo");
+        $storageType = $this->config("users.storage.type") ?: "pdo";
 
         return match ($storageType) {
             "json" => new JsonUserRepository(
@@ -250,7 +263,7 @@ class ServiceContainer
             ),
             "pdo" => new PdoUserRepository($this->getDb()),
             default => throw new \RuntimeException(
-                "Unknown user storage type: " . $storageType,
+                "Unknown user storage type: {$storageType}",
             ),
         };
     }
