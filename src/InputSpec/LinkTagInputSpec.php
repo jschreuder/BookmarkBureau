@@ -10,10 +10,7 @@ use Respect\Validation\Validator;
 
 final class LinkTagInputSpec implements InputSpecInterface
 {
-    private const FIELDS = [
-        'id',
-        'tag_name',
-    ];
+    private const array FIELDS = ["id", "tag_name"];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -27,12 +24,18 @@ final class LinkTagInputSpec implements InputSpecInterface
         $filtered = [];
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
-            $filtered[$field] = match($field) {
-                'id' => Filter::start($rawData, 'id', '')
-                    ->string(allowNull: false)->trim()->done(),
-                'tag_name' => Filter::start($rawData, 'tag_name', '')
-                    ->string(allowNull: false)->trim()->done(),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+            $filtered[$field] = match ($field) {
+                "id" => Filter::start($rawData, "id", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                "tag_name" => Filter::start($rawData, "tag_name", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 
@@ -46,9 +49,14 @@ final class LinkTagInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                'id' => $validator->key('id', Validator::notEmpty()->uuid()),
-                'tag_name' => $validator->key('tag_name', Validator::notEmpty()->length(1, 256)),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+                "id" => $validator->key("id", Validator::notEmpty()->uuid()),
+                "tag_name" => $validator->key(
+                    "tag_name",
+                    Validator::notEmpty()->length(1, 256),
+                ),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 

@@ -6,6 +6,7 @@ use jschreuder\BookmarkBureau\Collection\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Tag;
 use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DuplicateTagException;
+use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use Ramsey\Uuid\UuidInterface;
 
 interface TagRepositoryInterface
@@ -47,17 +48,26 @@ interface TagRepositoryInterface
      * @throws TagNotFoundException when tag doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
-    public function assignToLinkId(UuidInterface $linkId, string $tagName): void;
+    public function assignToLinkId(
+        UuidInterface $linkId,
+        string $tagName,
+    ): void;
 
     /**
      * Remove a tag from a link
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      * @throws TagNotFoundException when tag doesn't exist (FK violation)
      */
-    public function removeFromLinkId(UuidInterface $linkId, string $tagName): void;
+    public function removeFromLinkId(
+        UuidInterface $linkId,
+        string $tagName,
+    ): void;
 
     /**
      * Check if a tag is assigned to a link
      */
-    public function isAssignedToLinkId(UuidInterface $linkId, string $tagName): bool;
+    public function isAssignedToLinkId(
+        UuidInterface $linkId,
+        string $tagName,
+    ): bool;
 }

@@ -21,10 +21,12 @@ final readonly class FavoriteOutputSpec implements OutputSpecInterface
     private function doTransform(object $favorite): array
     {
         return [
-            'dashboard_id' => $favorite->dashboard->dashboardId->toString(),
-            'link_id' => $favorite->link->linkId->toString(),
-            'sort_order' => $favorite->sortOrder,
-            'created_at' => $favorite->createdAt->format(DateTimeInterface::ATOM),
+            "dashboard_id" => $favorite->dashboard->dashboardId->toString(),
+            "link_id" => $favorite->link->linkId->toString(),
+            "sort_order" => $favorite->sortOrder,
+            "created_at" => $favorite->createdAt->format(
+                DateTimeInterface::ATOM,
+            ),
         ];
     }
 }

@@ -10,10 +10,7 @@ use Respect\Validation\Validator;
 
 final class TagInputSpec implements InputSpecInterface
 {
-    private const FIELDS = [
-        'tag_name',
-        'color',
-    ];
+    private const array FIELDS = ["tag_name", "color"];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -27,12 +24,18 @@ final class TagInputSpec implements InputSpecInterface
         $filtered = [];
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
-            $filtered[$field] = match($field) {
-                'tag_name' => Filter::start($rawData, 'tag_name', '')
-                    ->string(allowNull: false)->trim()->done(),
-                'color' => Filter::start($rawData, 'color', null)
-                    ->string()->trim()->done(),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+            $filtered[$field] = match ($field) {
+                "tag_name" => Filter::start($rawData, "tag_name", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                "color" => Filter::start($rawData, "color", null)
+                    ->string()
+                    ->trim()
+                    ->done(),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 
@@ -46,9 +49,17 @@ final class TagInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                'tag_name' => $validator->key('tag_name', Validator::notEmpty()->length(1, 256)),
-                'color' => $validator->key('color', Validator::optional(Validator::stringType())),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+                "tag_name" => $validator->key(
+                    "tag_name",
+                    Validator::notEmpty()->length(1, 256),
+                ),
+                "color" => $validator->key(
+                    "color",
+                    Validator::optional(Validator::stringType()),
+                ),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 

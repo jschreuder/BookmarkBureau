@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace jschreuder\BookmarkBureau\Util;
 
@@ -17,14 +17,13 @@ use Closure;
  */
 final readonly class ResourceRouteBuilder
 {
-    private const string ID_SEGMENT = '/:id';
+    private const string ID_SEGMENT = "/:id";
 
     public function __construct(
         private RouterInterface $router,
         private string $resourceName,
-        private string $pathSegment
-    ) {
-    }
+        private string $pathSegment,
+    ) {}
 
     /**
      * Register a GET route for reading a single resource.
@@ -34,9 +33,12 @@ final readonly class ResourceRouteBuilder
     public function registerRead(Closure $actionFactory): self
     {
         $this->router->get(
-            $this->resourceName . '-read',
+            "{$this->resourceName}-read",
             $this->pathSegment . self::ID_SEGMENT,
-            fn(): ControllerInterface => new ActionController($actionFactory(), new JsonResponseTransformer())
+            fn(): ControllerInterface => new ActionController(
+                $actionFactory(),
+                new JsonResponseTransformer(),
+            ),
         );
         return $this;
     }
@@ -49,9 +51,12 @@ final readonly class ResourceRouteBuilder
     public function registerCreate(Closure $actionFactory): self
     {
         $this->router->post(
-            $this->resourceName . '-create',
+            "{$this->resourceName}-create",
             $this->pathSegment,
-            fn(): ControllerInterface => new ActionController($actionFactory(), new JsonResponseTransformer())
+            fn(): ControllerInterface => new ActionController(
+                $actionFactory(),
+                new JsonResponseTransformer(),
+            ),
         );
         return $this;
     }
@@ -64,9 +69,12 @@ final readonly class ResourceRouteBuilder
     public function registerUpdate(Closure $actionFactory): self
     {
         $this->router->put(
-            $this->resourceName . '-update',
+            "{$this->resourceName}-update",
             $this->pathSegment . self::ID_SEGMENT,
-            fn(): ControllerInterface => new ActionController($actionFactory(), new JsonResponseTransformer())
+            fn(): ControllerInterface => new ActionController(
+                $actionFactory(),
+                new JsonResponseTransformer(),
+            ),
         );
         return $this;
     }
@@ -79,9 +87,12 @@ final readonly class ResourceRouteBuilder
     public function registerDelete(Closure $actionFactory): self
     {
         $this->router->delete(
-            $this->resourceName . '-delete',
+            "{$this->resourceName}-delete",
             $this->pathSegment . self::ID_SEGMENT,
-            fn(): ControllerInterface => new ActionController($actionFactory(), new JsonResponseTransformer())
+            fn(): ControllerInterface => new ActionController(
+                $actionFactory(),
+                new JsonResponseTransformer(),
+            ),
         );
         return $this;
     }
@@ -100,26 +111,29 @@ final readonly class ResourceRouteBuilder
         string $method,
         string $suffix,
         string $pathSuffix,
-        Closure $actionFactory
+        Closure $actionFactory,
     ): self {
-        $routeName = $suffix !== ''
-            ? $this->resourceName . '-' . $suffix
-            : $this->resourceName;
+        $routeName =
+            $suffix !== ""
+                ? "{$this->resourceName}-{$suffix}"
+                : $this->resourceName;
 
         $path = $this->pathSegment . $pathSuffix;
 
         $controller = fn(): ControllerInterface => new ActionController(
             $actionFactory(),
-            new JsonResponseTransformer()
+            new JsonResponseTransformer(),
         );
 
         match (strtoupper($method)) {
-            'GET' => $this->router->get($routeName, $path, $controller),
-            'POST' => $this->router->post($routeName, $path, $controller),
-            'PUT' => $this->router->put($routeName, $path, $controller),
-            'DELETE' => $this->router->delete($routeName, $path, $controller),
-            'PATCH' => $this->router->patch($routeName, $path, $controller),
-            default => throw new \InvalidArgumentException("Unsupported HTTP method: {$method}")
+            "GET" => $this->router->get($routeName, $path, $controller),
+            "POST" => $this->router->post($routeName, $path, $controller),
+            "PUT" => $this->router->put($routeName, $path, $controller),
+            "DELETE" => $this->router->delete($routeName, $path, $controller),
+            "PATCH" => $this->router->patch($routeName, $path, $controller),
+            default => throw new \InvalidArgumentException(
+                "Unsupported HTTP method: {$method}",
+            ),
         };
 
         return $this;

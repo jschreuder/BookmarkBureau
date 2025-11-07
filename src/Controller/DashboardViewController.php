@@ -31,12 +31,13 @@ final readonly class DashboardViewController implements
     ) {}
 
     #[\Override]
-    public function filterRequest(ServerRequestInterface $request): ServerRequestInterface
-    {
+    public function filterRequest(
+        ServerRequestInterface $request,
+    ): ServerRequestInterface {
         // Extract UUID from route attributes
-        $id = $request->getAttribute('id');
+        $id = $request->getAttribute("id");
         if (!is_null($id)) {
-            return $request->withParsedBody(['id' => $id]);
+            return $request->withParsedBody(["id" => $id]);
         }
 
         return $request->withParsedBody([]);
@@ -48,12 +49,12 @@ final readonly class DashboardViewController implements
         $data = (array) $request->getParsedBody();
 
         // Validate that ID is present and is a valid UUID
-        if (!isset($data['id'])) {
-            throw new \InvalidArgumentException('Dashboard ID is required');
+        if (!isset($data["id"])) {
+            throw new \InvalidArgumentException("Dashboard ID is required");
         }
 
-        if (!v::uuid()->validate($data['id'])) {
-            throw new \InvalidArgumentException('Invalid dashboard ID format');
+        if (!v::uuid()->validate($data["id"])) {
+            throw new \InvalidArgumentException("Invalid dashboard ID format");
         }
     }
 
@@ -61,10 +62,12 @@ final readonly class DashboardViewController implements
     public function execute(ServerRequestInterface $request): ResponseInterface
     {
         $data = (array) $request->getParsedBody();
-        $dashboardId = \Ramsey\Uuid\Uuid::fromString($data['id']);
+        $dashboardId = \Ramsey\Uuid\Uuid::fromString($data["id"]);
 
         // Fetch the complete dashboard view (dashboard + categories with links + favorites)
-        $dashboardView = $this->dashboardService->getFullDashboard($dashboardId);
+        $dashboardView = $this->dashboardService->getFullDashboard(
+            $dashboardId,
+        );
 
         // Transform using the composite OutputSpec
         $dashboardArray = $this->outputSpec->transform($dashboardView);
@@ -72,10 +75,10 @@ final readonly class DashboardViewController implements
         // Return the response
         return $this->responseTransformer->transform(
             data: [
-                'success' => true,
-                'data' => $dashboardArray
+                "success" => true,
+                "data" => $dashboardArray,
             ],
-            statusCode: 200
+            statusCode: 200,
         );
     }
 }

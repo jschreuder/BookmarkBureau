@@ -11,7 +11,9 @@ final readonly class Url
     public function __construct(string $value)
     {
         if (!filter_var($value, FILTER_VALIDATE_URL)) {
-            throw new InvalidArgumentException('Url Value object must get a valid URL, was given: ' . $value);
+            throw new InvalidArgumentException(
+                "Url Value object must get a valid URL, was given: {$value}",
+            );
         }
         $this->value = $value;
     }

@@ -16,7 +16,7 @@ final readonly class FavoriteReorderAction implements ActionInterface
     public function __construct(
         private FavoriteServiceInterface $favoriteService,
         private InputSpecInterface $inputSpec,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
@@ -36,20 +36,20 @@ final readonly class FavoriteReorderAction implements ActionInterface
     {
         // Transform the links array into a map of link_id => sort_order
         $linkIdToSortOrder = [];
-        foreach ($data['links'] as $link) {
-            $linkIdToSortOrder[$link['link_id']] = $link['sort_order'];
+        foreach ($data["links"] as $link) {
+            $linkIdToSortOrder[$link["link_id"]] = $link["sort_order"];
         }
 
         // Reorder and get the updated favorites
         $reorderedFavorites = $this->favoriteService->reorderFavorites(
-            Uuid::fromString($data['dashboard_id']),
-            $linkIdToSortOrder
+            Uuid::fromString($data["dashboard_id"]),
+            $linkIdToSortOrder,
         );
 
         // Transform each favorite to array
         return array_map(
             fn($favorite) => $this->outputSpec->transform($favorite),
-            $reorderedFavorites->toArray()
+            $reorderedFavorites->toArray(),
         );
     }
 }

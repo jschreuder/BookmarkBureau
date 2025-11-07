@@ -16,7 +16,7 @@ final readonly class LinkUpdateAction implements ActionInterface
     public function __construct(
         private LinkServiceInterface $linkService,
         private InputSpecInterface $inputSpec,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
@@ -34,13 +34,13 @@ final readonly class LinkUpdateAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $linkId = Uuid::fromString($data['id']);
+        $linkId = Uuid::fromString($data["id"]);
         $link = $this->linkService->updateLink(
             linkId: $linkId,
-            url: $data['url'],
-            title: $data['title'],
-            description: $data['description'],
-            icon: $data['icon']
+            url: $data["url"],
+            title: $data["title"],
+            description: $data["description"],
+            icon: $data["icon"],
         );
         return $this->outputSpec->transform($link);
     }

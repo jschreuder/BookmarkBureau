@@ -13,7 +13,7 @@ final readonly class TagDeleteAction implements ActionInterface
 {
     public function __construct(
         private TagServiceInterface $tagService,
-        private InputSpecInterface $inputSpec
+        private InputSpecInterface $inputSpec,
     ) {}
 
     #[\Override]
@@ -31,7 +31,7 @@ final readonly class TagDeleteAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $this->tagService->deleteTag($data['tag_name']);
+        $this->tagService->deleteTag($data["tag_name"]);
 
         return [];
     }

@@ -6,6 +6,6 @@ final class Tag
 {
     public function __construct(
         public readonly Value\TagName $tagName,
-        public ?Value\HexColor $color
+        public ?Value\HexColor $color,
     ) {}
 }

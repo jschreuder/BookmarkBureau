@@ -14,9 +14,7 @@ use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 
 final readonly class PdoTagRepository implements TagRepositoryInterface
 {
-    public function __construct(
-        private readonly PDO $pdo
-    ) {}
+    public function __construct(private readonly PDO $pdo) {}
 
     /**
      * @throws TagNotFoundException when tag doesn't exist
@@ -25,9 +23,9 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     public function findByName(string $tagName): Tag
     {
         $statement = $this->pdo->prepare(
-            'SELECT * FROM tags WHERE tag_name = :tag_name LIMIT 1'
+            "SELECT * FROM tags WHERE tag_name = :tag_name LIMIT 1",
         );
-        $statement->execute([':tag_name' => $tagName]);
+        $statement->execute([":tag_name" => $tagName]);
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
@@ -44,7 +42,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     public function findAll(): TagCollection
     {
         $statement = $this->pdo->prepare(
-            'SELECT * FROM tags ORDER BY tag_name ASC'
+            "SELECT * FROM tags ORDER BY tag_name ASC",
         );
         $statement->execute();
 
@@ -64,8 +62,10 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     public function findTagsForLinkId(UuidInterface $link): TagCollection
     {
         // Verify that the link exists
-        $linkCheck = $this->pdo->prepare('SELECT 1 FROM links WHERE link_id = :link_id LIMIT 1');
-        $linkCheck->execute([':link_id' => $link->getBytes()]);
+        $linkCheck = $this->pdo->prepare(
+            "SELECT 1 FROM links WHERE link_id = :link_id LIMIT 1",
+        );
+        $linkCheck->execute([":link_id" => $link->getBytes()]);
 
         if ($linkCheck->fetch() === false) {
             throw LinkNotFoundException::forId($link);
@@ -75,9 +75,9 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             'SELECT t.* FROM tags t
              INNER JOIN link_tags lt ON t.tag_name = lt.tag_name
              WHERE lt.link_id = :link_id
-             ORDER BY t.tag_name ASC'
+             ORDER BY t.tag_name ASC',
         );
-        $statement->execute([':link_id' => $link->getBytes()]);
+        $statement->execute([":link_id" => $link->getBytes()]);
 
         $tags = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -93,13 +93,13 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     #[\Override]
     public function searchByName(string $query, int $limit = 20): TagCollection
     {
-        $searchTerm = $query . '%';
+        $searchTerm = "{$query}%";
 
         $statement = $this->pdo->prepare(
             'SELECT * FROM tags
              WHERE tag_name LIKE ?
              ORDER BY tag_name ASC
-             LIMIT ?'
+             LIMIT ?',
         );
         $statement->execute([$searchTerm, $limit]);
 
@@ -121,35 +121,41 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         $tagNameValue = $tag->tagName->value;
 
         // Check if tag exists
-        $check = $this->pdo->prepare('SELECT 1 FROM tags WHERE tag_name = :tag_name LIMIT 1');
-        $check->execute([':tag_name' => $tagNameValue]);
+        $check = $this->pdo->prepare(
+            "SELECT 1 FROM tags WHERE tag_name = :tag_name LIMIT 1",
+        );
+        $check->execute([":tag_name" => $tagNameValue]);
 
         if ($check->fetch() === false) {
             // Insert new tag
             try {
                 $statement = $this->pdo->prepare(
                     'INSERT INTO tags (tag_name, color)
-                     VALUES (:tag_name, :color)'
+                     VALUES (:tag_name, :color)',
                 );
                 $statement->execute([
-                    ':tag_name' => $tagNameValue,
-                    ':color' => $tag->color ? $tag->color->value : null,
+                    ":tag_name" => $tagNameValue,
+                    ":color" => $tag->color?->value,
                 ]);
             } catch (\PDOException $e) {
-                if (str_contains($e->getMessage(), 'Duplicate entry') ||
-                    str_contains($e->getMessage(), 'UNIQUE constraint failed')) {
-                    throw new DuplicateTagException('Tag already exists: ' . $tagNameValue);
+                if (
+                    str_contains($e->getMessage(), "Duplicate entry") ||
+                    str_contains($e->getMessage(), "UNIQUE constraint failed")
+                ) {
+                    throw new DuplicateTagException(
+                        "Tag already exists: {$tagNameValue}",
+                    );
                 }
                 throw $e;
             }
         } else {
             // Update existing tag
             $statement = $this->pdo->prepare(
-                'UPDATE tags SET color = :color WHERE tag_name = :tag_name'
+                "UPDATE tags SET color = :color WHERE tag_name = :tag_name",
             );
             $statement->execute([
-                ':tag_name' => $tagNameValue,
-                ':color' => $tag->color ? $tag->color->value : null,
+                ":tag_name" => $tagNameValue,
+                ":color" => $tag->color?->value,
             ]);
         }
     }
@@ -161,8 +167,10 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     public function delete(Tag $tag): void
     {
         // Delete cascades are handled by database constraints
-        $statement = $this->pdo->prepare('DELETE FROM tags WHERE tag_name = :tag_name');
-        $statement->execute([':tag_name' => $tag->tagName->value]);
+        $statement = $this->pdo->prepare(
+            "DELETE FROM tags WHERE tag_name = :tag_name",
+        );
+        $statement->execute([":tag_name" => $tag->tagName->value]);
     }
 
     /**
@@ -174,15 +182,19 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     public function assignToLinkId(UuidInterface $linkId, string $tagName): void
     {
         // Verify tag exists
-        $tagCheck = $this->pdo->prepare('SELECT 1 FROM tags WHERE tag_name = :tag_name LIMIT 1');
-        $tagCheck->execute([':tag_name' => $tagName]);
+        $tagCheck = $this->pdo->prepare(
+            "SELECT 1 FROM tags WHERE tag_name = :tag_name LIMIT 1",
+        );
+        $tagCheck->execute([":tag_name" => $tagName]);
         if ($tagCheck->fetch() === false) {
             throw TagNotFoundException::forName($tagName);
         }
 
         // Verify link exists
-        $linkCheck = $this->pdo->prepare('SELECT 1 FROM links WHERE link_id = :link_id LIMIT 1');
-        $linkCheck->execute([':link_id' => $linkId->getBytes()]);
+        $linkCheck = $this->pdo->prepare(
+            "SELECT 1 FROM links WHERE link_id = :link_id LIMIT 1",
+        );
+        $linkCheck->execute([":link_id" => $linkId->getBytes()]);
         if ($linkCheck->fetch() === false) {
             throw LinkNotFoundException::forId($linkId);
         }
@@ -190,16 +202,18 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         try {
             $statement = $this->pdo->prepare(
                 'INSERT INTO link_tags (link_id, tag_name)
-                 VALUES (:link_id, :tag_name)'
+                 VALUES (:link_id, :tag_name)',
             );
             $statement->execute([
-                ':link_id' => $linkId->getBytes(),
-                ':tag_name' => $tagName,
+                ":link_id" => $linkId->getBytes(),
+                ":tag_name" => $tagName,
             ]);
         } catch (\PDOException $e) {
             // Ignore duplicate entry errors (tag already assigned to link)
-            if (!str_contains($e->getMessage(), 'Duplicate entry') &&
-                !str_contains($e->getMessage(), 'UNIQUE constraint failed')) {
+            if (
+                !str_contains($e->getMessage(), "Duplicate entry") &&
+                !str_contains($e->getMessage(), "UNIQUE constraint failed")
+            ) {
                 throw $e;
             }
         }
@@ -211,20 +225,27 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * @throws TagNotFoundException when tag doesn't exist (FK violation)
      */
     #[\Override]
-    public function removeFromLinkId(UuidInterface $linkId, string $tagName): void
-    {
+    public function removeFromLinkId(
+        UuidInterface $linkId,
+        string $tagName,
+    ): void {
         try {
             $statement = $this->pdo->prepare(
-                'DELETE FROM link_tags WHERE link_id = :link_id AND tag_name = :tag_name'
+                "DELETE FROM link_tags WHERE link_id = :link_id AND tag_name = :tag_name",
             );
             $statement->execute([
-                ':link_id' => $linkId->getBytes(),
-                ':tag_name' => $tagName,
+                ":link_id" => $linkId->getBytes(),
+                ":tag_name" => $tagName,
             ]);
         } catch (\PDOException $e) {
-            if (str_contains($e->getMessage(), 'FOREIGN KEY constraint failed') ||
-                str_contains($e->getMessage(), 'foreign key constraint fails')) {
-                if (str_contains($e->getMessage(), 'link_id')) {
+            if (
+                str_contains(
+                    $e->getMessage(),
+                    "FOREIGN KEY constraint failed",
+                ) ||
+                str_contains($e->getMessage(), "foreign key constraint fails")
+            ) {
+                if (str_contains($e->getMessage(), "link_id")) {
                     throw LinkNotFoundException::forId($linkId);
                 } else {
                     throw TagNotFoundException::forName($tagName);
@@ -238,14 +259,16 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * Check if a tag is assigned to a link
      */
     #[\Override]
-    public function isAssignedToLinkId(UuidInterface $linkId, string $tagName): bool
-    {
+    public function isAssignedToLinkId(
+        UuidInterface $linkId,
+        string $tagName,
+    ): bool {
         $statement = $this->pdo->prepare(
-            'SELECT 1 FROM link_tags WHERE link_id = :link_id AND tag_name = :tag_name LIMIT 1'
+            "SELECT 1 FROM link_tags WHERE link_id = :link_id AND tag_name = :tag_name LIMIT 1",
         );
         $statement->execute([
-            ':link_id' => $linkId->getBytes(),
-            ':tag_name' => $tagName,
+            ":link_id" => $linkId->getBytes(),
+            ":tag_name" => $tagName,
         ]);
 
         return $statement->fetch() !== false;
@@ -257,8 +280,8 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     private function mapRowToTag(array $row): Tag
     {
         return new Tag(
-            tagName: new TagName($row['tag_name']),
-            color: $row['color'] !== null ? new HexColor($row['color']) : null,
+            tagName: new TagName($row["tag_name"]),
+            color: $row["color"] !== null ? new HexColor($row["color"]) : null,
         );
     }
 }

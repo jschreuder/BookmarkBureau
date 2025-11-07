@@ -13,6 +13,6 @@ final readonly class DashboardWithCategoriesAndFavorites
     public function __construct(
         public Dashboard $dashboard,
         public CategoryWithLinksCollection $categories,
-        public LinkCollection $favorites
+        public LinkCollection $favorites,
     ) {}
 }

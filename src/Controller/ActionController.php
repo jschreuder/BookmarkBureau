@@ -23,22 +23,26 @@ final readonly class ActionController implements
     public function __construct(
         private ActionInterface $action,
         private ResponseTransformerInterface $responseTransformer,
-        private int $successStatus = 200
+        private int $successStatus = 200,
     ) {}
 
     #[\Override]
-    public function filterRequest(ServerRequestInterface $request): ServerRequestInterface
-    {
+    public function filterRequest(
+        ServerRequestInterface $request,
+    ): ServerRequestInterface {
         // Fetch input data, query parameters for GET request, the (parsed) body parameters for all others
-        $rawData = $request->getMethod() === 'GET' ? $request->getQueryParams() : $request->getParsedBody();
+        $rawData =
+            $request->getMethod() === "GET"
+                ? $request->getQueryParams()
+                : $request->getParsedBody();
         if (!is_array($rawData)) {
             $rawData = [];
         }
 
         // Often the ID is part of the path, in which case routing should have added it to attributes
-        $id = $request->getAttribute('id');
+        $id = $request->getAttribute("id");
         if (!is_null($id)) {
-            $rawData['id'] = $id;
+            $rawData["id"] = $id;
         }
 
         // Return request with filtered body data
@@ -60,10 +64,10 @@ final readonly class ActionController implements
 
         return $this->responseTransformer->transform(
             data: [
-                'success' => true,
-                'data' => $result
+                "success" => true,
+                "data" => $result,
             ],
-            statusCode: $this->successStatus
+            statusCode: $this->successStatus,
         );
     }
 }

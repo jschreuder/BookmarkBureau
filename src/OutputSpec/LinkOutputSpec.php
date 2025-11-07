@@ -21,13 +21,13 @@ final readonly class LinkOutputSpec implements OutputSpecInterface
     private function doTransform(object $link): array
     {
         return [
-            'id' => $link->linkId->toString(),
-            'url' => $link->url->value,
-            'title' => $link->title->value,
-            'description' => $link->description,
-            'icon' => $link->icon?->value,
-            'created_at' => $link->createdAt->format(DateTimeInterface::ATOM),
-            'updated_at' => $link->updatedAt->format(DateTimeInterface::ATOM),
+            "id" => $link->linkId->toString(),
+            "url" => $link->url->value,
+            "title" => $link->title->value,
+            "description" => $link->description,
+            "icon" => $link->icon?->value,
+            "created_at" => $link->createdAt->format(DateTimeInterface::ATOM),
+            "updated_at" => $link->updatedAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

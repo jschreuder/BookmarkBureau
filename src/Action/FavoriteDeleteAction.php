@@ -14,20 +14,20 @@ final readonly class FavoriteDeleteAction implements ActionInterface
 {
     public function __construct(
         private FavoriteServiceInterface $favoriteService,
-        private InputSpecInterface $inputSpec
+        private InputSpecInterface $inputSpec,
     ) {}
 
     #[\Override]
     public function filter(array $rawData): array
     {
-        $fields = ['dashboard_id', 'link_id'];
+        $fields = ["dashboard_id", "link_id"];
         return $this->inputSpec->filter($rawData, $fields);
     }
 
     #[\Override]
     public function validate(array $data): void
     {
-        $fields = ['dashboard_id', 'link_id'];
+        $fields = ["dashboard_id", "link_id"];
         $this->inputSpec->validate($data, $fields);
     }
 
@@ -35,8 +35,8 @@ final readonly class FavoriteDeleteAction implements ActionInterface
     public function execute(array $data): array
     {
         $this->favoriteService->removeFavorite(
-            Uuid::fromString($data['dashboard_id']),
-            Uuid::fromString($data['link_id'])
+            Uuid::fromString($data["dashboard_id"]),
+            Uuid::fromString($data["link_id"]),
         );
 
         return [];

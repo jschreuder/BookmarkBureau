@@ -10,10 +10,7 @@ use Respect\Validation\Validator;
 
 final class ReorderFavoritesInputSpec implements InputSpecInterface
 {
-    private const FIELDS = [
-        'dashboard_id',
-        'links',
-    ];
+    private const array FIELDS = ["dashboard_id", "links"];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -27,14 +24,19 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
         $filtered = [];
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
-            $filtered[$field] = match($field) {
-                'dashboard_id' => Filter::start($rawData, 'dashboard_id', '')
-                    ->string(allowNull: false)->trim()->done(),
-                'links' => $this->filterLinks(
-                    Filter::start($rawData, 'links', [])
-                        ->do(fn($val) => is_array($val) ? $val : [])->done()
+            $filtered[$field] = match ($field) {
+                "dashboard_id" => Filter::start($rawData, "dashboard_id", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                "links" => $this->filterLinks(
+                    Filter::start($rawData, "links", [])
+                        ->do(fn($val) => is_array($val) ? $val : [])
+                        ->done(),
                 ),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 
@@ -49,10 +51,13 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
                 continue;
             }
             $filtered[] = [
-                'link_id' => Filter::start($link, 'link_id', '')
-                    ->string(allowNull: false)->trim()->done(),
-                'sort_order' => Filter::start($link, 'sort_order', 1)
-                    ->int(allowNull: false)->done(),
+                "link_id" => Filter::start($link, "link_id", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                "sort_order" => Filter::start($link, "sort_order", 1)
+                    ->int(allowNull: false)
+                    ->done(),
             ];
         }
 
@@ -66,9 +71,17 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                'dashboard_id' => $validator->key('dashboard_id', Validator::notEmpty()->uuid()),
-                'links' => $validator->key('links', Validator::arrayType()->notEmpty()),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+                "dashboard_id" => $validator->key(
+                    "dashboard_id",
+                    Validator::notEmpty()->uuid(),
+                ),
+                "links" => $validator->key(
+                    "links",
+                    Validator::arrayType()->notEmpty(),
+                ),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 
@@ -79,14 +92,17 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
         }
 
         // Validate each link entry
-        $links = $data['links'] ?? [];
+        $links = $data["links"] ?? [];
         if (!is_array($links) || empty($links)) {
-            throw new ValidationFailedException(['links' => 'Links array must not be empty']);
+            throw new ValidationFailedException([
+                "links" => "Links array must not be empty",
+            ]);
         }
 
         $linkValidator = Validator::each(
-            Validator::arrayType()->key('link_id', Validator::notEmpty()->uuid())
-                ->key('sort_order', Validator::intType()->positive())
+            Validator::arrayType()
+                ->key("link_id", Validator::notEmpty()->uuid())
+                ->key("sort_order", Validator::intType()->positive()),
         );
 
         try {

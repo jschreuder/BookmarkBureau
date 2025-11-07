@@ -54,7 +54,10 @@ interface UserServiceInterface
      *
      * @throws UserNotFoundException when user doesn't exist
      */
-    public function changePassword(UuidInterface $userId, string $plainPassword): void;
+    public function changePassword(
+        UuidInterface $userId,
+        string $plainPassword,
+    ): void;
 
     /**
      * Verify a plaintext password against a user's stored hash

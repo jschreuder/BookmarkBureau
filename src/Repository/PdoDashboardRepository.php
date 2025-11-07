@@ -13,11 +13,10 @@ use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 
-final readonly class PdoDashboardRepository implements DashboardRepositoryInterface
+final readonly class PdoDashboardRepository implements
+    DashboardRepositoryInterface
 {
-    public function __construct(
-        private readonly PDO $pdo
-    ) {}
+    public function __construct(private readonly PDO $pdo) {}
 
     /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
@@ -26,13 +25,15 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     public function findById(UuidInterface $dashboardId): Dashboard
     {
         $statement = $this->pdo->prepare(
-            'SELECT * FROM dashboards WHERE dashboard_id = :dashboard_id LIMIT 1'
+            "SELECT * FROM dashboards WHERE dashboard_id = :dashboard_id LIMIT 1",
         );
-        $statement->execute([':dashboard_id' => $dashboardId->getBytes()]);
+        $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
-            throw new DashboardNotFoundException('Dashboard not found: ' . $dashboardId->toString());
+            throw new DashboardNotFoundException(
+                "Dashboard not found: " . $dashboardId->toString(),
+            );
         }
 
         return $this->mapRowToDashboard($row);
@@ -45,7 +46,7 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     public function findAll(): DashboardCollection
     {
         $statement = $this->pdo->prepare(
-            'SELECT * FROM dashboards ORDER BY title ASC'
+            "SELECT * FROM dashboards ORDER BY title ASC",
         );
         $statement->execute();
 
@@ -66,22 +67,28 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
         $dashboardIdBytes = $dashboard->dashboardId->getBytes();
 
         // Check if dashboard exists
-        $check = $this->pdo->prepare('SELECT 1 FROM dashboards WHERE dashboard_id = :dashboard_id LIMIT 1');
-        $check->execute([':dashboard_id' => $dashboardIdBytes]);
+        $check = $this->pdo->prepare(
+            "SELECT 1 FROM dashboards WHERE dashboard_id = :dashboard_id LIMIT 1",
+        );
+        $check->execute([":dashboard_id" => $dashboardIdBytes]);
 
         if ($check->fetch() === false) {
             // Insert new dashboard
             $statement = $this->pdo->prepare(
                 'INSERT INTO dashboards (dashboard_id, title, description, icon, created_at, updated_at)
-                 VALUES (:dashboard_id, :title, :description, :icon, :created_at, :updated_at)'
+                 VALUES (:dashboard_id, :title, :description, :icon, :created_at, :updated_at)',
             );
             $statement->execute([
-                ':dashboard_id' => $dashboardIdBytes,
-                ':title' => (string) $dashboard->title,
-                ':description' => $dashboard->description,
-                ':icon' => $dashboard->icon ? (string) $dashboard->icon : null,
-                ':created_at' => $dashboard->createdAt->format(SqlFormat::TIMESTAMP),
-                ':updated_at' => $dashboard->updatedAt->format(SqlFormat::TIMESTAMP),
+                ":dashboard_id" => $dashboardIdBytes,
+                ":title" => (string) $dashboard->title,
+                ":description" => $dashboard->description,
+                ":icon" => $dashboard->icon ? (string) $dashboard->icon : null,
+                ":created_at" => $dashboard->createdAt->format(
+                    SqlFormat::TIMESTAMP,
+                ),
+                ":updated_at" => $dashboard->updatedAt->format(
+                    SqlFormat::TIMESTAMP,
+                ),
             ]);
         } else {
             // Update existing dashboard
@@ -89,14 +96,16 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
                 'UPDATE dashboards
                  SET title = :title, description = :description,
                      icon = :icon, updated_at = :updated_at
-                 WHERE dashboard_id = :dashboard_id'
+                 WHERE dashboard_id = :dashboard_id',
             );
             $statement->execute([
-                ':dashboard_id' => $dashboardIdBytes,
-                ':title' => (string) $dashboard->title,
-                ':description' => $dashboard->description,
-                ':icon' => $dashboard->icon ? (string) $dashboard->icon : null,
-                ':updated_at' => $dashboard->updatedAt->format(SqlFormat::TIMESTAMP),
+                ":dashboard_id" => $dashboardIdBytes,
+                ":title" => (string) $dashboard->title,
+                ":description" => $dashboard->description,
+                ":icon" => $dashboard->icon ? (string) $dashboard->icon : null,
+                ":updated_at" => $dashboard->updatedAt->format(
+                    SqlFormat::TIMESTAMP,
+                ),
             ]);
         }
     }
@@ -108,8 +117,12 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     public function delete(Dashboard $dashboard): void
     {
         // Delete cascades are handled by database constraints
-        $statement = $this->pdo->prepare('DELETE FROM dashboards WHERE dashboard_id = :dashboard_id');
-        $statement->execute([':dashboard_id' => $dashboard->dashboardId->getBytes()]);
+        $statement = $this->pdo->prepare(
+            "DELETE FROM dashboards WHERE dashboard_id = :dashboard_id",
+        );
+        $statement->execute([
+            ":dashboard_id" => $dashboard->dashboardId->getBytes(),
+        ]);
     }
 
     /**
@@ -118,11 +131,13 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     #[\Override]
     public function count(): int
     {
-        $statement = $this->pdo->prepare('SELECT COUNT(*) as count FROM dashboards');
+        $statement = $this->pdo->prepare(
+            "SELECT COUNT(*) as count FROM dashboards",
+        );
         $statement->execute();
 
         $result = $statement->fetch(PDO::FETCH_ASSOC);
-        return (int) $result['count'];
+        return (int) $result["count"];
     }
 
     /**
@@ -131,12 +146,12 @@ final readonly class PdoDashboardRepository implements DashboardRepositoryInterf
     private function mapRowToDashboard(array $row): Dashboard
     {
         return new Dashboard(
-            dashboardId: Uuid::fromBytes($row['dashboard_id']),
-            title: new Title($row['title']),
-            description: $row['description'],
-            icon: $row['icon'] !== null ? new Icon($row['icon']) : null,
-            createdAt: new DateTimeImmutable($row['created_at']),
-            updatedAt: new DateTimeImmutable($row['updated_at']),
+            dashboardId: Uuid::fromBytes($row["dashboard_id"]),
+            title: new Title($row["title"]),
+            description: $row["description"],
+            icon: $row["icon"] !== null ? new Icon($row["icon"]) : null,
+            createdAt: new DateTimeImmutable($row["created_at"]),
+            updatedAt: new DateTimeImmutable($row["updated_at"]),
         );
     }
 }

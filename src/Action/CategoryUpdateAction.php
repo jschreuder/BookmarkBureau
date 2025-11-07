@@ -16,7 +16,7 @@ final readonly class CategoryUpdateAction implements ActionInterface
     public function __construct(
         private CategoryServiceInterface $categoryService,
         private InputSpecInterface $inputSpec,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
@@ -34,11 +34,11 @@ final readonly class CategoryUpdateAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $categoryId = Uuid::fromString($data['id']);
+        $categoryId = Uuid::fromString($data["id"]);
         $category = $this->categoryService->updateCategory(
             categoryId: $categoryId,
-            title: $data['title'],
-            color: $data['color']
+            title: $data["title"],
+            color: $data["color"],
         );
         return $this->outputSpec->transform($category);
     }

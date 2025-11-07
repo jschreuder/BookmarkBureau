@@ -11,9 +11,8 @@ final readonly class LinkCollection implements IteratorAggregate, Countable
 {
     use CollectionTrait;
 
-    public function __construct(
-        Link ...$links
-    ) {
+    public function __construct(Link ...$links)
+    {
         $this->collection = $links;
     }
 }

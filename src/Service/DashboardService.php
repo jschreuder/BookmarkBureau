@@ -27,25 +27,34 @@ final class DashboardService implements DashboardServiceInterface
         private readonly CategoryRepositoryInterface $categoryRepository,
         private readonly FavoriteRepositoryInterface $favoriteRepository,
         private readonly UnitOfWorkInterface $unitOfWork,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     #[\Override]
-    public function getFullDashboard(UuidInterface $dashboardId): DashboardWithCategoriesAndFavorites
-    {
+    public function getFullDashboard(
+        UuidInterface $dashboardId,
+    ): DashboardWithCategoriesAndFavorites {
         $dashboard = $this->dashboardRepository->findById($dashboardId);
 
         // Get all categories for this dashboard
-        $categories = $this->categoryRepository->findByDashboardId($dashboardId);
+        $categories = $this->categoryRepository->findByDashboardId(
+            $dashboardId,
+        );
 
         // Build categories with their links
         $categoriesWithLinks = [];
         foreach ($categories as $category) {
-            $categoryLinks = $this->categoryRepository->findCategoryLinksForCategoryId($category->categoryId);
-            $links = new LinkCollection(...array_map(fn(CategoryLink $cl) => $cl->link, $categoryLinks->toArray()));
+            $categoryLinks = $this->categoryRepository->findCategoryLinksForCategoryId(
+                $category->categoryId,
+            );
+            $links = new LinkCollection(
+                ...array_map(
+                    fn(CategoryLink $cl) => $cl->link,
+                    $categoryLinks->toArray(),
+                ),
+            );
             $categoriesWithLinks[] = new CategoryWithLinks($category, $links);
         }
 
@@ -55,7 +64,12 @@ final class DashboardService implements DashboardServiceInterface
         return new DashboardWithCategoriesAndFavorites(
             $dashboard,
             new CategoryWithLinksCollection(...$categoriesWithLinks),
-            new LinkCollection(...array_map(fn($favorite) => $favorite->link, iterator_to_array($favorites)))
+            new LinkCollection(
+                ...array_map(
+                    fn($favorite) => $favorite->link,
+                    iterator_to_array($favorites),
+                ),
+            ),
         );
     }
 
@@ -69,16 +83,20 @@ final class DashboardService implements DashboardServiceInterface
     public function createDashboard(
         string $title,
         string $description,
-        ?string $icon = null
+        ?string $icon = null,
     ): Dashboard {
-        return $this->unitOfWork->transactional(function () use ($title, $description, $icon): Dashboard {
+        return $this->unitOfWork->transactional(function () use (
+            $title,
+            $description,
+            $icon,
+        ): Dashboard {
             $dashboard = new Dashboard(
                 Uuid::uuid4(),
                 new Title($title),
                 $description,
                 $icon !== null ? new Icon($icon) : null,
                 new DateTimeImmutable(),
-                new DateTimeImmutable()
+                new DateTimeImmutable(),
             );
 
             $this->dashboardRepository->save($dashboard);
@@ -95,9 +113,14 @@ final class DashboardService implements DashboardServiceInterface
         UuidInterface $dashboardId,
         string $title,
         string $description,
-        ?string $icon = null
+        ?string $icon = null,
     ): Dashboard {
-        return $this->unitOfWork->transactional(function () use ($dashboardId, $title, $description, $icon): Dashboard {
+        return $this->unitOfWork->transactional(function () use (
+            $dashboardId,
+            $title,
+            $description,
+            $icon,
+        ): Dashboard {
             $dashboard = $this->dashboardRepository->findById($dashboardId);
 
             $dashboard->title = new Title($title);

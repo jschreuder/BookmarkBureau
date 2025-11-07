@@ -16,7 +16,7 @@ final readonly class CategoryReadAction implements ActionInterface
     public function __construct(
         private CategoryServiceInterface $categoryService,
         private InputSpecInterface $inputSpec,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
@@ -34,7 +34,7 @@ final readonly class CategoryReadAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $categoryId = Uuid::fromString($data['id']);
+        $categoryId = Uuid::fromString($data["id"]);
         $category = $this->categoryService->getCategory($categoryId);
         return $this->outputSpec->transform($category);
     }

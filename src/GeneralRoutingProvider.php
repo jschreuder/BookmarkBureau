@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace jschreuder\BookmarkBureau;
 
@@ -60,153 +60,221 @@ class GeneralRoutingProvider implements RoutingProviderInterface
     #[\Override]
     public function registerRoutes(RouterInterface $router): void
     {
-        $router->get('home', '/', fn () => new class implements ControllerInterface {
-            public function execute(ServerRequestInterface $request): ResponseInterface
-            {
-                return new JsonResponse(['message' => 'Hello world!']);
-            }
-        });
+        $router->get(
+            "home",
+            "/",
+            fn() => new class implements ControllerInterface {
+                public function execute(
+                    ServerRequestInterface $request,
+                ): ResponseInterface {
+                    return new JsonResponse(["message" => "Hello world!"]);
+                }
+            },
+        );
 
         // Links
-        (new ResourceRouteBuilder($router, 'link', '/link'))
-            ->registerRead(fn() => new LinkReadAction(
-                $this->container->getLinkService(),
-                new LinkInputSpec(),
-                new LinkOutputSpec()
-            ))
-            ->registerCreate(fn() => new LinkCreateAction(
-                $this->container->getLinkService(),
-                new LinkInputSpec(),
-                new LinkOutputSpec()
-            ))
-            ->registerUpdate(fn() => new LinkUpdateAction(
-                $this->container->getLinkService(),
-                new LinkInputSpec(),
-                new LinkOutputSpec()
-            ))
-            ->registerDelete(fn() => new LinkDeleteAction(
-                $this->container->getLinkService(),
-                new LinkInputSpec()
-            ));
+        new ResourceRouteBuilder($router, "link", "/link")
+            ->registerRead(
+                fn() => new LinkReadAction(
+                    $this->container->getLinkService(),
+                    new LinkInputSpec(),
+                    new LinkOutputSpec(),
+                ),
+            )
+            ->registerCreate(
+                fn() => new LinkCreateAction(
+                    $this->container->getLinkService(),
+                    new LinkInputSpec(),
+                    new LinkOutputSpec(),
+                ),
+            )
+            ->registerUpdate(
+                fn() => new LinkUpdateAction(
+                    $this->container->getLinkService(),
+                    new LinkInputSpec(),
+                    new LinkOutputSpec(),
+                ),
+            )
+            ->registerDelete(
+                fn() => new LinkDeleteAction(
+                    $this->container->getLinkService(),
+                    new LinkInputSpec(),
+                ),
+            );
 
         // Tags
-        (new ResourceRouteBuilder($router, 'tag', '/tag'))
-            ->registerRead(fn() => new TagReadAction(
-                $this->container->getTagService(),
-                new TagNameInputSpec(),
-                new TagOutputSpec()
-            ))
-            ->registerCreate(fn() => new TagCreateAction(
-                $this->container->getTagService(),
-                new TagInputSpec(),
-                new TagOutputSpec()
-            ))
-            ->registerUpdate(fn() => new TagUpdateAction(
-                $this->container->getTagService(),
-                new TagInputSpec(),
-                new TagOutputSpec()
-            ))
-            ->registerDelete(fn() => new TagDeleteAction(
-                $this->container->getTagService(),
-                new TagNameInputSpec()
-            ));
+        new ResourceRouteBuilder($router, "tag", "/tag")
+            ->registerRead(
+                fn() => new TagReadAction(
+                    $this->container->getTagService(),
+                    new TagNameInputSpec(),
+                    new TagOutputSpec(),
+                ),
+            )
+            ->registerCreate(
+                fn() => new TagCreateAction(
+                    $this->container->getTagService(),
+                    new TagInputSpec(),
+                    new TagOutputSpec(),
+                ),
+            )
+            ->registerUpdate(
+                fn() => new TagUpdateAction(
+                    $this->container->getTagService(),
+                    new TagInputSpec(),
+                    new TagOutputSpec(),
+                ),
+            )
+            ->registerDelete(
+                fn() => new TagDeleteAction(
+                    $this->container->getTagService(),
+                    new TagNameInputSpec(),
+                ),
+            );
 
         // Link-Tag associations
-        (new ResourceRouteBuilder($router, 'link_tag', '/link/:id/tag'))
-            ->registerCreate(fn() => new LinkTagCreateAction(
-                $this->container->getTagService(),
-                new LinkTagInputSpec()
-            ))
-            ->registerCustom('DELETE', 'delete', '/:tag_name', fn() => new LinkTagDeleteAction(
-                $this->container->getTagService(),
-                new LinkTagInputSpec()
-            ));
+        new ResourceRouteBuilder($router, "link_tag", "/link/:id/tag")
+            ->registerCreate(
+                fn() => new LinkTagCreateAction(
+                    $this->container->getTagService(),
+                    new LinkTagInputSpec(),
+                ),
+            )
+            ->registerCustom(
+                "DELETE",
+                "delete",
+                "/:tag_name",
+                fn() => new LinkTagDeleteAction(
+                    $this->container->getTagService(),
+                    new LinkTagInputSpec(),
+                ),
+            );
 
         // Dashboards
-        (new ResourceRouteBuilder($router, 'dashboard', '/dashboard'))
-            ->registerCustom('GET', 'list', '', fn() => new DashboardListAction(
-                $this->container->getDashboardService(),
-                new DashboardOutputSpec()
-            ))
-            ->registerRead(fn() => new DashboardReadAction(
-                $this->container->getDashboardService(),
-                new DashboardInputSpec(),
-                new FullDashboardOutputSpec(
+        new ResourceRouteBuilder($router, "dashboard", "/dashboard")
+            ->registerCustom(
+                "GET",
+                "list",
+                "",
+                fn() => new DashboardListAction(
+                    $this->container->getDashboardService(),
                     new DashboardOutputSpec(),
-                    new CategoryOutputSpec(),
-                    new LinkOutputSpec()
-                )
-            ))
-            ->registerCreate(fn() => new DashboardCreateAction(
-                $this->container->getDashboardService(),
-                new DashboardInputSpec(),
-                new DashboardOutputSpec()
-            ))
-            ->registerUpdate(fn() => new DashboardUpdateAction(
-                $this->container->getDashboardService(),
-                new DashboardInputSpec(),
-                new DashboardOutputSpec()
-            ))
-            ->registerDelete(fn() => new DashboardDeleteAction(
-                $this->container->getDashboardService(),
-                new DashboardInputSpec()
-            ));
+                ),
+            )
+            ->registerRead(
+                fn() => new DashboardReadAction(
+                    $this->container->getDashboardService(),
+                    new DashboardInputSpec(),
+                    new FullDashboardOutputSpec(
+                        new DashboardOutputSpec(),
+                        new CategoryOutputSpec(),
+                        new LinkOutputSpec(),
+                    ),
+                ),
+            )
+            ->registerCreate(
+                fn() => new DashboardCreateAction(
+                    $this->container->getDashboardService(),
+                    new DashboardInputSpec(),
+                    new DashboardOutputSpec(),
+                ),
+            )
+            ->registerUpdate(
+                fn() => new DashboardUpdateAction(
+                    $this->container->getDashboardService(),
+                    new DashboardInputSpec(),
+                    new DashboardOutputSpec(),
+                ),
+            )
+            ->registerDelete(
+                fn() => new DashboardDeleteAction(
+                    $this->container->getDashboardService(),
+                    new DashboardInputSpec(),
+                ),
+            );
 
         // Favorites
-        (new ResourceRouteBuilder($router, 'favorite', '/dashboard/:id/favorites'))
-            ->registerCreate(fn() => new FavoriteCreateAction(
-                $this->container->getFavoriteService(),
-                new FavoriteInputSpec(),
-                new FavoriteOutputSpec()
-            ))
-            ->registerCustom('DELETE', 'delete', '', fn() => new FavoriteDeleteAction(
-                $this->container->getFavoriteService(),
-                new FavoriteInputSpec()
-            ))
-            ->registerCustom('PUT', 'reorder', '', fn() => new FavoriteReorderAction(
-                $this->container->getFavoriteService(),
-                new ReorderFavoritesInputSpec(),
-                new FavoriteOutputSpec()
-            ));
+        new ResourceRouteBuilder(
+            $router,
+            "favorite",
+            "/dashboard/:id/favorites",
+        )
+            ->registerCreate(
+                fn() => new FavoriteCreateAction(
+                    $this->container->getFavoriteService(),
+                    new FavoriteInputSpec(),
+                    new FavoriteOutputSpec(),
+                ),
+            )
+            ->registerCustom(
+                "DELETE",
+                "delete",
+                "",
+                fn() => new FavoriteDeleteAction(
+                    $this->container->getFavoriteService(),
+                    new FavoriteInputSpec(),
+                ),
+            )
+            ->registerCustom(
+                "PUT",
+                "reorder",
+                "",
+                fn() => new FavoriteReorderAction(
+                    $this->container->getFavoriteService(),
+                    new ReorderFavoritesInputSpec(),
+                    new FavoriteOutputSpec(),
+                ),
+            );
 
         // Categories
-        (new ResourceRouteBuilder($router, 'category', '/category'))
-            ->registerRead(fn() => new CategoryReadAction(
-                $this->container->getCategoryService(),
-                new CategoryInputSpec(),
-                new CategoryOutputSpec()
-            ))
-            ->registerCreate(fn() => new CategoryCreateAction(
-                $this->container->getCategoryService(),
-                new CategoryInputSpec(),
-                new CategoryOutputSpec()
-            ))
-            ->registerUpdate(fn() => new CategoryUpdateAction(
-                $this->container->getCategoryService(),
-                new CategoryInputSpec(),
-                new CategoryOutputSpec()
-            ))
-            ->registerDelete(fn() => new CategoryDeleteAction(
-                $this->container->getCategoryService(),
-                new CategoryInputSpec()
-            ));
+        new ResourceRouteBuilder($router, "category", "/category")
+            ->registerRead(
+                fn() => new CategoryReadAction(
+                    $this->container->getCategoryService(),
+                    new CategoryInputSpec(),
+                    new CategoryOutputSpec(),
+                ),
+            )
+            ->registerCreate(
+                fn() => new CategoryCreateAction(
+                    $this->container->getCategoryService(),
+                    new CategoryInputSpec(),
+                    new CategoryOutputSpec(),
+                ),
+            )
+            ->registerUpdate(
+                fn() => new CategoryUpdateAction(
+                    $this->container->getCategoryService(),
+                    new CategoryInputSpec(),
+                    new CategoryOutputSpec(),
+                ),
+            )
+            ->registerDelete(
+                fn() => new CategoryDeleteAction(
+                    $this->container->getCategoryService(),
+                    new CategoryInputSpec(),
+                ),
+            );
 
         // Dashboard view (complex operation with categories and favorites)
         // This route must be last as it uses a catch-all /:id pattern with UUID validation
         $router->get(
-            'dashboard-view',
-            '/:id',
-            fn () => new DashboardViewController(
+            "dashboard-view",
+            "/:id",
+            fn() => new DashboardViewController(
                 $this->container->getDashboardService(),
                 new JsonResponseTransformer(),
                 new FullDashboardOutputSpec(
                     new DashboardOutputSpec(),
                     new CategoryOutputSpec(),
-                    new LinkOutputSpec()
-                )
+                    new LinkOutputSpec(),
+                ),
             ),
             [],
-            ['id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}']
+            [
+                "id" =>
+                    "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+            ],
         );
     }
 }

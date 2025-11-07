@@ -10,8 +10,10 @@ final readonly class HexColor
 
     public function __construct(string $value)
     {
-        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $value)) {
-            throw new InvalidArgumentException('HexColor Value object must be a valid HTML hex color (#RRGGBB), was given: ' . $value);
+        if (!preg_match("/^#[0-9a-fA-F]{6}$/", $value)) {
+            throw new InvalidArgumentException(
+                "HexColor Value object must be a valid HTML hex color (#RRGGBB), was given: {$value}",
+            );
         }
         $this->value = $value;
     }

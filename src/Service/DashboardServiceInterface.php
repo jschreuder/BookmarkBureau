@@ -17,7 +17,9 @@ interface DashboardServiceInterface
      *
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
-    public function getFullDashboard(UuidInterface $dashboardId): DashboardWithCategoriesAndFavorites;
+    public function getFullDashboard(
+        UuidInterface $dashboardId,
+    ): DashboardWithCategoriesAndFavorites;
 
     /**
      * List all dashboards (without detailed data)
@@ -30,7 +32,7 @@ interface DashboardServiceInterface
     public function createDashboard(
         string $title,
         string $description,
-        ?string $icon = null
+        ?string $icon = null,
     ): Dashboard;
 
     /**
@@ -42,7 +44,7 @@ interface DashboardServiceInterface
         UuidInterface $dashboardId,
         string $title,
         string $description,
-        ?string $icon = null
+        ?string $icon = null,
     ): Dashboard;
 
     /**

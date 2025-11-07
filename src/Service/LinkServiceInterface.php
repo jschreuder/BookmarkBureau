@@ -22,8 +22,8 @@ interface LinkServiceInterface
     public function createLink(
         string $url,
         string $title,
-        string $description = '',
-        ?string $icon = null
+        string $description = "",
+        ?string $icon = null,
     ): Link;
 
     /**
@@ -35,8 +35,8 @@ interface LinkServiceInterface
         UuidInterface $linkId,
         string $url,
         string $title,
-        string $description = '',
-        ?string $icon = null
+        string $description = "",
+        ?string $icon = null,
     ): Link;
 
     /**
@@ -49,7 +49,10 @@ interface LinkServiceInterface
     /**
      * Search links by title and description
      */
-    public function searchLinks(string $query, int $limit = 100): LinkCollection;
+    public function searchLinks(
+        string $query,
+        int $limit = 100,
+    ): LinkCollection;
 
     /**
      * Find links by tag
@@ -59,5 +62,8 @@ interface LinkServiceInterface
     /**
      * List all links with pagination
      */
-    public function listLinks(int $limit = 100, int $offset = 0): LinkCollection;
+    public function listLinks(
+        int $limit = 100,
+        int $offset = 0,
+    ): LinkCollection;
 }

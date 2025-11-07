@@ -20,8 +20,7 @@ final class TagService implements TagServiceInterface
         private readonly TagRepositoryInterface $tagRepository,
         private readonly LinkRepositoryInterface $linkRepository,
         private readonly UnitOfWorkInterface $unitOfWork,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function listAllTags(): TagCollection
@@ -47,10 +46,13 @@ final class TagService implements TagServiceInterface
     #[\Override]
     public function createTag(string $tagName, ?string $color = null): Tag
     {
-        return $this->unitOfWork->transactional(function () use ($tagName, $color): Tag {
+        return $this->unitOfWork->transactional(function () use (
+            $tagName,
+            $color,
+        ): Tag {
             $tag = new Tag(
                 new TagName($tagName),
-                $color !== null ? new HexColor($color) : null
+                $color !== null ? new HexColor($color) : null,
             );
 
             $this->tagRepository->save($tag);
@@ -65,7 +67,10 @@ final class TagService implements TagServiceInterface
     #[\Override]
     public function updateTag(string $tagName, ?string $color = null): Tag
     {
-        return $this->unitOfWork->transactional(function () use ($tagName, $color): Tag {
+        return $this->unitOfWork->transactional(function () use (
+            $tagName,
+            $color,
+        ): Tag {
             $tag = $this->tagRepository->findByName($tagName);
 
             $tag->color = $color !== null ? new HexColor($color) : null;
@@ -92,9 +97,16 @@ final class TagService implements TagServiceInterface
      * @throws LinkNotFoundException when link doesn't exist
      */
     #[\Override]
-    public function assignTagToLink(UuidInterface $linkId, string $tagName, ?string $color = null): void
-    {
-        $this->unitOfWork->transactional(function () use ($linkId, $tagName, $color): void {
+    public function assignTagToLink(
+        UuidInterface $linkId,
+        string $tagName,
+        ?string $color = null,
+    ): void {
+        $this->unitOfWork->transactional(function () use (
+            $linkId,
+            $tagName,
+            $color,
+        ): void {
             // Verify link exists
             $this->linkRepository->findById($linkId);
 
@@ -105,7 +117,7 @@ final class TagService implements TagServiceInterface
                 // Tag doesn't exist, create it
                 $tag = new Tag(
                     new TagName($tagName),
-                    $color !== null ? new HexColor($color) : null
+                    $color !== null ? new HexColor($color) : null,
                 );
                 $this->tagRepository->save($tag);
             }
@@ -118,9 +130,14 @@ final class TagService implements TagServiceInterface
     }
 
     #[\Override]
-    public function removeTagFromLink(UuidInterface $linkId, string $tagName): void
-    {
-        $this->unitOfWork->transactional(function () use ($linkId, $tagName): void {
+    public function removeTagFromLink(
+        UuidInterface $linkId,
+        string $tagName,
+    ): void {
+        $this->unitOfWork->transactional(function () use (
+            $linkId,
+            $tagName,
+        ): void {
             $this->tagRepository->removeFromLinkId($linkId, $tagName);
         });
     }

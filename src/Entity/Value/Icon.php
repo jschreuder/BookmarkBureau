@@ -10,8 +10,8 @@ final readonly class Icon
 
     public function __construct(string $value)
     {
-        if (trim($value) === '') {
-            throw new InvalidArgumentException('Icon cannot be empty');
+        if (trim($value) === "") {
+            throw new InvalidArgumentException("Icon cannot be empty");
         }
         $this->value = $value;
     }

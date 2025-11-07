@@ -15,7 +15,7 @@ final readonly class TagReadAction implements ActionInterface
     public function __construct(
         private TagServiceInterface $tagService,
         private InputSpecInterface $inputSpec,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
@@ -38,14 +38,14 @@ final readonly class TagReadAction implements ActionInterface
         // This might need adjustment based on how tag retrieval is intended to work
         $tags = $this->tagService->listAllTags();
         foreach ($tags as $tag) {
-            if ($tag->tagName->value === $data['tag_name']) {
+            if ($tag->tagName->value === $data["tag_name"]) {
                 return $this->outputSpec->transform($tag);
             }
         }
         // If tag not found, let the service throw TagNotFoundException
         // We'll need to add a getTag method to TagService or handle this differently
         throw new \jschreuder\BookmarkBureau\Exception\TagNotFoundException(
-            'Tag not found: ' . $data['tag_name']
+            "Tag not found: " . $data["tag_name"],
         );
     }
 }

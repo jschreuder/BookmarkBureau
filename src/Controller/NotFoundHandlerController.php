@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace jschreuder\BookmarkBureau\Controller;
 
@@ -10,13 +10,13 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class NotFoundHandlerController implements ControllerInterface
 {
     #[\Override]
-    public function execute(ServerRequestInterface $request) : ResponseInterface
+    public function execute(ServerRequestInterface $request): ResponseInterface
     {
         return new JsonResponse(
             [
-                'message' => 'Not found: ' . $request->getUri()->getPath(),
+                "message" => "Not found: " . $request->getUri()->getPath(),
             ],
-            404
+            404,
         );
     }
 }

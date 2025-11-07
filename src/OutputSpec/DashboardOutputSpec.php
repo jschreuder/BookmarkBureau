@@ -21,12 +21,16 @@ final readonly class DashboardOutputSpec implements OutputSpecInterface
     private function doTransform(object $dashboard): array
     {
         return [
-            'id' => $dashboard->dashboardId->toString(),
-            'title' => $dashboard->title->value,
-            'description' => $dashboard->description,
-            'icon' => $dashboard->icon?->value,
-            'created_at' => $dashboard->createdAt->format(DateTimeInterface::ATOM),
-            'updated_at' => $dashboard->updatedAt->format(DateTimeInterface::ATOM),
+            "id" => $dashboard->dashboardId->toString(),
+            "title" => $dashboard->title->value,
+            "description" => $dashboard->description,
+            "icon" => $dashboard->icon?->value,
+            "created_at" => $dashboard->createdAt->format(
+                DateTimeInterface::ATOM,
+            ),
+            "updated_at" => $dashboard->updatedAt->format(
+                DateTimeInterface::ATOM,
+            ),
         ];
     }
 }

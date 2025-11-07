@@ -4,5 +4,5 @@ namespace jschreuder\BookmarkBureau\Util;
 
 final class SqlFormat
 {
-    public const string TIMESTAMP = 'Y-m-d H:i:s';
+    public const string TIMESTAMP = "Y-m-d H:i:s";
 }

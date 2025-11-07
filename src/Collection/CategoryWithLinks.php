@@ -12,6 +12,6 @@ final readonly class CategoryWithLinks
 {
     public function __construct(
         public Category $category,
-        public LinkCollection $links
+        public LinkCollection $links,
     ) {}
 }

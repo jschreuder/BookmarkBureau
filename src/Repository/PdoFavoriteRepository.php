@@ -19,7 +19,8 @@ use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 
-final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterface
+final readonly class PdoFavoriteRepository implements
+    FavoriteRepositoryInterface
 {
     public function __construct(
         private readonly PDO $pdo,
@@ -32,8 +33,9 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     #[\Override]
-    public function findByDashboardId(UuidInterface $dashboardId): FavoriteCollection
-    {
+    public function findByDashboardId(
+        UuidInterface $dashboardId,
+    ): FavoriteCollection {
         // Verify dashboard exists and reuse it for all favorites
         $dashboard = $this->dashboardRepository->findById($dashboardId);
 
@@ -41,9 +43,9 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
             'SELECT f.*, l.* FROM favorites f
              INNER JOIN links l ON f.link_id = l.link_id
              WHERE f.dashboard_id = :dashboard_id
-             ORDER BY f.sort_order ASC'
+             ORDER BY f.sort_order ASC',
         );
-        $statement->execute([':dashboard_id' => $dashboardId->getBytes()]);
+        $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
         $favorites = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -58,16 +60,17 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * Returns -1 if dashboard has no favorites
      */
     #[\Override]
-    public function getMaxSortOrderForDashboardId(UuidInterface $dashboardId): int
-    {
+    public function getMaxSortOrderForDashboardId(
+        UuidInterface $dashboardId,
+    ): int {
         $statement = $this->pdo->prepare(
-            'SELECT MAX(sort_order) as max_sort FROM favorites WHERE dashboard_id = :dashboard_id'
+            "SELECT MAX(sort_order) as max_sort FROM favorites WHERE dashboard_id = :dashboard_id",
         );
-        $statement->execute([':dashboard_id' => $dashboardId->getBytes()]);
+        $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
         $result = $statement->fetch(PDO::FETCH_ASSOC);
-        $maxSort = (int) $result['max_sort'];
-        return $maxSort === 0 && $result['max_sort'] === null ? -1 : $maxSort;
+        $maxSort = (int) $result["max_sort"];
+        return $maxSort === 0 && $result["max_sort"] === null ? -1 : $maxSort;
     }
 
     /**
@@ -76,8 +79,11 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
     #[\Override]
-    public function addFavorite(UuidInterface $dashboardId, UuidInterface $linkId, int $sortOrder): Favorite
-    {
+    public function addFavorite(
+        UuidInterface $dashboardId,
+        UuidInterface $linkId,
+        int $sortOrder,
+    ): Favorite {
         // Verify both dashboard and link exist
         $dashboard = $this->dashboardRepository->findById($dashboardId);
         $link = $this->linkRepository->findById($linkId);
@@ -86,26 +92,33 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
             $now = new DateTimeImmutable();
             $statement = $this->pdo->prepare(
                 'INSERT INTO favorites (dashboard_id, link_id, sort_order, created_at)
-                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)'
+                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)',
             );
             $statement->execute([
-                ':dashboard_id' => $dashboardId->getBytes(),
-                ':link_id' => $linkId->getBytes(),
-                ':sort_order' => $sortOrder,
-                ':created_at' => $now->format(SqlFormat::TIMESTAMP),
+                ":dashboard_id" => $dashboardId->getBytes(),
+                ":link_id" => $linkId->getBytes(),
+                ":sort_order" => $sortOrder,
+                ":created_at" => $now->format(SqlFormat::TIMESTAMP),
             ]);
 
             return new Favorite(
                 dashboard: $dashboard,
                 link: $link,
                 sortOrder: $sortOrder,
-                createdAt: $now
+                createdAt: $now,
             );
         } catch (\PDOException $e) {
-            if (str_contains($e->getMessage(), 'FOREIGN KEY constraint failed') ||
-                str_contains($e->getMessage(), 'foreign key constraint fails')) {
-                if (str_contains($e->getMessage(), 'dashboard_id')) {
-                    throw new DashboardNotFoundException('Dashboard not found: ' . $dashboardId->toString());
+            if (
+                str_contains(
+                    $e->getMessage(),
+                    "FOREIGN KEY constraint failed",
+                ) ||
+                str_contains($e->getMessage(), "foreign key constraint fails")
+            ) {
+                if (str_contains($e->getMessage(), "dashboard_id")) {
+                    throw new DashboardNotFoundException(
+                        "Dashboard not found: " . $dashboardId->toString(),
+                    );
                 } else {
                     throw LinkNotFoundException::forId($linkId);
                 }
@@ -119,22 +132,26 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * @throws FavoriteNotFoundException when favorite doesn't exist
      */
     #[\Override]
-    public function removeFavorite(UuidInterface $dashboardId, UuidInterface $linkId): void
-    {
+    public function removeFavorite(
+        UuidInterface $dashboardId,
+        UuidInterface $linkId,
+    ): void {
         // Check if the favorite exists
         if (!$this->isFavorite($dashboardId, $linkId)) {
             throw new FavoriteNotFoundException(
-                'Favorite not found: dashboard=' . $dashboardId->toString() .
-                ', link=' . $linkId->toString()
+                "Favorite not found: dashboard=" .
+                    $dashboardId->toString() .
+                    ", link=" .
+                    $linkId->toString(),
             );
         }
 
         $statement = $this->pdo->prepare(
-            'DELETE FROM favorites WHERE dashboard_id = :dashboard_id AND link_id = :link_id'
+            "DELETE FROM favorites WHERE dashboard_id = :dashboard_id AND link_id = :link_id",
         );
         $statement->execute([
-            ':dashboard_id' => $dashboardId->getBytes(),
-            ':link_id' => $linkId->getBytes(),
+            ":dashboard_id" => $dashboardId->getBytes(),
+            ":link_id" => $linkId->getBytes(),
         ]);
     }
 
@@ -142,14 +159,16 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * Check if a link is favorited on a dashboard
      */
     #[\Override]
-    public function isFavorite(UuidInterface $dashboardId, UuidInterface $linkId): bool
-    {
+    public function isFavorite(
+        UuidInterface $dashboardId,
+        UuidInterface $linkId,
+    ): bool {
         $statement = $this->pdo->prepare(
-            'SELECT 1 FROM favorites WHERE dashboard_id = :dashboard_id AND link_id = :link_id LIMIT 1'
+            "SELECT 1 FROM favorites WHERE dashboard_id = :dashboard_id AND link_id = :link_id LIMIT 1",
         );
         $statement->execute([
-            ':dashboard_id' => $dashboardId->getBytes(),
-            ':link_id' => $linkId->getBytes(),
+            ":dashboard_id" => $dashboardId->getBytes(),
+            ":link_id" => $linkId->getBytes(),
         ]);
 
         return $statement->fetch() !== false;
@@ -160,24 +179,29 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * @throws FavoriteNotFoundException when favorite doesn't exist
      */
     #[\Override]
-    public function updateSortOrder(UuidInterface $dashboardId, UuidInterface $linkId, int $sortOrder): void
-    {
+    public function updateSortOrder(
+        UuidInterface $dashboardId,
+        UuidInterface $linkId,
+        int $sortOrder,
+    ): void {
         // Check if the favorite exists
         if (!$this->isFavorite($dashboardId, $linkId)) {
             throw new FavoriteNotFoundException(
-                'Favorite not found: dashboard=' . $dashboardId->toString() .
-                ', link=' . $linkId->toString()
+                "Favorite not found: dashboard=" .
+                    $dashboardId->toString() .
+                    ", link=" .
+                    $linkId->toString(),
             );
         }
 
         $statement = $this->pdo->prepare(
             'UPDATE favorites SET sort_order = :sort_order
-             WHERE dashboard_id = :dashboard_id AND link_id = :link_id'
+             WHERE dashboard_id = :dashboard_id AND link_id = :link_id',
         );
         $statement->execute([
-            ':dashboard_id' => $dashboardId->getBytes(),
-            ':link_id' => $linkId->getBytes(),
-            ':sort_order' => $sortOrder,
+            ":dashboard_id" => $dashboardId->getBytes(),
+            ":link_id" => $linkId->getBytes(),
+            ":sort_order" => $sortOrder,
         ]);
     }
 
@@ -186,8 +210,10 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * @param array<string, int> $linkIdToSortOrder Map of link UUID strings to sort orders
      */
     #[\Override]
-    public function reorderFavorites(UuidInterface $dashboardId, array $linkIdToSortOrder): void
-    {
+    public function reorderFavorites(
+        UuidInterface $dashboardId,
+        array $linkIdToSortOrder,
+    ): void {
         foreach ($linkIdToSortOrder as $linkIdString => $sortOrder) {
             $linkId = Uuid::fromString($linkIdString);
             $this->updateSortOrder($dashboardId, $linkId, $sortOrder);
@@ -201,12 +227,12 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
     public function countForDashboardId(UuidInterface $dashboardId): int
     {
         $statement = $this->pdo->prepare(
-            'SELECT COUNT(*) as count FROM favorites WHERE dashboard_id = :dashboard_id'
+            "SELECT COUNT(*) as count FROM favorites WHERE dashboard_id = :dashboard_id",
         );
-        $statement->execute([':dashboard_id' => $dashboardId->getBytes()]);
+        $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
         $result = $statement->fetch(PDO::FETCH_ASSOC);
-        return (int) $result['count'];
+        return (int) $result["count"];
     }
 
     /**
@@ -214,8 +240,9 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
     #[\Override]
-    public function findDashboardsWithLinkAsFavorite(UuidInterface $linkId): DashboardCollection
-    {
+    public function findDashboardsWithLinkAsFavorite(
+        UuidInterface $linkId,
+    ): DashboardCollection {
         // Verify link exists
         $this->linkRepository->findById($linkId);
 
@@ -223,9 +250,9 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
             'SELECT DISTINCT d.* FROM dashboards d
              INNER JOIN favorites f ON d.dashboard_id = f.dashboard_id
              WHERE f.link_id = :link_id
-             ORDER BY d.title ASC'
+             ORDER BY d.title ASC',
         );
-        $statement->execute([':link_id' => $linkId->getBytes()]);
+        $statement->execute([":link_id" => $linkId->getBytes()]);
 
         $dashboards = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -239,11 +266,13 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
      * Map a database row to a Favorite entity
      * When called from findByDashboardId, the dashboard is passed to avoid redundant lookups
      */
-    private function mapRowToFavorite(array $row, ?Dashboard $dashboard = null): Favorite
-    {
+    private function mapRowToFavorite(
+        array $row,
+        ?Dashboard $dashboard = null,
+    ): Favorite {
         // Get dashboard if not provided (fallback for other methods that construct the Favorite)
         if ($dashboard === null) {
-            $dashboardId = Uuid::fromBytes($row['dashboard_id']);
+            $dashboardId = Uuid::fromBytes($row["dashboard_id"]);
             $dashboard = $this->dashboardRepository->findById($dashboardId);
         }
 
@@ -253,8 +282,8 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
         return new Favorite(
             dashboard: $dashboard,
             link: $link,
-            sortOrder: (int) $row['sort_order'],
-            createdAt: new DateTimeImmutable($row['created_at'])
+            sortOrder: (int) $row["sort_order"],
+            createdAt: new DateTimeImmutable($row["created_at"]),
         );
     }
 
@@ -265,13 +294,13 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
     private function mapRowToLink(array $row): Link
     {
         return new Link(
-            linkId: Uuid::fromBytes($row['link_id']),
-            url: new Url($row['url']),
-            title: new Title($row['title']),
-            description: $row['description'],
-            icon: $row['icon'] !== null ? new Icon($row['icon']) : null,
-            createdAt: new DateTimeImmutable($row['created_at']),
-            updatedAt: new DateTimeImmutable($row['updated_at']),
+            linkId: Uuid::fromBytes($row["link_id"]),
+            url: new Url($row["url"]),
+            title: new Title($row["title"]),
+            description: $row["description"],
+            icon: $row["icon"] !== null ? new Icon($row["icon"]) : null,
+            createdAt: new DateTimeImmutable($row["created_at"]),
+            updatedAt: new DateTimeImmutable($row["updated_at"]),
         );
     }
 
@@ -281,12 +310,12 @@ final readonly class PdoFavoriteRepository implements FavoriteRepositoryInterfac
     private function mapRowToDashboard(array $row): Dashboard
     {
         return new Dashboard(
-            dashboardId: Uuid::fromBytes($row['dashboard_id']),
-            title: new Title($row['title']),
-            description: $row['description'],
-            icon: $row['icon'] !== null ? new Icon($row['icon']) : null,
-            createdAt: new DateTimeImmutable($row['created_at']),
-            updatedAt: new DateTimeImmutable($row['updated_at']),
+            dashboardId: Uuid::fromBytes($row["dashboard_id"]),
+            title: new Title($row["title"]),
+            description: $row["description"],
+            icon: $row["icon"] !== null ? new Icon($row["icon"]) : null,
+            createdAt: new DateTimeImmutable($row["created_at"]),
+            updatedAt: new DateTimeImmutable($row["updated_at"]),
         );
     }
 }

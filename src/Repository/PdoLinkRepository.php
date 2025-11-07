@@ -19,9 +19,7 @@ use Ramsey\Uuid\Uuid;
 
 final readonly class PdoLinkRepository implements LinkRepositoryInterface
 {
-    public function __construct(
-        private readonly PDO $pdo
-    ) {}
+    public function __construct(private readonly PDO $pdo) {}
 
     /**
      * @throws LinkNotFoundException when link doesn't exist
@@ -30,9 +28,9 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     public function findById(UuidInterface $linkId): Link
     {
         $statement = $this->pdo->prepare(
-            'SELECT * FROM links WHERE link_id = :link_id LIMIT 1'
+            "SELECT * FROM links WHERE link_id = :link_id LIMIT 1",
         );
-        $statement->execute([':link_id' => $linkId->getBytes()]);
+        $statement->execute([":link_id" => $linkId->getBytes()]);
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
@@ -46,10 +44,10 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     public function findAll(int $limit = 100, int $offset = 0): LinkCollection
     {
         $statement = $this->pdo->prepare(
-            'SELECT * FROM links ORDER BY created_at DESC LIMIT :limit OFFSET :offset'
+            "SELECT * FROM links ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
         );
-        $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $statement->bindValue(":limit", $limit, PDO::PARAM_INT);
+        $statement->bindValue(":offset", $offset, PDO::PARAM_INT);
         $statement->execute();
 
         $links = [];
@@ -67,13 +65,13 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     #[\Override]
     public function search(string $query, int $limit = 100): LinkCollection
     {
-        $searchTerm = '%' . $query . '%';
+        $searchTerm = "%{$query}%";
 
         $statement = $this->pdo->prepare(
             'SELECT * FROM links
              WHERE title LIKE ? OR description LIKE ?
              ORDER BY created_at DESC
-             LIMIT ?'
+             LIMIT ?',
         );
         $statement->execute([$searchTerm, $searchTerm, $limit]);
 
@@ -99,13 +97,22 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
         // Build INTERSECT query that works in both MySQL 8.0+ and SQLite
         // For each tag, we select link_ids that have that tag,
         // then intersect all results to get links with ALL tags
-        $intersectQueries = array_map(fn() => 'SELECT link_id FROM link_tags WHERE tag_name = ?', $tagNames->toArray());
-        $query = 'SELECT l.* FROM links l WHERE l.link_id IN (' .
-                 implode(' INTERSECT ', $intersectQueries) .
-                 ') ORDER BY l.created_at DESC';
+        $intersectQueries = array_map(
+            fn() => "SELECT link_id FROM link_tags WHERE tag_name = ?",
+            $tagNames->toArray(),
+        );
+        $query =
+            "SELECT l.* FROM links l WHERE l.link_id IN (" .
+            implode(" INTERSECT ", $intersectQueries) .
+            ") ORDER BY l.created_at DESC";
 
         $statement = $this->pdo->prepare($query);
-        $statement->execute(array_map(fn (TagName $value) => $value->value, $tagNames->toArray()));
+        $statement->execute(
+            array_map(
+                fn(TagName $value) => $value->value,
+                $tagNames->toArray(),
+            ),
+        );
 
         $links = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -126,16 +133,18 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             'SELECT l.* FROM links l
              INNER JOIN category_links cl ON l.link_id = cl.link_id
              WHERE cl.category_id = :category_id
-             ORDER BY cl.sort_order ASC'
+             ORDER BY cl.sort_order ASC',
         );
-        $statement->execute([':category_id' => $categoryId->getBytes()]);
+        $statement->execute([":category_id" => $categoryId->getBytes()]);
 
         if ($statement->rowCount() === 0) {
             // Verify the category exists
             $categoryCheck = $this->pdo->prepare(
-                'SELECT 1 FROM categories WHERE category_id = :category_id LIMIT 1'
+                "SELECT 1 FROM categories WHERE category_id = :category_id LIMIT 1",
             );
-            $categoryCheck->execute([':category_id' => $categoryId->getBytes()]);
+            $categoryCheck->execute([
+                ":category_id" => $categoryId->getBytes(),
+            ]);
             if ($categoryCheck->fetch() === false) {
                 throw CategoryNotFoundException::forId($categoryId);
             }
@@ -158,23 +167,25 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
         $linkIdBytes = $link->linkId->getBytes();
 
         // Check if link exists
-        $check = $this->pdo->prepare('SELECT 1 FROM links WHERE link_id = :link_id LIMIT 1');
-        $check->execute([':link_id' => $linkIdBytes]);
+        $check = $this->pdo->prepare(
+            "SELECT 1 FROM links WHERE link_id = :link_id LIMIT 1",
+        );
+        $check->execute([":link_id" => $linkIdBytes]);
 
         if ($check->fetch() === false) {
             // Insert new link
             $statement = $this->pdo->prepare(
                 'INSERT INTO links (link_id, url, title, description, icon, created_at, updated_at)
-                 VALUES (:link_id, :url, :title, :description, :icon, :created_at, :updated_at)'
+                 VALUES (:link_id, :url, :title, :description, :icon, :created_at, :updated_at)',
             );
             $statement->execute([
-                ':link_id' => $linkIdBytes,
-                ':url' => (string) $link->url,
-                ':title' => (string) $link->title,
-                ':description' => $link->description,
-                ':icon' => $link->icon ? (string) $link->icon : null,
-                ':created_at' => $link->createdAt->format(SqlFormat::TIMESTAMP),
-                ':updated_at' => $link->updatedAt->format(SqlFormat::TIMESTAMP),
+                ":link_id" => $linkIdBytes,
+                ":url" => (string) $link->url,
+                ":title" => (string) $link->title,
+                ":description" => $link->description,
+                ":icon" => $link->icon ? (string) $link->icon : null,
+                ":created_at" => $link->createdAt->format(SqlFormat::TIMESTAMP),
+                ":updated_at" => $link->updatedAt->format(SqlFormat::TIMESTAMP),
             ]);
         } else {
             // Update existing link
@@ -182,15 +193,15 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
                 'UPDATE links
                  SET url = :url, title = :title, description = :description,
                      icon = :icon, updated_at = :updated_at
-                 WHERE link_id = :link_id'
+                 WHERE link_id = :link_id',
             );
             $statement->execute([
-                ':link_id' => $linkIdBytes,
-                ':url' => (string) $link->url,
-                ':title' => (string) $link->title,
-                ':description' => $link->description,
-                ':icon' => $link->icon ? (string) $link->icon : null,
-                ':updated_at' => $link->updatedAt->format(SqlFormat::TIMESTAMP),
+                ":link_id" => $linkIdBytes,
+                ":url" => (string) $link->url,
+                ":title" => (string) $link->title,
+                ":description" => $link->description,
+                ":icon" => $link->icon ? (string) $link->icon : null,
+                ":updated_at" => $link->updatedAt->format(SqlFormat::TIMESTAMP),
             ]);
         }
     }
@@ -202,8 +213,10 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     public function delete(Link $link): void
     {
         // Delete cascades are handled by database constraints
-        $statement = $this->pdo->prepare('DELETE FROM links WHERE link_id = :link_id');
-        $statement->execute([':link_id' => $link->linkId->getBytes()]);
+        $statement = $this->pdo->prepare(
+            "DELETE FROM links WHERE link_id = :link_id",
+        );
+        $statement->execute([":link_id" => $link->linkId->getBytes()]);
     }
 
     /**
@@ -212,11 +225,11 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     #[\Override]
     public function count(): int
     {
-        $statement = $this->pdo->prepare('SELECT COUNT(*) as count FROM links');
+        $statement = $this->pdo->prepare("SELECT COUNT(*) as count FROM links");
         $statement->execute();
 
         $result = $statement->fetch(PDO::FETCH_ASSOC);
-        return (int) $result['count'];
+        return (int) $result["count"];
     }
 
     /**
@@ -225,13 +238,13 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     private function mapRowToLink(array $row): Link
     {
         return new Link(
-            linkId: Uuid::fromBytes($row['link_id']),
-            url: new Url($row['url']),
-            title: new Title($row['title']),
-            description: $row['description'],
-            icon: $row['icon'] !== null ? new Icon($row['icon']) : null,
-            createdAt: new DateTimeImmutable($row['created_at']),
-            updatedAt: new DateTimeImmutable($row['updated_at']),
+            linkId: Uuid::fromBytes($row["link_id"]),
+            url: new Url($row["url"]),
+            title: new Title($row["title"]),
+            description: $row["description"],
+            icon: $row["icon"] !== null ? new Icon($row["icon"]) : null,
+            createdAt: new DateTimeImmutable($row["created_at"]),
+            updatedAt: new DateTimeImmutable($row["updated_at"]),
         );
     }
 }

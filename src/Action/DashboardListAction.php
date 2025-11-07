@@ -14,7 +14,7 @@ final readonly class DashboardListAction implements ActionInterface
 {
     public function __construct(
         private DashboardServiceInterface $dashboardService,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
@@ -40,6 +40,6 @@ final readonly class DashboardListAction implements ActionInterface
             $result[] = $this->outputSpec->transform($dashboard);
         }
 
-        return ['dashboards' => $result];
+        return ["dashboards" => $result];
     }
 }

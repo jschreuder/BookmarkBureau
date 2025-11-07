@@ -9,13 +9,14 @@ use jschreuder\BookmarkBureau\Collection\CollectionTrait;
 /**
  * View object representing a list of categories with their links
  */
-final readonly class CategoryWithLinksCollection implements IteratorAggregate, Countable
+final readonly class CategoryWithLinksCollection implements
+    IteratorAggregate,
+    Countable
 {
     use CollectionTrait;
 
-    public function __construct(
-        CategoryWithLinks ...$categoryWithLinks
-    ) {
+    public function __construct(CategoryWithLinks ...$categoryWithLinks)
+    {
         $this->collection = $categoryWithLinks;
     }
 }

@@ -16,7 +16,7 @@ final readonly class DashboardUpdateAction implements ActionInterface
     public function __construct(
         private DashboardServiceInterface $dashboardService,
         private InputSpecInterface $inputSpec,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
@@ -34,12 +34,12 @@ final readonly class DashboardUpdateAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $dashboardId = Uuid::fromString($data['id']);
+        $dashboardId = Uuid::fromString($data["id"]);
         $dashboard = $this->dashboardService->updateDashboard(
             dashboardId: $dashboardId,
-            title: $data['title'],
-            description: $data['description'],
-            icon: $data['icon']
+            title: $data["title"],
+            description: $data["description"],
+            icon: $data["icon"],
         );
         return $this->outputSpec->transform($dashboard);
     }

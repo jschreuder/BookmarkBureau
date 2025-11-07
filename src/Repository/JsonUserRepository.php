@@ -9,6 +9,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
+use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -21,9 +22,7 @@ final class JsonUserRepository implements UserRepositoryInterface
 
     private bool $isLoaded = false;
 
-    public function __construct(
-        private readonly string $filePath
-    ) {}
+    public function __construct(private readonly string $filePath) {}
 
     /**
      * @throws UserNotFoundException when user doesn't exist
@@ -35,7 +34,7 @@ final class JsonUserRepository implements UserRepositoryInterface
         $userIdString = $userId->toString();
 
         if (!isset($this->users[$userIdString])) {
-            throw new UserNotFoundException('User not found: ' . $userIdString);
+            throw new UserNotFoundException("User not found: {$userIdString}");
         }
 
         return $this->users[$userIdString];
@@ -56,7 +55,7 @@ final class JsonUserRepository implements UserRepositoryInterface
             }
         }
 
-        throw new UserNotFoundException('User not found: ' . $email);
+        throw new UserNotFoundException("User not found: {$emailString}");
     }
 
     /**
@@ -69,7 +68,13 @@ final class JsonUserRepository implements UserRepositoryInterface
 
         // Sort by email
         $users = $this->users;
-        usort($users, fn(User $a, User $b) => strcmp((string) $a->email, (string) $b->email));
+        usort(
+            $users,
+            fn(User $a, User $b) => strcmp(
+                (string) $a->email,
+                (string) $b->email,
+            ),
+        );
 
         return new UserCollection(...$users);
     }
@@ -123,7 +128,7 @@ final class JsonUserRepository implements UserRepositoryInterface
     public function count(): int
     {
         $this->loadUsers();
-        return count($this->users);
+        return \count($this->users);
     }
 
     /**
@@ -148,7 +153,7 @@ final class JsonUserRepository implements UserRepositoryInterface
         }
 
         $data = json_decode($content, true);
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return;
         }
 
@@ -175,11 +180,13 @@ final class JsonUserRepository implements UserRepositoryInterface
 
         $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($json === false) {
-            throw new \RuntimeException('Failed to encode users to JSON');
+            throw new \RuntimeException("Failed to encode users to JSON");
         }
 
         if (file_put_contents($this->filePath, $json) === false) {
-            throw new \RuntimeException('Failed to write users to file: ' . $this->filePath);
+            throw new \RuntimeException(
+                "Failed to write users to file: {$this->filePath}",
+            );
         }
     }
 
@@ -189,12 +196,12 @@ final class JsonUserRepository implements UserRepositoryInterface
     private function mapUserToArray(User $user): array
     {
         return [
-            'user_id' => $user->userId->toString(),
-            'email' => (string) $user->email,
-            'password_hash' => $user->passwordHash->getHash(),
-            'totp_secret' => $user->totpSecret?->getSecret(),
-            'created_at' => $user->createdAt->format('Y-m-d H:i:s'),
-            'updated_at' => $user->updatedAt->format('Y-m-d H:i:s'),
+            "user_id" => $user->userId->toString(),
+            "email" => (string) $user->email,
+            "password_hash" => $user->passwordHash->getHash(),
+            "totp_secret" => $user->totpSecret?->getSecret(),
+            "created_at" => $user->createdAt->format(SqlFormat::TIMESTAMP),
+            "updated_at" => $user->updatedAt->format(SqlFormat::TIMESTAMP),
         ];
     }
 
@@ -204,12 +211,14 @@ final class JsonUserRepository implements UserRepositoryInterface
     private function mapArrayToUser(array $data): User
     {
         return new User(
-            userId: Uuid::fromString($data['user_id']),
-            email: new Email($data['email']),
-            passwordHash: new HashedPassword($data['password_hash']),
-            totpSecret: !empty($data['totp_secret']) ? new TotpSecret($data['totp_secret']) : null,
-            createdAt: new DateTimeImmutable($data['created_at']),
-            updatedAt: new DateTimeImmutable($data['updated_at']),
+            userId: Uuid::fromString($data["user_id"]),
+            email: new Email($data["email"]),
+            passwordHash: new HashedPassword($data["password_hash"]),
+            totpSecret: !empty($data["totp_secret"])
+                ? new TotpSecret($data["totp_secret"])
+                : null,
+            createdAt: new DateTimeImmutable($data["created_at"]),
+            updatedAt: new DateTimeImmutable($data["updated_at"]),
         );
     }
 }

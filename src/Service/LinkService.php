@@ -20,9 +20,8 @@ final class LinkService implements LinkServiceInterface
 {
     public function __construct(
         private readonly LinkRepositoryInterface $linkRepository,
-        private readonly UnitOfWorkInterface $unitOfWork
-    ) {
-    }
+        private readonly UnitOfWorkInterface $unitOfWork,
+    ) {}
 
     /**
      * @throws LinkNotFoundException when link doesn't exist
@@ -37,10 +36,15 @@ final class LinkService implements LinkServiceInterface
     public function createLink(
         string $url,
         string $title,
-        string $description = '',
-        ?string $icon = null
+        string $description = "",
+        ?string $icon = null,
     ): Link {
-        return $this->unitOfWork->transactional(function () use ($url, $title, $description, $icon): Link {
+        return $this->unitOfWork->transactional(function () use (
+            $url,
+            $title,
+            $description,
+            $icon,
+        ): Link {
             $link = new Link(
                 Uuid::uuid4(),
                 new Url($url),
@@ -48,7 +52,7 @@ final class LinkService implements LinkServiceInterface
                 $description,
                 $icon !== null ? new Icon($icon) : null,
                 new DateTimeImmutable(),
-                new DateTimeImmutable()
+                new DateTimeImmutable(),
             );
 
             $this->linkRepository->save($link);
@@ -65,10 +69,16 @@ final class LinkService implements LinkServiceInterface
         UuidInterface $linkId,
         string $url,
         string $title,
-        string $description = '',
-        ?string $icon = null
+        string $description = "",
+        ?string $icon = null,
     ): Link {
-        return $this->unitOfWork->transactional(function () use ($linkId, $url, $title, $description, $icon): Link {
+        return $this->unitOfWork->transactional(function () use (
+            $linkId,
+            $url,
+            $title,
+            $description,
+            $icon,
+        ): Link {
             $link = $this->linkRepository->findById($linkId);
 
             $link->url = new Url($url);

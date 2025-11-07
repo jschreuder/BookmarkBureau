@@ -15,7 +15,7 @@ final readonly class TagCreateAction implements ActionInterface
     public function __construct(
         private TagServiceInterface $tagService,
         private InputSpecInterface $inputSpec,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
@@ -36,8 +36,8 @@ final readonly class TagCreateAction implements ActionInterface
     public function execute(array $data): array
     {
         $tag = $this->tagService->createTag(
-            tagName: $data['tag_name'],
-            color: $data['color']
+            tagName: $data["tag_name"],
+            color: $data["color"],
         );
         return $this->outputSpec->transform($tag);
     }

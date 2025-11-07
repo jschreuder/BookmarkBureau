@@ -10,9 +10,8 @@ final readonly class UserCollection implements IteratorAggregate, Countable
 {
     use CollectionTrait;
 
-    public function __construct(
-        User ...$users
-    ) {
+    public function __construct(User ...$users)
+    {
         $this->collection = $users;
     }
 }

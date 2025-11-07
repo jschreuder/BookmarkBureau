@@ -11,9 +11,8 @@ final readonly class TagCollection implements IteratorAggregate, Countable
 {
     use CollectionTrait;
 
-    public function __construct(
-        Tag ...$tags
-    ) {
+    public function __construct(Tag ...$tags)
+    {
         $this->collection = $tags;
     }
 }

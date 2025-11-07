@@ -14,7 +14,7 @@ use Respect\Validation\Validator;
  */
 final class TagNameInputSpec implements InputSpecInterface
 {
-    private const FIELDS = ['tag_name'];
+    private const array FIELDS = ["tag_name"];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -29,10 +29,14 @@ final class TagNameInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
 
         foreach ($fields as $field) {
-            $filtered[$field] = match($field) {
-                'tag_name' => Filter::start($rawData, 'tag_name', '')
-                    ->string(allowNull: false)->trim()->done(),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+            $filtered[$field] = match ($field) {
+                "tag_name" => Filter::start($rawData, "tag_name", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 
@@ -47,8 +51,13 @@ final class TagNameInputSpec implements InputSpecInterface
 
         foreach ($fields as $field) {
             match ($field) {
-                'tag_name' => $validator->key('tag_name', Validator::notEmpty()->length(1, 256)),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+                "tag_name" => $validator->key(
+                    "tag_name",
+                    Validator::notEmpty()->length(1, 256),
+                ),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 

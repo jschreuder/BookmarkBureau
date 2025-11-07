@@ -14,7 +14,7 @@ final readonly class LinkTagDeleteAction implements ActionInterface
 {
     public function __construct(
         private TagServiceInterface $tagService,
-        private InputSpecInterface $inputSpec
+        private InputSpecInterface $inputSpec,
     ) {}
 
     #[\Override]
@@ -33,8 +33,8 @@ final readonly class LinkTagDeleteAction implements ActionInterface
     public function execute(array $data): array
     {
         $this->tagService->removeTagFromLink(
-            linkId: Uuid::fromString($data['id']),
-            tagName: $data['tag_name']
+            linkId: Uuid::fromString($data["id"]),
+            tagName: $data["tag_name"],
         );
 
         return [];

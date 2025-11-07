@@ -15,14 +15,14 @@ final readonly class LinkCreateAction implements ActionInterface
     public function __construct(
         private LinkServiceInterface $linkService,
         private InputSpecInterface $inputSpec,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
     public function filter(array $rawData): array
     {
         // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
+        $fields = array_diff($this->inputSpec->getAvailableFields(), ["id"]);
         return $this->inputSpec->filter($rawData, $fields);
     }
 
@@ -30,7 +30,7 @@ final readonly class LinkCreateAction implements ActionInterface
     public function validate(array $data): void
     {
         // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
+        $fields = array_diff($this->inputSpec->getAvailableFields(), ["id"]);
         $this->inputSpec->validate($data, $fields);
     }
 
@@ -38,10 +38,10 @@ final readonly class LinkCreateAction implements ActionInterface
     public function execute(array $data): array
     {
         $link = $this->linkService->createLink(
-            url: $data['url'],
-            title: $data['title'],
-            description: $data['description'],
-            icon: $data['icon']
+            url: $data["url"],
+            title: $data["title"],
+            description: $data["description"],
+            icon: $data["icon"],
         );
         return $this->outputSpec->transform($link);
     }

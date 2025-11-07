@@ -14,7 +14,7 @@ final readonly class DashboardDeleteAction implements ActionInterface
 {
     public function __construct(
         private DashboardServiceInterface $dashboardService,
-        private InputSpecInterface $inputSpec
+        private InputSpecInterface $inputSpec,
     ) {}
 
     #[\Override]
@@ -32,7 +32,7 @@ final readonly class DashboardDeleteAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $dashboardId = Uuid::fromString($data['id']);
+        $dashboardId = Uuid::fromString($data["id"]);
         $this->dashboardService->deleteDashboard($dashboardId);
 
         return [];

@@ -16,33 +16,33 @@ final readonly class CategoryCreateAction implements ActionInterface
     public function __construct(
         private CategoryServiceInterface $categoryService,
         private InputSpecInterface $inputSpec,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
     public function filter(array $rawData): array
     {
-        // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
+        // Create operations need all fields except "id", since it doesn't exist yet
+        $fields = array_diff($this->inputSpec->getAvailableFields(), ["id"]);
         return $this->inputSpec->filter($rawData, $fields);
     }
 
     #[\Override]
     public function validate(array $data): void
     {
-        // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ['id']);
+        // Create operations need all fields except "id", since it doesn't exist yet
+        $fields = array_diff($this->inputSpec->getAvailableFields(), ["id"]);
         $this->inputSpec->validate($data, $fields);
     }
 
     #[\Override]
     public function execute(array $data): array
     {
-        $dashboardId = Uuid::fromString($data['dashboard_id']);
+        $dashboardId = Uuid::fromString($data["dashboard_id"]);
         $category = $this->categoryService->createCategory(
             dashboardId: $dashboardId,
-            title: $data['title'],
-            color: $data['color']
+            title: $data["title"],
+            color: $data["color"],
         );
         return $this->outputSpec->transform($category);
     }

@@ -14,7 +14,7 @@ final readonly class LinkDeleteAction implements ActionInterface
 {
     public function __construct(
         private LinkServiceInterface $linkService,
-        private InputSpecInterface $inputSpec
+        private InputSpecInterface $inputSpec,
     ) {}
 
     #[\Override]
@@ -32,7 +32,7 @@ final readonly class LinkDeleteAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $linkId = Uuid::fromString($data['id']);
+        $linkId = Uuid::fromString($data["id"]);
         $this->linkService->deleteLink($linkId);
 
         return [];

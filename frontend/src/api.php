@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 /** @var  jschreuder\BookmarkBureau\ServiceContainer $container */
 $container = require __DIR__ . '/../config/app_init.php';
@@ -7,9 +7,9 @@ $container = require __DIR__ . '/../config/app_init.php';
 $app = $container->getApp();
 
 // Register routing
-(new \jschreuder\Middle\Router\RoutingProviderCollection(
-    new \jschreuder\BookmarkBureau\GeneralRoutingProvider($container)
-))->registerRoutes($container->GetAppRouter());
+new \jschreuder\Middle\Router\RoutingProviderCollection(
+  new \jschreuder\BookmarkBureau\GeneralRoutingProvider($container),
+)->registerRoutes($container->GetAppRouter());
 
 // Create request from globals
 $request = Laminas\Diactoros\ServerRequestFactory::fromGlobals();
@@ -18,4 +18,4 @@ $request = Laminas\Diactoros\ServerRequestFactory::fromGlobals();
 $response = $app->process($request);
 
 // Output the response
-(new Laminas\HttpHandlerRunner\Emitter\SapiEmitter())->emit($response);
+new Laminas\HttpHandlerRunner\Emitter\SapiEmitter()->emit($response);

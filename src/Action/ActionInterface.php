@@ -2,6 +2,8 @@
 
 namespace jschreuder\BookmarkBureau\Action;
 
+use jschreuder\Middle\Exception\ValidationFailedException;
+
 /**
  * Application-layer component for processing input and executing operations
  *

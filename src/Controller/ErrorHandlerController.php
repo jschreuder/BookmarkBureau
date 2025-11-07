@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace jschreuder\BookmarkBureau\Controller;
 
@@ -18,23 +18,23 @@ final readonly class ErrorHandlerController implements ControllerInterface
     }
 
     #[\Override]
-    public function execute(ServerRequestInterface $request) : ResponseInterface
+    public function execute(ServerRequestInterface $request): ResponseInterface
     {
         /** @var  \Throwable $exception */
-        $exception = $request->getAttribute('error');
+        $exception = $request->getAttribute("error");
         $code = $this->getCode($exception);
         $message = $this->getMessage($code);
 
         $this->logger->log($code, $message);
         return new JsonResponse(
             [
-                'message' => $message,
+                "message" => $message,
             ],
-            $code
+            $code,
         );
     }
 
-    private function getCode(\Throwable $exception) : int
+    private function getCode(\Throwable $exception): int
     {
         if ($exception instanceof \PDOException) {
             return 503;
@@ -48,14 +48,14 @@ final readonly class ErrorHandlerController implements ControllerInterface
         return 500;
     }
 
-    private function getMessage(int $code) : string
+    private function getMessage(int $code): string
     {
         return match ($code) {
-            400 => 'Bad input',
-            401 => 'Unauthenticated',
-            403 => 'Unauthorized',
-            503 => 'Storage engine error',
-            default => 'Server error'
+            400 => "Bad input",
+            401 => "Unauthenticated",
+            403 => "Unauthorized",
+            503 => "Storage engine error",
+            default => "Server error",
         };
     }
 }

@@ -11,9 +11,8 @@ final readonly class FavoriteCollection implements IteratorAggregate, Countable
 {
     use CollectionTrait;
 
-    public function __construct(
-        Favorite ...$favorites
-    ) {
+    public function __construct(Favorite ...$favorites)
+    {
         $this->collection = $favorites;
     }
 }

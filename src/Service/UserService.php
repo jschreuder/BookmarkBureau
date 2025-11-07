@@ -32,7 +32,7 @@ final readonly class UserService implements UserServiceInterface
             // Check if email already exists
             if ($this->userRepository->existsByEmail($email)) {
                 throw new DuplicateEmailException(
-                    "Email already exists: " . $email,
+                    "Email already exists: {$email}",
                 );
             }
 

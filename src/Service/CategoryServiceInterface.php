@@ -24,7 +24,7 @@ interface CategoryServiceInterface
     public function createCategory(
         UuidInterface $dashboardId,
         string $title,
-        ?string $color = null
+        ?string $color = null,
     ): Category;
 
     /**
@@ -35,7 +35,7 @@ interface CategoryServiceInterface
     public function updateCategory(
         UuidInterface $categoryId,
         string $title,
-        ?string $color = null
+        ?string $color = null,
     ): Category;
 
     /**
@@ -51,7 +51,10 @@ interface CategoryServiceInterface
      * @param UuidInterface $dashboardId
      * @param array<string, int> $categoryIdToSortOrder Map of category UUID strings to sort orders
      */
-    public function reorderCategories(UuidInterface $dashboardId, array $categoryIdToSortOrder): void;
+    public function reorderCategories(
+        UuidInterface $dashboardId,
+        array $categoryIdToSortOrder,
+    ): void;
 
     /**
      * Add a link to a category
@@ -59,14 +62,20 @@ interface CategoryServiceInterface
      * @throws CategoryNotFoundException when category doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
-    public function addLinkToCategory(UuidInterface $categoryId, UuidInterface $linkId): void;
+    public function addLinkToCategory(
+        UuidInterface $categoryId,
+        UuidInterface $linkId,
+    ): void;
 
     /**
      * Remove a link from a category
      *
      * @throws CategoryNotFoundException when category doesn't exist
      */
-    public function removeLinkFromCategory(UuidInterface $categoryId, UuidInterface $linkId): void;
+    public function removeLinkFromCategory(
+        UuidInterface $categoryId,
+        UuidInterface $linkId,
+    ): void;
 
     /**
      * Reorder links within a category
@@ -75,5 +84,8 @@ interface CategoryServiceInterface
      * @param UuidInterface $categoryId
      * @param LinkCollection $links Links in the desired order
      */
-    public function reorderLinksInCategory(UuidInterface $categoryId, LinkCollection $links): void;
+    public function reorderLinksInCategory(
+        UuidInterface $categoryId,
+        LinkCollection $links,
+    ): void;
 }

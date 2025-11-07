@@ -20,8 +20,8 @@ final readonly class TagOutputSpec implements OutputSpecInterface
     private function doTransform(object $tag): array
     {
         return [
-            'tag_name' => $tag->tagName->value,
-            'color' => $tag->color?->value,
+            "tag_name" => $tag->tagName->value,
+            "color" => $tag->color?->value,
         ];
     }
 }

@@ -16,7 +16,7 @@ final readonly class LinkReadAction implements ActionInterface
     public function __construct(
         private LinkServiceInterface $linkService,
         private InputSpecInterface $inputSpec,
-        private OutputSpecInterface $outputSpec
+        private OutputSpecInterface $outputSpec,
     ) {}
 
     #[\Override]
@@ -34,7 +34,7 @@ final readonly class LinkReadAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $link = $this->linkService->getLink(Uuid::fromString($data['id']));
+        $link = $this->linkService->getLink(Uuid::fromString($data["id"]));
         return $this->outputSpec->transform($link);
     }
 }

@@ -47,6 +47,6 @@ interface ResponseTransformerInterface
     public function transform(
         array $data,
         int $statusCode = 200,
-        array $headers = []
+        array $headers = [],
     ): ResponseInterface;
 }

@@ -4,6 +4,4 @@ namespace jschreuder\BookmarkBureau\Exception;
 
 use RuntimeException;
 
-final class ResponseTransformerException extends RuntimeException
-{
-}
+final class ResponseTransformerException extends RuntimeException {}

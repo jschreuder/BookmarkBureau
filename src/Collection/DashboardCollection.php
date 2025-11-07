@@ -11,9 +11,8 @@ final readonly class DashboardCollection implements IteratorAggregate, Countable
 {
     use CollectionTrait;
 
-    public function __construct(
-        Dashboard ...$dashboards
-    ) {
+    public function __construct(Dashboard ...$dashboards)
+    {
         $this->collection = $dashboards;
     }
 }

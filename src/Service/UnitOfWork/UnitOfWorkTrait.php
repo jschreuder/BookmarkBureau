@@ -24,7 +24,9 @@ trait UnitOfWorkTrait
     public function commit(): void
     {
         if ($this->transactionLevel === 0) {
-            throw new InactiveUnitOfWorkException('No active transaction to commit');
+            throw new InactiveUnitOfWorkException(
+                "No active transaction to commit",
+            );
         }
 
         $this->transactionLevel--;
@@ -37,7 +39,9 @@ trait UnitOfWorkTrait
     public function rollback(): void
     {
         if ($this->transactionLevel === 0) {
-            throw new InactiveUnitOfWorkException('No active transaction to rollback');
+            throw new InactiveUnitOfWorkException(
+                "No active transaction to rollback",
+            );
         }
 
         $this->transactionLevel = 0;

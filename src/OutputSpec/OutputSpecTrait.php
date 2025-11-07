@@ -18,11 +18,9 @@ trait OutputSpecTrait
     {
         if (!$this->supports($data)) {
             throw new InvalidArgumentException(
-                sprintf(
-                    '%s does not support objects of type %s',
-                    static::class,
-                    get_class($data)
-                )
+                static::class .
+                    " does not support objects of type " .
+                    \get_class($data),
             );
         }
 

@@ -10,13 +10,7 @@ use Respect\Validation\Validator;
 
 final class LinkInputSpec implements InputSpecInterface
 {
-    private const FIELDS = [
-        'id',
-        'url',
-        'title',
-        'description',
-        'icon',
-    ];
+    private const array FIELDS = ["id", "url", "title", "description", "icon"];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -30,18 +24,32 @@ final class LinkInputSpec implements InputSpecInterface
         $filtered = [];
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
-            $filtered[$field] = match($field) {
-                'id' => Filter::start($rawData, 'id', '')
-                    ->string(allowNull: false)->trim()->done(),
-                'url' => Filter::start($rawData, 'url', '')
-                    ->string(allowNull: false)->trim()->done(),
-                'title' => Filter::start($rawData, 'title', '')
-                    ->string(allowNull: false)->trim()->striptags()->done(),
-                'description' => Filter::start($rawData, 'description', '')
-                    ->string(allowNull: false)->trim()->striptags()->done(),
-                'icon' => Filter::start($rawData, 'icon', null)
-                    ->string()->trim()->done(),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+            $filtered[$field] = match ($field) {
+                "id" => Filter::start($rawData, "id", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                "url" => Filter::start($rawData, "url", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                "title" => Filter::start($rawData, "title", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->striptags()
+                    ->done(),
+                "description" => Filter::start($rawData, "description", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->striptags()
+                    ->done(),
+                "icon" => Filter::start($rawData, "icon", null)
+                    ->string()
+                    ->trim()
+                    ->done(),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 
@@ -55,12 +63,23 @@ final class LinkInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                'id' => $validator->key('id', Validator::notEmpty()->uuid()),
-                'url' => $validator->key('url', Validator::notEmpty()->url()),
-                'title' => $validator->key('title', Validator::notEmpty()->length(1, 256)),
-                'description' => $validator->key('description', Validator::optional(Validator::stringType())),
-                'icon' => $validator->key('icon', Validator::optional(Validator::stringType())),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+                "id" => $validator->key("id", Validator::notEmpty()->uuid()),
+                "url" => $validator->key("url", Validator::notEmpty()->url()),
+                "title" => $validator->key(
+                    "title",
+                    Validator::notEmpty()->length(1, 256),
+                ),
+                "description" => $validator->key(
+                    "description",
+                    Validator::optional(Validator::stringType()),
+                ),
+                "icon" => $validator->key(
+                    "icon",
+                    Validator::optional(Validator::stringType()),
+                ),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 

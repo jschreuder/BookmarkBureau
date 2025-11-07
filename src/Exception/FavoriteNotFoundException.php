@@ -7,8 +7,13 @@ use RuntimeException;
 
 final class FavoriteNotFoundException extends RuntimeException
 {
-    public static function forDashboardAndLink(UuidInterface $dashboardId, UuidInterface $linkId): self
-    {
-        return new self("Favorite not found for dashboard '{$dashboardId}' and link '{$linkId}'", 404);
+    public static function forDashboardAndLink(
+        UuidInterface $dashboardId,
+        UuidInterface $linkId,
+    ): self {
+        return new self(
+            "Favorite not found for dashboard '{$dashboardId}' and link '{$linkId}'",
+            404,
+        );
     }
 }

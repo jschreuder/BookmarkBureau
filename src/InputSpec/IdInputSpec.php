@@ -14,7 +14,7 @@ use Respect\Validation\Validator;
  */
 final class IdInputSpec implements InputSpecInterface
 {
-    private const FIELDS = ['id'];
+    private const array FIELDS = ["id"];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -29,10 +29,14 @@ final class IdInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
 
         foreach ($fields as $field) {
-            $filtered[$field] = match($field) {
-                'id' => Filter::start($rawData, 'id', '')
-                    ->string(allowNull: false)->trim()->done(),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+            $filtered[$field] = match ($field) {
+                "id" => Filter::start($rawData, "id", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 
@@ -47,8 +51,10 @@ final class IdInputSpec implements InputSpecInterface
 
         foreach ($fields as $field) {
             $validator = match ($field) {
-                'id' => $validator->key('id', Validator::notEmpty()->uuid()),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+                "id" => $validator->key("id", Validator::notEmpty()->uuid()),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 

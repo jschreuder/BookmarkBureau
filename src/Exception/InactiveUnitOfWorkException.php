@@ -4,6 +4,4 @@ namespace jschreuder\BookmarkBureau\Exception;
 
 use RuntimeException;
 
-final class InactiveUnitOfWorkException extends RuntimeException
-{
-}
+final class InactiveUnitOfWorkException extends RuntimeException {}

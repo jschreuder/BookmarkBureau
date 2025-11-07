@@ -49,12 +49,19 @@ interface TagServiceInterface
      *
      * @throws LinkNotFoundException when link doesn't exist
      */
-    public function assignTagToLink(UuidInterface $linkId, string $tagName, ?string $color = null): void;
+    public function assignTagToLink(
+        UuidInterface $linkId,
+        string $tagName,
+        ?string $color = null,
+    ): void;
 
     /**
      * Remove a tag from a link
      */
-    public function removeTagFromLink(UuidInterface $linkId, string $tagName): void;
+    public function removeTagFromLink(
+        UuidInterface $linkId,
+        string $tagName,
+    ): void;
 
     /**
      * Search tags by name prefix

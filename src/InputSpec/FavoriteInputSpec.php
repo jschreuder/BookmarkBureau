@@ -10,11 +10,7 @@ use Respect\Validation\Validator;
 
 final class FavoriteInputSpec implements InputSpecInterface
 {
-    private const FIELDS = [
-        'dashboard_id',
-        'link_id',
-        'sort_order',
-    ];
+    private const array FIELDS = ["dashboard_id", "link_id", "sort_order"];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -28,14 +24,21 @@ final class FavoriteInputSpec implements InputSpecInterface
         $filtered = [];
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
-            $filtered[$field] = match($field) {
-                'dashboard_id' => Filter::start($rawData, 'dashboard_id', '')
-                    ->string(allowNull: false)->trim()->done(),
-                'link_id' => Filter::start($rawData, 'link_id', '')
-                    ->string(allowNull: false)->trim()->done(),
-                'sort_order' => Filter::start($rawData, 'sort_order', null)
-                    ->int()->done(),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+            $filtered[$field] = match ($field) {
+                "dashboard_id" => Filter::start($rawData, "dashboard_id", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                "link_id" => Filter::start($rawData, "link_id", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                "sort_order" => Filter::start($rawData, "sort_order", null)
+                    ->int()
+                    ->done(),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 
@@ -49,10 +52,21 @@ final class FavoriteInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                'dashboard_id' => $validator->key('dashboard_id', Validator::notEmpty()->uuid()),
-                'link_id' => $validator->key('link_id', Validator::notEmpty()->uuid()),
-                'sort_order' => $validator->key('sort_order', Validator::optional(Validator::intType())),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+                "dashboard_id" => $validator->key(
+                    "dashboard_id",
+                    Validator::notEmpty()->uuid(),
+                ),
+                "link_id" => $validator->key(
+                    "link_id",
+                    Validator::notEmpty()->uuid(),
+                ),
+                "sort_order" => $validator->key(
+                    "sort_order",
+                    Validator::optional(Validator::intType()),
+                ),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 

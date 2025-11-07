@@ -11,9 +11,8 @@ final readonly class CategoryCollection implements IteratorAggregate, Countable
 {
     use CollectionTrait;
 
-    public function __construct(
-        Category ...$categories
-    ) {
+    public function __construct(Category ...$categories)
+    {
         $this->collection = $categories;
     }
 }

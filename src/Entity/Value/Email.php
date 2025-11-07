@@ -11,7 +11,9 @@ final readonly class Email
     public function __construct(string $value)
     {
         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidArgumentException('Email Value object must get a valid e-mail address, was given: ' . $value);
+            throw new InvalidArgumentException(
+                "Email Value object must get a valid e-mail address, was given: {$value}",
+            );
         }
         $this->value = $value;
     }

@@ -7,7 +7,7 @@ use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
 final readonly class PhpPasswordHasher implements PasswordHasherInterface
 {
     public function __construct(
-        private string|int $algorithm = PASSWORD_ARGON2ID
+        private string|int $algorithm = PASSWORD_ARGON2ID,
     ) {}
 
     #[\Override]

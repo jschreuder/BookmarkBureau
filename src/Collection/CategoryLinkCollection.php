@@ -7,13 +7,14 @@ use IteratorAggregate;
 use jschreuder\BookmarkBureau\Collection\CollectionTrait;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
 
-final readonly class CategoryLinkCollection implements IteratorAggregate, Countable
+final readonly class CategoryLinkCollection implements
+    IteratorAggregate,
+    Countable
 {
     use CollectionTrait;
 
-    public function __construct(
-        CategoryLink ...$categoryLinks
-    ) {
+    public function __construct(CategoryLink ...$categoryLinks)
+    {
         $this->collection = $categoryLinks;
     }
 }

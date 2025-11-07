@@ -10,12 +10,12 @@ use Respect\Validation\Validator;
 
 final class CategoryInputSpec implements InputSpecInterface
 {
-    private const FIELDS = [
-        'id',
-        'dashboard_id',
-        'title',
-        'color',
-        'sort_order',
+    private const array FIELDS = [
+        "id",
+        "dashboard_id",
+        "title",
+        "color",
+        "sort_order",
     ];
 
     #[\Override]
@@ -30,18 +30,30 @@ final class CategoryInputSpec implements InputSpecInterface
         $filtered = [];
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
-            $filtered[$field] = match($field) {
-                'id' => Filter::start($rawData, 'id', '')
-                    ->string(allowNull: false)->trim()->done(),
-                'dashboard_id' => Filter::start($rawData, 'dashboard_id', '')
-                    ->string(allowNull: false)->trim()->done(),
-                'title' => Filter::start($rawData, 'title', '')
-                    ->string(allowNull: false)->trim()->striptags()->done(),
-                'color' => Filter::start($rawData, 'color', null)
-                    ->string()->trim()->done(),
-                'sort_order' => Filter::start($rawData, 'sort_order', 1)
-                    ->int(allowNull: false)->done(),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+            $filtered[$field] = match ($field) {
+                "id" => Filter::start($rawData, "id", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                "dashboard_id" => Filter::start($rawData, "dashboard_id", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->done(),
+                "title" => Filter::start($rawData, "title", "")
+                    ->string(allowNull: false)
+                    ->trim()
+                    ->striptags()
+                    ->done(),
+                "color" => Filter::start($rawData, "color", null)
+                    ->string()
+                    ->trim()
+                    ->done(),
+                "sort_order" => Filter::start($rawData, "sort_order", 1)
+                    ->int(allowNull: false)
+                    ->done(),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 
@@ -55,12 +67,26 @@ final class CategoryInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                'id' => $validator->key('id', Validator::notEmpty()->uuid()),
-                'dashboard_id' => $validator->key('dashboard_id', Validator::notEmpty()->uuid()),
-                'title' => $validator->key('title', Validator::notEmpty()->length(1, 256)),
-                'color' => $validator->key('color', Validator::optional(Validator::stringType()->hexRgbColor())),
-                'sort_order' => $validator->key('sort_order', Validator::optional(Validator::intType())),
-                default => throw new InvalidArgumentException("Unknown field: {$field}"),
+                "id" => $validator->key("id", Validator::notEmpty()->uuid()),
+                "dashboard_id" => $validator->key(
+                    "dashboard_id",
+                    Validator::notEmpty()->uuid(),
+                ),
+                "title" => $validator->key(
+                    "title",
+                    Validator::notEmpty()->length(1, 256),
+                ),
+                "color" => $validator->key(
+                    "color",
+                    Validator::optional(Validator::stringType()->hexRgbColor()),
+                ),
+                "sort_order" => $validator->key(
+                    "sort_order",
+                    Validator::optional(Validator::intType()),
+                ),
+                default => throw new InvalidArgumentException(
+                    "Unknown field: {$field}",
+                ),
             };
         }
 

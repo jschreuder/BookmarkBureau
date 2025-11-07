@@ -14,7 +14,7 @@ final readonly class CategoryDeleteAction implements ActionInterface
 {
     public function __construct(
         private CategoryServiceInterface $categoryService,
-        private InputSpecInterface $inputSpec
+        private InputSpecInterface $inputSpec,
     ) {}
 
     #[\Override]
@@ -32,7 +32,7 @@ final readonly class CategoryDeleteAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $categoryId = Uuid::fromString($data['id']);
+        $categoryId = Uuid::fromString($data["id"]);
         $this->categoryService->deleteCategory($categoryId);
 
         return [];

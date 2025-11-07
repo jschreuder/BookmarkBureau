@@ -8,9 +8,7 @@ final class PdoUnitOfWork implements UnitOfWorkInterface
 {
     use UnitOfWorkTrait;
 
-    public function __construct(
-        private readonly PDO $pdo
-    ) {}
+    public function __construct(private readonly PDO $pdo) {}
 
     private function doBegin(): void
     {

@@ -13,7 +13,8 @@ use Throwable;
  * This is the primary ResponseTransformer for REST APIs, converting
  * array data into JSON-formatted HTTP responses with appropriate headers.
  */
-final readonly class JsonResponseTransformer implements ResponseTransformerInterface
+final readonly class JsonResponseTransformer implements
+    ResponseTransformerInterface
 {
     /**
      * Transform array into JSON response
@@ -28,7 +29,7 @@ final readonly class JsonResponseTransformer implements ResponseTransformerInter
     public function transform(
         array $data,
         int $statusCode = 200,
-        array $headers = []
+        array $headers = [],
     ): ResponseInterface {
         try {
             $response = new JsonResponse($data, $statusCode);
@@ -38,9 +39,9 @@ final readonly class JsonResponseTransformer implements ResponseTransformerInter
             }
         } catch (Throwable $exception) {
             throw new ResponseTransformerException(
-                'Generating JSON response failed: ' . $exception->getMessage(),
+                "Generating JSON response failed: {$exception->getMessage()}",
                 500,
-                $exception
+                $exception,
             );
         }
 

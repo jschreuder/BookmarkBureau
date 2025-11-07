@@ -36,30 +36,34 @@ final readonly class FullDashboardOutputSpec implements OutputSpecInterface
     private function doTransform(object $dashboardView): array
     {
         // Transform the base dashboard
-        $dashboardArray = $this->dashboardOutputSpec->transform($dashboardView->dashboard);
+        $dashboardArray = $this->dashboardOutputSpec->transform(
+            $dashboardView->dashboard,
+        );
 
         // Transform categories with their links
         $categoriesArray = [];
         foreach ($dashboardView->categories as $categoryWithLinks) {
-            $categoryArray = $this->categoryOutputSpec->transform($categoryWithLinks->category);
+            $categoryArray = $this->categoryOutputSpec->transform(
+                $categoryWithLinks->category,
+            );
 
             // Transform links within the category
             $linksArray = [];
             foreach ($categoryWithLinks->links as $link) {
                 $linksArray[] = $this->linkOutputSpec->transform($link);
             }
-            $categoryArray['links'] = $linksArray;
+            $categoryArray["links"] = $linksArray;
 
             $categoriesArray[] = $categoryArray;
         }
-        $dashboardArray['categories'] = $categoriesArray;
+        $dashboardArray["categories"] = $categoriesArray;
 
         // Transform favorites
         $favoritesArray = [];
         foreach ($dashboardView->favorites as $favorite) {
             $favoritesArray[] = $this->linkOutputSpec->transform($favorite);
         }
-        $dashboardArray['favorites'] = $favoritesArray;
+        $dashboardArray["favorites"] = $favoritesArray;
 
         return $dashboardArray;
     }
