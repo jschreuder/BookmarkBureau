@@ -5,6 +5,7 @@ namespace jschreuder\BookmarkBureau\Command\User;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Exception\DuplicateEmailException;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -48,21 +49,12 @@ final class CreateCommand extends Command
         OutputInterface $output,
     ): int {
         $email = $input->getArgument("email");
-        $password = $input->getArgument("password");
+        $passwordArg = $input->getArgument("password");
         $enableTotp = $input->getOption("enable-totp");
 
-        if (!$password) {
-            /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
-            $helper = $this->getHelper("question");
-            $question = new Question("Enter password: ");
-            $question->setHidden(true);
-            $question->setHiddenFallback(false);
-            $password = $helper->ask($input, $output, $question);
-
-            if (!$password) {
-                $output->writeln("<error>Password cannot be empty</error>");
-                return Command::FAILURE;
-            }
+        $password = $this->resolvePassword($input, $output, $passwordArg);
+        if ($password === null) {
+            return Command::FAILURE;
         }
 
         try {
@@ -74,15 +66,7 @@ final class CreateCommand extends Command
             $output->writeln("  UUID: <comment>{$user->userId}</comment>");
 
             if ($enableTotp) {
-                $totpSecret = $this->userService->enableTotp($user->userId);
-                $output->writeln("");
-                $output->writeln("<info>TOTP enabled!</info>");
-                $output->writeln(
-                    "  Secret: <comment>{$totpSecret->getSecret()}</comment>",
-                );
-                $output->writeln(
-                    "<fg=yellow>Save this secret in your authenticator app!</>",
-                );
+                $this->displayTotpSetup($output, $user->userId);
             }
 
             return Command::SUCCESS;
@@ -90,10 +74,49 @@ final class CreateCommand extends Command
             $output->writeln(
                 "<error>User with email '{$email}' already exists</error>",
             );
-            return Command::FAILURE;
         } catch (\InvalidArgumentException $e) {
             $output->writeln("<error>Error: {$e->getMessage()}</error>");
-            return Command::FAILURE;
         }
+
+        return Command::FAILURE;
+    }
+
+    private function resolvePassword(
+        InputInterface $input,
+        OutputInterface $output,
+        ?string $passwordArg,
+    ): ?string {
+        if ($passwordArg) {
+            return $passwordArg;
+        }
+
+        /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
+        $helper = $this->getHelper("question");
+        $question = new Question("Enter password: ");
+        $question->setHidden(true);
+        $question->setHiddenFallback(false);
+        $password = $helper->ask($input, $output, $question);
+
+        if (!$password) {
+            $output->writeln("<error>Password cannot be empty</error>");
+            return null;
+        }
+
+        return $password;
+    }
+
+    private function displayTotpSetup(
+        OutputInterface $output,
+        UuidInterface $userId,
+    ): void {
+        $totpSecret = $this->userService->enableTotp($userId);
+        $output->writeln("");
+        $output->writeln("<info>TOTP enabled!</info>");
+        $output->writeln(
+            "  Secret: <comment>{$totpSecret->getSecret()}</comment>",
+        );
+        $output->writeln(
+            "<fg=yellow>Save this secret in your authenticator app!</>",
+        );
     }
 }

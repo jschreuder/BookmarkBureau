@@ -5,6 +5,7 @@ namespace jschreuder\BookmarkBureau\Command\User;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,7 +42,7 @@ final class TotpCommand extends Command
         $action = strtolower($input->getArgument("action"));
         $emailString = $input->getArgument("email");
 
-        if (!in_array($action, ["enable", "disable"])) {
+        if (!$this->isValidAction($action)) {
             $output->writeln(
                 "<error>Invalid action. Use 'enable' or 'disable'</error>",
             );
@@ -53,21 +54,9 @@ final class TotpCommand extends Command
             $user = $this->userService->getUserByEmail($email);
 
             if ($action === "enable") {
-                $totpSecret = $this->userService->enableTotp($user->userId);
-                $output->writeln(
-                    "<info>TOTP enabled for user '{$emailString}'</info>",
-                );
-                $output->writeln(
-                    "  Secret: <comment>{$totpSecret->getSecret()}</comment>",
-                );
-                $output->writeln(
-                    "<fg=yellow>Save this secret in your authenticator app!</>",
-                );
+                $this->displayTotpEnable($output, $user->userId, $emailString);
             } else {
-                $this->userService->disableTotp($user->userId);
-                $output->writeln(
-                    "<info>TOTP disabled for user '{$emailString}'</info>",
-                );
+                $this->displayTotpDisable($output, $user->userId, $emailString);
             }
 
             return Command::SUCCESS;
@@ -75,10 +64,41 @@ final class TotpCommand extends Command
             $output->writeln(
                 "<error>User with email '{$emailString}' not found</error>",
             );
-            return Command::FAILURE;
         } catch (\InvalidArgumentException $e) {
             $output->writeln("<error>Error: {$e->getMessage()}</error>");
-            return Command::FAILURE;
         }
+
+        return Command::FAILURE;
+    }
+
+    private function isValidAction(string $action): bool
+    {
+        return \in_array($action, ["enable", "disable"]);
+    }
+
+    private function displayTotpEnable(
+        OutputInterface $output,
+        UuidInterface $userId,
+        string $emailString,
+    ): void {
+        $totpSecret = $this->userService->enableTotp($userId);
+        $output->writeln("<info>TOTP enabled for user '{$emailString}'</info>");
+        $output->writeln(
+            "  Secret: <comment>{$totpSecret->getSecret()}</comment>",
+        );
+        $output->writeln(
+            "<fg=yellow>Save this secret in your authenticator app!</>",
+        );
+    }
+
+    private function displayTotpDisable(
+        OutputInterface $output,
+        UuidInterface $userId,
+        string $emailString,
+    ): void {
+        $this->userService->disableTotp($userId);
+        $output->writeln(
+            "<info>TOTP disabled for user '{$emailString}'</info>",
+        );
     }
 }

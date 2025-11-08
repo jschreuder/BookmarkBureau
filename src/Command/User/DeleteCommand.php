@@ -41,14 +41,7 @@ final class DeleteCommand extends Command
             $email = new Email($emailString);
             $user = $this->userService->getUserByEmail($email);
 
-            /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
-            $helper = $this->getHelper("question");
-            $question = new ConfirmationQuestion(
-                "Are you sure you want to delete user '{$emailString}'? [y/N] ",
-                false,
-            );
-
-            if (!$helper->ask($input, $output, $question)) {
+            if (!$this->confirmDeletion($input, $output, $emailString)) {
                 $output->writeln("<info>Cancelled</info>");
                 return Command::SUCCESS;
             }
@@ -63,10 +56,25 @@ final class DeleteCommand extends Command
             $output->writeln(
                 "<error>User with email '{$emailString}' not found</error>",
             );
-            return Command::FAILURE;
         } catch (\InvalidArgumentException $e) {
             $output->writeln("<error>Error: {$e->getMessage()}</error>");
-            return Command::FAILURE;
         }
+
+        return Command::FAILURE;
+    }
+
+    private function confirmDeletion(
+        InputInterface $input,
+        OutputInterface $output,
+        string $emailString,
+    ): bool {
+        /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
+        $helper = $this->getHelper("question");
+        $question = new ConfirmationQuestion(
+            "Are you sure you want to delete user '{$emailString}'? [y/N] ",
+            false,
+        );
+
+        return $helper->ask($input, $output, $question);
     }
 }

@@ -40,24 +40,15 @@ final class ChangePasswordCommand extends Command
         OutputInterface $output,
     ): int {
         $emailString = $input->getArgument("email");
-        $password = $input->getArgument("password");
+        $passwordArg = $input->getArgument("password");
 
         try {
             $email = new Email($emailString);
             $user = $this->userService->getUserByEmail($email);
+            $password = $this->resolvePassword($input, $output, $passwordArg);
 
-            if (!$password) {
-                /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
-                $helper = $this->getHelper("question");
-                $question = new Question("Enter new password: ");
-                $question->setHidden(true);
-                $question->setHiddenFallback(false);
-                $password = $helper->ask($input, $output, $question);
-
-                if (!$password) {
-                    $output->writeln("<error>Password cannot be empty</error>");
-                    return Command::FAILURE;
-                }
+            if ($password === null) {
+                return Command::FAILURE;
             }
 
             $this->userService->changePassword($user->userId, $password);
@@ -70,10 +61,34 @@ final class ChangePasswordCommand extends Command
             $output->writeln(
                 "<error>User with email '{$emailString}' not found</error>",
             );
-            return Command::FAILURE;
         } catch (\InvalidArgumentException $e) {
             $output->writeln("<error>Error: {$e->getMessage()}</error>");
-            return Command::FAILURE;
         }
+
+        return Command::FAILURE;
+    }
+
+    private function resolvePassword(
+        InputInterface $input,
+        OutputInterface $output,
+        ?string $passwordArg,
+    ): ?string {
+        if ($passwordArg) {
+            return $passwordArg;
+        }
+
+        /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
+        $helper = $this->getHelper("question");
+        $question = new Question("Enter new password: ");
+        $question->setHidden(true);
+        $question->setHiddenFallback(false);
+        $password = $helper->ask($input, $output, $question);
+
+        if (!$password) {
+            $output->writeln("<error>Password cannot be empty</error>");
+            return null;
+        }
+
+        return $password;
     }
 }
