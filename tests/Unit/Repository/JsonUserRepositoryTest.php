@@ -1,7 +1,6 @@
 <?php
 
 use jschreuder\BookmarkBureau\Entity\Value\Email;
-use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Repository\JsonUserRepository;

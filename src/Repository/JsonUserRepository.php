@@ -8,6 +8,7 @@ use jschreuder\BookmarkBureau\Entity\User;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
@@ -182,11 +183,13 @@ final class JsonUserRepository implements UserRepositoryInterface
 
         $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($json === false) {
-            throw new \RuntimeException("Failed to encode users to JSON");
+            throw new RepositoryStorageException(
+                "Failed to encode users to JSON",
+            );
         }
 
         if (file_put_contents($this->filePath, $json) === false) {
-            throw new \RuntimeException(
+            throw new RepositoryStorageException(
                 "Failed to write users to file: {$this->filePath}",
             );
         }

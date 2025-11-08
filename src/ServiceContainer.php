@@ -15,6 +15,7 @@ use jschreuder\Middle\ServerMiddleware\RoutingMiddleware;
 use jschreuder\MiddleDi\ConfigTrait;
 use jschreuder\BookmarkBureau\Controller\ErrorHandlerController;
 use jschreuder\BookmarkBureau\Controller\NotFoundHandlerController;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
@@ -133,7 +134,7 @@ class ServiceContainer
         return match ($dbType) {
             "sqlite" => $this->createSqliteDb($dsn),
             "mysql" => $this->createMysqlDb($dsn),
-            default => throw new \RuntimeException(
+            default => throw new RepositoryStorageException(
                 "Unsupported database type: {$dbType}",
             ),
         };
@@ -266,7 +267,7 @@ class ServiceContainer
                 $this->config("users.storage.path"),
             ),
             "pdo" => new PdoUserRepository($this->getDb()),
-            default => throw new \RuntimeException(
+            default => throw new RepositoryStorageException(
                 "Unknown user storage type: {$storageType}",
             ),
         };
