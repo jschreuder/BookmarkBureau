@@ -41,6 +41,7 @@ final class DeleteCommand extends Command
             $email = new Email($emailString);
             $user = $this->userService->getUserByEmail($email);
 
+            /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
             $helper = $this->getHelper("question");
             $question = new ConfirmationQuestion(
                 "Are you sure you want to delete user '{$emailString}'? [y/N] ",

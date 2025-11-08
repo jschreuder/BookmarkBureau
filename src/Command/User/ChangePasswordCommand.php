@@ -47,6 +47,7 @@ final class ChangePasswordCommand extends Command
             $user = $this->userService->getUserByEmail($email);
 
             if (!$password) {
+                /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
                 $helper = $this->getHelper("question");
                 $question = new Question("Enter new password: ");
                 $question->setHidden(true);

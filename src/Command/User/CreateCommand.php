@@ -52,6 +52,7 @@ final class CreateCommand extends Command
         $enableTotp = $input->getOption("enable-totp");
 
         if (!$password) {
+            /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
             $helper = $this->getHelper("question");
             $question = new Question("Enter password: ");
             $question->setHidden(true);
