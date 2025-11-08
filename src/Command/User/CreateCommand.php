@@ -11,10 +11,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 
 final class CreateCommand extends Command
 {
+    use PasswordPromptTrait;
     protected static ?string $defaultName = "user:create";
     protected static ?string $defaultDescription = "Create a new user";
 
@@ -79,30 +79,6 @@ final class CreateCommand extends Command
         }
 
         return Command::FAILURE;
-    }
-
-    private function resolvePassword(
-        InputInterface $input,
-        OutputInterface $output,
-        ?string $passwordArg,
-    ): ?string {
-        if ($passwordArg) {
-            return $passwordArg;
-        }
-
-        /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
-        $helper = $this->getHelper("question");
-        $question = new Question("Enter password: ");
-        $question->setHidden(true);
-        $question->setHiddenFallback(false);
-        $password = $helper->ask($input, $output, $question);
-
-        if (!$password) {
-            $output->writeln("<error>Password cannot be empty</error>");
-            return null;
-        }
-
-        return $password;
     }
 
     private function displayTotpSetup(

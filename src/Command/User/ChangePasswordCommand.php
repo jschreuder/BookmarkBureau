@@ -9,10 +9,10 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 
 final class ChangePasswordCommand extends Command
 {
+    use PasswordPromptTrait;
     protected static ?string $defaultName = "user:change-password";
     protected static ?string $defaultDescription = "Change a user password by email";
 
@@ -66,29 +66,5 @@ final class ChangePasswordCommand extends Command
         }
 
         return Command::FAILURE;
-    }
-
-    private function resolvePassword(
-        InputInterface $input,
-        OutputInterface $output,
-        ?string $passwordArg,
-    ): ?string {
-        if ($passwordArg) {
-            return $passwordArg;
-        }
-
-        /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
-        $helper = $this->getHelper("question");
-        $question = new Question("Enter new password: ");
-        $question->setHidden(true);
-        $question->setHiddenFallback(false);
-        $password = $helper->ask($input, $output, $question);
-
-        if (!$password) {
-            $output->writeln("<error>Password cannot be empty</error>");
-            return null;
-        }
-
-        return $password;
     }
 }
