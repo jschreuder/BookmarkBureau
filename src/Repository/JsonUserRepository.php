@@ -143,20 +143,32 @@ final class JsonUserRepository implements UserRepositoryInterface
         $this->users = [];
         $this->isLoaded = true;
 
-        if (!file_exists($this->filePath)) {
-            return;
+        $data = $this->loadJsonData();
+        if ($data !== null) {
+            $this->loadUsersFromData($data);
         }
+    }
 
-        $content = file_get_contents($this->filePath);
-        if ($content === false) {
-            return;
+    /**
+     * @return array<mixed>|null
+     */
+    private function loadJsonData(): ?array
+    {
+        if (file_exists($this->filePath)) {
+            $content = file_get_contents($this->filePath);
+            if ($content !== false) {
+                $data = json_decode($content, true);
+                return \is_array($data) ? $data : null;
+            }
         }
+        return null;
+    }
 
-        $data = json_decode($content, true);
-        if (!\is_array($data)) {
-            return;
-        }
-
+    /**
+     * @param array<mixed> $data
+     */
+    private function loadUsersFromData(array $data): void
+    {
         foreach ($data as $userArray) {
             $user = $this->mapArrayToUser($userArray);
             $this->users[$user->userId->toString()] = $user;
