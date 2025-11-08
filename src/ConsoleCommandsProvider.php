@@ -2,6 +2,11 @@
 
 namespace jschreuder\BookmarkBureau;
 
+use jschreuder\BookmarkBureau\Command\User\CreateCommand;
+use jschreuder\BookmarkBureau\Command\User\ListCommand;
+use jschreuder\BookmarkBureau\Command\User\DeleteCommand;
+use jschreuder\BookmarkBureau\Command\User\ChangePasswordCommand;
+use jschreuder\BookmarkBureau\Command\User\TotpCommand;
 use Symfony\Component\Console\Application;
 
 class ConsoleCommandsProvider
@@ -10,6 +15,16 @@ class ConsoleCommandsProvider
 
     public function registerCommands(Application $application): void
     {
-        // Example: $application->add(new StartWebserverCommand());
+        $application->add(
+            new CreateCommand($this->container->getUserService()),
+        );
+        $application->add(new ListCommand($this->container->getUserService()));
+        $application->add(
+            new DeleteCommand($this->container->getUserService()),
+        );
+        $application->add(
+            new ChangePasswordCommand($this->container->getUserService()),
+        );
+        $application->add(new TotpCommand($this->container->getUserService()));
     }
 }

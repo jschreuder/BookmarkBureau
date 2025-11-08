@@ -5,6 +5,8 @@
 /config/dev.php
 /var/logs/*.log
 /var/*.sqlite3
+/var/bb_database
+/var/users.json
 /vendor/
 composer.lock
 coverage.xml

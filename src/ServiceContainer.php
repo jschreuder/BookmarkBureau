@@ -44,7 +44,11 @@ use jschreuder\BookmarkBureau\Service\UserService;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
 use jschreuder\BookmarkBureau\Service\PhpPasswordHasher;
+use jschreuder\BookmarkBureau\Service\TotpVerifierInterface;
+use jschreuder\BookmarkBureau\Service\OtphpTotpVerifier;
 use jschreuder\Middle\Exception\ValidationFailedException;
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\Clock;
 use jschreuder\Middle\ServerMiddleware\RequestFilterMiddleware;
 use jschreuder\Middle\ServerMiddleware\RequestValidatorMiddleware;
 use Laminas\Diactoros\Response\JsonResponse;
@@ -137,7 +141,7 @@ class ServiceContainer
 
     private function createSqliteDb(string $dsn): PDO
     {
-        $dsn .= $this->config("db.dbname");
+        // SQLite DSN already contains the database path, so no need to append db.dbname
         // Convert empty values to null for PDO compatibility
         $user = $this->config("db.user") ?: null;
         $pass = $this->config("db.pass") ?: null;
@@ -275,5 +279,15 @@ class ServiceContainer
             $this->getPasswordHasher(),
             $this->getUnitOfWork(),
         );
+    }
+
+    public function getClock(): ClockInterface
+    {
+        return Clock::get();
+    }
+
+    public function getTotpVerifier(): TotpVerifierInterface
+    {
+        return new OtphpTotpVerifier($this->getClock(), window: 1);
     }
 }
