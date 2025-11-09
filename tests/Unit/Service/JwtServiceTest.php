@@ -1,8 +1,8 @@
 <?php
 
-use jschreuder\BookmarkBureau\Entity\Value\InvalidTokenException;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Service\JwtService;
+use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
 use Psr\Clock\ClockInterface;
 
 describe("JwtService", function () {

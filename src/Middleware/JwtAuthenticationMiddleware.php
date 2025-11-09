@@ -2,8 +2,8 @@
 
 namespace jschreuder\BookmarkBureau\Middleware;
 
-use jschreuder\BookmarkBureau\Entity\Value\InvalidTokenException;
 use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
+use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\Middle\Exception\AuthenticationException;
@@ -59,7 +59,7 @@ final readonly class JwtAuthenticationMiddleware implements MiddlewareInterface
         // Expected format: "Bearer <token>"
         $parts = explode(" ", trim($authHeader), 2);
 
-        if (count($parts) !== 2 || strtolower($parts[0]) !== "bearer") {
+        if (\count($parts) !== 2 || strtolower($parts[0]) !== "bearer") {
             throw new InvalidTokenException(
                 "Invalid Authorization header format",
             );

@@ -7,10 +7,10 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Firebase\JWT\JWT;
 use jschreuder\BookmarkBureau\Entity\User;
-use jschreuder\BookmarkBureau\Entity\Value\InvalidTokenException;
 use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
 use jschreuder\BookmarkBureau\Entity\Value\TokenClaims;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
+use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
 use Psr\Clock\ClockInterface;
 
 final readonly class JwtService implements JwtServiceInterface

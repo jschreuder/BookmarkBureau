@@ -3,10 +3,10 @@
 namespace jschreuder\BookmarkBureau\Service;
 
 use jschreuder\BookmarkBureau\Entity\User;
-use jschreuder\BookmarkBureau\Entity\Value\InvalidTokenException;
 use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
 use jschreuder\BookmarkBureau\Entity\Value\TokenClaims;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
+use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
 
 interface JwtServiceInterface
 {

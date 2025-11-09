@@ -1,9 +1,9 @@
 <?php
 
-use jschreuder\BookmarkBureau\Entity\Value\InvalidTokenException;
 use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
 use jschreuder\BookmarkBureau\Entity\Value\TokenClaims;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
+use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
 use jschreuder\BookmarkBureau\Middleware\JwtAuthenticationMiddleware;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;

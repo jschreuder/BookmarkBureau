@@ -1,6 +1,6 @@
 <?php
 
-use jschreuder\BookmarkBureau\Entity\Value\InvalidTokenException;
+use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
 
 describe("InvalidTokenException", function () {
     test("extends Exception", function () {
