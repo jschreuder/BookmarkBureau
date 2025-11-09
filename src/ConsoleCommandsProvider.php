@@ -7,6 +7,7 @@ use jschreuder\BookmarkBureau\Command\User\ListCommand;
 use jschreuder\BookmarkBureau\Command\User\DeleteCommand;
 use jschreuder\BookmarkBureau\Command\User\ChangePasswordCommand;
 use jschreuder\BookmarkBureau\Command\User\TotpCommand;
+use jschreuder\BookmarkBureau\Command\User\GenerateCliTokenCommand;
 use Symfony\Component\Console\Application;
 
 class ConsoleCommandsProvider
@@ -26,5 +27,11 @@ class ConsoleCommandsProvider
             new ChangePasswordCommand($this->container->getUserService()),
         );
         $application->add(new TotpCommand($this->container->getUserService()));
+        $application->add(
+            new GenerateCliTokenCommand(
+                $this->container->getUserService(),
+                $this->container->getJwtService(),
+            ),
+        );
     }
 }

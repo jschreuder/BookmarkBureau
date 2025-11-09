@@ -54,6 +54,8 @@ use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
+use jschreuder\BookmarkBureau\ServiceContainer;
+use jschreuder\MiddleDi\DiCompiler;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -188,5 +190,60 @@ class TestEntityFactory
             updatedAt: $updatedAt ??
                 new DateTimeImmutable("2024-01-01 12:00:00"),
         );
+    }
+}
+
+/**
+ * Test container helper for integration tests.
+ * Manages container compilation and configuration to prevent recompilation errors.
+ */
+class TestContainerHelper
+{
+    /**
+     * Get the compiled container class (only compiles once per PHP process).
+     * This is shared across all integration tests to prevent recompilation errors.
+     * This mimics what app_init.php does in production.
+     */
+    public static function getCompiledContainerClass()
+    {
+        static $compiledClass = null;
+
+        if ($compiledClass === null) {
+            $compiler = new DiCompiler(ServiceContainer::class);
+            $compiledClass = $compiler->compile();
+        }
+
+        return $compiledClass;
+    }
+
+    /**
+     * Create a test configuration for the container.
+     * Uses in-memory SQLite database for testing.
+     */
+    public static function createTestConfig(): array
+    {
+        return [
+            "site.url" => "http://test-localhost",
+            "logger.name" => "test-logger",
+            "logger.path" => "php://memory",
+            "db.dsn" => "sqlite:",
+            "db.dbname" => ":memory:",
+            "db.user" => "",
+            "db.pass" => "",
+            "users.storage.type" => "pdo",
+            "users.storage.path" => sys_get_temp_dir() . "/test_users.json",
+            "auth.jwt_secret" => "test-secret-key",
+            "auth.session_ttl" => 86400,
+            "auth.remember_me_ttl" => 1209600,
+        ];
+    }
+
+    /**
+     * Create a new container instance with test configuration.
+     */
+    public static function createContainerInstance(): ServiceContainer
+    {
+        $compiledClass = self::getCompiledContainerClass();
+        return $compiledClass->newInstance(self::createTestConfig());
     }
 }

@@ -1,0 +1,203 @@
+<?php declare(strict_types=1);
+
+use jschreuder\BookmarkBureau\GeneralRoutingProvider;
+use jschreuder\Middle\Router\RoutingProviderCollection;
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\Diactoros\StreamFactory;
+
+/**
+ * Create a new container instance with test configuration for JWT tests.
+ */
+function createJwtContainerInstance()
+{
+    $container = TestContainerHelper::createContainerInstance();
+
+    // Initialize the users table for in-memory SQLite
+    $pdo = $container->getDb();
+    $pdo->exec(
+        <<<SQL
+            CREATE TABLE IF NOT EXISTS users (
+                user_id CHAR(16) PRIMARY KEY,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                password_hash VARCHAR(255) NOT NULL,
+                totp_secret VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        SQL
+        ,
+    );
+
+    // Register routes
+    new RoutingProviderCollection(
+        new GeneralRoutingProvider($container),
+    )->registerRoutes($container->getAppRouter());
+
+    return $container;
+}
+
+describe("JWT Authentication Full Stack Integration", function () {
+    describe("complete authentication flow", function () {
+        test("user can login and receive JWT token", function () {
+            $container = createJwtContainerInstance();
+            $stack = $container->getApp();
+
+            // Create a test user first
+            $userRepository = $container->getUserRepository();
+            $unitOfWork = $container->getUnitOfWork();
+
+            $testUser = TestEntityFactory::createUser();
+            $unitOfWork->begin();
+            $userRepository->save($testUser);
+            $unitOfWork->commit();
+
+            // Simulate HTTP POST /auth/login
+            $request = ServerRequestFactory::fromGlobals();
+            $body = json_encode([
+                "email" => (string) $testUser->email,
+                "password" => "password123",
+                "remember_me" => false,
+            ]);
+            $request = $request
+                ->withMethod("POST")
+                ->withUri($request->getUri()->withPath("/auth/login"))
+                ->withHeader("Content-Type", "application/json")
+                ->withBody(new StreamFactory()->createStream($body))
+                ->withParsedBody([
+                    "email" => (string) $testUser->email,
+                    "password" => "test-password",
+                    "remember_me" => false,
+                ]);
+
+            // Execute through the middleware stack
+            $response = $stack->process($request);
+
+            // Verify response
+            if ($response->getStatusCode() !== 200) {
+                $error = json_decode($response->getBody()->getContents(), true);
+                throw new \Exception(
+                    "Login failed with status {$response->getStatusCode()}: " .
+                        json_encode($error),
+                );
+            }
+            expect($response->getStatusCode())->toBe(200);
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body["success"])->toBeTrue();
+            expect($body["data"])->toHaveKey("token");
+            expect($body["data"]["type"])->toBe("session");
+        });
+
+        test("authenticated request with valid token succeeds", function () {
+            $container = createJwtContainerInstance();
+            $stack = $container->getApp();
+            $userRepository = $container->getUserRepository();
+            $jwtService = $container->getJwtService();
+            $unitOfWork = $container->getUnitOfWork();
+
+            // Create and save test user
+            $testUser = TestEntityFactory::createUser();
+            $unitOfWork->begin();
+            $userRepository->save($testUser);
+            $unitOfWork->commit();
+
+            // Generate a valid token
+            $token = $jwtService->generate(
+                $testUser,
+                \jschreuder\BookmarkBureau\Entity\Value\TokenType::SESSION_TOKEN,
+            );
+
+            // Make authenticated request to a protected endpoint
+            $request = ServerRequestFactory::fromGlobals();
+            $request = $request
+                ->withMethod("POST")
+                ->withUri($request->getUri()->withPath("/auth/token-refresh"))
+                ->withHeader("Authorization", "Bearer " . (string) $token);
+
+            // Execute through middleware stack
+            $response = $stack->process($request);
+
+            // Should get a 200 response with new token
+            expect($response->getStatusCode())->toBe(200);
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body["success"])->toBeTrue();
+            expect($body["data"])->toHaveKey("token");
+        });
+
+        test(
+            "request without token is allowed but not authenticated",
+            function () {
+                $container = createJwtContainerInstance();
+                $stack = $container->getApp();
+
+                // Make request without token
+                $request = ServerRequestFactory::fromGlobals();
+                $request = $request
+                    ->withMethod("POST")
+                    ->withUri(
+                        $request->getUri()->withPath("/auth/token-refresh"),
+                    );
+
+                // Execute through middleware stack
+                $response = $stack->process($request);
+
+                // Should get 401 because middleware didn't set authenticatedUser
+                // and RefreshTokenController requires it (throws AuthenticationException)
+                expect($response->getStatusCode())->toBe(401);
+            },
+        );
+
+        test("malformed token in header is ignored", function () {
+            $container = createJwtContainerInstance();
+            $stack = $container->getApp();
+
+            // Make request with malformed token
+            $request = ServerRequestFactory::fromGlobals();
+            $request = $request
+                ->withMethod("POST")
+                ->withUri($request->getUri()->withPath("/auth/token-refresh"))
+                ->withHeader("Authorization", "Bearer malformed.token.here");
+
+            // Execute through middleware stack
+            $response = $stack->process($request);
+
+            // Should get 401 because middleware ignores bad token and RefreshTokenController fails
+            expect($response->getStatusCode())->toBe(401);
+        });
+
+        test("token refresh generates new token with same type", function () {
+            $container = createJwtContainerInstance();
+            $stack = $container->getApp();
+            $userRepository = $container->getUserRepository();
+            $jwtService = $container->getJwtService();
+            $unitOfWork = $container->getUnitOfWork();
+
+            // Create and save test user
+            $testUser = TestEntityFactory::createUser();
+            $unitOfWork->begin();
+            $userRepository->save($testUser);
+            $unitOfWork->commit();
+
+            // Generate remember-me token
+            $token = $jwtService->generate(
+                $testUser,
+                \jschreuder\BookmarkBureau\Entity\Value\TokenType::REMEMBER_ME_TOKEN,
+            );
+
+            // Refresh token
+            $request = ServerRequestFactory::fromGlobals();
+            $request = $request
+                ->withMethod("POST")
+                ->withUri($request->getUri()->withPath("/auth/token-refresh"))
+                ->withHeader("Authorization", "Bearer " . (string) $token);
+
+            $response = $stack->process($request);
+
+            expect($response->getStatusCode())->toBe(200);
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body["success"])->toBeTrue();
+            expect($body["data"]["type"])->toBe("remember_me");
+            expect($body["data"])->toHaveKey("token");
+            expect($body["data"])->toHaveKey("expires_at");
+        });
+    });
+});

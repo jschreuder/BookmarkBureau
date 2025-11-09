@@ -25,6 +25,9 @@ use jschreuder\BookmarkBureau\Action\TagDeleteAction;
 use jschreuder\BookmarkBureau\Action\TagReadAction;
 use jschreuder\BookmarkBureau\Action\TagUpdateAction;
 use jschreuder\BookmarkBureau\Controller\DashboardViewController;
+use jschreuder\BookmarkBureau\Controller\LoginController;
+use jschreuder\BookmarkBureau\Controller\RefreshTokenController;
+use jschreuder\BookmarkBureau\InputSpec\LoginInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\FavoriteInputSpec;
@@ -39,6 +42,7 @@ use jschreuder\BookmarkBureau\OutputSpec\FullDashboardOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\FavoriteOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\TokenOutputSpec;
 use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
 use jschreuder\BookmarkBureau\Util\ResourceRouteBuilder;
 use jschreuder\Middle\Router\RouterInterface;
@@ -70,6 +74,29 @@ class GeneralRoutingProvider implements RoutingProviderInterface
                     return new JsonResponse(["message" => "Hello world!"]);
                 }
             },
+        );
+
+        // Authentication routes
+        $router->post(
+            "auth.login",
+            "/auth/login",
+            fn() => new LoginController(
+                new LoginInputSpec(),
+                $this->container->getUserService(),
+                $this->container->getJwtService(),
+                new TokenOutputSpec(),
+                new JsonResponseTransformer(),
+            ),
+        );
+
+        $router->post(
+            "auth.token-refresh",
+            "/auth/token-refresh",
+            fn() => new RefreshTokenController(
+                $this->container->getJwtService(),
+                new TokenOutputSpec(),
+                new JsonResponseTransformer(),
+            ),
         );
 
         // Links

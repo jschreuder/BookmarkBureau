@@ -15,6 +15,7 @@ use jschreuder\Middle\ServerMiddleware\RoutingMiddleware;
 use jschreuder\MiddleDi\ConfigTrait;
 use jschreuder\BookmarkBureau\Controller\ErrorHandlerController;
 use jschreuder\BookmarkBureau\Controller\NotFoundHandlerController;
+use jschreuder\BookmarkBureau\Exception\IncompleteConfigException;
 use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
@@ -47,6 +48,9 @@ use jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
 use jschreuder\BookmarkBureau\Service\PhpPasswordHasher;
 use jschreuder\BookmarkBureau\Service\TotpVerifierInterface;
 use jschreuder\BookmarkBureau\Service\OtphpTotpVerifier;
+use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
+use jschreuder\BookmarkBureau\Service\JwtService;
+use jschreuder\BookmarkBureau\Middleware\JwtAuthenticationMiddleware;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
@@ -73,6 +77,10 @@ class ServiceContainer
             new RequestValidatorMiddleware($this->getValidationErrorHandler()),
             new RequestFilterMiddleware(),
             new JsonRequestParserMiddleware(),
+            new JwtAuthenticationMiddleware(
+                $this->getJwtService(),
+                $this->getUserService(),
+            ),
             new RoutingMiddleware(
                 $this->getAppRouter(),
                 $this->get404Handler(),
@@ -290,5 +298,22 @@ class ServiceContainer
     public function getTotpVerifier(): TotpVerifierInterface
     {
         return new OtphpTotpVerifier($this->getClock(), window: 1);
+    }
+
+    public function getJwtService(): JwtServiceInterface
+    {
+        $jwtSecret = $this->config("auth.jwt_secret");
+        if (!$jwtSecret) {
+            throw new IncompleteConfigException(
+                "JWT secret is not configured. Set auth.jwt_secret in config.",
+            );
+        }
+
+        return new JwtService(
+            $jwtSecret,
+            $this->config("auth.session_ttl") ?: 86400,
+            $this->config("auth.remember_me_ttl") ?: 1209600,
+            $this->getClock(),
+        );
     }
 }

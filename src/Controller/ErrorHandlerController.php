@@ -7,6 +7,7 @@ use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 final readonly class ErrorHandlerController implements ControllerInterface
 {
@@ -25,7 +26,8 @@ final readonly class ErrorHandlerController implements ControllerInterface
         $code = $this->getCode($exception);
         $message = $this->getMessage($code);
 
-        $this->logger->log($code, $message);
+        $logLevel = $this->getLogLevel($code);
+        $this->logger->log($logLevel, $message);
         return new JsonResponse(
             [
                 "message" => $message,
@@ -56,6 +58,15 @@ final readonly class ErrorHandlerController implements ControllerInterface
             403 => "Unauthorized",
             503 => "Storage engine error",
             default => "Server error",
+        };
+    }
+
+    private function getLogLevel(int $code): string
+    {
+        return match ($code) {
+            400, 401, 403 => LogLevel::WARNING,
+            503 => LogLevel::CRITICAL,
+            default => LogLevel::ERROR,
         };
     }
 }

@@ -1,6 +1,5 @@
 <?php declare(strict_types=1);
 
-use jschreuder\BookmarkBureau\ServiceContainer;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
@@ -8,6 +7,7 @@ use jschreuder\BookmarkBureau\Service\FavoriteServiceInterface;
 use jschreuder\BookmarkBureau\Service\TagServiceInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
+use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
 use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
@@ -15,66 +15,23 @@ use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
+use jschreuder\BookmarkBureau\ServiceContainer;
+use jschreuder\BookmarkBureau\Exception\IncompleteConfigException;
 use jschreuder\Middle\Router\RouterInterface;
 use jschreuder\Middle\ApplicationStack;
-use jschreuder\MiddleDi\DiCompiler;
 use Psr\Log\LoggerInterface;
-
-/**
- * Create a test configuration for the container.
- * Uses in-memory SQLite database for testing.
- */
-function createTestConfig(): array
-{
-    return [
-        "site.url" => "http://test-localhost",
-        "logger.name" => "test-logger",
-        "logger.path" => "php://memory",
-        "db.dsn" => "sqlite:",
-        "db.dbname" => ":memory:",
-        "db.user" => "",
-        "db.pass" => "",
-        "users.storage.type" => "pdo",
-        "users.storage.path" => sys_get_temp_dir() . "/test_users.json",
-    ];
-}
-
-/**
- * Get the compiled container class (only compiles once per PHP process).
- * This mimics what app_init.php does in production.
- */
-function getCompiledContainerClass()
-{
-    static $compiledClass = null;
-
-    if ($compiledClass === null) {
-        $compiler = new DiCompiler(ServiceContainer::class);
-        $compiledClass = $compiler->compile();
-    }
-
-    return $compiledClass;
-}
-
-/**
- * Create a new container instance with test configuration.
- */
-function createContainerInstance(): ServiceContainer
-{
-    $compiledClass = getCompiledContainerClass();
-    return $compiledClass->newInstance(createTestConfig());
-}
 
 describe("ServiceContainer Integration", function () {
     describe("container compilation", function () {
         test("container compiles successfully with DiCompiler", function () {
-            $compiledClass = getCompiledContainerClass();
+            $compiledClass = TestContainerHelper::getCompiledContainerClass();
             expect($compiledClass)->not->toBeNull();
         });
 
         test(
             "container instantiates successfully with test config",
             function () {
-                $container = createContainerInstance();
+                $container = TestContainerHelper::createContainerInstance();
                 expect($container)->toBeInstanceOf(ServiceContainer::class);
             },
         );
@@ -82,35 +39,35 @@ describe("ServiceContainer Integration", function () {
 
     describe("core service provisioning", function () {
         test("provides Logger instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $logger = $container->getLogger();
 
             expect($logger)->toBeInstanceOf(LoggerInterface::class);
         });
 
         test("provides Router instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $router = $container->getAppRouter();
 
             expect($router)->toBeInstanceOf(RouterInterface::class);
         });
 
         test("provides ApplicationStack instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $app = $container->getApp();
 
             expect($app)->toBeInstanceOf(ApplicationStack::class);
         });
 
         test("provides URL Generator via Router", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $urlGenerator = $container->getUrlGenerator();
 
             expect($urlGenerator)->not->toBeNull();
         });
 
         test("provides PDO database instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $db = $container->getDb();
 
             expect($db)->toBeInstanceOf(\PDO::class);
@@ -119,14 +76,14 @@ describe("ServiceContainer Integration", function () {
 
     describe("repository provisioning", function () {
         test("provides LinkRepository instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $repository = $container->getLinkRepository();
 
             expect($repository)->toBeInstanceOf(LinkRepositoryInterface::class);
         });
 
         test("provides CategoryRepository instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $repository = $container->getCategoryRepository();
 
             expect($repository)->toBeInstanceOf(
@@ -135,7 +92,7 @@ describe("ServiceContainer Integration", function () {
         });
 
         test("provides DashboardRepository instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $repository = $container->getDashboardRepository();
 
             expect($repository)->toBeInstanceOf(
@@ -144,7 +101,7 @@ describe("ServiceContainer Integration", function () {
         });
 
         test("provides FavoriteRepository instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $repository = $container->getFavoriteRepository();
 
             expect($repository)->toBeInstanceOf(
@@ -153,14 +110,14 @@ describe("ServiceContainer Integration", function () {
         });
 
         test("provides TagRepository instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $repository = $container->getTagRepository();
 
             expect($repository)->toBeInstanceOf(TagRepositoryInterface::class);
         });
 
         test("provides UserRepository instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $repository = $container->getUserRepository();
 
             expect($repository)->toBeInstanceOf(UserRepositoryInterface::class);
@@ -169,9 +126,9 @@ describe("ServiceContainer Integration", function () {
         test(
             "provides UserRepository with configurable storage type",
             function () {
-                $config = createTestConfig();
+                $config = TestContainerHelper::createTestConfig();
                 $config["users.storage.type"] = "json";
-                $compiledClass = getCompiledContainerClass();
+                $compiledClass = TestContainerHelper::getCompiledContainerClass();
                 $container = $compiledClass->newInstance($config);
                 $repository = $container->getUserRepository();
 
@@ -184,72 +141,93 @@ describe("ServiceContainer Integration", function () {
 
     describe("service provisioning", function () {
         test("provides LinkService instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $service = $container->getLinkService();
 
             expect($service)->toBeInstanceOf(LinkServiceInterface::class);
         });
 
         test("provides CategoryService instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $service = $container->getCategoryService();
 
             expect($service)->toBeInstanceOf(CategoryServiceInterface::class);
         });
 
         test("provides DashboardService instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $service = $container->getDashboardService();
 
             expect($service)->toBeInstanceOf(DashboardServiceInterface::class);
         });
 
         test("provides FavoriteService instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $service = $container->getFavoriteService();
 
             expect($service)->toBeInstanceOf(FavoriteServiceInterface::class);
         });
 
         test("provides TagService instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $service = $container->getTagService();
 
             expect($service)->toBeInstanceOf(TagServiceInterface::class);
         });
 
         test("provides UnitOfWork instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $unitOfWork = $container->getUnitOfWork();
 
             expect($unitOfWork)->toBeInstanceOf(UnitOfWorkInterface::class);
         });
 
         test("provides PasswordHasher instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $hasher = $container->getPasswordHasher();
 
             expect($hasher)->toBeInstanceOf(PasswordHasherInterface::class);
         });
 
         test("provides UserService instance", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $service = $container->getUserService();
 
             expect($service)->toBeInstanceOf(UserServiceInterface::class);
         });
+
+        test("provides JwtService instance", function () {
+            $container = TestContainerHelper::createContainerInstance();
+            $service = $container->getJwtService();
+
+            expect($service)->toBeInstanceOf(JwtServiceInterface::class);
+        });
+
+        test(
+            "throws IncompleteConfigException when JWT secret is not configured",
+            function () {
+                $config = TestContainerHelper::createTestConfig();
+                $config["auth.jwt_secret"] = "";
+                $compiledClass = TestContainerHelper::getCompiledContainerClass();
+                $container = $compiledClass->newInstance($config);
+
+                expect(fn() => $container->getJwtService())->toThrow(
+                    IncompleteConfigException::class,
+                );
+            },
+        );
     });
 
     describe("error handlers", function () {
         test("provides 404 error handler", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $handler = $container->get404Handler();
 
             expect($handler)->not->toBeNull();
         });
 
         test("provides 500 error handler", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $handler = $container->get500Handler();
 
             expect($handler)->not->toBeNull();
@@ -260,7 +238,7 @@ describe("ServiceContainer Integration", function () {
         test(
             "all services are properly wired with their dependencies",
             function () {
-                $container = createContainerInstance();
+                $container = TestContainerHelper::createContainerInstance();
 
                 // Services should all be instantiable and return the expected types
                 expect($container->getLinkService())->toBeInstanceOf(
@@ -287,7 +265,7 @@ describe("ServiceContainer Integration", function () {
         test(
             "DatabaseRepository instances share the same database connection",
             function () {
-                $container = createContainerInstance();
+                $container = TestContainerHelper::createContainerInstance();
 
                 $db1 = $container->getDb();
                 $db2 = $container->getDb();
@@ -299,7 +277,7 @@ describe("ServiceContainer Integration", function () {
         );
 
         test("services can be instantiated multiple times", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
 
             $linkService1 = $container->getLinkService();
             $linkService2 = $container->getLinkService();
@@ -311,7 +289,7 @@ describe("ServiceContainer Integration", function () {
 
     describe("application stack assembly", function () {
         test("ApplicationStack includes all required middleware", function () {
-            $container = createContainerInstance();
+            $container = TestContainerHelper::createContainerInstance();
             $app = $container->getApp();
 
             // The ApplicationStack should be properly constructed with all middleware

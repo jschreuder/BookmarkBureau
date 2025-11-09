@@ -20,4 +20,8 @@ return [
 
     "users.storage.type" => "json",
     "users.storage.path" => __DIR__ . "/../var/users.json",
+
+    "auth.jwt_secret" => "dev-secret-key-change-in-production",
+    "auth.session_ttl" => 86400, // 24 hours
+    "auth.remember_me_ttl" => 1209600, // 2 weeks
 ];
