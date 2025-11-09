@@ -38,7 +38,7 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
         $builder = $this->jwtConfig
             ->builder()
             ->issuedBy($this->applicationName)
-            ->permittedFor($this->applicationName . "-api")
+            ->permittedFor("{$this->applicationName}-api")
             ->relatedTo($user->userId->toString())
             ->withClaim("type", $tokenType->value)
             ->issuedAt($now)
@@ -76,7 +76,7 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
                     $this->jwtConfig->verificationKey(),
                 ),
                 new IssuedBy($this->applicationName),
-                new PermittedFor($this->applicationName . "-api"),
+                new PermittedFor("{$this->applicationName}-api"),
             ];
             if ($tokenType !== TokenType::CLI_TOKEN) {
                 $constraints[] = new StrictValidAt($this->clock);
@@ -149,7 +149,7 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
         $builder = $this->jwtConfig
             ->builder()
             ->issuedBy($this->applicationName)
-            ->permittedFor($this->applicationName . "-api")
+            ->permittedFor("{$this->applicationName}-api")
             ->relatedTo($userId->toString())
             ->withClaim("type", $tokenType->value)
             ->issuedAt($now)
