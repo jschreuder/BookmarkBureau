@@ -51,6 +51,7 @@ use jschreuder\BookmarkBureau\Service\OtphpTotpVerifier;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
 use jschreuder\BookmarkBureau\Service\JwtService;
 use jschreuder\BookmarkBureau\Middleware\JwtAuthenticationMiddleware;
+use jschreuder\BookmarkBureau\Middleware\RequireAuthenticationMiddleware;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
@@ -77,6 +78,11 @@ class ServiceContainer
             new RequestValidatorMiddleware($this->getValidationErrorHandler()),
             new RequestFilterMiddleware(),
             new JsonRequestParserMiddleware(),
+            new RequireAuthenticationMiddleware([
+                "home", // GET / - API info endpoint
+                "auth.login", // POST /auth/login - User login
+                // All other routes require authentication
+            ]),
             new JwtAuthenticationMiddleware(
                 $this->getJwtService(),
                 $this->getUserService(),

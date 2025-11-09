@@ -200,4 +200,134 @@ describe("JWT Authentication Full Stack Integration", function () {
             expect($body["data"])->toHaveKey("expires_at");
         });
     });
+
+    describe("authentication enforcement", function () {
+        test(
+            "public route (home) is accessible without authentication",
+            function () {
+                $container = createJwtContainerInstance();
+                $stack = $container->getApp();
+
+                $request = ServerRequestFactory::fromGlobals();
+                $request = $request
+                    ->withMethod("GET")
+                    ->withUri($request->getUri()->withPath("/"));
+
+                $response = $stack->process($request);
+
+                expect($response->getStatusCode())->toBe(200);
+                $body = json_decode($response->getBody()->getContents(), true);
+                expect($body)->toHaveKey("message");
+            },
+        );
+
+        test("protected route requires authentication", function () {
+            $container = createJwtContainerInstance();
+            $stack = $container->getApp();
+            $pdo = $container->getDb();
+
+            // Create dashboards table for this test
+            $pdo->exec(
+                <<<SQL
+                CREATE TABLE IF NOT EXISTS dashboards (
+                    dashboard_id CHAR(16) PRIMARY KEY,
+                    title VARCHAR(255) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                SQL
+                ,
+            );
+
+            $request = ServerRequestFactory::fromGlobals();
+            $request = $request
+                ->withMethod("GET")
+                ->withUri($request->getUri()->withPath("/dashboard"));
+
+            $response = $stack->process($request);
+
+            // Should get 401 Unauthenticated
+            expect($response->getStatusCode())->toBe(401);
+            $body = json_decode($response->getBody()->getContents(), true);
+            expect($body["message"])->toBe("Unauthenticated");
+        });
+
+        test(
+            "protected route is accessible with valid authentication",
+            function () {
+                $container = createJwtContainerInstance();
+                $stack = $container->getApp();
+                $pdo = $container->getDb();
+                $userRepository = $container->getUserRepository();
+                $jwtService = $container->getJwtService();
+                $unitOfWork = $container->getUnitOfWork();
+
+                // Create tables
+                $pdo->exec(
+                    <<<SQL
+                    CREATE TABLE IF NOT EXISTS dashboards (
+                        dashboard_id CHAR(16) PRIMARY KEY,
+                        title VARCHAR(255) NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                    SQL
+                    ,
+                );
+
+                // Create and save test user
+                $testUser = TestEntityFactory::createUser();
+                $unitOfWork->begin();
+                $userRepository->save($testUser);
+                $unitOfWork->commit();
+
+                // Generate a valid token
+                $token = $jwtService->generate(
+                    $testUser,
+                    \jschreuder\BookmarkBureau\Entity\Value\TokenType::SESSION_TOKEN,
+                );
+
+                $request = ServerRequestFactory::fromGlobals();
+                $request = $request
+                    ->withMethod("GET")
+                    ->withUri($request->getUri()->withPath("/dashboard"))
+                    ->withHeader("Authorization", "Bearer " . (string) $token);
+
+                $response = $stack->process($request);
+
+                // Should get 200 OK
+                expect($response->getStatusCode())->toBe(200);
+            },
+        );
+
+        test("protected route rejects invalid token", function () {
+            $container = createJwtContainerInstance();
+            $stack = $container->getApp();
+            $pdo = $container->getDb();
+
+            // Create dashboards table
+            $pdo->exec(
+                <<<SQL
+                CREATE TABLE IF NOT EXISTS dashboards (
+                    dashboard_id CHAR(16) PRIMARY KEY,
+                    title VARCHAR(255) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                SQL
+                ,
+            );
+
+            $request = ServerRequestFactory::fromGlobals();
+            $request = $request
+                ->withMethod("GET")
+                ->withUri($request->getUri()->withPath("/dashboard"))
+                ->withHeader("Authorization", "Bearer invalid.jwt.token");
+
+            $response = $stack->process($request);
+
+            // Should get 401 Unauthenticated
+            expect($response->getStatusCode())->toBe(401);
+        });
+    });
 });
