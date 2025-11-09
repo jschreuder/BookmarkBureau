@@ -216,6 +216,21 @@ describe("ServiceContainer Integration", function () {
                 );
             },
         );
+
+        test(
+            "throws IncompleteConfigException when JWT secret is too short",
+            function () {
+                $config = TestContainerHelper::createTestConfig();
+                $config["auth.jwt_secret"] = "too-short"; // Only 9 bytes, needs 32
+                $compiledClass = TestContainerHelper::getCompiledContainerClass();
+                $container = $compiledClass->newInstance($config);
+
+                expect(fn() => $container->getJwtService())->toThrow(
+                    IncompleteConfigException::class,
+                    "JWT secret must be at least 32 bytes",
+                );
+            },
+        );
     });
 
     describe("error handlers", function () {

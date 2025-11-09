@@ -232,7 +232,7 @@ class TestContainerHelper
             "db.pass" => "",
             "users.storage.type" => "pdo",
             "users.storage.path" => sys_get_temp_dir() . "/test_users.json",
-            "auth.jwt_secret" => "test-secret-key",
+            "auth.jwt_secret" => "test-secret-key-32-bytes-long!!!", // Exactly 32 bytes
             "auth.session_ttl" => 86400,
             "auth.remember_me_ttl" => 1209600,
         ];

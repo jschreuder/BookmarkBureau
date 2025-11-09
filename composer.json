@@ -23,7 +23,7 @@
     "respect/validation": "^2.4",
     "spomky-labs/otphp": "^11.3",
     "symfony/clock": "^7.3",
-    "firebase/php-jwt": "^6.10"
+    "lcobucci/jwt": "^5.6"
   },
   "require-dev": {
     "pestphp/pest": "^4.1",

@@ -49,7 +49,10 @@ use jschreuder\BookmarkBureau\Service\PhpPasswordHasher;
 use jschreuder\BookmarkBureau\Service\TotpVerifierInterface;
 use jschreuder\BookmarkBureau\Service\OtphpTotpVerifier;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
-use jschreuder\BookmarkBureau\Service\JwtService;
+use jschreuder\BookmarkBureau\Service\LcobucciJwtService;
+use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Signer\Key\InMemory;
 use jschreuder\BookmarkBureau\Middleware\JwtAuthenticationMiddleware;
 use jschreuder\BookmarkBureau\Middleware\RequireAuthenticationMiddleware;
 use jschreuder\Middle\Exception\ValidationFailedException;
@@ -306,7 +309,7 @@ class ServiceContainer
         return new OtphpTotpVerifier($this->getClock(), window: 1);
     }
 
-    public function getJwtService(): JwtServiceInterface
+    public function getJwtConfiguration(): Configuration
     {
         $jwtSecret = $this->config("auth.jwt_secret");
         if (!$jwtSecret) {
@@ -315,8 +318,27 @@ class ServiceContainer
             );
         }
 
-        return new JwtService(
-            $jwtSecret,
+        // Enforce minimum key length for HS256 (256 bits = 32 bytes)
+        if (\strlen($jwtSecret) < 32) {
+            throw new IncompleteConfigException(
+                "JWT secret must be at least 32 bytes (256 bits) for HS256. Current length: " .
+                    \strlen($jwtSecret) .
+                    " bytes.",
+            );
+        }
+
+        return Configuration::forSymmetricSigner(
+            new Sha256(),
+            InMemory::plainText($jwtSecret),
+        )
+            // Clear default validation constraints to use only our custom ones
+            ->withValidationConstraints();
+    }
+
+    public function getJwtService(): JwtServiceInterface
+    {
+        return new LcobucciJwtService(
+            $this->getJwtConfiguration(),
             $this->config("auth.session_ttl") ?: 86400,
             $this->config("auth.remember_me_ttl") ?: 1209600,
             $this->getClock(),

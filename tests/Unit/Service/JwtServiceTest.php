@@ -1,9 +1,21 @@
 <?php
 
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
-use jschreuder\BookmarkBureau\Service\JwtService;
+use jschreuder\BookmarkBureau\Service\LcobucciJwtService;
 use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
+use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Signer\Key\InMemory;
 use Psr\Clock\ClockInterface;
+
+function createJwtConfig(
+    string $secret = "test-secret-key-32-bytes-long!!!",
+): Configuration {
+    return Configuration::forSymmetricSigner(
+        new Sha256(),
+        InMemory::plainText($secret),
+    )->withValidationConstraints();
+}
 
 describe("JwtService", function () {
     describe("generate method", function () {
@@ -19,8 +31,8 @@ describe("JwtService", function () {
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = new JwtService(
-                "secret-key",
+            $service = new LcobucciJwtService(
+                createJwtConfig(),
                 $sessionTtl,
                 $rememberMeTtl,
                 $clock,
@@ -46,8 +58,8 @@ describe("JwtService", function () {
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = new JwtService(
-                "secret-key",
+            $service = new LcobucciJwtService(
+                createJwtConfig(),
                 $sessionTtl,
                 $rememberMeTtl,
                 $clock,
@@ -72,8 +84,8 @@ describe("JwtService", function () {
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = new JwtService(
-                "secret-key",
+            $service = new LcobucciJwtService(
+                createJwtConfig(),
                 $sessionTtl,
                 $rememberMeTtl,
                 $clock,
@@ -100,8 +112,8 @@ describe("JwtService", function () {
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = new JwtService(
-                "secret-key",
+            $service = new LcobucciJwtService(
+                createJwtConfig(),
                 $sessionTtl,
                 $rememberMeTtl,
                 $clock,
@@ -138,8 +150,8 @@ describe("JwtService", function () {
                 ->shouldReceive("now")
                 ->andReturnValues([$now, $now->modify("+365 days")]);
 
-            $service = new JwtService(
-                "secret-key",
+            $service = new LcobucciJwtService(
+                createJwtConfig(),
                 $sessionTtl,
                 $rememberMeTtl,
                 $clock,
@@ -175,8 +187,8 @@ describe("JwtService", function () {
                     ->shouldReceive("now")
                     ->andReturnValues([$now, $laterTime]);
 
-                $service = new JwtService(
-                    "secret-key",
+                $service = new LcobucciJwtService(
+                    createJwtConfig(),
                     $sessionTtl,
                     $rememberMeTtl,
                     $clock,
@@ -202,8 +214,8 @@ describe("JwtService", function () {
                 $clock = Mockery::mock(ClockInterface::class);
                 $clock->shouldReceive("now")->andReturn($now);
 
-                $service = new JwtService(
-                    "secret-key",
+                $service = new LcobucciJwtService(
+                    createJwtConfig(),
                     $sessionTtl,
                     $rememberMeTtl,
                     $clock,
@@ -230,8 +242,8 @@ describe("JwtService", function () {
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = new JwtService(
-                "secret-key",
+            $service = new LcobucciJwtService(
+                createJwtConfig(),
                 $sessionTtl,
                 $rememberMeTtl,
                 $clock,
@@ -264,8 +276,8 @@ describe("JwtService", function () {
                     ->shouldReceive("now")
                     ->andReturnValues([$now, $now, $laterTime, $laterTime]);
 
-                $service = new JwtService(
-                    "secret-key",
+                $service = new LcobucciJwtService(
+                    createJwtConfig(),
                     $sessionTtl,
                     $rememberMeTtl,
                     $clock,
@@ -308,8 +320,8 @@ describe("JwtService", function () {
                     ->shouldReceive("now")
                     ->andReturnValues([$now, $now, $laterTime]);
 
-                $service = new JwtService(
-                    "secret-key",
+                $service = new LcobucciJwtService(
+                    createJwtConfig(),
                     $sessionTtl,
                     $rememberMeTtl,
                     $clock,
@@ -343,8 +355,8 @@ describe("JwtService", function () {
                 ->shouldReceive("now")
                 ->andReturnValues([$now, $now, $laterTime, $laterTime]);
 
-            $service = new JwtService(
-                "secret-key",
+            $service = new LcobucciJwtService(
+                createJwtConfig(),
                 $sessionTtl,
                 $rememberMeTtl,
                 $clock,
@@ -380,8 +392,8 @@ describe("JwtService", function () {
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturnValues([$now, $now]);
 
-            $service = new JwtService(
-                "secret-key",
+            $service = new LcobucciJwtService(
+                createJwtConfig(),
                 $sessionTtl,
                 $rememberMeTtl,
                 $clock,
@@ -405,8 +417,8 @@ describe("JwtService", function () {
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturnValues([$now, $now]);
 
-            $service = new JwtService(
-                "secret-key",
+            $service = new LcobucciJwtService(
+                createJwtConfig(),
                 $sessionTtl,
                 $rememberMeTtl,
                 $clock,
@@ -430,8 +442,8 @@ describe("JwtService", function () {
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturnValues([$now, $now]);
 
-            $service = new JwtService(
-                "secret-key",
+            $service = new LcobucciJwtService(
+                createJwtConfig(),
                 $sessionTtl,
                 $rememberMeTtl,
                 $clock,
