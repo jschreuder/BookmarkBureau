@@ -31,7 +31,7 @@ final readonly class JwtAuthenticationMiddleware implements MiddlewareInterface
                 // Attach authenticated user to request for controllers/actions
                 $request = $request->withAttribute(
                     "authenticatedUserId",
-                    $claims->getUserId(),
+                    $claims->userId,
                 );
                 $request = $request->withAttribute("tokenClaims", $claims);
             } catch (InvalidTokenException $e) {

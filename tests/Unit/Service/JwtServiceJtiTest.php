@@ -74,9 +74,12 @@ describe("LcobucciJwtService with JTI", function () {
             $jtiRepository = Mockery::mock(JwtJtiRepositoryInterface::class);
             $jtiRepository
                 ->shouldReceive("saveJti")
-                ->withArgs(function ($jti, $userId, $createdAt) use ($user, $now) {
-                    return $userId->toString() === $user->userId->toString()
-                        && $createdAt->getTimestamp() === $now->getTimestamp();
+                ->withArgs(function ($jti, $userId, $createdAt) use (
+                    $user,
+                    $now,
+                ) {
+                    return $userId->toString() === $user->userId->toString() &&
+                        $createdAt->getTimestamp() === $now->getTimestamp();
                 })
                 ->once();
 
@@ -134,34 +137,42 @@ describe("LcobucciJwtService with JTI", function () {
             $clock->shouldReceive("now")->andReturn($now);
             $claims = $service->verify($token);
 
-            expect($claims->getTokenType())->toBe(TokenType::CLI_TOKEN);
-            expect($claims->getJti())->not()->toBeNull();
+            expect($claims->tokenType)->toBe(TokenType::CLI_TOKEN);
+            expect($claims->jti)->not()->toBeNull();
         });
 
-        test("fails to verify CLI token with JTI not in whitelist", function () {
-            $user = TestEntityFactory::createUser();
-            $now = new DateTimeImmutable(
-                "2024-01-01 12:00:00",
-                new DateTimeZone("UTC"),
-            );
+        test(
+            "fails to verify CLI token with JTI not in whitelist",
+            function () {
+                $user = TestEntityFactory::createUser();
+                $now = new DateTimeImmutable(
+                    "2024-01-01 12:00:00",
+                    new DateTimeZone("UTC"),
+                );
 
-            $jtiRepository = Mockery::mock(JwtJtiRepositoryInterface::class);
-            $jtiRepository->shouldReceive("saveJti")->once();
-            $jtiRepository->shouldReceive("hasJti")->andReturn(false);
+                $jtiRepository = Mockery::mock(
+                    JwtJtiRepositoryInterface::class,
+                );
+                $jtiRepository->shouldReceive("saveJti")->once();
+                $jtiRepository->shouldReceive("hasJti")->andReturn(false);
 
-            $clock = Mockery::mock(ClockInterface::class);
-            $clock->shouldReceive("now")->andReturn($now);
+                $clock = Mockery::mock(ClockInterface::class);
+                $clock->shouldReceive("now")->andReturn($now);
 
-            $service = createJwtServiceWithJti($jtiRepository, clock: $clock);
-            $token = $service->generate($user, TokenType::CLI_TOKEN);
+                $service = createJwtServiceWithJti(
+                    $jtiRepository,
+                    clock: $clock,
+                );
+                $token = $service->generate($user, TokenType::CLI_TOKEN);
 
-            $clock->shouldReceive("now")->andReturn($now);
+                $clock->shouldReceive("now")->andReturn($now);
 
-            expect(fn() => $service->verify($token))->toThrow(
-                InvalidTokenException::class,
-                "CLI token JTI not in whitelist (revoked or invalid)",
-            );
-        });
+                expect(fn() => $service->verify($token))->toThrow(
+                    InvalidTokenException::class,
+                    "CLI token JTI not in whitelist (revoked or invalid)",
+                );
+            },
+        );
 
         test("fails to verify CLI token without JTI claim", function () {
             $config = createJwtConfigForJti();
@@ -174,7 +185,11 @@ describe("LcobucciJwtService with JTI", function () {
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = createJwtServiceWithJti($jtiRepository, $config, clock: $clock);
+            $service = createJwtServiceWithJti(
+                $jtiRepository,
+                $config,
+                clock: $clock,
+            );
 
             // Manually create a token without JTI for CLI type
             $user = TestEntityFactory::createUser();
@@ -203,31 +218,39 @@ describe("LcobucciJwtService with JTI", function () {
             );
         });
 
-        test("returns TokenClaims with JTI when verifying valid CLI token", function () {
-            $user = TestEntityFactory::createUser();
-            $now = new DateTimeImmutable(
-                "2024-01-01 12:00:00",
-                new DateTimeZone("UTC"),
-            );
+        test(
+            "returns TokenClaims with JTI when verifying valid CLI token",
+            function () {
+                $user = TestEntityFactory::createUser();
+                $now = new DateTimeImmutable(
+                    "2024-01-01 12:00:00",
+                    new DateTimeZone("UTC"),
+                );
 
-            $jtiRepository = Mockery::mock(JwtJtiRepositoryInterface::class);
-            $jtiRepository->shouldReceive("saveJti")->once();
-            $jtiRepository->shouldReceive("hasJti")->andReturn(true);
+                $jtiRepository = Mockery::mock(
+                    JwtJtiRepositoryInterface::class,
+                );
+                $jtiRepository->shouldReceive("saveJti")->once();
+                $jtiRepository->shouldReceive("hasJti")->andReturn(true);
 
-            $clock = Mockery::mock(ClockInterface::class);
-            $clock->shouldReceive("now")->andReturn($now);
+                $clock = Mockery::mock(ClockInterface::class);
+                $clock->shouldReceive("now")->andReturn($now);
 
-            $service = createJwtServiceWithJti($jtiRepository, clock: $clock);
-            $token = $service->generate($user, TokenType::CLI_TOKEN);
+                $service = createJwtServiceWithJti(
+                    $jtiRepository,
+                    clock: $clock,
+                );
+                $token = $service->generate($user, TokenType::CLI_TOKEN);
 
-            $clock->shouldReceive("now")->andReturn($now);
-            $claims = $service->verify($token);
+                $clock->shouldReceive("now")->andReturn($now);
+                $claims = $service->verify($token);
 
-            expect($claims->getJti())->not()->toBeNull();
-            expect($claims->getJti())->toBeInstanceOf(
-                \Ramsey\Uuid\UuidInterface::class,
-            );
-        });
+                expect($claims->jti)->not()->toBeNull();
+                expect($claims->jti)->toBeInstanceOf(
+                    \Ramsey\Uuid\UuidInterface::class,
+                );
+            },
+        );
     });
 
     describe("refresh method for CLI tokens", function () {
@@ -250,7 +273,7 @@ describe("LcobucciJwtService with JTI", function () {
 
             $clock->shouldReceive("now")->andReturn($now);
             $claims = $service->verify($token);
-            $originalJti = $claims->getJti();
+            $originalJti = $claims->jti;
 
             $clock->shouldReceive("now")->andReturn($now);
             $jtiRepository->shouldReceive("hasJti")->andReturn(true);
@@ -260,7 +283,7 @@ describe("LcobucciJwtService with JTI", function () {
             $jtiRepository->shouldReceive("hasJti")->andReturn(true);
             $refreshedClaims = $service->verify($refreshedToken);
 
-            expect($refreshedClaims->getJti()->toString())->toBe(
+            expect($refreshedClaims->jti->toString())->toBe(
                 $originalJti->toString(),
             );
         });
@@ -308,7 +331,7 @@ describe("LcobucciJwtService with JTI", function () {
             $clock->shouldReceive("now")->andReturn($now);
             $claims = $service->verify($token);
 
-            expect($claims->getJti())->toBeNull();
+            expect($claims->jti)->toBeNull();
         });
 
         test("REMEMBER_ME_TOKEN does not have JTI", function () {
@@ -331,7 +354,7 @@ describe("LcobucciJwtService with JTI", function () {
             $clock->shouldReceive("now")->andReturn($now);
             $claims = $service->verify($token);
 
-            expect($claims->getJti())->toBeNull();
+            expect($claims->jti)->toBeNull();
         });
     });
 });

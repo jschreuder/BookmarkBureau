@@ -91,9 +91,7 @@ describe("JsonUserRepository", function () {
             $found = $repo->findById($userWithTotp->userId);
 
             expect($found->totpSecret)->not->toBeNull();
-            expect($found->totpSecret->getSecret())->toBe(
-                $totpSecret->getSecret(),
-            );
+            expect($found->totpSecret->value)->toBe($totpSecret->value);
             expect($found->requiresTotp())->toBeTrue();
 
             cleanupTestFile($filePath);
@@ -287,9 +285,7 @@ describe("JsonUserRepository", function () {
 
             $found = $repo->findById($user->userId);
             expect($found->totpSecret)->not->toBeNull();
-            expect($found->totpSecret->getSecret())->toBe(
-                $totpSecret->getSecret(),
-            );
+            expect($found->totpSecret->value)->toBe($totpSecret->value);
 
             cleanupTestFile($filePath);
         });

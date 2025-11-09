@@ -17,7 +17,7 @@ final readonly class OtphpTotpVerifier implements TotpVerifierInterface
     public function verify(string $code, TotpSecret $secret): bool
     {
         try {
-            $totp = TOTP::create($secret->getSecret(), clock: $this->clock);
+            $totp = TOTP::create((string) $secret, clock: $this->clock);
             return $totp->verify(
                 $code,
                 $this->clock->now()->getTimestamp(),

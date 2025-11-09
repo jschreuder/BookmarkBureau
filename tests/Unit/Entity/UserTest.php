@@ -166,9 +166,7 @@ describe("User Entity", function () {
             $user->changeTotpSecret($newSecret);
 
             expect($user->totpSecret)->toBe($newSecret);
-            expect($user->totpSecret->getSecret())->not->toBe(
-                $oldSecret->getSecret(),
-            );
+            expect($user->totpSecret->value)->not->toBe($oldSecret->value);
         });
 
         test("TOTP secret change updates the updatedAt timestamp", function () {

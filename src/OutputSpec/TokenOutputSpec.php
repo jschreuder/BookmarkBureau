@@ -18,9 +18,9 @@ final readonly class TokenOutputSpec implements OutputSpecInterface
     {
         /** @var TokenResponse $data */
         return [
-            "token" => (string) $data->getToken(),
-            "type" => $data->getType(),
-            "expires_at" => $data->getExpiresAt()?->format("c"),
+            "token" => (string) $data->token,
+            "type" => $data->type,
+            "expires_at" => $data->expiresAt?->format("c"),
         ];
     }
 }

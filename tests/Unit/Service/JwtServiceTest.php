@@ -126,14 +126,14 @@ describe("JwtService", function () {
             expect($claims)->toBeInstanceOf(
                 \jschreuder\BookmarkBureau\Entity\Value\TokenClaims::class,
             );
-            expect($claims->getUserId()->toString())->toBe(
+            expect($claims->userId->toString())->toBe(
                 $user->userId->toString(),
             );
-            expect($claims->getTokenType())->toBe(TokenType::SESSION_TOKEN);
-            expect($claims->getIssuedAt()->getTimestamp())->toBe(
+            expect($claims->tokenType)->toBe(TokenType::SESSION_TOKEN);
+            expect($claims->issuedAt->getTimestamp())->toBe(
                 $now->getTimestamp(),
             );
-            expect($claims->getExpiresAt())->not()->toBeNull();
+            expect($claims->expiresAt)->not()->toBeNull();
         });
 
         test("verifies a valid CLI_TOKEN without expiry", function () {
@@ -156,11 +156,11 @@ describe("JwtService", function () {
             expect($claims)->toBeInstanceOf(
                 \jschreuder\BookmarkBureau\Entity\Value\TokenClaims::class,
             );
-            expect($claims->getUserId()->toString())->toBe(
+            expect($claims->userId->toString())->toBe(
                 $user->userId->toString(),
             );
-            expect($claims->getTokenType())->toBe(TokenType::CLI_TOKEN);
-            expect($claims->getExpiresAt())->toBeNull();
+            expect($claims->tokenType)->toBe(TokenType::CLI_TOKEN);
+            expect($claims->expiresAt)->toBeNull();
         });
 
         test(
@@ -262,7 +262,7 @@ describe("JwtService", function () {
                 expect((string) $refreshedToken)
                     ->not()
                     ->toBe((string) $originalToken);
-                expect($refreshedClaims->getIssuedAt()->getTimestamp())->toBe(
+                expect($refreshedClaims->issuedAt->getTimestamp())->toBe(
                     $laterTime->getTimestamp(),
                 );
             },
@@ -321,10 +321,8 @@ describe("JwtService", function () {
             $refreshedToken = $service->refresh($claims);
             $refreshedClaims = $service->verify($refreshedToken);
 
-            expect($refreshedClaims->getTokenType())->toBe(
-                TokenType::SESSION_TOKEN,
-            );
-            expect($refreshedClaims->getUserId()->toString())->toBe(
+            expect($refreshedClaims->tokenType)->toBe(TokenType::SESSION_TOKEN);
+            expect($refreshedClaims->userId->toString())->toBe(
                 $user->userId->toString(),
             );
         });

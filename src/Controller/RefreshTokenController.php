@@ -45,8 +45,8 @@ final readonly class RefreshTokenController implements ControllerInterface
 
         $tokenResponse = new TokenResponse(
             $newToken,
-            $tokenClaims->getTokenType()->value,
-            $newClaims->getExpiresAt(),
+            $tokenClaims->tokenType->value,
+            $newClaims->expiresAt,
         );
 
         return $this->responseTransformer->transform(

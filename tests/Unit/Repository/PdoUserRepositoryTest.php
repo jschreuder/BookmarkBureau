@@ -41,7 +41,7 @@ describe("PdoUserRepository", function () {
             $user->userId->getBytes(),
             (string) $user->email,
             $user->passwordHash->getHash(),
-            $user->totpSecret?->getSecret(),
+            $user->totpSecret ? (string) $user->totpSecret : null,
             $user->createdAt->format("Y-m-d H:i:s"),
             $user->updatedAt->format("Y-m-d H:i:s"),
         ]);
@@ -103,9 +103,7 @@ describe("PdoUserRepository", function () {
             $found = $repo->findById($userWithTotp->userId);
 
             expect($found->totpSecret)->not->toBeNull();
-            expect($found->totpSecret->getSecret())->toBe(
-                $totpSecret->getSecret(),
-            );
+            expect($found->totpSecret->value)->toBe($totpSecret->value);
             expect($found->requiresTotp())->toBeTrue();
         });
 
@@ -258,9 +256,7 @@ describe("PdoUserRepository", function () {
 
             $found = $repo->findById($user->userId);
             expect($found->totpSecret)->not->toBeNull();
-            expect($found->totpSecret->getSecret())->toBe(
-                $totpSecret->getSecret(),
-            );
+            expect($found->totpSecret->value)->toBe($totpSecret->value);
         });
 
         test("saves user without TOTP secret (null)", function () {

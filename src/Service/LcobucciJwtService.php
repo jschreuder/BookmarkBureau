@@ -71,9 +71,7 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
     {
         try {
             /** @var Plain $parsedToken */
-            $parsedToken = $this->jwtConfig
-                ->parser()
-                ->parse($token->getToken());
+            $parsedToken = $this->jwtConfig->parser()->parse((string) $token);
 
             $tokenType = TokenType::from($parsedToken->claims()->get("type"));
 
@@ -169,8 +167,8 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
     #[\Override]
     public function refresh(TokenClaims $claims): JwtToken
     {
-        $userId = $claims->getUserId();
-        $tokenType = $claims->getTokenType();
+        $userId = $claims->userId;
+        $tokenType = $claims->tokenType;
         $now = $this->clock->now();
 
         $builder = $this->jwtConfig
@@ -184,7 +182,7 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
 
         if ($tokenType === TokenType::CLI_TOKEN) {
             // Preserve the JTI for CLI tokens (same token identity)
-            $jti = $claims->getJti();
+            $jti = $claims->jti;
             if ($jti === null) {
                 throw new InvalidTokenException(
                     "CLI token missing JTI for refresh",

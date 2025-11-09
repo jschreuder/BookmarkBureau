@@ -88,7 +88,7 @@ final readonly class LoginController implements
             $tokenResponse = new TokenResponse(
                 $jwtToken,
                 $tokenType->value,
-                $claims->getExpiresAt(),
+                $claims->expiresAt,
             );
 
             return $this->responseTransformer->transform(

@@ -9,15 +9,15 @@ describe("TokenResponse", function () {
         $token = new JwtToken($tokenStr);
         $response = new TokenResponse($token, "session", null);
 
-        expect($response->getToken())->toBe($token);
-        expect((string) $response->getToken())->toBe($tokenStr);
+        expect($response->token)->toBe($token);
+        expect((string) $response->token)->toBe($tokenStr);
     });
 
     test("stores and returns token type as string", function () {
         $token = new JwtToken("test.token");
         $response = new TokenResponse($token, "session", null);
 
-        expect($response->getType())->toBe("session");
+        expect($response->type)->toBe("session");
     });
 
     test("stores and returns expiresAt as DateTimeInterface", function () {
@@ -28,14 +28,14 @@ describe("TokenResponse", function () {
         );
         $response = new TokenResponse($token, "session", $expiresAt);
 
-        expect($response->getExpiresAt())->toBe($expiresAt);
+        expect($response->expiresAt)->toBe($expiresAt);
     });
 
     test("allows null expiresAt for CLI tokens", function () {
         $token = new JwtToken("test.token");
         $response = new TokenResponse($token, "cli", null);
 
-        expect($response->getExpiresAt())->toBeNull();
+        expect($response->expiresAt)->toBeNull();
     });
 
     test("is immutable (readonly)", function () {

@@ -88,9 +88,7 @@ final class CreateCommand extends Command
         $totpSecret = $this->userService->enableTotp($userId);
         $output->writeln("");
         $output->writeln("<info>TOTP enabled!</info>");
-        $output->writeln(
-            "  Secret: <comment>{$totpSecret->getSecret()}</comment>",
-        );
+        $output->writeln("  Secret: <comment>{$totpSecret->value}</comment>");
         $output->writeln(
             "<fg=yellow>Save this secret in your authenticator app!</>",
         );

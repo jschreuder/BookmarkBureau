@@ -20,7 +20,7 @@ describe("TokenClaims", function () {
             $expiresAt,
         );
 
-        expect($claims->getUserId()->toString())->toBe($userId->toString());
+        expect($claims->userId->toString())->toBe($userId->toString());
     });
 
     test("stores and returns tokenType", function () {
@@ -38,7 +38,7 @@ describe("TokenClaims", function () {
             $expiresAt,
         );
 
-        expect($claims->getTokenType())->toBe(TokenType::SESSION_TOKEN);
+        expect($claims->tokenType)->toBe(TokenType::SESSION_TOKEN);
     });
 
     test("stores and returns issuedAt", function () {
@@ -56,9 +56,7 @@ describe("TokenClaims", function () {
             $expiresAt,
         );
 
-        expect($claims->getIssuedAt()->getTimestamp())->toBe(
-            $now->getTimestamp(),
-        );
+        expect($claims->issuedAt->getTimestamp())->toBe($now->getTimestamp());
     });
 
     test("stores and returns expiresAt", function () {
@@ -76,7 +74,7 @@ describe("TokenClaims", function () {
             $expiresAt,
         );
 
-        expect($claims->getExpiresAt()->getTimestamp())->toBe(
+        expect($claims->expiresAt->getTimestamp())->toBe(
             $expiresAt->getTimestamp(),
         );
     });
@@ -90,7 +88,7 @@ describe("TokenClaims", function () {
 
         $claims = new TokenClaims($userId, TokenType::CLI_TOKEN, $now, null);
 
-        expect($claims->getExpiresAt())->toBeNull();
+        expect($claims->expiresAt)->toBeNull();
     });
 
     test("isExpired returns false when token not expired", function () {
@@ -187,7 +185,7 @@ describe("TokenClaims", function () {
             $jti,
         );
 
-        expect($claims->getJti()->toString())->toBe($jti->toString());
+        expect($claims->jti->toString())->toBe($jti->toString());
     });
 
     test("jti is null for non-CLI tokens", function () {
@@ -206,7 +204,7 @@ describe("TokenClaims", function () {
             null,
         );
 
-        expect($claims->getJti())->toBeNull();
+        expect($claims->jti)->toBeNull();
     });
 
     test("jti defaults to null when not provided", function () {
@@ -218,7 +216,7 @@ describe("TokenClaims", function () {
 
         $claims = new TokenClaims($userId, TokenType::CLI_TOKEN, $now, null);
 
-        expect($claims->getJti())->toBeNull();
+        expect($claims->jti)->toBeNull();
     });
 
     test("is immutable (readonly)", function () {

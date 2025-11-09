@@ -98,14 +98,13 @@ describe("JwtAuthenticationMiddleware", function () {
             $nextHandler
                 ->shouldReceive("handle")
                 ->andReturnUsing(function (ServerRequestInterface $req) {
-                    expect(
-                        $req->getAttribute("tokenClaims")->getTokenType(),
-                    )->toBe(TokenType::SESSION_TOKEN);
+                    expect($req->getAttribute("tokenClaims")->tokenType)->toBe(
+                        TokenType::SESSION_TOKEN,
+                    );
                     expect(
                         $req
                             ->getAttribute("tokenClaims")
-                            ->getIssuedAt()
-                            ->getTimestamp(),
+                            ->issuedAt->getTimestamp(),
                     )->toBe(
                         new DateTimeImmutable(
                             "2024-01-01 12:00:00",

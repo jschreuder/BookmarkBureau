@@ -8,37 +8,12 @@ use Ramsey\Uuid\UuidInterface;
 final readonly class TokenClaims
 {
     public function __construct(
-        private UuidInterface $userId,
-        private TokenType $tokenType,
-        private DateTimeInterface $issuedAt,
-        private ?DateTimeInterface $expiresAt,
-        private ?UuidInterface $jti = null,
+        public UuidInterface $userId,
+        public TokenType $tokenType,
+        public DateTimeInterface $issuedAt,
+        public ?DateTimeInterface $expiresAt,
+        public ?UuidInterface $jti = null,
     ) {}
-
-    public function getUserId(): UuidInterface
-    {
-        return $this->userId;
-    }
-
-    public function getTokenType(): TokenType
-    {
-        return $this->tokenType;
-    }
-
-    public function getIssuedAt(): DateTimeInterface
-    {
-        return $this->issuedAt;
-    }
-
-    public function getExpiresAt(): ?DateTimeInterface
-    {
-        return $this->expiresAt;
-    }
-
-    public function getJti(): ?UuidInterface
-    {
-        return $this->jti;
-    }
 
     public function isExpired(DateTimeInterface $now): bool
     {

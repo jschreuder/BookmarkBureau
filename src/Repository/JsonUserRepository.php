@@ -204,7 +204,9 @@ final class JsonUserRepository implements UserRepositoryInterface
             "user_id" => $user->userId->toString(),
             "email" => (string) $user->email,
             "password_hash" => $user->passwordHash->getHash(),
-            "totp_secret" => $user->totpSecret?->getSecret(),
+            "totp_secret" => $user->totpSecret
+                ? (string) $user->totpSecret
+                : null,
             "created_at" => $user->createdAt->format(SqlFormat::TIMESTAMP),
             "updated_at" => $user->updatedAt->format(SqlFormat::TIMESTAMP),
         ];

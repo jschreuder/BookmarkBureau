@@ -2,18 +2,12 @@
 
 namespace jschreuder\BookmarkBureau\Entity\Value;
 
-final readonly class JwtToken implements \Stringable
+final readonly class JwtToken
 {
-    public function __construct(private string $token) {}
+    use StringValueTrait;
 
-    #[\Override]
-    public function __toString(): string
+    public function __construct(string $value)
     {
-        return $this->token;
-    }
-
-    public function getToken(): string
-    {
-        return $this->token;
+        $this->value = $value;
     }
 }

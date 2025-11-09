@@ -11,12 +11,12 @@ describe("JwtToken", function () {
         expect((string) $token)->toBe($tokenString);
     });
 
-    test("getToken returns the token string", function () {
+    test("value property returns the token string", function () {
         $tokenString =
             "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1dXlkIn0.signature";
         $token = new JwtToken($tokenString);
 
-        expect($token->getToken())->toBe($tokenString);
+        expect($token->value)->toBe($tokenString);
     });
 
     test("is immutable", function () {
