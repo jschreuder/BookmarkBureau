@@ -21,6 +21,7 @@ use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
 use jschreuder\BookmarkBureau\Repository\JwtJtiRepositoryInterface;
 use Psr\Clock\ClockInterface;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 final readonly class LcobucciJwtService implements JwtServiceInterface
 {
@@ -72,73 +73,16 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
         try {
             /** @var Plain $parsedToken */
             $parsedToken = $this->jwtConfig->parser()->parse((string) $token);
-
             $tokenType = TokenType::from($parsedToken->claims()->get("type"));
 
-            // Build constraints: always verify signature, issuer, audience, optionally verify expiry
-            $constraints = [
-                new SignedWith(
-                    $this->jwtConfig->signer(),
-                    $this->jwtConfig->verificationKey(),
-                ),
-                new IssuedBy($this->applicationName),
-                new PermittedFor("{$this->applicationName}-api"),
-            ];
-            if ($tokenType !== TokenType::CLI_TOKEN) {
-                $constraints[] = new StrictValidAt($this->clock);
-            }
+            $this->validateTokenConstraints($parsedToken, $tokenType);
 
-            // Validate all constraints
-            $this->jwtConfig
-                ->validator()
-                ->assert($parsedToken, ...$constraints);
-
-            // Extract claims
             $userId = Uuid::fromString($parsedToken->claims()->get("sub"));
-            $issuedAt = DateTime::createFromFormat(
-                "U",
-                (string) $parsedToken->claims()->get("iat")->getTimestamp(),
-                new DateTimeZone("UTC"),
+            $issuedAt = $this->extractIssuedAt($parsedToken);
+            [$expiresAt, $jti] = $this->extractTypeSpecificClaims(
+                $parsedToken,
+                $tokenType,
             );
-
-            if ($issuedAt === false) {
-                throw new InvalidTokenException(
-                    "Invalid token issued-at timestamp",
-                );
-            }
-
-            $expiresAt = null;
-            $jti = null;
-            if ($tokenType === TokenType::CLI_TOKEN) {
-                // Verify CLI token JTI is in whitelist
-                $jtiClaim = $parsedToken->claims()->get("jti");
-                if ($jtiClaim === null) {
-                    throw new InvalidTokenException(
-                        "CLI token missing required JTI claim",
-                    );
-                }
-                $jti = Uuid::fromString((string) $jtiClaim);
-                if (!$this->jwtJtiRepository->hasJti($jti)) {
-                    throw new InvalidTokenException(
-                        "CLI token JTI not in whitelist (revoked or invalid)",
-                    );
-                }
-            } else {
-                $expClaim = $parsedToken->claims()->get("exp");
-                if ($expClaim !== null) {
-                    $expiresAt = DateTime::createFromFormat(
-                        "U",
-                        (string) $expClaim->getTimestamp(),
-                        new DateTimeZone("UTC"),
-                    );
-
-                    if ($expiresAt === false) {
-                        throw new InvalidTokenException(
-                            "Invalid token expiry timestamp",
-                        );
-                    }
-                }
-            }
 
             return new TokenClaims(
                 $userId,
@@ -162,6 +106,97 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
                 $e,
             );
         }
+    }
+
+    private function validateTokenConstraints(
+        Plain $token,
+        TokenType $tokenType,
+    ): void {
+        $constraints = [
+            new SignedWith(
+                $this->jwtConfig->signer(),
+                $this->jwtConfig->verificationKey(),
+            ),
+            new IssuedBy($this->applicationName),
+            new PermittedFor("{$this->applicationName}-api"),
+        ];
+
+        if ($tokenType !== TokenType::CLI_TOKEN) {
+            $constraints[] = new StrictValidAt($this->clock);
+        }
+
+        $this->jwtConfig->validator()->assert($token, ...$constraints);
+    }
+
+    private function extractIssuedAt(Plain $token): DateTime
+    {
+        $issuedAt = DateTime::createFromFormat(
+            "U",
+            (string) $token->claims()->get("iat")->getTimestamp(),
+            new DateTimeZone("UTC"),
+        );
+
+        if ($issuedAt === false) {
+            throw new InvalidTokenException(
+                "Invalid token issued-at timestamp",
+            );
+        }
+
+        return $issuedAt;
+    }
+
+    /**
+     * @return array{0: ?DateTime, 1: ?UuidInterface}
+     */
+    private function extractTypeSpecificClaims(
+        Plain $token,
+        TokenType $tokenType,
+    ): array {
+        if ($tokenType === TokenType::CLI_TOKEN) {
+            return [null, $this->extractAndValidateCliJti($token)];
+        }
+
+        return [$this->extractExpiresAt($token), null];
+    }
+
+    private function extractAndValidateCliJti(Plain $token): UuidInterface
+    {
+        $jtiClaim = $token->claims()->get("jti");
+        if ($jtiClaim === null) {
+            throw new InvalidTokenException(
+                "CLI token missing required JTI claim",
+            );
+        }
+
+        $jti = Uuid::fromString((string) $jtiClaim);
+
+        if (!$this->jwtJtiRepository->hasJti($jti)) {
+            throw new InvalidTokenException(
+                "CLI token JTI not in whitelist (revoked or invalid)",
+            );
+        }
+
+        return $jti;
+    }
+
+    private function extractExpiresAt(Plain $token): ?DateTime
+    {
+        $expClaim = $token->claims()->get("exp");
+        if ($expClaim === null) {
+            return null;
+        }
+
+        $expiresAt = DateTime::createFromFormat(
+            "U",
+            (string) $expClaim->getTimestamp(),
+            new DateTimeZone("UTC"),
+        );
+
+        if ($expiresAt === false) {
+            throw new InvalidTokenException("Invalid token expiry timestamp");
+        }
+
+        return $expiresAt;
     }
 
     #[\Override]
