@@ -156,12 +156,8 @@ class ServiceContainer
 
     private function createSqliteDb(string $dsn): PDO
     {
-        // SQLite DSN already contains the database path, so no need to append db.dbname
-        // Convert empty values to null for PDO compatibility
-        $user = $this->config("db.user") ?: null;
-        $pass = $this->config("db.pass") ?: null;
-
-        return new PDO($dsn, $user, $pass, [
+        // SQLite doesn't support authentication, so only pass DSN and options
+        return new PDO($dsn, null, null, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ]);
     }
@@ -176,11 +172,12 @@ class ServiceContainer
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
         ];
 
-        // Convert empty values to null for PDO compatibility
-        $user = $this->config("db.user") ?: null;
-        $pass = $this->config("db.pass") ?: null;
-
-        return new PDO($dsn, $user, $pass, $options);
+        return new PDO(
+            $dsn,
+            $this->config("db.user"),
+            $this->config("db.pass"),
+            $options,
+        );
     }
 
     public function getUnitOfWork(): UnitOfWorkInterface
@@ -274,7 +271,7 @@ class ServiceContainer
 
     public function getUserRepository(): UserRepositoryInterface
     {
-        $storageType = $this->config("users.storage.type") ?: "pdo";
+        $storageType = $this->config("users.storage.type");
 
         return match ($storageType) {
             "json" => new JsonUserRepository(
@@ -336,9 +333,9 @@ class ServiceContainer
     {
         return new LcobucciJwtService(
             $this->getJwtConfiguration(),
-            $this->config("auth.application_name") ?: "bookmark-bureau",
-            $this->config("auth.session_ttl") ?: 86400,
-            $this->config("auth.remember_me_ttl") ?: 1209600,
+            $this->config("auth.application_name"),
+            $this->config("auth.session_ttl"),
+            $this->config("auth.remember_me_ttl"),
             $this->getClock(),
         );
     }
