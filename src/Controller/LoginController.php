@@ -10,6 +10,7 @@ use jschreuder\BookmarkBureau\InputSpec\LoginInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TokenOutputSpec;
 use jschreuder\BookmarkBureau\Response\ResponseTransformerInterface;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
+use jschreuder\BookmarkBureau\Service\TotpVerifierInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\Middle\Controller\ControllerInterface;
 use jschreuder\Middle\Controller\RequestFilterInterface;
@@ -26,6 +27,7 @@ final readonly class LoginController implements
         private LoginInputSpec $inputSpec,
         private UserServiceInterface $userService,
         private JwtServiceInterface $jwtService,
+        private TotpVerifierInterface $totpVerifier,
         private TokenOutputSpec $tokenOutputSpec,
         private ResponseTransformerInterface $responseTransformer,
     ) {}
@@ -59,6 +61,19 @@ final readonly class LoginController implements
             // Verify password
             if (!$this->userService->verifyPassword($user, $data["password"])) {
                 throw new \InvalidArgumentException("Invalid credentials");
+            }
+
+            // Verify TOTP if enabled on user account
+            if ($user->requiresTotp()) {
+                $totpCode = $data["totp_code"] ?? "";
+                if (empty($totpCode)) {
+                    throw new \InvalidArgumentException("TOTP code required");
+                }
+                if (
+                    !$this->totpVerifier->verify($totpCode, $user->totpSecret)
+                ) {
+                    throw new \InvalidArgumentException("Invalid TOTP code");
+                }
             }
 
             // Generate appropriate token based on rememberMe flag

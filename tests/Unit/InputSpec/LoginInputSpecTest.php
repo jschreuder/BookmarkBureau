@@ -12,6 +12,7 @@ describe("LoginInputSpec", function () {
             expect($fields)->toContain("email");
             expect($fields)->toContain("password");
             expect($fields)->toContain("remember_me");
+            expect($fields)->toContain("totp_code");
         });
     });
 
@@ -22,6 +23,7 @@ describe("LoginInputSpec", function () {
                 "email" => "Test@EXAMPLE.COM",
                 "password" => "pass",
                 "remember_me" => false,
+                "totp_code" => "",
             ];
 
             $filtered = $spec->filter($rawData);
@@ -35,6 +37,7 @@ describe("LoginInputSpec", function () {
                 "email" => "  test@example.com  ",
                 "password" => "pass",
                 "remember_me" => false,
+                "totp_code" => "",
             ];
 
             $filtered = $spec->filter($rawData);
@@ -48,6 +51,7 @@ describe("LoginInputSpec", function () {
                 "email" => "test@example.com",
                 "password" => "MyPassword123!",
                 "remember_me" => false,
+                "totp_code" => "",
             ];
 
             $filtered = $spec->filter($rawData);
@@ -87,6 +91,7 @@ describe("LoginInputSpec", function () {
             $filtered = $spec->filter($rawData);
 
             expect($filtered["remember_me"])->toBeFalse();
+            expect($filtered["totp_code"])->toBe("");
         });
 
         test("filters only requested fields", function () {
@@ -111,6 +116,7 @@ describe("LoginInputSpec", function () {
                 "email" => "test@example.com",
                 "password" => "password123",
                 "remember_me" => false,
+                "totp_code" => "",
             ];
 
             // Should not throw
@@ -120,7 +126,11 @@ describe("LoginInputSpec", function () {
 
         test("throws on invalid email format", function () {
             $spec = new LoginInputSpec();
-            $data = ["email" => "not-an-email", "password" => "password123"];
+            $data = [
+                "email" => "not-an-email",
+                "password" => "password123",
+                "totp_code" => "",
+            ];
 
             expect(fn() => $spec->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -129,7 +139,11 @@ describe("LoginInputSpec", function () {
 
         test("throws on empty email", function () {
             $spec = new LoginInputSpec();
-            $data = ["email" => "", "password" => "password123"];
+            $data = [
+                "email" => "",
+                "password" => "password123",
+                "totp_code" => "",
+            ];
 
             expect(fn() => $spec->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -138,7 +152,11 @@ describe("LoginInputSpec", function () {
 
         test("throws on empty password", function () {
             $spec = new LoginInputSpec();
-            $data = ["email" => "test@example.com", "password" => ""];
+            $data = [
+                "email" => "test@example.com",
+                "password" => "",
+                "totp_code" => "",
+            ];
 
             expect(fn() => $spec->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -151,6 +169,7 @@ describe("LoginInputSpec", function () {
                 "email" => "test@example.com",
                 "password" => "pass",
                 "remember_me" => true,
+                "totp_code" => "",
             ];
 
             $spec->validate($data);
@@ -159,7 +178,11 @@ describe("LoginInputSpec", function () {
 
         test("validates only requested fields", function () {
             $spec = new LoginInputSpec();
-            $data = ["email" => "test@example.com", "password" => "pass"];
+            $data = [
+                "email" => "test@example.com",
+                "password" => "pass",
+                "totp_code" => "",
+            ];
 
             $spec->validate($data, ["email"]);
             expect(true)->toBeTrue();

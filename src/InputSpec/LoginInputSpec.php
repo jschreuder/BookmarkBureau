@@ -10,7 +10,12 @@ use Respect\Validation\Validator;
 
 final class LoginInputSpec implements InputSpecInterface
 {
-    private const array FIELDS = ["email", "password", "remember_me"];
+    private const array FIELDS = [
+        "email",
+        "password",
+        "remember_me",
+        "totp_code",
+    ];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -37,6 +42,10 @@ final class LoginInputSpec implements InputSpecInterface
                 "remember_me" => Filter::start($rawData, "remember_me", false)
                     ->bool()
                     ->done(),
+                "totp_code" => Filter::start($rawData, "totp_code", "")
+                    ->string(allowNull: true)
+                    ->trim()
+                    ->done(),
                 default => throw new InvalidArgumentException(
                     "Unknown field: {$field}",
                 ),
@@ -61,6 +70,12 @@ final class LoginInputSpec implements InputSpecInterface
                 "remember_me" => $validator->key(
                     "remember_me",
                     Validator::optional(Validator::boolType()),
+                ),
+                "totp_code" => $validator->key(
+                    "totp_code",
+                    Validator::optional(
+                        Validator::stringType()->length(6, 6)->digit(),
+                    ),
                 ),
                 default => throw new InvalidArgumentException(
                     "Unknown field: {$field}",

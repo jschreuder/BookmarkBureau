@@ -84,6 +84,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
                 new LoginInputSpec(),
                 $this->container->getUserService(),
                 $this->container->getJwtService(),
+                $this->container->getTotpVerifier(),
                 new TokenOutputSpec(),
                 new JsonResponseTransformer(),
             ),

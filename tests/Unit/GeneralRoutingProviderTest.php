@@ -9,6 +9,7 @@ use jschreuder\BookmarkBureau\Service\FavoriteServiceInterface;
 use jschreuder\BookmarkBureau\Service\TagServiceInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
+use jschreuder\BookmarkBureau\Service\TotpVerifierInterface;
 use jschreuder\Middle\Router\RouterInterface;
 use jschreuder\Middle\Controller\ControllerInterface;
 
@@ -37,6 +38,9 @@ describe("GeneralRoutingProvider", function () {
         $container
             ->shouldReceive("getJwtService")
             ->andReturn(Mockery::mock(JwtServiceInterface::class));
+        $container
+            ->shouldReceive("getTotpVerifier")
+            ->andReturn(Mockery::mock(TotpVerifierInterface::class));
         return $container;
     }
 
