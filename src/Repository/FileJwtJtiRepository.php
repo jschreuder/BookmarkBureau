@@ -72,19 +72,18 @@ final class FileJwtJtiRepository implements JwtJtiRepositoryInterface
     public function hasJti(UuidInterface $jti): bool
     {
         try {
-            if (!file_exists($this->filePath)) {
-                return false;
-            }
-
             $jtiString = $jti->toString();
             $searchPrefix = "{$jtiString},";
 
-            // Read file line by line and check for JTI
-            $handle = fopen($this->filePath, "r");
-            if ($handle === false) {
+            // Return false if file does not exist or cannot be opened
+            if (
+                !file_exists($this->filePath) ||
+                !($handle = fopen($this->filePath, "r"))
+            ) {
                 return false;
             }
 
+            // Read file line by line and check for JTI
             try {
                 while (($line = fgets($handle)) !== false) {
                     if (strpos($line, $searchPrefix) === 0) {
