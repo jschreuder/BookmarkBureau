@@ -33,6 +33,7 @@ final readonly class RefreshTokenController implements ControllerInterface
         }
 
         try {
+            // Fetch user to check if it exists, throws exception if not found
             $user = $this->userService->getUser($userId);
         } catch (UserNotFoundException $e) {
             throw new AuthenticationException("Invalid user ID");
