@@ -31,6 +31,7 @@ BookmarkBureau is a bookmark management application demonstrating clean architec
 ├── tests/                  - Pest tests (85 files, ~95% coverage)
 ├── config/                 - DI container configuration
 ├── migrations/             - Phinx database migrations
+├── var/log                 - Application logs, when CLI or integration test output is limited
 ├── web/                    - Public directory (api.php entry point)
 └── frontend/               - Angular 20 SPA (see frontend/CLAUDE.md)
 ```
@@ -38,7 +39,7 @@ BookmarkBureau is a bookmark management application demonstrating clean architec
 ## Commands
 
 ### Testing
-- `vendor/bin/pest` - Run ALL tests (IMPORTANT: Use this, NOT phpunit)
+- `vendor/bin/pest --parallel` - Run ALL tests, use parallel to speed up execution (IMPORTANT: Use this, NOT phpunit)
 - `vendor/bin/pest --filter TestName` - Run specific test
 - `vendor/bin/pest tests/Path/ToTest.php` - Run specific file
 
