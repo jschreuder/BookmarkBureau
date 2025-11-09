@@ -135,6 +135,7 @@ final readonly class ImplementationClass implements SpecificInterface
 - Override attribute for interface methods
 - Traits for sharing code between implementations (e.g., `UnitOfWorkTrait`, `OutputSpecTrait`, `CollectionTrait`)
 - Utility classes in `src/Util/` for shared functionality (e.g., `Filter` for input sanitization, `SqlFormat` for constants)
+- Use double quotes for strings and interpolation where possible
 
 ### Naming
 - Interfaces: `*Interface` (e.g., `DashboardServiceInterface`)
