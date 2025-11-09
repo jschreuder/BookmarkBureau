@@ -9,6 +9,8 @@ use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Token\InvalidTokenStructure;
 use Lcobucci\JWT\Token\Plain;
 use Lcobucci\JWT\Token\UnsupportedHeaderFound;
+use Lcobucci\JWT\Validation\Constraint\IssuedBy;
+use Lcobucci\JWT\Validation\Constraint\PermittedFor;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Validation\Constraint\StrictValidAt;
 use jschreuder\BookmarkBureau\Entity\User;
@@ -22,6 +24,7 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
 {
     public function __construct(
         private Configuration $jwtConfig,
+        private string $applicationName,
         private int $sessionTtl,
         private int $rememberMeTtl,
         private ClockInterface $clock,
@@ -34,6 +37,8 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
 
         $builder = $this->jwtConfig
             ->builder()
+            ->issuedBy($this->applicationName)
+            ->permittedFor($this->applicationName . "-api")
             ->relatedTo($user->userId->toString())
             ->withClaim("type", $tokenType->value)
             ->issuedAt($now)
@@ -64,12 +69,14 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
 
             $tokenType = TokenType::from($parsedToken->claims()->get("type"));
 
-            // Build constraints: always verify signature, optionally verify expiry
+            // Build constraints: always verify signature, issuer, audience, optionally verify expiry
             $constraints = [
                 new SignedWith(
                     $this->jwtConfig->signer(),
                     $this->jwtConfig->verificationKey(),
                 ),
+                new IssuedBy($this->applicationName),
+                new PermittedFor($this->applicationName . "-api"),
             ];
             if ($tokenType !== TokenType::CLI_TOKEN) {
                 $constraints[] = new StrictValidAt($this->clock);
@@ -141,6 +148,8 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
 
         $builder = $this->jwtConfig
             ->builder()
+            ->issuedBy($this->applicationName)
+            ->permittedFor($this->applicationName . "-api")
             ->relatedTo($userId->toString())
             ->withClaim("type", $tokenType->value)
             ->issuedAt($now)

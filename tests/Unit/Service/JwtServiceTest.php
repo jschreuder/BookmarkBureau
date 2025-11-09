@@ -17,6 +17,25 @@ function createJwtConfig(
     )->withValidationConstraints();
 }
 
+function createJwtService(
+    ?Configuration $config = null,
+    string $applicationName = "bookmark-bureau",
+    int $sessionTtl = 86400,
+    int $rememberMeTtl = 1209600,
+    ?ClockInterface $clock = null,
+): LcobucciJwtService {
+    $config ??= createJwtConfig();
+    $clock ??= Mockery::mock(ClockInterface::class);
+
+    return new LcobucciJwtService(
+        $config,
+        $applicationName,
+        $sessionTtl,
+        $rememberMeTtl,
+        $clock,
+    );
+}
+
 describe("JwtService", function () {
     describe("generate method", function () {
         test("generates a SESSION_TOKEN with 24-hour expiry", function () {
@@ -25,18 +44,11 @@ describe("JwtService", function () {
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
             );
-            $sessionTtl = 86400;
-            $rememberMeTtl = 1209600;
 
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = new LcobucciJwtService(
-                createJwtConfig(),
-                $sessionTtl,
-                $rememberMeTtl,
-                $clock,
-            );
+            $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::SESSION_TOKEN);
 
             expect($token)->toBeInstanceOf(
@@ -52,18 +64,11 @@ describe("JwtService", function () {
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
             );
-            $sessionTtl = 86400;
-            $rememberMeTtl = 1209600;
 
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = new LcobucciJwtService(
-                createJwtConfig(),
-                $sessionTtl,
-                $rememberMeTtl,
-                $clock,
-            );
+            $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::REMEMBER_ME_TOKEN);
 
             expect($token)->toBeInstanceOf(
@@ -78,18 +83,11 @@ describe("JwtService", function () {
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
             );
-            $sessionTtl = 86400;
-            $rememberMeTtl = 1209600;
 
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = new LcobucciJwtService(
-                createJwtConfig(),
-                $sessionTtl,
-                $rememberMeTtl,
-                $clock,
-            );
+            $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::CLI_TOKEN);
 
             expect($token)->toBeInstanceOf(
@@ -106,18 +104,11 @@ describe("JwtService", function () {
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
             );
-            $sessionTtl = 86400;
-            $rememberMeTtl = 1209600;
 
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = new LcobucciJwtService(
-                createJwtConfig(),
-                $sessionTtl,
-                $rememberMeTtl,
-                $clock,
-            );
+            $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::SESSION_TOKEN);
 
             $clock->shouldReceive("now")->andReturn($now);
@@ -142,20 +133,13 @@ describe("JwtService", function () {
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
             );
-            $sessionTtl = 86400;
-            $rememberMeTtl = 1209600;
 
             $clock = Mockery::mock(ClockInterface::class);
             $clock
                 ->shouldReceive("now")
                 ->andReturnValues([$now, $now->modify("+365 days")]);
 
-            $service = new LcobucciJwtService(
-                createJwtConfig(),
-                $sessionTtl,
-                $rememberMeTtl,
-                $clock,
-            );
+            $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::CLI_TOKEN);
 
             $claims = $service->verify($token);
@@ -179,20 +163,13 @@ describe("JwtService", function () {
                     new DateTimeZone("UTC"),
                 );
                 $laterTime = $now->modify("+86401 seconds");
-                $sessionTtl = 86400;
-                $rememberMeTtl = 1209600;
 
                 $clock = Mockery::mock(ClockInterface::class);
                 $clock
                     ->shouldReceive("now")
                     ->andReturnValues([$now, $laterTime]);
 
-                $service = new LcobucciJwtService(
-                    createJwtConfig(),
-                    $sessionTtl,
-                    $rememberMeTtl,
-                    $clock,
-                );
+                $service = createJwtService(clock: $clock);
                 $token = $service->generate($user, TokenType::SESSION_TOKEN);
 
                 expect(fn() => $service->verify($token))->toThrow(
@@ -208,18 +185,11 @@ describe("JwtService", function () {
                     "2024-01-01 12:00:00",
                     new DateTimeZone("UTC"),
                 );
-                $sessionTtl = 86400;
-                $rememberMeTtl = 1209600;
 
                 $clock = Mockery::mock(ClockInterface::class);
                 $clock->shouldReceive("now")->andReturn($now);
 
-                $service = new LcobucciJwtService(
-                    createJwtConfig(),
-                    $sessionTtl,
-                    $rememberMeTtl,
-                    $clock,
-                );
+                $service = createJwtService(clock: $clock);
 
                 $fakeToken = new \jschreuder\BookmarkBureau\Entity\Value\JwtToken(
                     "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.wrongsignature",
@@ -236,18 +206,11 @@ describe("JwtService", function () {
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
             );
-            $sessionTtl = 86400;
-            $rememberMeTtl = 1209600;
 
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturn($now);
 
-            $service = new LcobucciJwtService(
-                createJwtConfig(),
-                $sessionTtl,
-                $rememberMeTtl,
-                $clock,
-            );
+            $service = createJwtService(clock: $clock);
             $fakeToken = new \jschreuder\BookmarkBureau\Entity\Value\JwtToken(
                 "not.a.jwt",
             );
@@ -268,20 +231,13 @@ describe("JwtService", function () {
                     new DateTimeZone("UTC"),
                 );
                 $laterTime = $now->modify("+3600 seconds");
-                $sessionTtl = 86400;
-                $rememberMeTtl = 1209600;
 
                 $clock = Mockery::mock(ClockInterface::class);
                 $clock
                     ->shouldReceive("now")
                     ->andReturnValues([$now, $now, $laterTime, $laterTime]);
 
-                $service = new LcobucciJwtService(
-                    createJwtConfig(),
-                    $sessionTtl,
-                    $rememberMeTtl,
-                    $clock,
-                );
+                $service = createJwtService(clock: $clock);
 
                 $originalToken = $service->generate(
                     $user,
@@ -312,20 +268,13 @@ describe("JwtService", function () {
                     new DateTimeZone("UTC"),
                 );
                 $laterTime = $now->modify("+604800 seconds");
-                $sessionTtl = 86400;
-                $rememberMeTtl = 1209600;
 
                 $clock = Mockery::mock(ClockInterface::class);
                 $clock
                     ->shouldReceive("now")
                     ->andReturnValues([$now, $now, $laterTime]);
 
-                $service = new LcobucciJwtService(
-                    createJwtConfig(),
-                    $sessionTtl,
-                    $rememberMeTtl,
-                    $clock,
-                );
+                $service = createJwtService(clock: $clock);
 
                 $originalToken = $service->generate(
                     $user,
@@ -347,20 +296,13 @@ describe("JwtService", function () {
                 new DateTimeZone("UTC"),
             );
             $laterTime = $now->modify("+3600 seconds");
-            $sessionTtl = 86400;
-            $rememberMeTtl = 1209600;
 
             $clock = Mockery::mock(ClockInterface::class);
             $clock
                 ->shouldReceive("now")
                 ->andReturnValues([$now, $now, $laterTime, $laterTime]);
 
-            $service = new LcobucciJwtService(
-                createJwtConfig(),
-                $sessionTtl,
-                $rememberMeTtl,
-                $clock,
-            );
+            $service = createJwtService(clock: $clock);
 
             $originalToken = $service->generate(
                 $user,
@@ -386,18 +328,11 @@ describe("JwtService", function () {
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
             );
-            $sessionTtl = 86400;
-            $rememberMeTtl = 1209600;
 
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturnValues([$now, $now]);
 
-            $service = new LcobucciJwtService(
-                createJwtConfig(),
-                $sessionTtl,
-                $rememberMeTtl,
-                $clock,
-            );
+            $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::CLI_TOKEN);
             $claims = $service->verify($token);
 
@@ -411,18 +346,11 @@ describe("JwtService", function () {
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
             );
-            $sessionTtl = 86400;
-            $rememberMeTtl = 1209600;
 
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturnValues([$now, $now]);
 
-            $service = new LcobucciJwtService(
-                createJwtConfig(),
-                $sessionTtl,
-                $rememberMeTtl,
-                $clock,
-            );
+            $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::SESSION_TOKEN);
             $claims = $service->verify($token);
 
@@ -436,18 +364,11 @@ describe("JwtService", function () {
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
             );
-            $sessionTtl = 86400;
-            $rememberMeTtl = 1209600;
 
             $clock = Mockery::mock(ClockInterface::class);
             $clock->shouldReceive("now")->andReturnValues([$now, $now]);
 
-            $service = new LcobucciJwtService(
-                createJwtConfig(),
-                $sessionTtl,
-                $rememberMeTtl,
-                $clock,
-            );
+            $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::SESSION_TOKEN);
             $claims = $service->verify($token);
 

@@ -336,6 +336,7 @@ class ServiceContainer
     {
         return new LcobucciJwtService(
             $this->getJwtConfiguration(),
+            $this->config("auth.application_name") ?: "bookmark-bureau",
             $this->config("auth.session_ttl") ?: 86400,
             $this->config("auth.remember_me_ttl") ?: 1209600,
             $this->getClock(),

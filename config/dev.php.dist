@@ -22,6 +22,7 @@ return [
     "users.storage.path" => __DIR__ . "/../var/users.json",
 
     "auth.jwt_secret" => "dev-secret-key-change-in-production",
+    "auth.application_name" => "bookmark-bureau",
     "auth.session_ttl" => 1800, // 30 minutes
     "auth.remember_me_ttl" => 2592000, // 30 days
 ];
