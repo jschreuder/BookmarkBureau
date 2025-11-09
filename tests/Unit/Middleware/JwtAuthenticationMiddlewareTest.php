@@ -6,13 +6,13 @@ use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
 use jschreuder\BookmarkBureau\Middleware\JwtAuthenticationMiddleware;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
-use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\Middle\Exception\AuthenticationException;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Response\TextResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Ramsey\Uuid\UuidInterface;
 
 describe("JwtAuthenticationMiddleware", function () {
     describe("with valid token", function () {
@@ -20,7 +20,6 @@ describe("JwtAuthenticationMiddleware", function () {
             "extracts token and attaches authenticated user to request",
             function () {
                 $user = TestEntityFactory::createUser();
-                $token = new JwtToken("valid.jwt.token");
                 $now = new DateTimeImmutable(
                     "2024-01-01 12:00:00",
                     new DateTimeZone("UTC"),
@@ -39,16 +38,7 @@ describe("JwtAuthenticationMiddleware", function () {
                     ->withAnyArgs()
                     ->andReturn($claims);
 
-                $userService = Mockery::mock(UserServiceInterface::class);
-                $userService
-                    ->shouldReceive("getUser")
-                    ->with($user->userId)
-                    ->andReturn($user);
-
-                $middleware = new JwtAuthenticationMiddleware(
-                    $jwtService,
-                    $userService,
-                );
+                $middleware = new JwtAuthenticationMiddleware($jwtService);
 
                 $request = new ServerRequest();
                 $request = $request->withHeader(
@@ -62,10 +52,8 @@ describe("JwtAuthenticationMiddleware", function () {
                     ->andReturnUsing(function (ServerRequestInterface $req) {
                         // Verify the request has the authenticated user attached
                         expect(
-                            $req->getAttribute("authenticatedUser"),
-                        )->toBeInstanceOf(
-                            \jschreuder\BookmarkBureau\Entity\User::class,
-                        );
+                            $req->getAttribute("authenticatedUserId"),
+                        )->toBeInstanceOf(UuidInterface::class);
                         expect(
                             $req->getAttribute("tokenClaims"),
                         )->toBeInstanceOf(TokenClaims::class);
@@ -80,7 +68,6 @@ describe("JwtAuthenticationMiddleware", function () {
 
         test("attaches tokenClaims to request", function () {
             $user = TestEntityFactory::createUser();
-            $token = new JwtToken("valid.jwt.token");
             $now = new DateTimeImmutable(
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
@@ -99,16 +86,7 @@ describe("JwtAuthenticationMiddleware", function () {
                 ->withAnyArgs()
                 ->andReturn($claims);
 
-            $userService = Mockery::mock(UserServiceInterface::class);
-            $userService
-                ->shouldReceive("getUser")
-                ->with($user->userId)
-                ->andReturn($user);
-
-            $middleware = new JwtAuthenticationMiddleware(
-                $jwtService,
-                $userService,
-            );
+            $middleware = new JwtAuthenticationMiddleware($jwtService);
 
             $request = new ServerRequest();
             $request = $request->withHeader(
@@ -153,12 +131,7 @@ describe("JwtAuthenticationMiddleware", function () {
                     ->with($token)
                     ->andThrow(new InvalidTokenException("Invalid signature"));
 
-                $userService = Mockery::mock(UserServiceInterface::class);
-
-                $middleware = new JwtAuthenticationMiddleware(
-                    $jwtService,
-                    $userService,
-                );
+                $middleware = new JwtAuthenticationMiddleware($jwtService);
 
                 $request = new ServerRequest();
                 $request = $request->withHeader(
@@ -185,12 +158,7 @@ describe("JwtAuthenticationMiddleware", function () {
                     ->with($token)
                     ->andThrow(new InvalidTokenException("Token has expired"));
 
-                $userService = Mockery::mock(UserServiceInterface::class);
-
-                $middleware = new JwtAuthenticationMiddleware(
-                    $jwtService,
-                    $userService,
-                );
+                $middleware = new JwtAuthenticationMiddleware($jwtService);
 
                 $request = new ServerRequest();
                 $request = $request->withHeader(
@@ -205,69 +173,13 @@ describe("JwtAuthenticationMiddleware", function () {
                 )->toThrow(AuthenticationException::class);
             },
         );
-
-        test(
-            "throws AuthenticationException when user is not found",
-            function () {
-                $user = TestEntityFactory::createUser();
-                $token = new JwtToken("valid.jwt.token");
-                $now = new DateTimeImmutable(
-                    "2024-01-01 12:00:00",
-                    new DateTimeZone("UTC"),
-                );
-                $expiresAt = $now->modify("+86400 seconds");
-                $claims = new TokenClaims(
-                    $user->userId,
-                    TokenType::SESSION_TOKEN,
-                    $now,
-                    $expiresAt,
-                );
-
-                $jwtService = Mockery::mock(JwtServiceInterface::class);
-                $jwtService
-                    ->shouldReceive("verify")
-                    ->withAnyArgs()
-                    ->andReturn($claims);
-
-                $userService = Mockery::mock(UserServiceInterface::class);
-                $userService
-                    ->shouldReceive("getUser")
-                    ->with($user->userId)
-                    ->andThrow(
-                        new \jschreuder\BookmarkBureau\Exception\UserNotFoundException(
-                            "User not found",
-                        ),
-                    );
-
-                $middleware = new JwtAuthenticationMiddleware(
-                    $jwtService,
-                    $userService,
-                );
-
-                $request = new ServerRequest();
-                $request = $request->withHeader(
-                    "Authorization",
-                    "Bearer valid.jwt.token",
-                );
-
-                $nextHandler = Mockery::mock(RequestHandlerInterface::class);
-
-                expect(
-                    fn() => $middleware->process($request, $nextHandler),
-                )->toThrow(AuthenticationException::class);
-            },
-        );
     });
 
     describe("without token", function () {
         test("allows request through without authentication", function () {
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $userService = Mockery::mock(UserServiceInterface::class);
 
-            $middleware = new JwtAuthenticationMiddleware(
-                $jwtService,
-                $userService,
-            );
+            $middleware = new JwtAuthenticationMiddleware($jwtService);
 
             $request = new ServerRequest(); // No Authorization header
 
@@ -288,12 +200,8 @@ describe("JwtAuthenticationMiddleware", function () {
 
         test("allows empty Authorization header through", function () {
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $userService = Mockery::mock(UserServiceInterface::class);
 
-            $middleware = new JwtAuthenticationMiddleware(
-                $jwtService,
-                $userService,
-            );
+            $middleware = new JwtAuthenticationMiddleware($jwtService);
 
             $request = new ServerRequest();
             $request = $request->withHeader("Authorization", "");
@@ -317,12 +225,8 @@ describe("JwtAuthenticationMiddleware", function () {
             "throws AuthenticationException for malformed Authorization header",
             function () {
                 $jwtService = Mockery::mock(JwtServiceInterface::class);
-                $userService = Mockery::mock(UserServiceInterface::class);
 
-                $middleware = new JwtAuthenticationMiddleware(
-                    $jwtService,
-                    $userService,
-                );
+                $middleware = new JwtAuthenticationMiddleware($jwtService);
 
                 $request = new ServerRequest();
                 $request = $request->withHeader(
@@ -342,12 +246,8 @@ describe("JwtAuthenticationMiddleware", function () {
             "throws AuthenticationException for missing token in header",
             function () {
                 $jwtService = Mockery::mock(JwtServiceInterface::class);
-                $userService = Mockery::mock(UserServiceInterface::class);
 
-                $middleware = new JwtAuthenticationMiddleware(
-                    $jwtService,
-                    $userService,
-                );
+                $middleware = new JwtAuthenticationMiddleware($jwtService);
 
                 $request = new ServerRequest();
                 $request = $request->withHeader("Authorization", "Bearer");
@@ -362,7 +262,6 @@ describe("JwtAuthenticationMiddleware", function () {
 
         test("accepts case-insensitive Bearer scheme", function () {
             $user = TestEntityFactory::createUser();
-            $token = new JwtToken("valid.jwt.token");
             $now = new DateTimeImmutable(
                 "2024-01-01 12:00:00",
                 new DateTimeZone("UTC"),
@@ -381,16 +280,7 @@ describe("JwtAuthenticationMiddleware", function () {
                 ->withAnyArgs()
                 ->andReturn($claims);
 
-            $userService = Mockery::mock(UserServiceInterface::class);
-            $userService
-                ->shouldReceive("getUser")
-                ->with($user->userId)
-                ->andReturn($user);
-
-            $middleware = new JwtAuthenticationMiddleware(
-                $jwtService,
-                $userService,
-            );
+            $middleware = new JwtAuthenticationMiddleware($jwtService);
 
             $request = new ServerRequest();
             $request = $request->withHeader(

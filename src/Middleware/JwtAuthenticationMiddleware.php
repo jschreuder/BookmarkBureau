@@ -5,7 +5,6 @@ namespace jschreuder\BookmarkBureau\Middleware;
 use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
 use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
-use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\Middle\Exception\AuthenticationException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,10 +13,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 final readonly class JwtAuthenticationMiddleware implements MiddlewareInterface
 {
-    public function __construct(
-        private JwtServiceInterface $jwtService,
-        private UserServiceInterface $userService,
-    ) {}
+    public function __construct(private JwtServiceInterface $jwtService) {}
 
     #[\Override]
     public function process(
@@ -31,10 +27,12 @@ final readonly class JwtAuthenticationMiddleware implements MiddlewareInterface
             try {
                 $token = $this->extractTokenFromHeader($authHeader);
                 $claims = $this->jwtService->verify($token);
-                $user = $this->userService->getUser($claims->getUserId());
 
                 // Attach authenticated user to request for controllers/actions
-                $request = $request->withAttribute("authenticatedUser", $user);
+                $request = $request->withAttribute(
+                    "authenticatedUserId",
+                    $claims->getUserId(),
+                );
                 $request = $request->withAttribute("tokenClaims", $claims);
             } catch (InvalidTokenException $e) {
                 // Token is invalid/expired, throw authentication exception

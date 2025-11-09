@@ -94,6 +94,7 @@ class GeneralRoutingProvider implements RoutingProviderInterface
             "/auth/token-refresh",
             fn() => new RefreshTokenController(
                 $this->container->getJwtService(),
+                $this->container->getUserService(),
                 new TokenOutputSpec(),
                 new JsonResponseTransformer(),
             ),

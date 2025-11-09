@@ -7,6 +7,7 @@ use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\OutputSpec\TokenOutputSpec;
 use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
+use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\Middle\Exception\AuthenticationException;
 use Laminas\Diactoros\ServerRequest;
 
@@ -14,15 +15,22 @@ describe("RefreshTokenController", function () {
     describe("execute", function () {
         test("refreshes session token and returns new token", function () {
             $jwtService = Mockery::mock(JwtServiceInterface::class);
+            $userService = Mockery::mock(UserServiceInterface::class);
             $tokenOutputSpec = new TokenOutputSpec();
             $responseTransformer = new JsonResponseTransformer();
             $controller = new RefreshTokenController(
                 $jwtService,
+                $userService,
                 $tokenOutputSpec,
                 $responseTransformer,
             );
 
             $user = TestEntityFactory::createUser();
+            $userService
+                ->shouldReceive("getUser")
+                ->with($user->userId)
+                ->andReturn($user);
+
             $now = new DateTimeImmutable();
             $expiresAt = $now->modify("+24 hours");
             $oldClaims = new TokenClaims(
@@ -56,7 +64,7 @@ describe("RefreshTokenController", function () {
                 serverParams: [],
             );
             $request = $request
-                ->withAttribute("authenticatedUser", $user)
+                ->withAttribute("authenticatedUserId", $user->userId)
                 ->withAttribute("tokenClaims", $oldClaims);
 
             $response = $controller->execute($request);
@@ -70,15 +78,21 @@ describe("RefreshTokenController", function () {
 
         test("refreshes remember-me token and returns new token", function () {
             $jwtService = Mockery::mock(JwtServiceInterface::class);
+            $userService = Mockery::mock(UserServiceInterface::class);
             $tokenOutputSpec = new TokenOutputSpec();
             $responseTransformer = new JsonResponseTransformer();
             $controller = new RefreshTokenController(
                 $jwtService,
+                $userService,
                 $tokenOutputSpec,
                 $responseTransformer,
             );
 
             $user = TestEntityFactory::createUser();
+            $userService
+                ->shouldReceive("getUser")
+                ->with($user->userId)
+                ->andReturn($user);
             $now = new DateTimeImmutable();
             $expiresAt = $now->modify("+14 days");
             $oldClaims = new TokenClaims(
@@ -112,7 +126,7 @@ describe("RefreshTokenController", function () {
                 serverParams: [],
             );
             $request = $request
-                ->withAttribute("authenticatedUser", $user)
+                ->withAttribute("authenticatedUserId", $user->userId)
                 ->withAttribute("tokenClaims", $oldClaims);
 
             $response = $controller->execute($request);
@@ -127,10 +141,12 @@ describe("RefreshTokenController", function () {
             "throws AuthenticationException when authenticatedUser is null",
             function () {
                 $jwtService = Mockery::mock(JwtServiceInterface::class);
+                $userService = Mockery::mock(UserServiceInterface::class);
                 $tokenOutputSpec = new TokenOutputSpec();
                 $responseTransformer = new JsonResponseTransformer();
                 $controller = new RefreshTokenController(
                     $jwtService,
+                    $userService,
                     $tokenOutputSpec,
                     $responseTransformer,
                 );
@@ -161,10 +177,12 @@ describe("RefreshTokenController", function () {
             "throws AuthenticationException when tokenClaims is null",
             function () {
                 $jwtService = Mockery::mock(JwtServiceInterface::class);
+                $userService = Mockery::mock(UserServiceInterface::class);
                 $tokenOutputSpec = new TokenOutputSpec();
                 $responseTransformer = new JsonResponseTransformer();
                 $controller = new RefreshTokenController(
                     $jwtService,
+                    $userService,
                     $tokenOutputSpec,
                     $responseTransformer,
                 );
@@ -175,7 +193,10 @@ describe("RefreshTokenController", function () {
                     method: "POST",
                     serverParams: [],
                 );
-                $request = $request->withAttribute("authenticatedUser", $user);
+                $request = $request->withAttribute(
+                    "authenticatedUserId",
+                    $user->userId,
+                );
 
                 expect(fn() => $controller->execute($request))->toThrow(
                     AuthenticationException::class,
@@ -185,15 +206,22 @@ describe("RefreshTokenController", function () {
 
         test("returns token response with correct format", function () {
             $jwtService = Mockery::mock(JwtServiceInterface::class);
+            $userService = Mockery::mock(UserServiceInterface::class);
             $tokenOutputSpec = new TokenOutputSpec();
             $responseTransformer = new JsonResponseTransformer();
             $controller = new RefreshTokenController(
                 $jwtService,
+                $userService,
                 $tokenOutputSpec,
                 $responseTransformer,
             );
 
             $user = TestEntityFactory::createUser();
+            $userService
+                ->shouldReceive("getUser")
+                ->with($user->userId)
+                ->andReturn($user);
+
             $now = new DateTimeImmutable();
             $expiresAt = $now->modify("+24 hours");
             $oldClaims = new TokenClaims(
@@ -227,7 +255,7 @@ describe("RefreshTokenController", function () {
                 serverParams: [],
             );
             $request = $request
-                ->withAttribute("authenticatedUser", $user)
+                ->withAttribute("authenticatedUserId", $user->userId)
                 ->withAttribute("tokenClaims", $oldClaims);
 
             $response = $controller->execute($request);
@@ -243,10 +271,12 @@ describe("RefreshTokenController", function () {
     describe("interface implementation", function () {
         test("implements ControllerInterface", function () {
             $jwtService = Mockery::mock(JwtServiceInterface::class);
+            $userService = Mockery::mock(UserServiceInterface::class);
             $tokenOutputSpec = new TokenOutputSpec();
             $responseTransformer = new JsonResponseTransformer();
             $controller = new RefreshTokenController(
                 $jwtService,
+                $userService,
                 $tokenOutputSpec,
                 $responseTransformer,
             );

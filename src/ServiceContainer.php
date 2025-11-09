@@ -86,10 +86,7 @@ class ServiceContainer
                 "auth.login", // POST /auth/login - User login
                 // All other routes require authentication
             ]),
-            new JwtAuthenticationMiddleware(
-                $this->getJwtService(),
-                $this->getUserService(),
-            ),
+            new JwtAuthenticationMiddleware($this->getJwtService()),
             new RoutingMiddleware(
                 $this->getAppRouter(),
                 $this->get404Handler(),

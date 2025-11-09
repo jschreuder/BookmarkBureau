@@ -5,6 +5,7 @@ use jschreuder\Middle\Exception\AuthenticationException;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequest;
 use Psr\Http\Server\RequestHandlerInterface;
+use Ramsey\Uuid\Uuid;
 
 describe("RequireAuthenticationMiddleware", function () {
     describe("process", function () {
@@ -32,11 +33,11 @@ describe("RequireAuthenticationMiddleware", function () {
             $publicRoutes = ["home"];
             $middleware = new RequireAuthenticationMiddleware($publicRoutes);
 
-            $user = TestEntityFactory::createUser();
+            $userId = Uuid::uuid4();
             $request = new ServerRequest();
             $request = $request
                 ->withAttribute("route", "dashboard.list")
-                ->withAttribute("authenticatedUser", $user);
+                ->withAttribute("authenticatedUserId", $userId);
 
             $handler = Mockery::mock(RequestHandlerInterface::class);
             $expectedResponse = new JsonResponse(["data" => "protected"]);
@@ -86,7 +87,7 @@ describe("RequireAuthenticationMiddleware", function () {
                 $request = new ServerRequest();
                 $request = $request
                     ->withAttribute("route", "link.create")
-                    ->withAttribute("authenticatedUser", null);
+                    ->withAttribute("authenticatedUserId", null);
 
                 $handler = Mockery::mock(RequestHandlerInterface::class);
                 $handler->shouldNotReceive("handle");
