@@ -3,6 +3,7 @@
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Service\LcobucciJwtService;
 use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
+use jschreuder\BookmarkBureau\Repository\JwtJtiRepositoryInterface;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
@@ -23,9 +24,16 @@ function createJwtService(
     int $sessionTtl = 86400,
     int $rememberMeTtl = 1209600,
     ?ClockInterface $clock = null,
+    ?JwtJtiRepositoryInterface $jtiRepository = null,
 ): LcobucciJwtService {
     $config ??= createJwtConfig();
     $clock ??= Mockery::mock(ClockInterface::class);
+    if ($jtiRepository === null) {
+        $jtiRepository = Mockery::mock(JwtJtiRepositoryInterface::class);
+        // Set default expectations for CLI token tests
+        $jtiRepository->shouldReceive("saveJti")->byDefault();
+        $jtiRepository->shouldReceive("hasJti")->byDefault()->andReturn(true);
+    }
 
     return new LcobucciJwtService(
         $config,
@@ -33,6 +41,7 @@ function createJwtService(
         $sessionTtl,
         $rememberMeTtl,
         $clock,
+        $jtiRepository,
     );
 }
 

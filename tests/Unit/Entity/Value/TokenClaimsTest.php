@@ -171,6 +171,56 @@ describe("TokenClaims", function () {
         },
     );
 
+    test("stores and returns jti for CLI tokens", function () {
+        $userId = Uuid::uuid4();
+        $jti = Uuid::uuid4();
+        $now = new DateTimeImmutable(
+            "2024-01-01 12:00:00",
+            new DateTimeZone("UTC"),
+        );
+
+        $claims = new TokenClaims(
+            $userId,
+            TokenType::CLI_TOKEN,
+            $now,
+            null,
+            $jti,
+        );
+
+        expect($claims->getJti()->toString())->toBe($jti->toString());
+    });
+
+    test("jti is null for non-CLI tokens", function () {
+        $userId = Uuid::uuid4();
+        $now = new DateTimeImmutable(
+            "2024-01-01 12:00:00",
+            new DateTimeZone("UTC"),
+        );
+        $expiresAt = $now->modify("+24 hours");
+
+        $claims = new TokenClaims(
+            $userId,
+            TokenType::SESSION_TOKEN,
+            $now,
+            $expiresAt,
+            null,
+        );
+
+        expect($claims->getJti())->toBeNull();
+    });
+
+    test("jti defaults to null when not provided", function () {
+        $userId = Uuid::uuid4();
+        $now = new DateTimeImmutable(
+            "2024-01-01 12:00:00",
+            new DateTimeZone("UTC"),
+        );
+
+        $claims = new TokenClaims($userId, TokenType::CLI_TOKEN, $now, null);
+
+        expect($claims->getJti())->toBeNull();
+    });
+
     test("is immutable (readonly)", function () {
         $userId = Uuid::uuid4();
         $now = new DateTimeImmutable(

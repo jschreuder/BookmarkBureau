@@ -12,6 +12,7 @@ final readonly class TokenClaims
         private TokenType $tokenType,
         private DateTimeInterface $issuedAt,
         private ?DateTimeInterface $expiresAt,
+        private ?UuidInterface $jti = null,
     ) {}
 
     public function getUserId(): UuidInterface
@@ -32,6 +33,11 @@ final readonly class TokenClaims
     public function getExpiresAt(): ?DateTimeInterface
     {
         return $this->expiresAt;
+    }
+
+    public function getJti(): ?UuidInterface
+    {
+        return $this->jti;
     }
 
     public function isExpired(DateTimeInterface $now): bool

@@ -18,7 +18,9 @@ use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
 use jschreuder\BookmarkBureau\Entity\Value\TokenClaims;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
+use jschreuder\BookmarkBureau\Repository\JwtJtiRepositoryInterface;
 use Psr\Clock\ClockInterface;
+use Ramsey\Uuid\Uuid;
 
 final readonly class LcobucciJwtService implements JwtServiceInterface
 {
@@ -28,6 +30,7 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
         private int $sessionTtl,
         private int $rememberMeTtl,
         private ClockInterface $clock,
+        private JwtJtiRepositoryInterface $jwtJtiRepository,
     ) {}
 
     #[\Override]
@@ -44,7 +47,12 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
             ->issuedAt($now)
             ->canOnlyBeUsedAfter($now);
 
-        if ($tokenType !== TokenType::CLI_TOKEN) {
+        if ($tokenType === TokenType::CLI_TOKEN) {
+            // Generate and store JTI for CLI tokens
+            $jti = Uuid::uuid4();
+            $builder = $builder->identifiedBy($jti->toString());
+            $this->jwtJtiRepository->saveJti($jti, $user->userId, $now);
+        } else {
             $builder = $builder->expiresAt(
                 $this->getExpiresAt($tokenType, $now),
             );
@@ -88,9 +96,7 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
                 ->assert($parsedToken, ...$constraints);
 
             // Extract claims
-            $userId = \Ramsey\Uuid\Uuid::fromString(
-                $parsedToken->claims()->get("sub"),
-            );
+            $userId = Uuid::fromString($parsedToken->claims()->get("sub"));
             $issuedAt = DateTime::createFromFormat(
                 "U",
                 (string) $parsedToken->claims()->get("iat")->getTimestamp(),
@@ -104,7 +110,22 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
             }
 
             $expiresAt = null;
-            if ($tokenType !== TokenType::CLI_TOKEN) {
+            $jti = null;
+            if ($tokenType === TokenType::CLI_TOKEN) {
+                // Verify CLI token JTI is in whitelist
+                $jtiClaim = $parsedToken->claims()->get("jti");
+                if ($jtiClaim === null) {
+                    throw new InvalidTokenException(
+                        "CLI token missing required JTI claim",
+                    );
+                }
+                $jti = Uuid::fromString((string) $jtiClaim);
+                if (!$this->jwtJtiRepository->hasJti($jti)) {
+                    throw new InvalidTokenException(
+                        "CLI token JTI not in whitelist (revoked or invalid)",
+                    );
+                }
+            } else {
                 $expClaim = $parsedToken->claims()->get("exp");
                 if ($expClaim !== null) {
                     $expiresAt = DateTime::createFromFormat(
@@ -121,7 +142,13 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
                 }
             }
 
-            return new TokenClaims($userId, $tokenType, $issuedAt, $expiresAt);
+            return new TokenClaims(
+                $userId,
+                $tokenType,
+                $issuedAt,
+                $expiresAt,
+                $jti,
+            );
         } catch (InvalidTokenException $e) {
             throw $e;
         } catch (InvalidTokenStructure | UnsupportedHeaderFound $e) {
@@ -155,7 +182,16 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
             ->issuedAt($now)
             ->canOnlyBeUsedAfter($now);
 
-        if ($tokenType !== TokenType::CLI_TOKEN) {
+        if ($tokenType === TokenType::CLI_TOKEN) {
+            // Preserve the JTI for CLI tokens (same token identity)
+            $jti = $claims->getJti();
+            if ($jti === null) {
+                throw new InvalidTokenException(
+                    "CLI token missing JTI for refresh",
+                );
+            }
+            $builder = $builder->identifiedBy($jti->toString());
+        } else {
             $builder = $builder->expiresAt(
                 $this->getExpiresAt($tokenType, $now),
             );

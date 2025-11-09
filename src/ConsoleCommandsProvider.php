@@ -8,6 +8,7 @@ use jschreuder\BookmarkBureau\Command\User\DeleteCommand;
 use jschreuder\BookmarkBureau\Command\User\ChangePasswordCommand;
 use jschreuder\BookmarkBureau\Command\User\TotpCommand;
 use jschreuder\BookmarkBureau\Command\User\GenerateCliTokenCommand;
+use jschreuder\BookmarkBureau\Command\User\RevokeCliTokenCommand;
 use Symfony\Component\Console\Application;
 
 class ConsoleCommandsProvider
@@ -32,6 +33,9 @@ class ConsoleCommandsProvider
                 $this->container->getUserService(),
                 $this->container->getJwtService(),
             ),
+        );
+        $application->add(
+            new RevokeCliTokenCommand($this->container->getJwtJtiRepository()),
         );
     }
 }

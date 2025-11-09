@@ -21,10 +21,12 @@ use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\JsonUserRepository;
+use jschreuder\BookmarkBureau\Repository\JwtJtiRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\PdoCategoryRepository;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
 use jschreuder\BookmarkBureau\Repository\PdoFavoriteRepository;
+use jschreuder\BookmarkBureau\Repository\PdoJwtJtiRepository;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
 use jschreuder\BookmarkBureau\Repository\PdoTagRepository;
 use jschreuder\BookmarkBureau\Repository\PdoUserRepository;
@@ -329,6 +331,11 @@ class ServiceContainer
             ->withValidationConstraints();
     }
 
+    public function getJwtJtiRepository(): JwtJtiRepositoryInterface
+    {
+        return new PdoJwtJtiRepository($this->getDb());
+    }
+
     public function getJwtService(): JwtServiceInterface
     {
         return new LcobucciJwtService(
@@ -337,6 +344,7 @@ class ServiceContainer
             $this->config("auth.session_ttl"),
             $this->config("auth.remember_me_ttl"),
             $this->getClock(),
+            $this->getJwtJtiRepository(),
         );
     }
 }

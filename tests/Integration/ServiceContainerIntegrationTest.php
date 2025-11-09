@@ -15,6 +15,7 @@ use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
+use jschreuder\BookmarkBureau\Repository\JwtJtiRepositoryInterface;
 use jschreuder\BookmarkBureau\ServiceContainer;
 use jschreuder\BookmarkBureau\Exception\IncompleteConfigException;
 use jschreuder\Middle\Router\RouterInterface;
@@ -137,6 +138,15 @@ describe("ServiceContainer Integration", function () {
                 );
             },
         );
+
+        test("provides JwtJtiRepository instance", function () {
+            $container = TestContainerHelper::createContainerInstance();
+            $repository = $container->getJwtJtiRepository();
+
+            expect($repository)->toBeInstanceOf(
+                JwtJtiRepositoryInterface::class,
+            );
+        });
     });
 
     describe("service provisioning", function () {
