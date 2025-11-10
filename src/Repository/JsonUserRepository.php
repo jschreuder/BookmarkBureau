@@ -5,12 +5,10 @@ namespace jschreuder\BookmarkBureau\Repository;
 use DateTimeImmutable;
 use jschreuder\BookmarkBureau\Collection\UserCollection;
 use jschreuder\BookmarkBureau\Entity\User;
+use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
-use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
-use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
-use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -23,7 +21,10 @@ final class JsonUserRepository implements UserRepositoryInterface
 
     private bool $isLoaded = false;
 
-    public function __construct(private readonly string $filePath) {}
+    public function __construct(
+        private readonly string $filePath,
+        private readonly UserEntityMapper $mapper,
+    ) {}
 
     /**
      * @throws UserNotFoundException when user doesn't exist
@@ -197,35 +198,37 @@ final class JsonUserRepository implements UserRepositoryInterface
 
     /**
      * Map a User entity to an array for JSON serialization
+     * Uses mapper to transform UUIDs to string format for JSON storage
      */
     private function mapUserToArray(User $user): array
     {
+        $row = $this->mapper->mapToRow($user);
+        // Convert binary UUID back to string for JSON storage
         return [
             "user_id" => $user->userId->toString(),
-            "email" => (string) $user->email,
-            "password_hash" => $user->passwordHash->value,
-            "totp_secret" => $user->totpSecret
-                ? (string) $user->totpSecret
-                : null,
-            "created_at" => $user->createdAt->format(SqlFormat::TIMESTAMP),
-            "updated_at" => $user->updatedAt->format(SqlFormat::TIMESTAMP),
+            "email" => $row["email"],
+            "password_hash" => $row["password_hash"],
+            "totp_secret" => $row["totp_secret"],
+            "created_at" => $row["created_at"],
+            "updated_at" => $row["updated_at"],
         ];
     }
 
     /**
      * Map an array from JSON to a User entity
+     * Converts string UUID to bytes format expected by mapper
      */
     private function mapArrayToUser(array $data): User
     {
-        return new User(
-            userId: Uuid::fromString($data["user_id"]),
-            email: new Email($data["email"]),
-            passwordHash: new HashedPassword($data["password_hash"]),
-            totpSecret: !empty($data["totp_secret"])
-                ? new TotpSecret($data["totp_secret"])
-                : null,
-            createdAt: new DateTimeImmutable($data["created_at"]),
-            updatedAt: new DateTimeImmutable($data["updated_at"]),
-        );
+        // Convert string UUID to bytes for mapper compatibility
+        $mappedData = [
+            "user_id" => Uuid::fromString($data["user_id"])->getBytes(),
+            "email" => $data["email"],
+            "password_hash" => $data["password_hash"],
+            "totp_secret" => $data["totp_secret"],
+            "created_at" => $data["created_at"],
+            "updated_at" => $data["updated_at"],
+        ];
+        return $this->mapper->mapToEntity($mappedData);
     }
 }

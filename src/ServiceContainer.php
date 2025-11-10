@@ -292,6 +292,7 @@ class ServiceContainer
         return match ($storageType) {
             "json" => new JsonUserRepository(
                 $this->config("users.storage.path"),
+                new UserEntityMapper(),
             ),
             "pdo" => new PdoUserRepository(
                 $this->getDb(),
