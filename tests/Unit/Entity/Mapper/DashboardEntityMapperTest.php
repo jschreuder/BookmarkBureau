@@ -8,14 +8,9 @@ use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 
 describe("DashboardEntityMapper", function () {
-    function createDashboardMapper(): DashboardEntityMapper
-    {
-        return new DashboardEntityMapper();
-    }
-
     describe("getFields", function () {
         test("returns all dashboard field names", function () {
-            $mapper = createDashboardMapper();
+            $mapper = new DashboardEntityMapper();
             $fields = $mapper->getFields();
 
             expect($fields)->toBe([
@@ -31,14 +26,14 @@ describe("DashboardEntityMapper", function () {
 
     describe("supports", function () {
         test("returns true for Dashboard entities", function () {
-            $mapper = createDashboardMapper();
+            $mapper = new DashboardEntityMapper();
             $dashboard = TestEntityFactory::createDashboard();
 
             expect($mapper->supports($dashboard))->toBeTrue();
         });
 
         test("returns false for non-Dashboard entities", function () {
-            $mapper = createDashboardMapper();
+            $mapper = new DashboardEntityMapper();
             $link = TestEntityFactory::createLink();
 
             expect($mapper->supports($link))->toBeFalse();
@@ -47,7 +42,7 @@ describe("DashboardEntityMapper", function () {
 
     describe("mapToEntity", function () {
         test("maps row data to Dashboard entity", function () {
-            $mapper = createDashboardMapper();
+            $mapper = new DashboardEntityMapper();
             $dashboardId = Uuid::uuid4();
 
             $data = [
@@ -75,7 +70,7 @@ describe("DashboardEntityMapper", function () {
         });
 
         test("maps row data with null icon to Dashboard entity", function () {
-            $mapper = createDashboardMapper();
+            $mapper = new DashboardEntityMapper();
             $dashboardId = Uuid::uuid4();
 
             $data = [
@@ -95,7 +90,7 @@ describe("DashboardEntityMapper", function () {
         test(
             "throws InvalidArgumentException when required fields are missing",
             function () {
-                $mapper = createDashboardMapper();
+                $mapper = new DashboardEntityMapper();
 
                 $data = [
                     "dashboard_id" => Uuid::uuid4()->getBytes(),
@@ -112,7 +107,7 @@ describe("DashboardEntityMapper", function () {
 
     describe("mapToRow", function () {
         test("maps Dashboard entity to row array", function () {
-            $mapper = createDashboardMapper();
+            $mapper = new DashboardEntityMapper();
             $dashboard = TestEntityFactory::createDashboard(
                 title: new Title("Work Dashboard"),
                 description: "For work stuff",
@@ -137,7 +132,7 @@ describe("DashboardEntityMapper", function () {
         });
 
         test("maps Dashboard entity with null icon to row array", function () {
-            $mapper = createDashboardMapper();
+            $mapper = new DashboardEntityMapper();
             $dashboardId = Uuid::uuid4();
             $createdAt = new DateTimeImmutable("2024-02-01 09:15:00");
             $updatedAt = new DateTimeImmutable("2024-02-05 11:20:00");
@@ -156,7 +151,7 @@ describe("DashboardEntityMapper", function () {
         });
 
         test("formats timestamps correctly", function () {
-            $mapper = createDashboardMapper();
+            $mapper = new DashboardEntityMapper();
             $createdAt = new DateTimeImmutable("2024-02-01 09:15:30");
             $updatedAt = new DateTimeImmutable("2024-02-05 11:20:15");
             $dashboard = TestEntityFactory::createDashboard(
@@ -177,7 +172,7 @@ describe("DashboardEntityMapper", function () {
         test(
             "throws InvalidArgumentException when entity is not supported",
             function () {
-                $mapper = createDashboardMapper();
+                $mapper = new DashboardEntityMapper();
                 $link = TestEntityFactory::createLink();
 
                 expect(fn() => $mapper->mapToRow($link))->toThrow(
@@ -189,7 +184,7 @@ describe("DashboardEntityMapper", function () {
 
     describe("round-trip mapping", function () {
         test("maps entity to row and back preserves all data", function () {
-            $mapper = createDashboardMapper();
+            $mapper = new DashboardEntityMapper();
             $originalDashboard = TestEntityFactory::createDashboard(
                 title: new Title("Round Trip Dashboard"),
                 description: "Testing round-trip",
@@ -216,7 +211,7 @@ describe("DashboardEntityMapper", function () {
         });
 
         test("round-trip mapping with null icon preserves null", function () {
-            $mapper = createDashboardMapper();
+            $mapper = new DashboardEntityMapper();
             $dashboardId = Uuid::uuid4();
             $createdAt = new DateTimeImmutable("2024-02-01 09:15:00");
             $updatedAt = new DateTimeImmutable("2024-02-05 11:20:00");

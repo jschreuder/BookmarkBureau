@@ -9,14 +9,9 @@ use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 
 describe("CategoryEntityMapper", function () {
-    function createCategoryMapper(): CategoryEntityMapper
-    {
-        return new CategoryEntityMapper(new DashboardEntityMapper());
-    }
-
     describe("getFields", function () {
         test("returns all category field names", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $fields = $mapper->getFields();
 
             expect($fields)->toBe([
@@ -33,14 +28,14 @@ describe("CategoryEntityMapper", function () {
 
     describe("supports", function () {
         test("returns true for Category entities", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $category = TestEntityFactory::createCategory();
 
             expect($mapper->supports($category))->toBeTrue();
         });
 
         test("returns false for non-Category entities", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $dashboard = TestEntityFactory::createDashboard();
 
             expect($mapper->supports($dashboard))->toBeFalse();
@@ -49,7 +44,7 @@ describe("CategoryEntityMapper", function () {
 
     describe("mapToEntity", function () {
         test("maps row data to Category entity", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $categoryId = Uuid::uuid4();
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
@@ -82,7 +77,7 @@ describe("CategoryEntityMapper", function () {
         });
 
         test("maps row data with null color to Category entity", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $categoryId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard();
 
@@ -105,7 +100,7 @@ describe("CategoryEntityMapper", function () {
         test(
             "throws InvalidArgumentException when required fields are missing",
             function () {
-                $mapper = createCategoryMapper();
+                $mapper = new CategoryEntityMapper();
 
                 $data = [
                     "category_id" => Uuid::uuid4()->getBytes(),
@@ -122,7 +117,7 @@ describe("CategoryEntityMapper", function () {
 
     describe("mapToRow", function () {
         test("maps Category entity to row array", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $dashboard = TestEntityFactory::createDashboard();
             $category = TestEntityFactory::createCategory(
                 dashboard: $dashboard,
@@ -153,7 +148,7 @@ describe("CategoryEntityMapper", function () {
         });
 
         test("maps Category entity with null color to row array", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $dashboard = TestEntityFactory::createDashboard();
             $category = TestEntityFactory::createCategory(
                 dashboard: $dashboard,
@@ -168,7 +163,7 @@ describe("CategoryEntityMapper", function () {
         test(
             "extracts dashboard_id from related Dashboard entity",
             function () {
-                $mapper = createCategoryMapper();
+                $mapper = new CategoryEntityMapper();
                 $dashboard = TestEntityFactory::createDashboard();
                 $category = TestEntityFactory::createCategory(
                     dashboard: $dashboard,
@@ -183,7 +178,7 @@ describe("CategoryEntityMapper", function () {
         );
 
         test("formats timestamps correctly", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $createdAt = new DateTimeImmutable("2024-03-01 08:00:45");
             $updatedAt = new DateTimeImmutable("2024-03-05 10:30:20");
             $category = TestEntityFactory::createCategory(
@@ -204,7 +199,7 @@ describe("CategoryEntityMapper", function () {
         test(
             "throws InvalidArgumentException when entity is not supported",
             function () {
-                $mapper = createCategoryMapper();
+                $mapper = new CategoryEntityMapper();
                 $link = TestEntityFactory::createLink();
 
                 expect(fn() => $mapper->mapToRow($link))->toThrow(
@@ -216,7 +211,7 @@ describe("CategoryEntityMapper", function () {
 
     describe("round-trip mapping", function () {
         test("maps entity to row and back preserves all data", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $dashboard = TestEntityFactory::createDashboard();
             $originalCategory = TestEntityFactory::createCategory(
                 dashboard: $dashboard,
@@ -246,7 +241,7 @@ describe("CategoryEntityMapper", function () {
         });
 
         test("round-trip mapping with null color preserves null", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $dashboard = TestEntityFactory::createDashboard();
             $originalCategory = TestEntityFactory::createCategory(
                 dashboard: $dashboard,
@@ -261,7 +256,7 @@ describe("CategoryEntityMapper", function () {
         });
 
         test("preserves sort order through round-trip", function () {
-            $mapper = createCategoryMapper();
+            $mapper = new CategoryEntityMapper();
             $dashboard = TestEntityFactory::createDashboard();
             $originalCategory = TestEntityFactory::createCategory(
                 dashboard: $dashboard,

@@ -13,10 +13,6 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
 {
     use EntityMapperTrait;
 
-    public function __construct(
-        private DashboardEntityMapper $dashboardMapper,
-    ) {}
-
     #[\Override]
     public function getFields(): array
     {

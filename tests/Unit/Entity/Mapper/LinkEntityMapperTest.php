@@ -9,14 +9,9 @@ use jschreuder\BookmarkBureau\Util\SqlFormat;
 use Ramsey\Uuid\Uuid;
 
 describe("LinkEntityMapper", function () {
-    function createLinkMapper(): LinkEntityMapper
-    {
-        return new LinkEntityMapper();
-    }
-
     describe("getFields", function () {
         test("returns all link field names", function () {
-            $mapper = createLinkMapper();
+            $mapper = new LinkEntityMapper();
             $fields = $mapper->getFields();
 
             expect($fields)->toBe([
@@ -33,14 +28,14 @@ describe("LinkEntityMapper", function () {
 
     describe("supports", function () {
         test("returns true for Link entities", function () {
-            $mapper = createLinkMapper();
+            $mapper = new LinkEntityMapper();
             $link = TestEntityFactory::createLink();
 
             expect($mapper->supports($link))->toBeTrue();
         });
 
         test("returns false for non-Link entities", function () {
-            $mapper = createLinkMapper();
+            $mapper = new LinkEntityMapper();
             $dashboard = TestEntityFactory::createDashboard();
 
             expect($mapper->supports($dashboard))->toBeFalse();
@@ -49,7 +44,7 @@ describe("LinkEntityMapper", function () {
 
     describe("mapToEntity", function () {
         test("maps row data to Link entity", function () {
-            $mapper = createLinkMapper();
+            $mapper = new LinkEntityMapper();
             $linkId = Uuid::uuid4();
             $createdAt = new DateTimeImmutable("2024-01-15 10:30:00");
             $updatedAt = new DateTimeImmutable("2024-01-20 14:45:00");
@@ -81,7 +76,7 @@ describe("LinkEntityMapper", function () {
         });
 
         test("maps row data with null icon to Link entity", function () {
-            $mapper = createLinkMapper();
+            $mapper = new LinkEntityMapper();
             $linkId = Uuid::uuid4();
 
             $data = [
@@ -102,7 +97,7 @@ describe("LinkEntityMapper", function () {
         test(
             "throws InvalidArgumentException when required fields are missing",
             function () {
-                $mapper = createLinkMapper();
+                $mapper = new LinkEntityMapper();
 
                 $data = [
                     "link_id" => Uuid::uuid4()->getBytes(),
@@ -119,7 +114,7 @@ describe("LinkEntityMapper", function () {
         test(
             "throws InvalidArgumentException with helpful message about missing fields",
             function () {
-                $mapper = createLinkMapper();
+                $mapper = new LinkEntityMapper();
 
                 $data = [
                     "link_id" => Uuid::uuid4()->getBytes(),
@@ -135,7 +130,7 @@ describe("LinkEntityMapper", function () {
 
     describe("mapToRow", function () {
         test("maps Link entity to row array", function () {
-            $mapper = createLinkMapper();
+            $mapper = new LinkEntityMapper();
             $link = TestEntityFactory::createLink(
                 url: new Url("https://test.com"),
                 title: new Title("Test Title"),
@@ -161,7 +156,7 @@ describe("LinkEntityMapper", function () {
         });
 
         test("maps Link entity with null icon to row array", function () {
-            $mapper = createLinkMapper();
+            $mapper = new LinkEntityMapper();
             $link = TestEntityFactory::createLink(icon: null);
 
             $row = $mapper->mapToRow($link);
@@ -170,7 +165,7 @@ describe("LinkEntityMapper", function () {
         });
 
         test("formats timestamps correctly", function () {
-            $mapper = createLinkMapper();
+            $mapper = new LinkEntityMapper();
             $createdAt = new DateTimeImmutable("2024-01-15 10:30:45");
             $updatedAt = new DateTimeImmutable("2024-01-20 14:45:30");
             $link = TestEntityFactory::createLink(
@@ -191,7 +186,7 @@ describe("LinkEntityMapper", function () {
         test(
             "throws InvalidArgumentException when entity is not supported",
             function () {
-                $mapper = createLinkMapper();
+                $mapper = new LinkEntityMapper();
                 $dashboard = TestEntityFactory::createDashboard();
 
                 expect(fn() => $mapper->mapToRow($dashboard))->toThrow(
@@ -203,7 +198,7 @@ describe("LinkEntityMapper", function () {
 
     describe("round-trip mapping", function () {
         test("maps entity to row and back preserves all data", function () {
-            $mapper = createLinkMapper();
+            $mapper = new LinkEntityMapper();
             $originalLink = TestEntityFactory::createLink(
                 url: new Url("https://roundtrip.test"),
                 title: new Title("Round Trip Test"),
@@ -232,7 +227,7 @@ describe("LinkEntityMapper", function () {
         });
 
         test("round-trip mapping with null icon preserves null", function () {
-            $mapper = createLinkMapper();
+            $mapper = new LinkEntityMapper();
             $originalLink = TestEntityFactory::createLink(icon: null);
 
             $row = $mapper->mapToRow($originalLink);
