@@ -2,6 +2,8 @@
 
 namespace jschreuder\BookmarkBureau\Util;
 
+use jschreuder\BookmarkBureau\Entity\Mapper\EntityMapperInterface;
+
 /**
  * Helper for building dynamic SQL statements from field lists.
  *
@@ -17,12 +19,41 @@ namespace jschreuder\BookmarkBureau\Util;
 final readonly class SqlBuilder
 {
     /**
+     * Generate a SELECT field list from an EntityMapper's fields.
+     *
+     * Useful for constructing SELECT clauses or for use within JOIN queries
+     * where fields need to be table-qualified.
+     *
+     * @param EntityMapperInterface $mapper The entity mapper to extract fields from
+     * @param string|null $tableAlias Optional table alias (e.g., "l" for "links l")
+     *                                 If provided, fields will be qualified (e.g., "l.field_name")
+     * @return string Comma-separated field list
+     */
+    public static function selectFieldsFromMapper(
+        EntityMapperInterface $mapper,
+        ?string $tableAlias = null,
+    ): string {
+        $fields = $mapper->getFields();
+
+        if ($tableAlias === null || $tableAlias === "") {
+            return implode(", ", $fields);
+        }
+
+        return implode(
+            ", ",
+            array_map(fn(string $field) => "{$tableAlias}.{$field}", $fields),
+        );
+    }
+
+    /**
      * Build a SELECT statement with the given fields.
      *
      * @param string $table The table name
      * @param array<string> $fields The field names to select
      * @param string|null $where Optional WHERE clause (without WHERE keyword)
      * @param string|null $orderBy Optional ORDER BY clause (without ORDER BY keyword)
+     * @param int|null $limit Optional LIMIT clause value
+     * @param int|null $offset Optional OFFSET clause value (only applied if $limit is set)
      * @return string The complete SELECT statement
      */
     public static function buildSelect(
@@ -30,6 +61,8 @@ final readonly class SqlBuilder
         array $fields,
         ?string $where = null,
         ?string $orderBy = null,
+        ?int $limit = null,
+        ?int $offset = null,
     ): string {
         $sql = "SELECT " . implode(", ", $fields) . " FROM {$table}";
 
@@ -39,6 +72,13 @@ final readonly class SqlBuilder
 
         if ($orderBy !== null) {
             $sql .= " ORDER BY {$orderBy}";
+        }
+
+        if ($limit !== null) {
+            $sql .= " LIMIT {$limit}";
+            if ($offset !== null) {
+                $sql .= " OFFSET {$offset}";
+            }
         }
 
         return $sql;

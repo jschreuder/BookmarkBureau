@@ -15,6 +15,7 @@ use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
+use jschreuder\BookmarkBureau\Util\SqlBuilder;
 use Ramsey\Uuid\Uuid;
 
 final readonly class PdoFavoriteRepository implements
@@ -40,21 +41,19 @@ final readonly class PdoFavoriteRepository implements
         // Verify dashboard exists and reuse it for all favorites
         $dashboard = $this->dashboardRepository->findById($dashboardId);
 
-        $favoriteFields = array_map(fn(string $field) => "f." . $field, [
-            "dashboard_id",
-            "link_id",
-            "sort_order",
-            "created_at",
-        ]);
-        $linkFields = array_map(
-            fn(string $field) => "l." . $field,
-            $this->linkMapper->getFields(),
+        $favoriteFields = SqlBuilder::selectFieldsFromMapper(
+            $this->favoriteMapper,
+            "f",
+        );
+        $linkFields = SqlBuilder::selectFieldsFromMapper(
+            $this->linkMapper,
+            "l",
         );
         $statement = $this->pdo->prepare(
             "SELECT " .
-                implode(", ", $favoriteFields) .
+                $favoriteFields .
                 ", " .
-                implode(", ", $linkFields) .
+                $linkFields .
                 ' FROM favorites f
              INNER JOIN links l ON f.link_id = l.link_id
              WHERE f.dashboard_id = :dashboard_id
@@ -263,13 +262,13 @@ final readonly class PdoFavoriteRepository implements
         // Verify link exists
         $this->linkRepository->findById($linkId);
 
-        $dashboardFields = array_map(
-            fn(string $field) => "d." . $field,
-            $this->dashboardMapper->getFields(),
+        $dashboardFields = SqlBuilder::selectFieldsFromMapper(
+            $this->dashboardMapper,
+            "d",
         );
         $statement = $this->pdo->prepare(
             "SELECT DISTINCT " .
-                implode(", ", $dashboardFields) .
+                $dashboardFields .
                 ' FROM dashboards d
              INNER JOIN favorites f ON d.dashboard_id = f.dashboard_id
              WHERE f.link_id = :link_id

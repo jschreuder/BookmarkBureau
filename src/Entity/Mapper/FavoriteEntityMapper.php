@@ -13,14 +13,7 @@ final readonly class FavoriteEntityMapper implements EntityMapperInterface
     #[\Override]
     public function getFields(): array
     {
-        return [
-            "dashboard_id",
-            "link_id",
-            "sort_order",
-            "created_at",
-            "dashboard",
-            "link",
-        ];
+        return ["dashboard_id", "link_id", "sort_order", "created_at"];
     }
 
     #[\Override]

@@ -81,17 +81,13 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             throw LinkNotFoundException::forId($link);
         }
 
-        $tagFields = array_map(
-            fn(string $field) => "t." . $field,
-            $this->mapper->getFields(),
-        );
+        $tagFields = SqlBuilder::selectFieldsFromMapper($this->mapper, "t");
         $statement = $this->pdo->prepare(
-            "SELECT " .
-                implode(", ", $tagFields) .
-                ' FROM tags t
+            "SELECT {$tagFields}
+             FROM tags t
              INNER JOIN link_tags lt ON t.tag_name = lt.tag_name
              WHERE lt.link_id = :link_id
-             ORDER BY t.tag_name ASC',
+             ORDER BY t.tag_name ASC",
         );
         $statement->execute([":link_id" => $link->getBytes()]);
 
@@ -116,10 +112,10 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             $this->mapper->getFields(),
             "tag_name LIKE ?",
             "tag_name ASC",
+            $limit,
         );
-        $sql .= " LIMIT ?";
         $statement = $this->pdo->prepare($sql);
-        $statement->execute([$searchTerm, $limit]);
+        $statement->execute([$searchTerm]);
 
         $tags = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {

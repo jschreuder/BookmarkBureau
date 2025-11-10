@@ -97,18 +97,16 @@ final readonly class PdoCategoryRepository implements
         // Verify category exists
         $category = $this->findById($categoryId);
 
-        $linkFields = array_map(
-            fn(string $field) => "l." . $field,
-            $this->linkMapper->getFields(),
+        $linkFields = SqlBuilder::selectFieldsFromMapper(
+            $this->linkMapper,
+            "l",
         );
         $statement = $this->pdo->prepare(
-            'SELECT cl.category_id, cl.link_id, cl.sort_order, cl.created_at as category_link_created_at,
-                    ' .
-                implode(", ", $linkFields) .
-                ' FROM category_links cl
+            "SELECT cl.category_id, cl.link_id, cl.sort_order, cl.created_at as category_link_created_at, {$linkFields}
+             FROM category_links cl
              INNER JOIN links l ON cl.link_id = l.link_id
              WHERE cl.category_id = :category_id
-             ORDER BY cl.sort_order ASC',
+             ORDER BY cl.sort_order ASC",
         );
         $statement->execute([":category_id" => $categoryId->getBytes()]);
 

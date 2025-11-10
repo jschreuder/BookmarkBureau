@@ -15,8 +15,6 @@ describe("FavoriteEntityMapper", function () {
                 "link_id",
                 "sort_order",
                 "created_at",
-                "dashboard",
-                "link",
             ]);
         });
     });

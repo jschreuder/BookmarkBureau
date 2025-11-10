@@ -12,7 +12,6 @@ use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
-use Ramsey\Uuid\Uuid;
 
 final readonly class PdoLinkRepository implements LinkRepositoryInterface
 {
@@ -51,11 +50,10 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             $this->mapper->getFields(),
             null,
             "created_at DESC",
+            $limit,
+            $offset,
         );
-        $sql .= " LIMIT :limit OFFSET :offset";
         $statement = $this->pdo->prepare($sql);
-        $statement->bindValue(":limit", $limit, PDO::PARAM_INT);
-        $statement->bindValue(":offset", $offset, PDO::PARAM_INT);
         $statement->execute();
 
         $links = [];
@@ -111,13 +109,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             fn() => "SELECT link_id FROM link_tags WHERE tag_name = ?",
             $tagNames->toArray(),
         );
-        $fields = implode(
-            ", ",
-            array_map(
-                fn(string $field) => "l." . $field,
-                $this->mapper->getFields(),
-            ),
-        );
+        $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
         $query =
             "SELECT " .
             $fields .
@@ -148,20 +140,12 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     #[\Override]
     public function findByCategoryId(UuidInterface $categoryId): LinkCollection
     {
-        $fields = implode(
-            ", ",
-            array_map(
-                fn(string $field) => "l." . $field,
-                $this->mapper->getFields(),
-            ),
-        );
+        $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
         $statement = $this->pdo->prepare(
-            "SELECT " .
-                $fields .
-                ' FROM links l
+            "SELECT {$fields} FROM links l
              INNER JOIN category_links cl ON l.link_id = cl.link_id
              WHERE cl.category_id = :category_id
-             ORDER BY cl.sort_order ASC',
+             ORDER BY cl.sort_order ASC",
         );
         $statement->execute([":category_id" => $categoryId->getBytes()]);
 
