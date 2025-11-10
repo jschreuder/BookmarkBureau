@@ -13,17 +13,19 @@ final readonly class DashboardEntityMapper implements EntityMapperInterface
 {
     use EntityMapperTrait;
 
+    private const array FIELDS = [
+        "dashboard_id",
+        "title",
+        "description",
+        "icon",
+        "created_at",
+        "updated_at",
+    ];
+
     #[\Override]
     public function getFields(): array
     {
-        return [
-            "dashboard_id",
-            "title",
-            "description",
-            "icon",
-            "created_at",
-            "updated_at",
-        ];
+        return self::FIELDS;
     }
 
     #[\Override]

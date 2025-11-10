@@ -14,17 +14,19 @@ final readonly class UserEntityMapper implements EntityMapperInterface
 {
     use EntityMapperTrait;
 
+    private const array FIELDS = [
+        "user_id",
+        "email",
+        "password_hash",
+        "totp_secret",
+        "created_at",
+        "updated_at",
+    ];
+
     #[\Override]
     public function getFields(): array
     {
-        return [
-            "user_id",
-            "email",
-            "password_hash",
-            "totp_secret",
-            "created_at",
-            "updated_at",
-        ];
+        return self::FIELDS;
     }
 
     #[\Override]

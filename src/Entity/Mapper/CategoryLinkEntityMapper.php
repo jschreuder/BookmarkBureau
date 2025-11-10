@@ -10,17 +10,19 @@ final readonly class CategoryLinkEntityMapper implements EntityMapperInterface
 {
     use EntityMapperTrait;
 
+    private const array FIELDS = [
+        "category_id",
+        "link_id",
+        "sort_order",
+        "created_at",
+        "category",
+        "link",
+    ];
+
     #[\Override]
     public function getFields(): array
     {
-        return [
-            "category_id",
-            "link_id",
-            "sort_order",
-            "created_at",
-            "category",
-            "link",
-        ];
+        return self::FIELDS;
     }
 
     #[\Override]

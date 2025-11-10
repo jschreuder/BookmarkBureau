@@ -10,13 +10,12 @@ final readonly class TagEntityMapper implements EntityMapperInterface
 {
     use EntityMapperTrait;
 
+    private const array FIELDS = ["tag_name", "color"];
+
     #[\Override]
     public function getFields(): array
     {
-        return [
-            "tag_name",
-            "color",
-        ];
+        return self::FIELDS;
     }
 
     #[\Override]

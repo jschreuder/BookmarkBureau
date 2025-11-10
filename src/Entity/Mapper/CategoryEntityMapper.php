@@ -13,18 +13,20 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
 {
     use EntityMapperTrait;
 
+    private const array FIELDS = [
+        "category_id",
+        "dashboard_id",
+        "title",
+        "color",
+        "sort_order",
+        "created_at",
+        "updated_at",
+    ];
+
     #[\Override]
     public function getFields(): array
     {
-        return [
-            "category_id",
-            "dashboard_id",
-            "title",
-            "color",
-            "sort_order",
-            "created_at",
-            "updated_at",
-        ];
+        return self::FIELDS;
     }
 
     #[\Override]

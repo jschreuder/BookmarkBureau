@@ -10,10 +10,17 @@ final readonly class FavoriteEntityMapper implements EntityMapperInterface
 {
     use EntityMapperTrait;
 
+    private const array FIELDS = [
+        "dashboard_id",
+        "link_id",
+        "sort_order",
+        "created_at",
+    ];
+
     #[\Override]
     public function getFields(): array
     {
-        return ["dashboard_id", "link_id", "sort_order", "created_at"];
+        return self::FIELDS;
     }
 
     #[\Override]

@@ -14,18 +14,20 @@ final readonly class LinkEntityMapper implements EntityMapperInterface
 {
     use EntityMapperTrait;
 
+    private const array FIELDS = [
+        "link_id",
+        "url",
+        "title",
+        "description",
+        "icon",
+        "created_at",
+        "updated_at",
+    ];
+
     #[\Override]
     public function getFields(): array
     {
-        return [
-            "link_id",
-            "url",
-            "title",
-            "description",
-            "icon",
-            "created_at",
-            "updated_at",
-        ];
+        return self::FIELDS;
     }
 
     #[\Override]
