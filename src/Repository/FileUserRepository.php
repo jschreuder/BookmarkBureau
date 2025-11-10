@@ -2,7 +2,6 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use DateTimeImmutable;
 use jschreuder\BookmarkBureau\Collection\UserCollection;
 use jschreuder\BookmarkBureau\Entity\User;
 use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
@@ -12,7 +11,7 @@ use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-final class JsonUserRepository implements UserRepositoryInterface
+final class FileUserRepository implements UserRepositoryInterface
 {
     /**
      * @var array<string, User> In-memory cache of users indexed by user_id string

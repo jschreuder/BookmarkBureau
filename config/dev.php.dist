@@ -18,7 +18,7 @@ return [
     "db.user" => null,
     "db.pass" => null,
 
-    "users.storage.type" => "json",
+    "users.storage.type" => "file",
     "users.storage.path" => __DIR__ . "/../var/users.json",
 
     "auth.jwt_secret" => "dev-secret-key-change-in-production",

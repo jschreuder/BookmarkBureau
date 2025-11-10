@@ -128,7 +128,7 @@ describe("ServiceContainer Integration", function () {
             "provides UserRepository with configurable storage type",
             function () {
                 $config = TestContainerHelper::createTestConfig();
-                $config["users.storage.type"] = "json";
+                $config["users.storage.type"] = "file";
                 $compiledClass = TestContainerHelper::getCompiledContainerClass();
                 $container = $compiledClass->newInstance($config);
                 $repository = $container->getUserRepository();

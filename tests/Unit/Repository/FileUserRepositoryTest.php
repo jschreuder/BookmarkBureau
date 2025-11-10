@@ -4,10 +4,10 @@ use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
-use jschreuder\BookmarkBureau\Repository\JsonUserRepository;
+use jschreuder\BookmarkBureau\Repository\FileUserRepository;
 use Ramsey\Uuid\Uuid;
 
-describe("JsonUserRepository", function () {
+describe("FileUserRepository", function () {
     function getTestFilePath(): string
     {
         return sys_get_temp_dir() . "/test_users_" . uniqid() . ".json";
@@ -23,7 +23,7 @@ describe("JsonUserRepository", function () {
     describe("findById", function () {
         test("finds and returns a user by ID", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             $repo->save($user);
@@ -42,7 +42,7 @@ describe("JsonUserRepository", function () {
             "throws UserNotFoundException when user does not exist",
             function () {
                 $filePath = getTestFilePath();
-                $repo = new JsonUserRepository(
+                $repo = new FileUserRepository(
                     $filePath,
                     new UserEntityMapper(),
                 );
@@ -60,7 +60,7 @@ describe("JsonUserRepository", function () {
             "throws UserNotFoundException when file does not exist",
             function () {
                 $filePath = getTestFilePath();
-                $repo = new JsonUserRepository(
+                $repo = new FileUserRepository(
                     $filePath,
                     new UserEntityMapper(),
                 );
@@ -74,7 +74,7 @@ describe("JsonUserRepository", function () {
 
         test("correctly maps nullable TOTP secret", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $userWithoutTotp = TestEntityFactory::createUser();
 
             $repo->save($userWithoutTotp);
@@ -88,7 +88,7 @@ describe("JsonUserRepository", function () {
 
         test("correctly maps TOTP secret when present", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $totpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
             $userWithTotp = TestEntityFactory::createUser(
                 totpSecret: $totpSecret,
@@ -106,7 +106,7 @@ describe("JsonUserRepository", function () {
 
         test("preserves timestamps", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             $repo->save($user);
@@ -126,7 +126,7 @@ describe("JsonUserRepository", function () {
     describe("findByEmail", function () {
         test("finds and returns a user by email", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $email = new Email("test@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
@@ -143,7 +143,7 @@ describe("JsonUserRepository", function () {
             "throws UserNotFoundException when email does not exist",
             function () {
                 $filePath = getTestFilePath();
-                $repo = new JsonUserRepository(
+                $repo = new FileUserRepository(
                     $filePath,
                     new UserEntityMapper(),
                 );
@@ -159,14 +159,14 @@ describe("JsonUserRepository", function () {
 
         test("finds user from existing JSON file", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $email = new Email("stored@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
             $repo->save($user);
 
             // Create new repo instance to load from file
-            $repo2 = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
             $found = $repo2->findByEmail($email);
 
             expect($found->userId->toString())->toBe($user->userId->toString());
@@ -178,7 +178,7 @@ describe("JsonUserRepository", function () {
     describe("findAll", function () {
         test("returns empty collection when no users exist", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
 
             $result = $repo->findAll();
 
@@ -190,7 +190,7 @@ describe("JsonUserRepository", function () {
 
         test("returns all users ordered by email", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
 
             $user1 = TestEntityFactory::createUser(
                 email: new Email("alice@example.com"),
@@ -219,7 +219,7 @@ describe("JsonUserRepository", function () {
 
         test("loads users from existing JSON file", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
 
             $user1 = TestEntityFactory::createUser(
                 email: new Email("first@example.com"),
@@ -232,7 +232,7 @@ describe("JsonUserRepository", function () {
             $repo->save($user2);
 
             // Create new repo instance to load from file
-            $repo2 = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
             $result = $repo2->findAll();
 
             expect($result->count())->toBe(2);
@@ -244,7 +244,7 @@ describe("JsonUserRepository", function () {
     describe("save", function () {
         test("inserts a new user", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             $repo->save($user);
@@ -258,7 +258,7 @@ describe("JsonUserRepository", function () {
 
         test("updates an existing user", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $userId = Uuid::uuid4();
             $user = TestEntityFactory::createUser(
                 id: $userId,
@@ -287,7 +287,7 @@ describe("JsonUserRepository", function () {
 
         test("saves user with TOTP secret", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $totpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
             $user = TestEntityFactory::createUser(totpSecret: $totpSecret);
 
@@ -302,7 +302,7 @@ describe("JsonUserRepository", function () {
 
         test("saves user without TOTP secret (null)", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser(totpSecret: null);
 
             $repo->save($user);
@@ -315,7 +315,7 @@ describe("JsonUserRepository", function () {
 
         test("creates file if it does not exist", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             expect(file_exists($filePath))->toBeFalse();
@@ -330,7 +330,7 @@ describe("JsonUserRepository", function () {
         test("creates directory if it does not exist", function () {
             $tempDir = sys_get_temp_dir() . "/test_users_" . uniqid();
             $filePath = $tempDir . "/users.json";
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             expect(is_dir($tempDir))->toBeFalse();
@@ -346,7 +346,7 @@ describe("JsonUserRepository", function () {
 
         test("persists data to file", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser(
                 email: new Email("test@example.com"),
             );
@@ -368,7 +368,7 @@ describe("JsonUserRepository", function () {
     describe("delete", function () {
         test("deletes an existing user", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             $repo->save($user);
@@ -385,7 +385,7 @@ describe("JsonUserRepository", function () {
             "does not throw error when deleting non-existent user",
             function () {
                 $filePath = getTestFilePath();
-                $repo = new JsonUserRepository(
+                $repo = new FileUserRepository(
                     $filePath,
                     new UserEntityMapper(),
                 );
@@ -404,14 +404,14 @@ describe("JsonUserRepository", function () {
 
         test("persists deletion to file", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             $repo->save($user);
             $repo->delete($user);
 
             // Create new repo instance to load from file
-            $repo2 = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
 
             expect(fn() => $repo2->findById($user->userId))->toThrow(
                 UserNotFoundException::class,
@@ -424,7 +424,7 @@ describe("JsonUserRepository", function () {
     describe("existsByEmail", function () {
         test("returns true when email exists", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $email = new Email("test@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
@@ -437,7 +437,7 @@ describe("JsonUserRepository", function () {
 
         test("returns false when email does not exist", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $email = new Email("nonexistent@example.com");
 
             expect($repo->existsByEmail($email))->toBeFalse();
@@ -447,7 +447,7 @@ describe("JsonUserRepository", function () {
 
         test("returns false for empty database", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $email = new Email("any@example.com");
 
             expect($repo->existsByEmail($email))->toBeFalse();
@@ -457,14 +457,14 @@ describe("JsonUserRepository", function () {
 
         test("loads from file to check existence", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $email = new Email("stored@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
             $repo->save($user);
 
             // Create new repo instance to load from file
-            $repo2 = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
 
             expect($repo2->existsByEmail($email))->toBeTrue();
 
@@ -475,7 +475,7 @@ describe("JsonUserRepository", function () {
     describe("count", function () {
         test("returns zero for empty database", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
 
             expect($repo->count())->toBe(0);
 
@@ -484,7 +484,7 @@ describe("JsonUserRepository", function () {
 
         test("returns correct count of users", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
 
             $user1 = TestEntityFactory::createUser();
             $user2 = TestEntityFactory::createUser();
@@ -501,7 +501,7 @@ describe("JsonUserRepository", function () {
 
         test("count updates after deletion", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             $repo->save($user);
@@ -515,7 +515,7 @@ describe("JsonUserRepository", function () {
 
         test("loads from file to get count", function () {
             $filePath = getTestFilePath();
-            $repo = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
 
             $user1 = TestEntityFactory::createUser();
             $user2 = TestEntityFactory::createUser();
@@ -524,7 +524,7 @@ describe("JsonUserRepository", function () {
             $repo->save($user2);
 
             // Create new repo instance to load from file
-            $repo2 = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
 
             expect($repo2->count())->toBe(2);
 
@@ -537,7 +537,7 @@ describe("JsonUserRepository", function () {
             $filePath = getTestFilePath();
 
             // First instance: save users
-            $repo1 = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo1 = new FileUserRepository($filePath, new UserEntityMapper());
             $user1 = TestEntityFactory::createUser(
                 email: new Email("user1@example.com"),
             );
@@ -549,7 +549,7 @@ describe("JsonUserRepository", function () {
             $repo1->save($user2);
 
             // Second instance: load and verify
-            $repo2 = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
             expect($repo2->count())->toBe(2);
             expect(
                 (string) $repo2->findByEmail(new Email("user1@example.com"))
@@ -567,14 +567,14 @@ describe("JsonUserRepository", function () {
             $filePath = getTestFilePath();
 
             // First instance: save a user
-            $repo1 = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo1 = new FileUserRepository($filePath, new UserEntityMapper());
             $user1 = TestEntityFactory::createUser(
                 email: new Email("user1@example.com"),
             );
             $repo1->save($user1);
 
             // Second instance loads from file
-            $repo2 = new JsonUserRepository($filePath, new UserEntityMapper());
+            $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
 
             // First instance saves another user
             $user2 = TestEntityFactory::createUser(

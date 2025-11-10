@@ -20,7 +20,7 @@ use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
-use jschreuder\BookmarkBureau\Repository\JsonUserRepository;
+use jschreuder\BookmarkBureau\Repository\FileUserRepository;
 use jschreuder\BookmarkBureau\Repository\JwtJtiRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\PdoCategoryRepository;
@@ -290,7 +290,7 @@ class ServiceContainer
         $storageType = $this->config("users.storage.type");
 
         return match ($storageType) {
-            "json" => new JsonUserRepository(
+            "file" => new FileUserRepository(
                 $this->config("users.storage.path"),
                 new UserEntityMapper(),
             ),
