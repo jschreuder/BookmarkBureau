@@ -2,21 +2,21 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use DateTimeImmutable;
 use PDO;
-use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Collection\UserCollection;
 use jschreuder\BookmarkBureau\Entity\User;
+use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
-use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
-use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
-use jschreuder\BookmarkBureau\Util\SqlFormat;
+use jschreuder\BookmarkBureau\Util\SqlBuilder;
 
 final readonly class PdoUserRepository implements UserRepositoryInterface
 {
-    public function __construct(private readonly PDO $pdo) {}
+    public function __construct(
+        private readonly PDO $pdo,
+        private readonly UserEntityMapper $mapper,
+    ) {}
 
     /**
      * @throws UserNotFoundException when user doesn't exist
@@ -24,9 +24,12 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     #[\Override]
     public function findById(UuidInterface $userId): User
     {
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM users WHERE user_id = :user_id LIMIT 1",
+        $sql = SqlBuilder::buildSelect(
+            "users",
+            $this->mapper->getFields(),
+            "user_id = :user_id LIMIT 1",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([":user_id" => $userId->getBytes()]);
         $row = $statement->fetch(PDO::FETCH_ASSOC);
 
@@ -36,18 +39,22 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
             );
         }
 
-        return $this->mapRowToUser($row);
+        return $this->mapper->mapToEntity($row);
     }
 
     /**
      * @throws UserNotFoundException when user doesn't exist
      */
     #[\Override]
-    public function findByEmail(Email $email): User
-    {
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM users WHERE email = :email LIMIT 1",
+    public function findByEmail(
+        \jschreuder\BookmarkBureau\Entity\Value\Email $email,
+    ): User {
+        $sql = SqlBuilder::buildSelect(
+            "users",
+            $this->mapper->getFields(),
+            "email = :email LIMIT 1",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([":email" => (string) $email]);
         $row = $statement->fetch(PDO::FETCH_ASSOC);
 
@@ -55,7 +62,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
             throw new UserNotFoundException("User not found: " . $email);
         }
 
-        return $this->mapRowToUser($row);
+        return $this->mapper->mapToEntity($row);
     }
 
     /**
@@ -64,13 +71,17 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     #[\Override]
     public function findAll(): UserCollection
     {
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM users ORDER BY email ASC",
+        $sql = SqlBuilder::buildSelect(
+            "users",
+            $this->mapper->getFields(),
+            null,
+            "email ASC",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute();
         $users = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $users[] = $this->mapRowToUser($row);
+            $users[] = $this->mapper->mapToEntity($row);
         }
         return new UserCollection(...$users);
     }
@@ -81,7 +92,8 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     #[\Override]
     public function save(User $user): void
     {
-        $userIdBytes = $user->userId->getBytes();
+        $row = $this->mapper->mapToRow($user);
+        $userIdBytes = $row["user_id"];
 
         // Check if user exists
         $check = $this->pdo->prepare(
@@ -91,37 +103,12 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
 
         if ($check->fetch() === false) {
             // Insert new user
-            $statement = $this->pdo->prepare(
-                'INSERT INTO users (user_id, email, password_hash, totp_secret, created_at, updated_at)
-                 VALUES (:user_id, :email, :password_hash, :totp_secret, :created_at, :updated_at)',
-            );
-            $statement->execute([
-                ":user_id" => $userIdBytes,
-                ":email" => (string) $user->email,
-                ":password_hash" => $user->passwordHash->value,
-                ":totp_secret" => $user->totpSecret
-                    ? (string) $user->totpSecret
-                    : null,
-                ":created_at" => $user->createdAt->format(SqlFormat::TIMESTAMP),
-                ":updated_at" => $user->updatedAt->format(SqlFormat::TIMESTAMP),
-            ]);
+            $build = SqlBuilder::buildInsert("users", $row);
+            $this->pdo->prepare($build["sql"])->execute($build["params"]);
         } else {
             // Update existing user
-            $statement = $this->pdo->prepare(
-                'UPDATE users
-                 SET email = :email, password_hash = :password_hash,
-                     totp_secret = :totp_secret, updated_at = :updated_at
-                 WHERE user_id = :user_id',
-            );
-            $statement->execute([
-                ":user_id" => $userIdBytes,
-                ":email" => (string) $user->email,
-                ":password_hash" => $user->passwordHash->value,
-                ":totp_secret" => $user->totpSecret
-                    ? (string) $user->totpSecret
-                    : null,
-                ":updated_at" => $user->updatedAt->format(SqlFormat::TIMESTAMP),
-            ]);
+            $build = SqlBuilder::buildUpdate("users", $row, "user_id");
+            $this->pdo->prepare($build["sql"])->execute($build["params"]);
         }
     }
 
@@ -160,22 +147,5 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         $statement->execute();
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         return (int) $result["count"];
-    }
-
-    /**
-     * Map a database row to a User entity
-     */
-    private function mapRowToUser(array $row): User
-    {
-        return new User(
-            userId: Uuid::fromBytes($row["user_id"]),
-            email: new Email($row["email"]),
-            passwordHash: new HashedPassword($row["password_hash"]),
-            totpSecret: $row["totp_secret"] !== null
-                ? new TotpSecret($row["totp_secret"])
-                : null,
-            createdAt: new DateTimeImmutable($row["created_at"]),
-            updatedAt: new DateTimeImmutable($row["updated_at"]),
-        );
     }
 }

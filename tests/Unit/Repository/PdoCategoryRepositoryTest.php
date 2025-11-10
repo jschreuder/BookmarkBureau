@@ -1,6 +1,9 @@
 <?php
 
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Entity\Mapper\CategoryEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
@@ -9,7 +12,6 @@ use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Repository\PdoCategoryRepository;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
-use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use Ramsey\Uuid\Uuid;
 
 describe("PdoCategoryRepository", function () {
@@ -139,15 +141,19 @@ describe("PdoCategoryRepository", function () {
 
     function createCategoryRepositories(PDO $pdo)
     {
-        return [
-            new PdoDashboardRepository($pdo, new DashboardEntityMapper()),
-            new PdoLinkRepository($pdo),
-            new PdoCategoryRepository(
-                $pdo,
-                new PdoDashboardRepository($pdo, new DashboardEntityMapper()),
-                new PdoLinkRepository($pdo),
-            ),
-        ];
+        $dashboardRepo = new PdoDashboardRepository(
+            $pdo,
+            new DashboardEntityMapper(),
+        );
+        $linkRepo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+        $categoryRepo = new PdoCategoryRepository(
+            $pdo,
+            $dashboardRepo,
+            $linkRepo,
+            new CategoryEntityMapper(),
+            new LinkEntityMapper(),
+        );
+        return [$dashboardRepo, $linkRepo, $categoryRepo];
     }
 
     describe("findById", function () {
@@ -473,10 +479,10 @@ describe("PdoCategoryRepository", function () {
                 $mockPdo
                     ->shouldReceive("prepare")
                     ->once()
-                    ->with(
-                        'INSERT INTO categories (category_id, dashboard_id, title, color, sort_order, created_at, updated_at)
-                     VALUES (:category_id, :dashboard_id, :title, :color, :sort_order, :created_at, :updated_at)',
-                    )
+                    ->withArgs(function ($sql) {
+                        return str_contains($sql, "INSERT INTO categories") &&
+                            str_contains($sql, "VALUES");
+                    })
                     ->andReturn($insertStmt);
 
                 $mockDashboardRepo = \Mockery::mock(
@@ -489,6 +495,8 @@ describe("PdoCategoryRepository", function () {
                     $mockPdo,
                     $mockDashboardRepo,
                     $mockLinkRepo,
+                    new CategoryEntityMapper(),
+                    new LinkEntityMapper(),
                 );
 
                 expect(fn() => $repo->save($category))->toThrow(
@@ -531,10 +539,10 @@ describe("PdoCategoryRepository", function () {
                 $mockPdo
                     ->shouldReceive("prepare")
                     ->once()
-                    ->with(
-                        'INSERT INTO categories (category_id, dashboard_id, title, color, sort_order, created_at, updated_at)
-                     VALUES (:category_id, :dashboard_id, :title, :color, :sort_order, :created_at, :updated_at)',
-                    )
+                    ->withArgs(function ($sql) {
+                        return str_contains($sql, "INSERT INTO categories") &&
+                            str_contains($sql, "VALUES");
+                    })
                     ->andReturn($insertStmt);
 
                 $mockDashboardRepo = \Mockery::mock(
@@ -547,6 +555,8 @@ describe("PdoCategoryRepository", function () {
                     $mockPdo,
                     $mockDashboardRepo,
                     $mockLinkRepo,
+                    new CategoryEntityMapper(),
+                    new LinkEntityMapper(),
                 );
 
                 expect(fn() => $repo->save($category))->toThrow(
@@ -733,6 +743,8 @@ describe("PdoCategoryRepository", function () {
                     $mockPdo,
                     $mockDashboardRepo,
                     $mockLinkRepo,
+                    new CategoryEntityMapper(),
+                    new LinkEntityMapper(),
                 );
 
                 expect(

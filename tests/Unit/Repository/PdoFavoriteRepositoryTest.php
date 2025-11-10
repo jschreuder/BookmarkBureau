@@ -1,12 +1,14 @@
 <?php
 
+use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\FavoriteEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
 use jschreuder\BookmarkBureau\Repository\PdoFavoriteRepository;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
-use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use Ramsey\Uuid\Uuid;
 
 describe("PdoFavoriteRepository", function () {
@@ -137,15 +139,20 @@ describe("PdoFavoriteRepository", function () {
 
     function createFavoriteRepositories(PDO $pdo)
     {
-        return [
-            new PdoDashboardRepository($pdo, new DashboardEntityMapper()),
-            new PdoLinkRepository($pdo),
-            new PdoFavoriteRepository(
-                $pdo,
-                new PdoDashboardRepository($pdo, new DashboardEntityMapper()),
-                new PdoLinkRepository($pdo),
-            ),
-        ];
+        $dashboardRepo = new PdoDashboardRepository(
+            $pdo,
+            new DashboardEntityMapper(),
+        );
+        $linkRepo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+        $favoriteRepo = new PdoFavoriteRepository(
+            $pdo,
+            $dashboardRepo,
+            $linkRepo,
+            new FavoriteEntityMapper(),
+            new DashboardEntityMapper(),
+            new LinkEntityMapper(),
+        );
+        return [$dashboardRepo, $linkRepo, $favoriteRepo];
     }
 
     describe("findByDashboardId", function () {
@@ -395,6 +402,9 @@ describe("PdoFavoriteRepository", function () {
                     $mockPdo,
                     $mockDashboardRepo,
                     $mockLinkRepo,
+                    new FavoriteEntityMapper(),
+                    new DashboardEntityMapper(),
+                    new LinkEntityMapper(),
                 );
 
                 expect(
@@ -449,6 +459,9 @@ describe("PdoFavoriteRepository", function () {
                     $mockPdo,
                     $mockDashboardRepo,
                     $mockLinkRepo,
+                    new FavoriteEntityMapper(),
+                    new DashboardEntityMapper(),
+                    new LinkEntityMapper(),
                 );
 
                 expect(
@@ -503,6 +516,9 @@ describe("PdoFavoriteRepository", function () {
                     $mockPdo,
                     $mockDashboardRepo,
                     $mockLinkRepo,
+                    new FavoriteEntityMapper(),
+                    new DashboardEntityMapper(),
+                    new LinkEntityMapper(),
                 );
 
                 expect(

@@ -6,15 +6,18 @@ use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Collection\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Tag;
-use jschreuder\BookmarkBureau\Entity\Value\HexColor;
-use jschreuder\BookmarkBureau\Entity\Value\TagName;
+use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DuplicateTagException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Util\SqlBuilder;
 
 final readonly class PdoTagRepository implements TagRepositoryInterface
 {
-    public function __construct(private readonly PDO $pdo) {}
+    public function __construct(
+        private readonly PDO $pdo,
+        private readonly TagEntityMapper $mapper,
+    ) {}
 
     /**
      * @throws TagNotFoundException when tag doesn't exist
@@ -22,9 +25,12 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     #[\Override]
     public function findByName(string $tagName): Tag
     {
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM tags WHERE tag_name = :tag_name LIMIT 1",
+        $sql = SqlBuilder::buildSelect(
+            "tags",
+            $this->mapper->getFields(),
+            "tag_name = :tag_name LIMIT 1",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([":tag_name" => $tagName]);
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
@@ -32,7 +38,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             throw TagNotFoundException::forName($tagName);
         }
 
-        return $this->mapRowToTag($row);
+        return $this->mapper->mapToEntity($row);
     }
 
     /**
@@ -41,14 +47,18 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     #[\Override]
     public function findAll(): TagCollection
     {
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM tags ORDER BY tag_name ASC",
+        $sql = SqlBuilder::buildSelect(
+            "tags",
+            $this->mapper->getFields(),
+            null,
+            "tag_name ASC",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute();
 
         $tags = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $tags[] = $this->mapRowToTag($row);
+            $tags[] = $this->mapper->mapToEntity($row);
         }
 
         return new TagCollection(...$tags);
@@ -71,8 +81,14 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             throw LinkNotFoundException::forId($link);
         }
 
+        $tagFields = array_map(
+            fn(string $field) => "t." . $field,
+            $this->mapper->getFields(),
+        );
         $statement = $this->pdo->prepare(
-            'SELECT t.* FROM tags t
+            "SELECT " .
+                implode(", ", $tagFields) .
+                ' FROM tags t
              INNER JOIN link_tags lt ON t.tag_name = lt.tag_name
              WHERE lt.link_id = :link_id
              ORDER BY t.tag_name ASC',
@@ -81,7 +97,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
 
         $tags = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $tags[] = $this->mapRowToTag($row);
+            $tags[] = $this->mapper->mapToEntity($row);
         }
 
         return new TagCollection(...$tags);
@@ -95,17 +111,19 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     {
         $searchTerm = "{$query}%";
 
-        $statement = $this->pdo->prepare(
-            'SELECT * FROM tags
-             WHERE tag_name LIKE ?
-             ORDER BY tag_name ASC
-             LIMIT ?',
+        $sql = SqlBuilder::buildSelect(
+            "tags",
+            $this->mapper->getFields(),
+            "tag_name LIKE ?",
+            "tag_name ASC",
         );
+        $sql .= " LIMIT ?";
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([$searchTerm, $limit]);
 
         $tags = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $tags[] = $this->mapRowToTag($row);
+            $tags[] = $this->mapper->mapToEntity($row);
         }
 
         return new TagCollection(...$tags);
@@ -118,7 +136,8 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     #[\Override]
     public function save(Tag $tag): void
     {
-        $tagNameValue = $tag->tagName->value;
+        $row = $this->mapper->mapToRow($tag);
+        $tagNameValue = $row["tag_name"];
 
         // Check if tag exists
         $check = $this->pdo->prepare(
@@ -129,14 +148,8 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         if ($check->fetch() === false) {
             // Insert new tag
             try {
-                $statement = $this->pdo->prepare(
-                    'INSERT INTO tags (tag_name, color)
-                     VALUES (:tag_name, :color)',
-                );
-                $statement->execute([
-                    ":tag_name" => $tagNameValue,
-                    ":color" => $tag->color?->value,
-                ]);
+                $build = SqlBuilder::buildInsert("tags", $row);
+                $this->pdo->prepare($build["sql"])->execute($build["params"]);
             } catch (\PDOException $e) {
                 if (
                     str_contains($e->getMessage(), "Duplicate entry") ||
@@ -150,13 +163,8 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             }
         } else {
             // Update existing tag
-            $statement = $this->pdo->prepare(
-                "UPDATE tags SET color = :color WHERE tag_name = :tag_name",
-            );
-            $statement->execute([
-                ":tag_name" => $tagNameValue,
-                ":color" => $tag->color?->value,
-            ]);
+            $build = SqlBuilder::buildUpdate("tags", $row, "tag_name");
+            $this->pdo->prepare($build["sql"])->execute($build["params"]);
         }
     }
 
@@ -272,16 +280,5 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         ]);
 
         return $statement->fetch() !== false;
-    }
-
-    /**
-     * Map a database row to a Tag entity
-     */
-    private function mapRowToTag(array $row): Tag
-    {
-        return new Tag(
-            tagName: new TagName($row["tag_name"]),
-            color: $row["color"] !== null ? new HexColor($row["color"]) : null,
-        );
     }
 }

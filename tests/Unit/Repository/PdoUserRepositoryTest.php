@@ -1,5 +1,6 @@
 <?php
 
+use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
@@ -50,7 +51,7 @@ describe("PdoUserRepository", function () {
     describe("findById", function () {
         test("finds and returns a user by ID", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             insertTestUser($pdo, $user);
@@ -68,7 +69,7 @@ describe("PdoUserRepository", function () {
             "throws UserNotFoundException when user does not exist",
             function () {
                 $pdo = createUserDatabase();
-                $repo = new PdoUserRepository($pdo);
+                $repo = new PdoUserRepository($pdo, new UserEntityMapper());
                 $nonExistentId = Uuid::uuid4();
 
                 expect(fn() => $repo->findById($nonExistentId))->toThrow(
@@ -79,7 +80,7 @@ describe("PdoUserRepository", function () {
 
         test("correctly maps nullable TOTP secret", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $userWithoutTotp = TestEntityFactory::createUser();
 
             insertTestUser($pdo, $userWithoutTotp);
@@ -92,7 +93,7 @@ describe("PdoUserRepository", function () {
 
         test("correctly maps TOTP secret when present", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $totpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
             $userWithTotp = TestEntityFactory::createUser(
                 totpSecret: $totpSecret,
@@ -109,7 +110,7 @@ describe("PdoUserRepository", function () {
 
         test("preserves timestamps", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             insertTestUser($pdo, $user);
@@ -128,7 +129,7 @@ describe("PdoUserRepository", function () {
     describe("findByEmail", function () {
         test("finds and returns a user by email", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $email = new Email("test@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
@@ -144,7 +145,7 @@ describe("PdoUserRepository", function () {
             "throws UserNotFoundException when email does not exist",
             function () {
                 $pdo = createUserDatabase();
-                $repo = new PdoUserRepository($pdo);
+                $repo = new PdoUserRepository($pdo, new UserEntityMapper());
                 $nonExistentEmail = new Email("nonexistent@example.com");
 
                 expect(fn() => $repo->findByEmail($nonExistentEmail))->toThrow(
@@ -155,7 +156,7 @@ describe("PdoUserRepository", function () {
 
         test("is case sensitive for email lookup", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $email = new Email("test@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
@@ -170,7 +171,7 @@ describe("PdoUserRepository", function () {
     describe("findAll", function () {
         test("returns empty collection when no users exist", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
 
             $result = $repo->findAll();
 
@@ -180,7 +181,7 @@ describe("PdoUserRepository", function () {
 
         test("returns all users ordered by email", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
 
             $user1 = TestEntityFactory::createUser(
                 email: new Email("alice@example.com"),
@@ -209,7 +210,7 @@ describe("PdoUserRepository", function () {
     describe("save", function () {
         test("inserts a new user", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             $repo->save($user);
@@ -221,7 +222,7 @@ describe("PdoUserRepository", function () {
 
         test("updates an existing user", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $userId = Uuid::uuid4();
             $user = TestEntityFactory::createUser(
                 id: $userId,
@@ -248,7 +249,7 @@ describe("PdoUserRepository", function () {
 
         test("saves user with TOTP secret", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $totpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
             $user = TestEntityFactory::createUser(totpSecret: $totpSecret);
 
@@ -261,7 +262,7 @@ describe("PdoUserRepository", function () {
 
         test("saves user without TOTP secret (null)", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $user = TestEntityFactory::createUser(totpSecret: null);
 
             $repo->save($user);
@@ -272,7 +273,7 @@ describe("PdoUserRepository", function () {
 
         test("preserves timestamps on insert", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             $repo->save($user);
@@ -290,7 +291,7 @@ describe("PdoUserRepository", function () {
     describe("delete", function () {
         test("deletes an existing user", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             insertTestUser($pdo, $user);
@@ -306,7 +307,7 @@ describe("PdoUserRepository", function () {
             "does not throw error when deleting non-existent user",
             function () {
                 $pdo = createUserDatabase();
-                $repo = new PdoUserRepository($pdo);
+                $repo = new PdoUserRepository($pdo, new UserEntityMapper());
                 $user = TestEntityFactory::createUser();
 
                 try {
@@ -322,7 +323,7 @@ describe("PdoUserRepository", function () {
     describe("existsByEmail", function () {
         test("returns true when email exists", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $email = new Email("test@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
@@ -333,7 +334,7 @@ describe("PdoUserRepository", function () {
 
         test("returns false when email does not exist", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $email = new Email("nonexistent@example.com");
 
             expect($repo->existsByEmail($email))->toBeFalse();
@@ -341,7 +342,7 @@ describe("PdoUserRepository", function () {
 
         test("returns false for empty database", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $email = new Email("any@example.com");
 
             expect($repo->existsByEmail($email))->toBeFalse();
@@ -351,14 +352,14 @@ describe("PdoUserRepository", function () {
     describe("count", function () {
         test("returns zero for empty database", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
 
             expect($repo->count())->toBe(0);
         });
 
         test("returns correct count of users", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
 
             $user1 = TestEntityFactory::createUser(
                 email: new Email("user1@example.com"),
@@ -379,7 +380,7 @@ describe("PdoUserRepository", function () {
 
         test("count updates after deletion", function () {
             $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo);
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
             insertTestUser($pdo, $user);

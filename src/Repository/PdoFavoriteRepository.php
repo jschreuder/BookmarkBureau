@@ -7,12 +7,10 @@ use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Collection\DashboardCollection;
 use jschreuder\BookmarkBureau\Collection\FavoriteCollection;
-use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Favorite;
-use jschreuder\BookmarkBureau\Entity\Link;
-use jschreuder\BookmarkBureau\Entity\Value\Icon;
-use jschreuder\BookmarkBureau\Entity\Value\Title;
-use jschreuder\BookmarkBureau\Entity\Value\Url;
+use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\FavoriteEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
@@ -26,6 +24,9 @@ final readonly class PdoFavoriteRepository implements
         private readonly PDO $pdo,
         private readonly DashboardRepositoryInterface $dashboardRepository,
         private readonly LinkRepositoryInterface $linkRepository,
+        private readonly FavoriteEntityMapper $favoriteMapper,
+        private readonly DashboardEntityMapper $dashboardMapper,
+        private readonly LinkEntityMapper $linkMapper,
     ) {}
 
     /**
@@ -39,8 +40,22 @@ final readonly class PdoFavoriteRepository implements
         // Verify dashboard exists and reuse it for all favorites
         $dashboard = $this->dashboardRepository->findById($dashboardId);
 
+        $favoriteFields = array_map(fn(string $field) => "f." . $field, [
+            "dashboard_id",
+            "link_id",
+            "sort_order",
+            "created_at",
+        ]);
+        $linkFields = array_map(
+            fn(string $field) => "l." . $field,
+            $this->linkMapper->getFields(),
+        );
         $statement = $this->pdo->prepare(
-            'SELECT f.*, l.* FROM favorites f
+            "SELECT " .
+                implode(", ", $favoriteFields) .
+                ", " .
+                implode(", ", $linkFields) .
+                ' FROM favorites f
              INNER JOIN links l ON f.link_id = l.link_id
              WHERE f.dashboard_id = :dashboard_id
              ORDER BY f.sort_order ASC',
@@ -49,7 +64,9 @@ final readonly class PdoFavoriteRepository implements
 
         $favorites = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $favorites[] = $this->mapRowToFavorite($row, $dashboard);
+            $row["dashboard"] = $dashboard;
+            $row["link"] = $this->linkMapper->mapToEntity($row);
+            $favorites[] = $this->favoriteMapper->mapToEntity($row);
         }
 
         return new FavoriteCollection(...$favorites);
@@ -246,8 +263,14 @@ final readonly class PdoFavoriteRepository implements
         // Verify link exists
         $this->linkRepository->findById($linkId);
 
+        $dashboardFields = array_map(
+            fn(string $field) => "d." . $field,
+            $this->dashboardMapper->getFields(),
+        );
         $statement = $this->pdo->prepare(
-            'SELECT DISTINCT d.* FROM dashboards d
+            "SELECT DISTINCT " .
+                implode(", ", $dashboardFields) .
+                ' FROM dashboards d
              INNER JOIN favorites f ON d.dashboard_id = f.dashboard_id
              WHERE f.link_id = :link_id
              ORDER BY d.title ASC',
@@ -256,66 +279,9 @@ final readonly class PdoFavoriteRepository implements
 
         $dashboards = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $dashboards[] = $this->mapRowToDashboard($row);
+            $dashboards[] = $this->dashboardMapper->mapToEntity($row);
         }
 
         return new DashboardCollection(...$dashboards);
-    }
-
-    /**
-     * Map a database row to a Favorite entity
-     * When called from findByDashboardId, the dashboard is passed to avoid redundant lookups
-     */
-    private function mapRowToFavorite(
-        array $row,
-        ?Dashboard $dashboard = null,
-    ): Favorite {
-        // Get dashboard if not provided (fallback for other methods that construct the Favorite)
-        if ($dashboard === null) {
-            $dashboardId = Uuid::fromBytes($row["dashboard_id"]);
-            $dashboard = $this->dashboardRepository->findById($dashboardId);
-        }
-
-        // Map link directly from the row data without hitting the repository
-        $link = $this->mapRowToLink($row);
-
-        return new Favorite(
-            dashboard: $dashboard,
-            link: $link,
-            sortOrder: (int) $row["sort_order"],
-            createdAt: new DateTimeImmutable($row["created_at"]),
-        );
-    }
-
-    /**
-     * Map a database row to a Link entity (helper for Favorite mapping)
-     * Constructs Link directly from row data instead of calling repository
-     */
-    private function mapRowToLink(array $row): Link
-    {
-        return new Link(
-            linkId: Uuid::fromBytes($row["link_id"]),
-            url: new Url($row["url"]),
-            title: new Title($row["title"]),
-            description: $row["description"],
-            icon: $row["icon"] !== null ? new Icon($row["icon"]) : null,
-            createdAt: new DateTimeImmutable($row["created_at"]),
-            updatedAt: new DateTimeImmutable($row["updated_at"]),
-        );
-    }
-
-    /**
-     * Map a database row to a Dashboard entity
-     */
-    private function mapRowToDashboard(array $row): Dashboard
-    {
-        return new Dashboard(
-            dashboardId: Uuid::fromBytes($row["dashboard_id"]),
-            title: new Title($row["title"]),
-            description: $row["description"],
-            icon: $row["icon"] !== null ? new Icon($row["icon"]) : null,
-            createdAt: new DateTimeImmutable($row["created_at"]),
-            updatedAt: new DateTimeImmutable($row["updated_at"]),
-        );
     }
 }

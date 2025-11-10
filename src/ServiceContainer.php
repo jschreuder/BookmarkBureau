@@ -33,6 +33,11 @@ use jschreuder\BookmarkBureau\Repository\PdoUserRepository;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\CategoryEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\FavoriteEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use jschreuder\BookmarkBureau\Service\CategoryService;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Service\DashboardService;
@@ -190,12 +195,12 @@ class ServiceContainer
 
     public function getLinkRepository(): LinkRepositoryInterface
     {
-        return new PdoLinkRepository($this->getDb());
+        return new PdoLinkRepository($this->getDb(), new LinkEntityMapper());
     }
 
     public function getTagRepository(): TagRepositoryInterface
     {
-        return new PdoTagRepository($this->getDb());
+        return new PdoTagRepository($this->getDb(), new TagEntityMapper());
     }
 
     public function getCategoryRepository(): CategoryRepositoryInterface
@@ -204,6 +209,8 @@ class ServiceContainer
             $this->getDb(),
             $this->getDashboardRepository(),
             $this->getLinkRepository(),
+            new CategoryEntityMapper(),
+            new LinkEntityMapper(),
         );
     }
 
@@ -221,6 +228,9 @@ class ServiceContainer
             $this->getDb(),
             $this->getDashboardRepository(),
             $this->getLinkRepository(),
+            new FavoriteEntityMapper(),
+            new DashboardEntityMapper(),
+            new LinkEntityMapper(),
         );
     }
 
@@ -283,7 +293,10 @@ class ServiceContainer
             "json" => new JsonUserRepository(
                 $this->config("users.storage.path"),
             ),
-            "pdo" => new PdoUserRepository($this->getDb()),
+            "pdo" => new PdoUserRepository(
+                $this->getDb(),
+                new UserEntityMapper(),
+            ),
             default => throw new RepositoryStorageException(
                 "Unknown user storage type: {$storageType}",
             ),

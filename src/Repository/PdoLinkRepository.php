@@ -2,24 +2,24 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use DateTimeImmutable;
 use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Collection\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
-use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
-use jschreuder\BookmarkBureau\Entity\Value\Title;
-use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
-use jschreuder\BookmarkBureau\Util\SqlFormat;
+use jschreuder\BookmarkBureau\Util\SqlBuilder;
 use Ramsey\Uuid\Uuid;
 
 final readonly class PdoLinkRepository implements LinkRepositoryInterface
 {
-    public function __construct(private readonly PDO $pdo) {}
+    public function __construct(
+        private readonly PDO $pdo,
+        private readonly LinkEntityMapper $mapper,
+    ) {}
 
     /**
      * @throws LinkNotFoundException when link doesn't exist
@@ -27,9 +27,12 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     #[\Override]
     public function findById(UuidInterface $linkId): Link
     {
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM links WHERE link_id = :link_id LIMIT 1",
+        $sql = SqlBuilder::buildSelect(
+            "links",
+            $this->mapper->getFields(),
+            "link_id = :link_id LIMIT 1",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([":link_id" => $linkId->getBytes()]);
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
@@ -37,22 +40,27 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             throw LinkNotFoundException::forId($linkId);
         }
 
-        return $this->mapRowToLink($row);
+        return $this->mapper->mapToEntity($row);
     }
 
     #[\Override]
     public function findAll(int $limit = 100, int $offset = 0): LinkCollection
     {
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM links ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
+        $sql = SqlBuilder::buildSelect(
+            "links",
+            $this->mapper->getFields(),
+            null,
+            "created_at DESC",
         );
+        $sql .= " LIMIT :limit OFFSET :offset";
+        $statement = $this->pdo->prepare($sql);
         $statement->bindValue(":limit", $limit, PDO::PARAM_INT);
         $statement->bindValue(":offset", $offset, PDO::PARAM_INT);
         $statement->execute();
 
         $links = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $links[] = $this->mapRowToLink($row);
+            $links[] = $this->mapper->mapToEntity($row);
         }
 
         return new LinkCollection(...$links);
@@ -67,17 +75,19 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     {
         $searchTerm = "%{$query}%";
 
-        $statement = $this->pdo->prepare(
-            'SELECT * FROM links
-             WHERE title LIKE ? OR description LIKE ?
-             ORDER BY created_at DESC
-             LIMIT ?',
+        $sql = SqlBuilder::buildSelect(
+            "links",
+            $this->mapper->getFields(),
+            "title LIKE ? OR description LIKE ?",
+            "created_at DESC",
         );
+        $sql .= " LIMIT ?";
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([$searchTerm, $searchTerm, $limit]);
 
         $links = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $links[] = $this->mapRowToLink($row);
+            $links[] = $this->mapper->mapToEntity($row);
         }
 
         return new LinkCollection(...$links);
@@ -101,8 +111,17 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             fn() => "SELECT link_id FROM link_tags WHERE tag_name = ?",
             $tagNames->toArray(),
         );
+        $fields = implode(
+            ", ",
+            array_map(
+                fn(string $field) => "l." . $field,
+                $this->mapper->getFields(),
+            ),
+        );
         $query =
-            "SELECT l.* FROM links l WHERE l.link_id IN (" .
+            "SELECT " .
+            $fields .
+            " FROM links l WHERE l.link_id IN (" .
             implode(" INTERSECT ", $intersectQueries) .
             ") ORDER BY l.created_at DESC";
 
@@ -116,7 +135,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
 
         $links = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $links[] = $this->mapRowToLink($row);
+            $links[] = $this->mapper->mapToEntity($row);
         }
 
         return new LinkCollection(...$links);
@@ -129,8 +148,17 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     #[\Override]
     public function findByCategoryId(UuidInterface $categoryId): LinkCollection
     {
+        $fields = implode(
+            ", ",
+            array_map(
+                fn(string $field) => "l." . $field,
+                $this->mapper->getFields(),
+            ),
+        );
         $statement = $this->pdo->prepare(
-            'SELECT l.* FROM links l
+            "SELECT " .
+                $fields .
+                ' FROM links l
              INNER JOIN category_links cl ON l.link_id = cl.link_id
              WHERE cl.category_id = :category_id
              ORDER BY cl.sort_order ASC',
@@ -152,7 +180,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
 
         $links = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $links[] = $this->mapRowToLink($row);
+            $links[] = $this->mapper->mapToEntity($row);
         }
 
         return new LinkCollection(...$links);
@@ -164,7 +192,8 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     #[\Override]
     public function save(Link $link): void
     {
-        $linkIdBytes = $link->linkId->getBytes();
+        $row = $this->mapper->mapToRow($link);
+        $linkIdBytes = $row["link_id"];
 
         // Check if link exists
         $check = $this->pdo->prepare(
@@ -174,35 +203,12 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
 
         if ($check->fetch() === false) {
             // Insert new link
-            $statement = $this->pdo->prepare(
-                'INSERT INTO links (link_id, url, title, description, icon, created_at, updated_at)
-                 VALUES (:link_id, :url, :title, :description, :icon, :created_at, :updated_at)',
-            );
-            $statement->execute([
-                ":link_id" => $linkIdBytes,
-                ":url" => (string) $link->url,
-                ":title" => (string) $link->title,
-                ":description" => $link->description,
-                ":icon" => $link->icon ? (string) $link->icon : null,
-                ":created_at" => $link->createdAt->format(SqlFormat::TIMESTAMP),
-                ":updated_at" => $link->updatedAt->format(SqlFormat::TIMESTAMP),
-            ]);
+            $build = SqlBuilder::buildInsert("links", $row);
+            $this->pdo->prepare($build["sql"])->execute($build["params"]);
         } else {
             // Update existing link
-            $statement = $this->pdo->prepare(
-                'UPDATE links
-                 SET url = :url, title = :title, description = :description,
-                     icon = :icon, updated_at = :updated_at
-                 WHERE link_id = :link_id',
-            );
-            $statement->execute([
-                ":link_id" => $linkIdBytes,
-                ":url" => (string) $link->url,
-                ":title" => (string) $link->title,
-                ":description" => $link->description,
-                ":icon" => $link->icon ? (string) $link->icon : null,
-                ":updated_at" => $link->updatedAt->format(SqlFormat::TIMESTAMP),
-            ]);
+            $build = SqlBuilder::buildUpdate("links", $row, "link_id");
+            $this->pdo->prepare($build["sql"])->execute($build["params"]);
         }
     }
 
@@ -230,21 +236,5 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
 
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         return (int) $result["count"];
-    }
-
-    /**
-     * Map a database row to a Link entity
-     */
-    private function mapRowToLink(array $row): Link
-    {
-        return new Link(
-            linkId: Uuid::fromBytes($row["link_id"]),
-            url: new Url($row["url"]),
-            title: new Title($row["title"]),
-            description: $row["description"],
-            icon: $row["icon"] !== null ? new Icon($row["icon"]) : null,
-            createdAt: new DateTimeImmutable($row["created_at"]),
-            updatedAt: new DateTimeImmutable($row["updated_at"]),
-        );
     }
 }

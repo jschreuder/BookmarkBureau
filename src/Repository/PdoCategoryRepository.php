@@ -10,16 +10,13 @@ use jschreuder\BookmarkBureau\Collection\CategoryLinkCollection;
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
-use jschreuder\BookmarkBureau\Entity\Dashboard;
-use jschreuder\BookmarkBureau\Entity\Link;
-use jschreuder\BookmarkBureau\Entity\Value\HexColor;
-use jschreuder\BookmarkBureau\Entity\Value\Icon;
-use jschreuder\BookmarkBureau\Entity\Value\Title;
-use jschreuder\BookmarkBureau\Entity\Value\Url;
+use jschreuder\BookmarkBureau\Entity\Mapper\CategoryEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
+use jschreuder\BookmarkBureau\Util\SqlBuilder;
 use Ramsey\Uuid\Uuid;
 
 final readonly class PdoCategoryRepository implements
@@ -29,6 +26,8 @@ final readonly class PdoCategoryRepository implements
         private readonly PDO $pdo,
         private readonly DashboardRepositoryInterface $dashboardRepository,
         private readonly LinkRepositoryInterface $linkRepository,
+        private readonly CategoryEntityMapper $categoryMapper,
+        private readonly LinkEntityMapper $linkMapper,
     ) {}
 
     /**
@@ -37,9 +36,12 @@ final readonly class PdoCategoryRepository implements
     #[\Override]
     public function findById(UuidInterface $categoryId): Category
     {
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM categories WHERE category_id = :category_id LIMIT 1",
+        $sql = SqlBuilder::buildSelect(
+            "categories",
+            $this->categoryMapper->getFields(),
+            "category_id = :category_id LIMIT 1",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([":category_id" => $categoryId->getBytes()]);
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
@@ -47,7 +49,11 @@ final readonly class PdoCategoryRepository implements
             throw CategoryNotFoundException::forId($categoryId);
         }
 
-        return $this->mapRowToCategory($row);
+        $dashboardId = Uuid::fromBytes($row["dashboard_id"]);
+        $dashboard = $this->dashboardRepository->findById($dashboardId);
+        $row["dashboard"] = $dashboard;
+
+        return $this->categoryMapper->mapToEntity($row);
     }
 
     /**
@@ -61,14 +67,19 @@ final readonly class PdoCategoryRepository implements
         // Verify dashboard exists and reuse it for all categories
         $dashboard = $this->dashboardRepository->findById($dashboardId);
 
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM categories WHERE dashboard_id = :dashboard_id ORDER BY sort_order ASC",
+        $sql = SqlBuilder::buildSelect(
+            "categories",
+            $this->categoryMapper->getFields(),
+            "dashboard_id = :dashboard_id",
+            "sort_order ASC",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
         $categories = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $categories[] = $this->mapRowToCategory($row, $dashboard);
+            $row["dashboard"] = $dashboard;
+            $categories[] = $this->categoryMapper->mapToEntity($row);
         }
 
         return new CategoryCollection(...$categories);
@@ -86,9 +97,15 @@ final readonly class PdoCategoryRepository implements
         // Verify category exists
         $category = $this->findById($categoryId);
 
+        $linkFields = array_map(
+            fn(string $field) => "l." . $field,
+            $this->linkMapper->getFields(),
+        );
         $statement = $this->pdo->prepare(
             'SELECT cl.category_id, cl.link_id, cl.sort_order, cl.created_at as category_link_created_at,
-                    l.* FROM category_links cl
+                    ' .
+                implode(", ", $linkFields) .
+                ' FROM category_links cl
              INNER JOIN links l ON cl.link_id = l.link_id
              WHERE cl.category_id = :category_id
              ORDER BY cl.sort_order ASC',
@@ -97,7 +114,7 @@ final readonly class PdoCategoryRepository implements
 
         $categoryLinks = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $link = $this->mapRowToLink($row);
+            $link = $this->linkMapper->mapToEntity($row);
             $categoryLinks[] = new CategoryLink(
                 category: $category,
                 link: $link,
@@ -153,7 +170,8 @@ final readonly class PdoCategoryRepository implements
     #[\Override]
     public function save(Category $category): void
     {
-        $categoryIdBytes = $category->categoryId->getBytes();
+        $row = $this->categoryMapper->mapToRow($category);
+        $categoryIdBytes = $row["category_id"];
 
         // Check if category exists
         $check = $this->pdo->prepare(
@@ -164,25 +182,8 @@ final readonly class PdoCategoryRepository implements
         if ($check->fetch() === false) {
             // Insert new category
             try {
-                $statement = $this->pdo->prepare(
-                    'INSERT INTO categories (category_id, dashboard_id, title, color, sort_order, created_at, updated_at)
-                     VALUES (:category_id, :dashboard_id, :title, :color, :sort_order, :created_at, :updated_at)',
-                );
-                $statement->execute([
-                    ":category_id" => $categoryIdBytes,
-                    ":dashboard_id" => $category->dashboard->dashboardId->getBytes(),
-                    ":title" => (string) $category->title,
-                    ":color" => $category->color
-                        ? (string) $category->color
-                        : null,
-                    ":sort_order" => $category->sortOrder,
-                    ":created_at" => $category->createdAt->format(
-                        SqlFormat::TIMESTAMP,
-                    ),
-                    ":updated_at" => $category->updatedAt->format(
-                        SqlFormat::TIMESTAMP,
-                    ),
-                ]);
+                $build = SqlBuilder::buildInsert("categories", $row);
+                $this->pdo->prepare($build["sql"])->execute($build["params"]);
             } catch (\PDOException $e) {
                 if (
                     str_contains(
@@ -203,20 +204,8 @@ final readonly class PdoCategoryRepository implements
             }
         } else {
             // Update existing category
-            $statement = $this->pdo->prepare(
-                'UPDATE categories
-                 SET title = :title, color = :color, sort_order = :sort_order, updated_at = :updated_at
-                 WHERE category_id = :category_id',
-            );
-            $statement->execute([
-                ":category_id" => $categoryIdBytes,
-                ":title" => (string) $category->title,
-                ":color" => $category->color ? (string) $category->color : null,
-                ":sort_order" => $category->sortOrder,
-                ":updated_at" => $category->updatedAt->format(
-                    SqlFormat::TIMESTAMP,
-                ),
-            ]);
+            $build = SqlBuilder::buildUpdate("categories", $row, "category_id");
+            $this->pdo->prepare($build["sql"])->execute($build["params"]);
         }
     }
 
@@ -408,47 +397,5 @@ final readonly class PdoCategoryRepository implements
 
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         return (int) $result["count"];
-    }
-
-    /**
-     * Map a database row to a Category entity
-     * When called from findByDashboardId, the dashboard is passed to avoid redundant lookups
-     */
-    private function mapRowToCategory(
-        array $row,
-        ?Dashboard $dashboard = null,
-    ): Category {
-        // Get dashboard if not provided (fallback for other methods)
-        if ($dashboard === null) {
-            $dashboardId = Uuid::fromBytes($row["dashboard_id"]);
-            $dashboard = $this->dashboardRepository->findById($dashboardId);
-        }
-
-        return new Category(
-            categoryId: Uuid::fromBytes($row["category_id"]),
-            dashboard: $dashboard,
-            title: new Title($row["title"]),
-            color: $row["color"] !== null ? new HexColor($row["color"]) : null,
-            sortOrder: (int) $row["sort_order"],
-            createdAt: new DateTimeImmutable($row["created_at"]),
-            updatedAt: new DateTimeImmutable($row["updated_at"]),
-        );
-    }
-
-    /**
-     * Map a database row to a Link entity (constructs directly from row data)
-     * Avoids repository lookups for better performance
-     */
-    private function mapRowToLink(array $row): Link
-    {
-        return new Link(
-            linkId: Uuid::fromBytes($row["link_id"]),
-            url: new Url($row["url"]),
-            title: new Title($row["title"]),
-            description: $row["description"],
-            icon: $row["icon"] !== null ? new Icon($row["icon"]) : null,
-            createdAt: new DateTimeImmutable($row["created_at"]),
-            updatedAt: new DateTimeImmutable($row["updated_at"]),
-        );
     }
 }
