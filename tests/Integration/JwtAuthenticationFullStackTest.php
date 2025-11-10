@@ -268,6 +268,8 @@ describe("JWT Authentication Full Stack Integration", function () {
                     CREATE TABLE IF NOT EXISTS dashboards (
                         dashboard_id CHAR(16) PRIMARY KEY,
                         title VARCHAR(255) NOT NULL,
+                        description TEXT NOT NULL,
+                        icon TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
@@ -311,6 +313,8 @@ describe("JWT Authentication Full Stack Integration", function () {
                 CREATE TABLE IF NOT EXISTS dashboards (
                     dashboard_id CHAR(16) PRIMARY KEY,
                     title VARCHAR(255) NOT NULL,
+                    description TEXT NOT NULL,
+                    icon TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )

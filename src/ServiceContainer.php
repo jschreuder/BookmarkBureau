@@ -32,6 +32,7 @@ use jschreuder\BookmarkBureau\Repository\PdoTagRepository;
 use jschreuder\BookmarkBureau\Repository\PdoUserRepository;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
+use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Service\CategoryService;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Service\DashboardService;
@@ -208,7 +209,10 @@ class ServiceContainer
 
     public function getDashboardRepository(): DashboardRepositoryInterface
     {
-        return new PdoDashboardRepository($this->getDb());
+        return new PdoDashboardRepository(
+            $this->getDb(),
+            new DashboardEntityMapper(),
+        );
     }
 
     public function getFavoriteRepository(): FavoriteRepositoryInterface

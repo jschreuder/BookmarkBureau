@@ -2,21 +2,21 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use DateTimeImmutable;
 use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Collection\DashboardCollection;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
-use jschreuder\BookmarkBureau\Entity\Value\Icon;
-use jschreuder\BookmarkBureau\Entity\Value\Title;
+use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
-use jschreuder\BookmarkBureau\Util\SqlFormat;
-use Ramsey\Uuid\Uuid;
+use jschreuder\BookmarkBureau\Util\SqlBuilder;
 
 final readonly class PdoDashboardRepository implements
     DashboardRepositoryInterface
 {
-    public function __construct(private readonly PDO $pdo) {}
+    public function __construct(
+        private readonly PDO $pdo,
+        private readonly DashboardEntityMapper $mapper,
+    ) {}
 
     /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
@@ -24,9 +24,12 @@ final readonly class PdoDashboardRepository implements
     #[\Override]
     public function findById(UuidInterface $dashboardId): Dashboard
     {
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM dashboards WHERE dashboard_id = :dashboard_id LIMIT 1",
+        $sql = SqlBuilder::buildSelect(
+            "dashboards",
+            $this->mapper->getFields(),
+            "dashboard_id = :dashboard_id LIMIT 1",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
@@ -36,7 +39,7 @@ final readonly class PdoDashboardRepository implements
             );
         }
 
-        return $this->mapRowToDashboard($row);
+        return $this->mapper->mapToEntity($row);
     }
 
     /**
@@ -45,14 +48,18 @@ final readonly class PdoDashboardRepository implements
     #[\Override]
     public function findAll(): DashboardCollection
     {
-        $statement = $this->pdo->prepare(
-            "SELECT * FROM dashboards ORDER BY title ASC",
+        $sql = SqlBuilder::buildSelect(
+            "dashboards",
+            $this->mapper->getFields(),
+            null,
+            "title ASC",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute();
 
         $dashboards = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $dashboards[] = $this->mapRowToDashboard($row);
+            $dashboards[] = $this->mapper->mapToEntity($row);
         }
 
         return new DashboardCollection(...$dashboards);
@@ -64,7 +71,8 @@ final readonly class PdoDashboardRepository implements
     #[\Override]
     public function save(Dashboard $dashboard): void
     {
-        $dashboardIdBytes = $dashboard->dashboardId->getBytes();
+        $row = $this->mapper->mapToRow($dashboard);
+        $dashboardIdBytes = $row["dashboard_id"];
 
         // Check if dashboard exists
         $check = $this->pdo->prepare(
@@ -74,39 +82,16 @@ final readonly class PdoDashboardRepository implements
 
         if ($check->fetch() === false) {
             // Insert new dashboard
-            $statement = $this->pdo->prepare(
-                'INSERT INTO dashboards (dashboard_id, title, description, icon, created_at, updated_at)
-                 VALUES (:dashboard_id, :title, :description, :icon, :created_at, :updated_at)',
-            );
-            $statement->execute([
-                ":dashboard_id" => $dashboardIdBytes,
-                ":title" => (string) $dashboard->title,
-                ":description" => $dashboard->description,
-                ":icon" => $dashboard->icon ? (string) $dashboard->icon : null,
-                ":created_at" => $dashboard->createdAt->format(
-                    SqlFormat::TIMESTAMP,
-                ),
-                ":updated_at" => $dashboard->updatedAt->format(
-                    SqlFormat::TIMESTAMP,
-                ),
-            ]);
+            $build = SqlBuilder::buildInsert("dashboards", $row);
+            $this->pdo->prepare($build["sql"])->execute($build["params"]);
         } else {
             // Update existing dashboard
-            $statement = $this->pdo->prepare(
-                'UPDATE dashboards
-                 SET title = :title, description = :description,
-                     icon = :icon, updated_at = :updated_at
-                 WHERE dashboard_id = :dashboard_id',
+            $build = SqlBuilder::buildUpdate(
+                "dashboards",
+                $row,
+                "dashboard_id",
             );
-            $statement->execute([
-                ":dashboard_id" => $dashboardIdBytes,
-                ":title" => (string) $dashboard->title,
-                ":description" => $dashboard->description,
-                ":icon" => $dashboard->icon ? (string) $dashboard->icon : null,
-                ":updated_at" => $dashboard->updatedAt->format(
-                    SqlFormat::TIMESTAMP,
-                ),
-            ]);
+            $this->pdo->prepare($build["sql"])->execute($build["params"]);
         }
     }
 
@@ -138,20 +123,5 @@ final readonly class PdoDashboardRepository implements
 
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         return (int) $result["count"];
-    }
-
-    /**
-     * Map a database row to a Dashboard entity
-     */
-    private function mapRowToDashboard(array $row): Dashboard
-    {
-        return new Dashboard(
-            dashboardId: Uuid::fromBytes($row["dashboard_id"]),
-            title: new Title($row["title"]),
-            description: $row["description"],
-            icon: $row["icon"] !== null ? new Icon($row["icon"]) : null,
-            createdAt: new DateTimeImmutable($row["created_at"]),
-            updatedAt: new DateTimeImmutable($row["updated_at"]),
-        );
     }
 }
