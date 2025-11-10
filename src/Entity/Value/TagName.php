@@ -8,7 +8,7 @@ final readonly class TagName
 {
     use StringValueTrait;
 
-    public const PATTERN = "/^[a-z0-9\-]+$/";
+    public const string PATTERN = "/^[a-z0-9\-]+$/";
 
     public function __construct(string $value)
     {

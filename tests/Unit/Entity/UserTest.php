@@ -29,9 +29,7 @@ describe("User Entity", function () {
 
             expect($user->userId)->toBe($userId);
             expect($user->email)->toBe($email);
-            expect($user->passwordHash->getHash())->toBe(
-                $passwordHash->getHash(),
-            );
+            expect($user->passwordHash->value)->toBe($passwordHash->value);
             expect($user->totpSecret)->toBe($totpSecret);
             expect($user->createdAt)->toBe($createdAt);
             expect($user->updatedAt)->toBe($updatedAt);
@@ -57,9 +55,7 @@ describe("User Entity", function () {
 
             expect($user->userId)->toBe($userId);
             expect($user->email)->toBe($email);
-            expect($user->passwordHash->getHash())->toBe(
-                $passwordHash->getHash(),
-            );
+            expect($user->passwordHash->value)->toBe($passwordHash->value);
             expect($user->totpSecret)->toBeNull();
         });
     });
@@ -87,8 +83,8 @@ describe("User Entity", function () {
             $user->changePassword($newPasswordHash);
 
             expect($user->passwordHash)->toBe($newPasswordHash);
-            expect($user->passwordHash->getHash())->not->toBe(
-                $oldPasswordHash->getHash(),
+            expect($user->passwordHash->value)->not->toBe(
+                $oldPasswordHash->value,
             );
         });
 

@@ -203,7 +203,7 @@ final class JsonUserRepository implements UserRepositoryInterface
         return [
             "user_id" => $user->userId->toString(),
             "email" => (string) $user->email,
-            "password_hash" => $user->passwordHash->getHash(),
+            "password_hash" => $user->passwordHash->value,
             "totp_secret" => $user->totpSecret
                 ? (string) $user->totpSecret
                 : null,

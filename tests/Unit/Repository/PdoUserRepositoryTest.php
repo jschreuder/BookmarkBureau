@@ -40,7 +40,7 @@ describe("PdoUserRepository", function () {
         $stmt->execute([
             $user->userId->getBytes(),
             (string) $user->email,
-            $user->passwordHash->getHash(),
+            $user->passwordHash->value,
             $user->totpSecret ? (string) $user->totpSecret : null,
             $user->createdAt->format("Y-m-d H:i:s"),
             $user->updatedAt->format("Y-m-d H:i:s"),
@@ -59,8 +59,8 @@ describe("PdoUserRepository", function () {
 
             expect($found->userId->toString())->toBe($user->userId->toString());
             expect((string) $found->email)->toBe((string) $user->email);
-            expect($found->passwordHash->getHash())->toBe(
-                $user->passwordHash->getHash(),
+            expect($found->passwordHash->value)->toBe(
+                $user->passwordHash->value,
             );
         });
 

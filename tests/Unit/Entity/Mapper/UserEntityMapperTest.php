@@ -61,7 +61,7 @@ describe("UserEntityMapper", function () {
             expect($user)->toBeInstanceOf(User::class);
             expect($user->userId->equals($userId))->toBeTrue();
             expect((string) $user->email)->toBe("user@example.com");
-            expect($user->passwordHash->getHash())->toBe($passwordHash);
+            expect($user->passwordHash->value)->toBe($passwordHash);
             expect($user->totpSecret)->toBeNull();
             expect($user->createdAt->format("Y-m-d H:i:s"))->toBe(
                 "2024-03-01 08:00:00",
@@ -201,8 +201,8 @@ describe("UserEntityMapper", function () {
             expect((string) $restoredUser->email)->toBe(
                 (string) $originalUser->email,
             );
-            expect($restoredUser->passwordHash->getHash())->toBe(
-                $originalUser->passwordHash->getHash(),
+            expect($restoredUser->passwordHash->value)->toBe(
+                $originalUser->passwordHash->value,
             );
             expect($restoredUser->totpSecret)->toBeNull();
         });
@@ -242,7 +242,7 @@ describe("UserEntityMapper", function () {
             $restoredUser = $mapper->mapToEntity($row);
 
             expect((string) $restoredUser->email)->toBe($email);
-            expect($restoredUser->passwordHash->getHash())->toBe($passwordHash);
+            expect($restoredUser->passwordHash->value)->toBe($passwordHash);
         });
     });
 });

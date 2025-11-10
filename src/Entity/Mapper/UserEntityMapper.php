@@ -55,7 +55,7 @@ final readonly class UserEntityMapper implements EntityMapperInterface
         return [
             "user_id" => $entity->userId->getBytes(),
             "email" => (string) $entity->email,
-            "password_hash" => $entity->passwordHash->getHash(),
+            "password_hash" => $entity->passwordHash->value,
             "totp_secret" => $entity->totpSecret?->value,
             "created_at" => $entity->createdAt->format(SqlFormat::TIMESTAMP),
             "updated_at" => $entity->updatedAt->format(SqlFormat::TIMESTAMP),

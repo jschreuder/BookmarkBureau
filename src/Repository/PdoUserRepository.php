@@ -98,7 +98,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
             $statement->execute([
                 ":user_id" => $userIdBytes,
                 ":email" => (string) $user->email,
-                ":password_hash" => $user->passwordHash->getHash(),
+                ":password_hash" => $user->passwordHash->value,
                 ":totp_secret" => $user->totpSecret
                     ? (string) $user->totpSecret
                     : null,
@@ -116,7 +116,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
             $statement->execute([
                 ":user_id" => $userIdBytes,
                 ":email" => (string) $user->email,
-                ":password_hash" => $user->passwordHash->getHash(),
+                ":password_hash" => $user->passwordHash->value,
                 ":totp_secret" => $user->totpSecret
                     ? (string) $user->totpSecret
                     : null,

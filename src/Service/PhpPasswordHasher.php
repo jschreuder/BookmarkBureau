@@ -19,6 +19,6 @@ final readonly class PhpPasswordHasher implements PasswordHasherInterface
     #[\Override]
     public function verify(string $plaintext, HashedPassword $hash): bool
     {
-        return password_verify($plaintext, $hash->getHash());
+        return password_verify($plaintext, $hash->value);
     }
 }

@@ -30,8 +30,8 @@ describe("JsonUserRepository", function () {
 
             expect($found->userId->toString())->toBe($user->userId->toString());
             expect((string) $found->email)->toBe((string) $user->email);
-            expect($found->passwordHash->getHash())->toBe(
-                $user->passwordHash->getHash(),
+            expect($found->passwordHash->value)->toBe(
+                $user->passwordHash->value,
             );
 
             cleanupTestFile($filePath);
