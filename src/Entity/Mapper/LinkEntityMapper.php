@@ -37,7 +37,7 @@ final readonly class LinkEntityMapper implements EntityMapperInterface
     }
 
     #[\Override]
-    private function doMapToEntity(array $data): object
+    private function doMapToEntity(array $data): Link
     {
         return new Link(
             linkId: Uuid::fromBytes($data["link_id"]),

@@ -35,7 +35,7 @@ final readonly class DashboardEntityMapper implements EntityMapperInterface
     }
 
     #[\Override]
-    private function doMapToEntity(array $data): object
+    private function doMapToEntity(array $data): Dashboard
     {
         return new Dashboard(
             dashboardId: Uuid::fromBytes($data["dashboard_id"]),

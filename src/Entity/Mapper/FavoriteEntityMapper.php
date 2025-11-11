@@ -30,7 +30,7 @@ final readonly class FavoriteEntityMapper implements EntityMapperInterface
     }
 
     #[\Override]
-    private function doMapToEntity(array $data): object
+    private function doMapToEntity(array $data): Favorite
     {
         return new Favorite(
             dashboard: $data["dashboard"],

@@ -36,7 +36,7 @@ final readonly class UserEntityMapper implements EntityMapperInterface
     }
 
     #[\Override]
-    private function doMapToEntity(array $data): object
+    private function doMapToEntity(array $data): User
     {
         return new User(
             userId: Uuid::fromBytes($data["user_id"]),

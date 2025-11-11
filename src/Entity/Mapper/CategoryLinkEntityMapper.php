@@ -32,7 +32,7 @@ final readonly class CategoryLinkEntityMapper implements EntityMapperInterface
     }
 
     #[\Override]
-    private function doMapToEntity(array $data): object
+    private function doMapToEntity(array $data): CategoryLink
     {
         return new CategoryLink(
             category: $data["category"],

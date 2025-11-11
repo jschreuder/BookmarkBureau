@@ -36,7 +36,7 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
     }
 
     #[\Override]
-    private function doMapToEntity(array $data): object
+    private function doMapToEntity(array $data): Category
     {
         return new Category(
             categoryId: Uuid::fromBytes($data["category_id"]),

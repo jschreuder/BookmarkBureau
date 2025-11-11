@@ -25,7 +25,7 @@ final readonly class TagEntityMapper implements EntityMapperInterface
     }
 
     #[\Override]
-    private function doMapToEntity(array $data): object
+    private function doMapToEntity(array $data): Tag
     {
         return new Tag(
             tagName: new TagName($data["tag_name"]),
