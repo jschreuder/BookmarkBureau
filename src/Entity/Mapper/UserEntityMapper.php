@@ -42,7 +42,7 @@ final readonly class UserEntityMapper implements EntityMapperInterface
             userId: Uuid::fromBytes($data["user_id"]),
             email: new Email($data["email"]),
             passwordHash: new HashedPassword($data["password_hash"]),
-            totpSecret: !\is_null($data["totp_secret"])
+            totpSecret: $data["totp_secret"] !== null
                 ? new TotpSecret($data["totp_secret"])
                 : null,
             createdAt: new DateTimeImmutable($data["created_at"]),

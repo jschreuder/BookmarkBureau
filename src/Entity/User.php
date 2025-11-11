@@ -79,7 +79,7 @@ final class User
 
     public function requiresTotp(): bool
     {
-        return !is_null($this->totpSecret);
+        return $this->totpSecret !== null;
     }
 
     private function markAsUpdated(): void

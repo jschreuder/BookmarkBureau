@@ -23,36 +23,28 @@ final class Filter
     public function string(bool $allowNull = true): self
     {
         $this->value =
-            !$allowNull || !\is_null($this->value)
-                ? strval($this->value)
-                : null;
+            !$allowNull || $this->value !== null ? (string) $this->value : null;
         return $this;
     }
 
     public function int(bool $allowNull = true): self
     {
         $this->value =
-            !$allowNull || !\is_null($this->value)
-                ? intval($this->value)
-                : null;
+            !$allowNull || $this->value !== null ? (int) $this->value : null;
         return $this;
     }
 
     public function float(bool $allowNull = true): self
     {
         $this->value =
-            !$allowNull || !\is_null($this->value)
-                ? floatval($this->value)
-                : null;
+            !$allowNull || $this->value !== null ? (float) $this->value : null;
         return $this;
     }
 
     public function bool(bool $allowNull = true): self
     {
         $this->value =
-            !$allowNull || !\is_null($this->value)
-                ? boolval($this->value)
-                : null;
+            !$allowNull || $this->value !== null ? (bool) $this->value : null;
         return $this;
     }
 

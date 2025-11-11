@@ -41,7 +41,7 @@ final readonly class ActionController implements
 
         // Often the ID is part of the path, in which case routing should have added it to attributes
         $id = $request->getAttribute("id");
-        if (!is_null($id)) {
+        if ($id !== null) {
             $rawData["id"] = $id;
         }
 

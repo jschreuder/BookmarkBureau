@@ -36,7 +36,7 @@ final readonly class DashboardViewController implements
     ): ServerRequestInterface {
         // Extract UUID from route attributes
         $id = $request->getAttribute("id");
-        if (!is_null($id)) {
+        if ($id !== null) {
             return $request->withParsedBody(["id" => $id]);
         }
 

@@ -42,7 +42,7 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
             categoryId: Uuid::fromBytes($data["category_id"]),
             dashboard: $data["dashboard"],
             title: new Title($data["title"]),
-            color: !\is_null($data["color"])
+            color: $data["color"] !== null
                 ? new HexColor($data["color"])
                 : null,
             sortOrder: (int) $data["sort_order"],

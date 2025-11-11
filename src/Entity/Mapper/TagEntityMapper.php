@@ -29,7 +29,7 @@ final readonly class TagEntityMapper implements EntityMapperInterface
     {
         return new Tag(
             tagName: new TagName($data["tag_name"]),
-            color: !\is_null($data["color"])
+            color: $data["color"] !== null
                 ? new HexColor($data["color"])
                 : null,
         );

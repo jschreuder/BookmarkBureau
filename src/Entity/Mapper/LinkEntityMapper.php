@@ -44,7 +44,7 @@ final readonly class LinkEntityMapper implements EntityMapperInterface
             url: new Url($data["url"]),
             title: new Title($data["title"]),
             description: $data["description"],
-            icon: !\is_null($data["icon"]) ? new Icon($data["icon"]) : null,
+            icon: $data["icon"] !== null ? new Icon($data["icon"]) : null,
             createdAt: new DateTimeImmutable($data["created_at"]),
             updatedAt: new DateTimeImmutable($data["updated_at"]),
         );
