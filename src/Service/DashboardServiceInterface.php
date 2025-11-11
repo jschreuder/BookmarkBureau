@@ -11,6 +11,13 @@ use Ramsey\Uuid\UuidInterface;
 interface DashboardServiceInterface
 {
     /**
+     * Get a dashboard by ID
+     *
+     * @throws DashboardNotFoundException when dashboard doesn't exist
+     */
+    public function getDashboard(UuidInterface $dashboardId): Dashboard;
+
+    /**
      * Get complete dashboard data for rendering
      *
      * Returns the dashboard with all categories (and their links) plus favorites

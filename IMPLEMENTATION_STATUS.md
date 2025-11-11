@@ -30,9 +30,9 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Action/`
 
 ### Implemented Actions (23 total):
 
-#### Dashboard Operations (5 Actions - ⚠️ NEARLY COMPLETE)
+#### Dashboard Operations (5 Actions - ✅ COMPLETE)
 - **DashboardListAction** - Lists all dashboards (simple list)
-- **DashboardReadAction** - Should read single dashboard entity only (currently returns full dashboard - needs fixing)
+- **DashboardReadAction** - Reads single dashboard entity only (R)
 - **DashboardCreateAction** - Creates new dashboard (C)
 - **DashboardUpdateAction** - Updates existing dashboard (U)
 - **DashboardDeleteAction** - Deletes dashboard (D)
@@ -76,9 +76,9 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Action/`
 - Transaction support via `UnitOfWorkInterface`
 
 ### Note on Dashboard Read vs. View:
-**DashboardReadAction** should follow the standard Read pattern (like CategoryReadAction, LinkReadAction) and return only the dashboard entity using DashboardOutputSpec. Currently it incorrectly uses FullDashboardOutputSpec.
+**DashboardReadAction** follows the standard Read pattern (like CategoryReadAction, LinkReadAction) and returns only the dashboard entity using DashboardOutputSpec. It uses the simpler `getDashboard()` method from DashboardService.
 
-**DashboardViewController** is intentionally separate from the Action pattern - it's designed for public-facing full dashboard views, returning complete nested data (dashboard + all categories with links + favorites) via FullDashboardOutputSpec. This controller serves a different purpose than simple CRUD operations.
+**DashboardViewController** is intentionally separate from the Action pattern - it's designed for public-facing full dashboard views, returning complete nested data (dashboard + all categories with links + favorites) via FullDashboardOutputSpec. This controller serves a different purpose than simple CRUD operations and uses the `getFullDashboard()` method.
 
 ---
 
@@ -908,25 +908,22 @@ $link = TestEntityFactory::createLink(title: 'Custom Title');
 ### Minor Missing Pieces:
 
 #### 1. DashboardReadAction Implementation
-**Issue:** DashboardReadAction currently uses FullDashboardOutputSpec and returns complete nested dashboard data (same as DashboardViewController).
-**Expected Behavior:** Should follow standard Read pattern (like CategoryReadAction, LinkReadAction) and return only the dashboard entity.
-**Current Implementation:**
+**Issue:** DashboardReadAction previously used FullDashboardOutputSpec and returned complete nested dashboard data (same as DashboardViewController).
+**Solution Implemented:** ✅ COMPLETED
+- Added `getDashboard()` method to DashboardServiceInterface and DashboardService
+- Updated DashboardReadAction to use `getDashboard()` instead of `getFullDashboard()`
+- Simplified output spec from FullDashboardOutputSpec to DashboardOutputSpec
+- Updated tests to verify correct behavior
+**Implementation Details:**
 ```php
-// Currently in DashboardReadAction:
-$dashboard = $this->dashboardService->getFullDashboard($dashboardId); // ❌ Wrong
-return $this->outputSpec->transform($dashboard); // Uses FullDashboardOutputSpec ❌
+// Now in DashboardReadAction:
+$dashboard = $this->dashboardService->getDashboard($dashboardId); // ✅ Simple entity read
+return $this->outputSpec->transform($dashboard); // Uses DashboardOutputSpec ✅
 ```
-**Expected Implementation:**
-```php
-// Should be:
-$dashboard = $this->dashboardRepository->findById($dashboardId); // ✅ Simple entity read
-return $this->outputSpec->transform($dashboard); // Use DashboardOutputSpec ✅
-```
-**Status:** ❌ Not implemented correctly
-**Fix Required:**
-1. Change DashboardReadAction to use repository directly (or add simple `getDashboard()` method to service)
-2. Configure with DashboardOutputSpec instead of FullDashboardOutputSpec in GeneralRoutingProvider
-3. Keep DashboardViewController unchanged - it's intentionally for public full dashboard views
+**Status:** ✅ Completed
+- DashboardReadAction follows standard Read pattern (like CategoryReadAction, LinkReadAction)
+- Returns only the dashboard entity via DashboardOutputSpec
+- DashboardViewController remains unchanged - still uses getFullDashboard() for public full dashboard views
 
 #### 2. Tags in Dashboard View Response
 **Issue:** FullDashboardOutputSpec returns complete dashboard with categories and favorites, but links don't include their tags.
