@@ -39,6 +39,10 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Create environment file
+        run: cp src/environments/environment.ts.dist src/environments/environment.ts
+        working-directory: ./frontend
+
       - name: Install frontend dependencies
         run: npm install
         working-directory: ./frontend
