@@ -113,14 +113,15 @@ describe("RequireAuthenticationMiddleware", function () {
                 // No route attribute - this shouldn't happen in practice but we handle it gracefully
 
                 $handler = Mockery::mock(RequestHandlerInterface::class);
-                $handler->shouldNotReceive("handle");
+                $expectedResponse = new JsonResponse(["ok" => true]);
+                $handler
+                    ->shouldReceive("handle")
+                    ->once()
+                    ->with($request)
+                    ->andReturn($expectedResponse);
 
-                expect(
-                    fn() => $middleware->process($request, $handler),
-                )->toThrow(
-                    AuthenticationException::class,
-                    "Authentication required",
-                );
+                $response = $middleware->process($request, $handler);
+                expect($response)->toBe($expectedResponse);
             },
         );
 

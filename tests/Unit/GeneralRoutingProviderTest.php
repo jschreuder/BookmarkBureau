@@ -343,7 +343,7 @@ describe("GeneralRoutingProvider", function () {
                 // Link routes
                 expect($registeredRoutes["link-read"])->toBe([
                     "method" => "GET",
-                    "path" => "/link/:id",
+                    "path" => "/link/{id}",
                 ]);
                 expect($registeredRoutes["link-create"])->toBe([
                     "method" => "POST",
@@ -351,17 +351,17 @@ describe("GeneralRoutingProvider", function () {
                 ]);
                 expect($registeredRoutes["link-update"])->toBe([
                     "method" => "PUT",
-                    "path" => "/link/:id",
+                    "path" => "/link/{id}",
                 ]);
                 expect($registeredRoutes["link-delete"])->toBe([
                     "method" => "DELETE",
-                    "path" => "/link/:id",
+                    "path" => "/link/{id}",
                 ]);
 
                 // Category routes
                 expect($registeredRoutes["category-read"])->toBe([
                     "method" => "GET",
-                    "path" => "/category/:id",
+                    "path" => "/category/{id}",
                 ]);
                 expect($registeredRoutes["category-create"])->toBe([
                     "method" => "POST",
@@ -369,11 +369,11 @@ describe("GeneralRoutingProvider", function () {
                 ]);
                 expect($registeredRoutes["category-update"])->toBe([
                     "method" => "PUT",
-                    "path" => "/category/:id",
+                    "path" => "/category/{id}",
                 ]);
                 expect($registeredRoutes["category-delete"])->toBe([
                     "method" => "DELETE",
-                    "path" => "/category/:id",
+                    "path" => "/category/{id}",
                 ]);
 
                 // Dashboard routes
@@ -383,7 +383,7 @@ describe("GeneralRoutingProvider", function () {
                 ]);
                 expect($registeredRoutes["dashboard-read"])->toBe([
                     "method" => "GET",
-                    "path" => "/dashboard/:id",
+                    "path" => "/dashboard/{id}",
                 ]);
                 expect($registeredRoutes["dashboard-create"])->toBe([
                     "method" => "POST",
@@ -391,35 +391,35 @@ describe("GeneralRoutingProvider", function () {
                 ]);
                 expect($registeredRoutes["dashboard-update"])->toBe([
                     "method" => "PUT",
-                    "path" => "/dashboard/:id",
+                    "path" => "/dashboard/{id}",
                 ]);
                 expect($registeredRoutes["dashboard-delete"])->toBe([
                     "method" => "DELETE",
-                    "path" => "/dashboard/:id",
+                    "path" => "/dashboard/{id}",
                 ]);
                 expect($registeredRoutes["dashboard-view"])->toBe([
                     "method" => "GET",
-                    "path" => "/:id",
+                    "path" => "/{id}",
                 ]);
 
                 // Favorite routes
                 expect($registeredRoutes["favorite-create"])->toBe([
                     "method" => "POST",
-                    "path" => "/dashboard/:id/favorites",
+                    "path" => "/dashboard/{id}/favorites",
                 ]);
                 expect($registeredRoutes["favorite-delete"])->toBe([
                     "method" => "DELETE",
-                    "path" => "/dashboard/:id/favorites",
+                    "path" => "/dashboard/{id}/favorites",
                 ]);
                 expect($registeredRoutes["favorite-reorder"])->toBe([
                     "method" => "PUT",
-                    "path" => "/dashboard/:id/favorites",
+                    "path" => "/dashboard/{id}/favorites",
                 ]);
 
                 // Tag routes
                 expect($registeredRoutes["tag-read"])->toBe([
                     "method" => "GET",
-                    "path" => "/tag/:id",
+                    "path" => "/tag/{id}",
                 ]);
                 expect($registeredRoutes["tag-create"])->toBe([
                     "method" => "POST",
@@ -427,21 +427,21 @@ describe("GeneralRoutingProvider", function () {
                 ]);
                 expect($registeredRoutes["tag-update"])->toBe([
                     "method" => "PUT",
-                    "path" => "/tag/:id",
+                    "path" => "/tag/{id}",
                 ]);
                 expect($registeredRoutes["tag-delete"])->toBe([
                     "method" => "DELETE",
-                    "path" => "/tag/:id",
+                    "path" => "/tag/{id}",
                 ]);
 
                 // Link-Tag routes
                 expect($registeredRoutes["link_tag-create"])->toBe([
                     "method" => "POST",
-                    "path" => "/link/:id/tag",
+                    "path" => "/link/{id}/tag",
                 ]);
                 expect($registeredRoutes["link_tag-delete"])->toBe([
                     "method" => "DELETE",
-                    "path" => "/link/:id/tag/:tag_name",
+                    "path" => "/link/{id}/tag/{tag_name}",
                 ]);
 
                 // Authentication routes
