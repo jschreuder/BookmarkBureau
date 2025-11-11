@@ -1,5 +1,8 @@
 <?php declare(strict_types=1);
 
+// Set working directory to project root for consistent relative paths
+chdir(__DIR__ . '/..');
+
 /** @var  jschreuder\BookmarkBureau\ServiceContainer $container */
 $container = require __DIR__ . '/../config/app_init.php';
 

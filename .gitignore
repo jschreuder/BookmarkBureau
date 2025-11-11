@@ -4,7 +4,7 @@
 /config/env.php
 /config/dev.php
 /var/logs/*.log
-/var/*.sqlite3
+/var/*.db
 /var/bb_database
 /var/users.json
 /vendor/

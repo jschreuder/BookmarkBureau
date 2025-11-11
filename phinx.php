@@ -51,6 +51,7 @@ switch ($type) {
         if (preg_match('#^sqlite:(?P<path>.+)$#i', $dsn, $matches)) {
             $config["adapter"] = "sqlite";
             $config["name"] = $matches["path"];
+            $config["suffix"] = ""; // Disable automatic suffix, use exact path from DSN
             // SQLite doesn't need user/pass/host/port
             unset($config["user"], $config["pass"], $config["charset"]);
         } else {
