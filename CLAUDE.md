@@ -135,7 +135,7 @@ final readonly class ImplementationClass implements SpecificInterface
 - Override attribute for interface methods
 - Traits for sharing code between implementations (e.g., `UnitOfWorkTrait`, `OutputSpecTrait`, `CollectionTrait`)
 - Utility classes in `src/Util/` for shared functionality (e.g., `Filter` for input sanitization, `SqlFormat` for constants)
-- Use double quotes for strings and interpolation where possible
+- Use double quotes `"` for strings and interpolation with brackets `"{$value}"` where possible
 
 ### Naming
 - Interfaces: `*Interface` (e.g., `DashboardServiceInterface`)
@@ -171,6 +171,9 @@ Example: `DashboardViewController` - implements `ControllerInterface` + filter/v
 
 ## Do Not
 
+### Code style
+- ❌ **DO NOT** use single quotes `'`
+
 ### Critical Commands
 - ❌ **DO NOT** use `phpunit` directly → ✅ Use `vendor/bin/pest`
 
@@ -194,3 +197,4 @@ Example: `DashboardViewController` - implements `ControllerInterface` + filter/v
 - **Testing Requirement:** Run tests before commits (but no CI enforcing it)
 - **API Pattern:** `/api/*` routes to PHP backend (`web/api.php`), all other routes to Angular SPA
 - **Frontend Build:** Frontend builds to `web/`, served alongside API
+Getting rid of some of my old code-style tendencies
