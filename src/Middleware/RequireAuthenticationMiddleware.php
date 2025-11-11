@@ -32,8 +32,13 @@ final readonly class RequireAuthenticationMiddleware implements
         }
 
         // For protected routes, require authenticatedUser attribute
-        if (!$request->getAttribute("authenticatedUserId")) {
-            throw new AuthenticationException("Authentication required");
+        if (
+            $routeName !== null &&
+            !$request->getAttribute("authenticatedUserId")
+        ) {
+            throw new AuthenticationException(
+                "Authentication required: {$routeName}",
+            );
         }
 
         return $requestHandler->handle($request);

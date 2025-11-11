@@ -17,7 +17,7 @@ use Closure;
  */
 final readonly class ResourceRouteBuilder
 {
-    private const string ID_SEGMENT = "/:id";
+    private const string ID_SEGMENT = "/{id}";
 
     public function __construct(
         private RouterInterface $router,

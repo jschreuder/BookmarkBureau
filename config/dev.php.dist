@@ -1,7 +1,7 @@
 <?php
 
 return [
-    "site.url" => "http://localhost",
+    "site.url" => "http://localhost:8080/api.php",
 
     "logger.name" => "middle-skeleton",
     "logger.path" =>

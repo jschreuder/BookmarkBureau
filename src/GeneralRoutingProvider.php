@@ -162,7 +162,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             );
 
         // Link-Tag associations
-        new ResourceRouteBuilder($router, "link_tag", "/link/:id/tag")
+        new ResourceRouteBuilder($router, "link_tag", "/link/{id}/tag")
             ->registerCreate(
                 fn() => new LinkTagCreateAction(
                     $this->container->getTagService(),
@@ -172,7 +172,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerCustom(
                 "DELETE",
                 "delete",
-                "/:tag_name",
+                "/{tag_name}",
                 fn() => new LinkTagDeleteAction(
                     $this->container->getTagService(),
                     new LinkTagInputSpec(),
@@ -226,7 +226,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
         new ResourceRouteBuilder(
             $router,
             "favorite",
-            "/dashboard/:id/favorites",
+            "/dashboard/{id}/favorites",
         )
             ->registerCreate(
                 fn() => new FavoriteCreateAction(
@@ -286,10 +286,10 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             );
 
         // Dashboard view (complex operation with categories and favorites)
-        // This route must be last as it uses a catch-all /:id pattern with UUID validation
+        // This route must be last as it uses a catch-all /{id} pattern with UUID validation
         $router->get(
             "dashboard-view",
-            "/:id",
+            "/{id}",
             fn() => new DashboardViewController(
                 $this->container->getDashboardService(),
                 new JsonResponseTransformer(),
