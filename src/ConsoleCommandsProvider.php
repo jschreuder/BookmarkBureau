@@ -11,7 +11,7 @@ use jschreuder\BookmarkBureau\Command\User\GenerateCliTokenCommand;
 use jschreuder\BookmarkBureau\Command\User\RevokeCliTokenCommand;
 use Symfony\Component\Console\Application;
 
-class ConsoleCommandsProvider
+final readonly class ConsoleCommandsProvider
 {
     public function __construct(private ServiceContainer $container) {}
 

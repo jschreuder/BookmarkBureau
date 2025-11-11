@@ -52,7 +52,7 @@ use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class GeneralRoutingProvider implements RoutingProviderInterface
+final readonly class GeneralRoutingProvider implements RoutingProviderInterface
 {
     private ServiceContainer $container;
 

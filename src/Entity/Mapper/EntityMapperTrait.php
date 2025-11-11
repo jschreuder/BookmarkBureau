@@ -2,7 +2,6 @@
 
 namespace jschreuder\BookmarkBureau\Entity\Mapper;
 
-use DomainException;
 use InvalidArgumentException;
 
 /**
@@ -32,7 +31,7 @@ trait EntityMapperTrait
             throw new InvalidArgumentException(
                 static::class .
                     " requires fields: " .
-                    implode(', ', $missingFields),
+                    implode(", ", $missingFields),
             );
         }
 
