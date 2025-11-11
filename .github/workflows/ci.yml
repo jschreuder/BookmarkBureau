@@ -3,27 +3,46 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  test:
+  backend-tests:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Needed for SonarCloud
-      
+          fetch-depth: 0 # Needed for SonarCloud
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           coverage: xdebug
-      
-      - name: Install dependencies
+
+      - name: Install PHP dependencies
         run: composer install --prefer-dist --no-progress
-      
-      - name: Run tests with coverage
+
+      - name: Run backend tests with coverage
         run: vendor/bin/pest --coverage --coverage-clover=coverage.xml
-      
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ./frontend
+
+      - name: Run frontend tests
+        run: npm run test:ci
+        working-directory: ./frontend
