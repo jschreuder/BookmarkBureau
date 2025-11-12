@@ -54,20 +54,13 @@ final readonly class ErrorHandlerController implements ControllerInterface
 
     private function getCode(Throwable $exception): int
     {
-        if ($exception instanceof RateLimitExceededException) {
-            return 429;
-        }
-
-        if ($exception instanceof \PDOException) {
-            return 503;
-        }
-
         $code = $exception->getCode();
-        if ($code >= 400 && $code < 600) {
-            return $code;
-        }
-
-        return 500;
+        return match (true) {
+            $exception instanceof RateLimitExceededException => 429,
+            $exception instanceof \PDOException => 503,
+            $code >= 400 && $code < 600 => $code,
+            default => 500,
+        };
     }
 
     private function getMessage(Throwable $exception, int $code): string
