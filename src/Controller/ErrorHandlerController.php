@@ -2,12 +2,14 @@
 
 namespace jschreuder\BookmarkBureau\Controller;
 
+use jschreuder\BookmarkBureau\Exception\RateLimitExceededException;
 use jschreuder\Middle\Controller\ControllerInterface;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Throwable;
 
 final readonly class ErrorHandlerController implements ControllerInterface
 {
@@ -24,20 +26,38 @@ final readonly class ErrorHandlerController implements ControllerInterface
         /** @var  \Throwable $exception */
         $exception = $request->getAttribute("error");
         $code = $this->getCode($exception);
-        $message = $this->getMessage($code);
+        $message = $this->getMessage($exception, $code);
 
         $logLevel = $this->getLogLevel($code);
         $this->logger->log($logLevel, $message);
-        return new JsonResponse(
+
+        $response = new JsonResponse(
             [
                 "message" => $message,
             ],
             $code,
         );
+
+        // Add Retry-After header for rate limit responses
+        if ($exception instanceof RateLimitExceededException) {
+            $retryAfter = $exception->getRetryAfterSeconds();
+            if ($retryAfter !== null) {
+                $response = $response->withHeader(
+                    "Retry-After",
+                    (string) $retryAfter,
+                );
+            }
+        }
+
+        return $response;
     }
 
-    private function getCode(\Throwable $exception): int
+    private function getCode(Throwable $exception): int
     {
+        if ($exception instanceof RateLimitExceededException) {
+            return 429;
+        }
+
         if ($exception instanceof \PDOException) {
             return 503;
         }
@@ -50,13 +70,16 @@ final readonly class ErrorHandlerController implements ControllerInterface
         return 500;
     }
 
-    private function getMessage(int $code): string
+    private function getMessage(Throwable $exception, int $code): string
     {
-        return match ($code) {
-            400 => "Bad input",
-            401 => "Unauthenticated",
-            403 => "Unauthorized",
-            503 => "Storage engine error",
+        return match (true) {
+            $exception instanceof RateLimitExceededException
+                => $exception->getMessage(),
+            $code === 400 => "Bad input",
+            $code === 401 => "Unauthenticated",
+            $code === 403 => "Unauthorized",
+            $code === 429 => "Too many requests",
+            $code === 503 => "Storage engine error",
             default => "Server error",
         };
     }
@@ -64,7 +87,7 @@ final readonly class ErrorHandlerController implements ControllerInterface
     private function getLogLevel(int $code): string
     {
         return match ($code) {
-            400, 401, 403 => LogLevel::WARNING,
+            400, 401, 403, 429 => LogLevel::WARNING,
             503 => LogLevel::CRITICAL,
             default => LogLevel::ERROR,
         };

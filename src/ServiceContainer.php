@@ -148,14 +148,42 @@ class ServiceContainer
 
     public function getDb(): PDO
     {
-        // Extract database type from DSN
         $dsn = $this->config("db.dsn");
+        $dbname = $this->config("db.dbname");
+        $user = $this->config("db.user");
+        $pass = $this->config("db.pass");
+
+        return $this->createPdoConnection($dsn, $dbname, $user, $pass);
+    }
+
+    public function getRateLimitDb(): PDO
+    {
+        $dsn = $this->config("ratelimit.db.dsn");
+        $dbname = $this->config("ratelimit.db.dbname");
+        $user = $this->config("ratelimit.db.user");
+        $pass = $this->config("ratelimit.db.pass");
+
+        return $this->createPdoConnection($dsn, $dbname, $user, $pass);
+    }
+
+    private function createPdoConnection(
+        string $dsn,
+        ?string $dbname,
+        ?string $user,
+        ?string $pass,
+    ): PDO {
+        // Extract database type from DSN
         $parts = explode(":", $dsn, 2);
         $dbType = strtolower($parts[0]);
 
         return match ($dbType) {
             "sqlite" => $this->createSqliteDb($dsn),
-            "mysql" => $this->createMysqlDb($dsn),
+            "mysql" => $this->createMysqlDb(
+                $dsn,
+                $dbname ?? "",
+                $user ?? "",
+                $pass ?? "",
+            ),
             default => throw new RepositoryStorageException(
                 "Unsupported database type: {$dbType}",
             ),
@@ -170,9 +198,12 @@ class ServiceContainer
         ]);
     }
 
-    private function createMysqlDb(string $baseDsn): PDO
-    {
-        $dbname = $this->config("db.dbname");
+    private function createMysqlDb(
+        string $baseDsn,
+        string $dbname,
+        string $user,
+        string $pass,
+    ): PDO {
         $dsn = $baseDsn . ";dbname={$dbname};charset=utf8mb4";
 
         $options = [
@@ -180,12 +211,7 @@ class ServiceContainer
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
         ];
 
-        return new PDO(
-            $dsn,
-            $this->config("db.user"),
-            $this->config("db.pass"),
-            $options,
-        );
+        return new PDO($dsn, $user, $pass, $options);
     }
 
     public function getUnitOfWork(): UnitOfWorkInterface
@@ -363,6 +389,25 @@ class ServiceContainer
             $this->config("auth.remember_me_ttl"),
             $this->getClock(),
             $this->getJwtJtiRepository(),
+        );
+    }
+
+    public function getRateLimitService(): Service\RateLimitServiceInterface
+    {
+        return new Service\LoginRateLimitService(
+            $this->getLoginRateLimitRepository(),
+            $this->getClock(),
+            $this->config("ratelimit.username_threshold"),
+            $this->config("ratelimit.ip_threshold"),
+            $this->config("ratelimit.window_minutes"),
+        );
+    }
+
+    private function getLoginRateLimitRepository(): Repository\LoginRateLimitRepositoryInterface
+    {
+        return new Repository\PdoLoginRateLimitRepository(
+            $this->getRateLimitDb(),
+            $this->config("ratelimit.window_minutes"),
         );
     }
 }

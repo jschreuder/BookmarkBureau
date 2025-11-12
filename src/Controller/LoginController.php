@@ -10,8 +10,10 @@ use jschreuder\BookmarkBureau\InputSpec\LoginInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TokenOutputSpec;
 use jschreuder\BookmarkBureau\Response\ResponseTransformerInterface;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
+use jschreuder\BookmarkBureau\Service\RateLimitServiceInterface;
 use jschreuder\BookmarkBureau\Service\TotpVerifierInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
+use jschreuder\BookmarkBureau\Util\IpAddress;
 use jschreuder\Middle\Controller\ControllerInterface;
 use jschreuder\Middle\Controller\RequestFilterInterface;
 use jschreuder\Middle\Controller\RequestValidatorInterface;
@@ -30,6 +32,8 @@ final readonly class LoginController implements
         private TotpVerifierInterface $totpVerifier,
         private TokenOutputSpec $tokenOutputSpec,
         private ResponseTransformerInterface $responseTransformer,
+        private RateLimitServiceInterface $rateLimitService,
+        private bool $trustProxyHeaders = false,
     ) {}
 
     #[\Override]
@@ -52,14 +56,21 @@ final readonly class LoginController implements
     public function execute(ServerRequestInterface $request): ResponseInterface
     {
         $data = (array) $request->getParsedBody();
+        $email = new Email($data["email"]);
+
+        // First check if there's any rate-limit blocks
+        $clientIp = IpAddress::fromRequest($request, $this->trustProxyHeaders);
+        $this->rateLimitService->checkBlock($email->value, $clientIp);
 
         try {
             // Get user by email
-            $email = new Email($data["email"]);
             $user = $this->userService->getUserByEmail($email);
-
             // Verify password
             if (!$this->userService->verifyPassword($user, $data["password"])) {
+                $this->rateLimitService->recordFailure(
+                    $email->value,
+                    $clientIp,
+                );
                 throw new \InvalidArgumentException("Invalid credentials");
             }
 
@@ -67,14 +78,25 @@ final readonly class LoginController implements
             if ($user->requiresTotp()) {
                 $totpCode = $data["totp_code"] ?? "";
                 if (empty($totpCode)) {
+                    $this->rateLimitService->recordFailure(
+                        $email->value,
+                        $clientIp,
+                    );
                     throw new \InvalidArgumentException("TOTP code required");
                 }
                 if (
                     !$this->totpVerifier->verify($totpCode, $user->totpSecret)
                 ) {
+                    $this->rateLimitService->recordFailure(
+                        $email->value,
+                        $clientIp,
+                    );
                     throw new \InvalidArgumentException("Invalid TOTP code");
                 }
             }
+
+            // Everything checked out, clear username failures
+            $this->rateLimitService->clearUsername($email->value);
 
             // Generate appropriate token based on rememberMe flag
             $rememberMe = $data["remember_me"] ?? false;

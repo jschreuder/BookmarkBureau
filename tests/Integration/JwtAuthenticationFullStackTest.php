@@ -28,6 +28,34 @@ function createJwtContainerInstance()
         ,
     );
 
+    // Initialize the rate limiting tables for file-based SQLite
+    $rateLimitDbPath = sys_get_temp_dir() . "/test_ratelimit.db";
+    $rateLimitPdo = new PDO("sqlite:" . $rateLimitDbPath);
+    $rateLimitPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Drop and recreate tables for clean test state
+    $rateLimitPdo->exec("DROP TABLE IF EXISTS failed_login_attempts");
+    $rateLimitPdo->exec("DROP TABLE IF EXISTS login_blocks");
+    $rateLimitPdo->exec(
+        <<<SQL
+            CREATE TABLE failed_login_attempts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp DATETIME NOT NULL,
+                ip TEXT NOT NULL,
+                username TEXT
+            );
+
+            CREATE TABLE login_blocks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT,
+                ip TEXT,
+                blocked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                expires_at DATETIME NOT NULL
+            );
+        SQL
+        ,
+    );
+
     // Register routes
     new RoutingProviderCollection(
         new GeneralRoutingProvider($container),

@@ -18,6 +18,15 @@ return [
     "db.user" => null,
     "db.pass" => null,
 
+    "ratelimit.db.dsn" => "sqlite:./var/ratelimit.db",
+    "ratelimit.db.dbname" => null,
+    "ratelimit.db.user" => null,
+    "ratelimit.db.pass" => null,
+    "ratelimit.username_threshold" => 10, // Max failed attempts per username in window
+    "ratelimit.ip_threshold" => 100, // Max failed attempts per IP in window
+    "ratelimit.window_minutes" => 10, // Time window for rate limiting
+    "ratelimit.trust_proxy_headers" => false, // Trust X-Forwarded-For when behind load balancer
+
     "users.storage.type" => "file",
     "users.storage.path" => __DIR__ . "/../var/users.json",
 

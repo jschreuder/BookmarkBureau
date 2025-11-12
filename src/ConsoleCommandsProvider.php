@@ -9,6 +9,8 @@ use jschreuder\BookmarkBureau\Command\User\ChangePasswordCommand;
 use jschreuder\BookmarkBureau\Command\User\TotpCommand;
 use jschreuder\BookmarkBureau\Command\User\GenerateCliTokenCommand;
 use jschreuder\BookmarkBureau\Command\User\RevokeCliTokenCommand;
+use jschreuder\BookmarkBureau\Command\Security\CreateRateLimitDatabaseCommand;
+use jschreuder\BookmarkBureau\Command\Security\RateLimitCleanupCommand;
 use Symfony\Component\Console\Application;
 
 final readonly class ConsoleCommandsProvider
@@ -36,6 +38,16 @@ final readonly class ConsoleCommandsProvider
         );
         $application->add(
             new RevokeCliTokenCommand($this->container->getJwtJtiRepository()),
+        );
+        $application->add(
+            new CreateRateLimitDatabaseCommand(
+                $this->container->getRateLimitDb(),
+            ),
+        );
+        $application->add(
+            new RateLimitCleanupCommand(
+                $this->container->getRateLimitService(),
+            ),
         );
     }
 }

@@ -230,6 +230,15 @@ class TestContainerHelper
             "db.dbname" => ":memory:",
             "db.user" => "",
             "db.pass" => "",
+            "ratelimit.db.dsn" =>
+                "sqlite:" . sys_get_temp_dir() . "/test_ratelimit.db",
+            "ratelimit.db.dbname" => "",
+            "ratelimit.db.user" => "",
+            "ratelimit.db.pass" => "",
+            "ratelimit.username_threshold" => 10,
+            "ratelimit.ip_threshold" => 100,
+            "ratelimit.window_minutes" => 10,
+            "ratelimit.trust_proxy_headers" => false,
             "users.storage.type" => "pdo",
             "users.storage.path" => sys_get_temp_dir() . "/test_users.json",
             "auth.jwt_secret" => "test-secret-key-32-bytes-long!!!", // Exactly 32 bytes

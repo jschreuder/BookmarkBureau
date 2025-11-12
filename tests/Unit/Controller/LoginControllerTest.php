@@ -7,11 +7,13 @@ use jschreuder\BookmarkBureau\Entity\Value\TokenClaims;
 use jschreuder\BookmarkBureau\Entity\Value\TokenResponse;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
+use jschreuder\BookmarkBureau\Exception\RateLimitExceededException;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\InputSpec\LoginInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TokenOutputSpec;
 use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
+use jschreuder\BookmarkBureau\Service\RateLimitServiceInterface;
 use jschreuder\BookmarkBureau\Service\TotpVerifierInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\Middle\Exception\ValidationFailedException;
@@ -26,6 +28,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -33,6 +39,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $request = new ServerRequest(
@@ -60,6 +67,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -67,6 +78,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $request = new ServerRequest(
@@ -92,6 +104,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -99,6 +115,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $request = new ServerRequest(
@@ -125,6 +142,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -132,6 +153,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $request = new ServerRequest(
@@ -157,6 +179,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -164,6 +190,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $request = new ServerRequest(
@@ -189,6 +216,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -196,6 +227,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $request = new ServerRequest(
@@ -225,14 +257,19 @@ describe("LoginController", function () {
                 $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
                 $responseTransformer = new JsonResponseTransformer();
                 $tokenOutputSpec = new TokenOutputSpec();
-                $controller = new LoginController(
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
+            $controller = new LoginController(
                     $inputSpec,
                     $userService,
                     $jwtService,
                     $totpVerifier,
                     $tokenOutputSpec,
                     $responseTransformer,
-                );
+                $rateLimitService,
+            );
 
                 $user = TestEntityFactory::createUser();
                 $userService->shouldReceive("getUserByEmail")->andReturn($user);
@@ -287,6 +324,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -294,6 +335,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $user = TestEntityFactory::createUser();
@@ -350,14 +392,19 @@ describe("LoginController", function () {
                 $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
                 $responseTransformer = new JsonResponseTransformer();
                 $tokenOutputSpec = new TokenOutputSpec();
-                $controller = new LoginController(
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
+            $controller = new LoginController(
                     $inputSpec,
                     $userService,
                     $jwtService,
                     $totpVerifier,
                     $tokenOutputSpec,
                     $responseTransformer,
-                );
+                $rateLimitService,
+            );
 
                 $user = TestEntityFactory::createUser();
                 $userService->shouldReceive("getUserByEmail")->andReturn($user);
@@ -392,14 +439,19 @@ describe("LoginController", function () {
                 $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
                 $responseTransformer = new JsonResponseTransformer();
                 $tokenOutputSpec = new TokenOutputSpec();
-                $controller = new LoginController(
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
+            $controller = new LoginController(
                     $inputSpec,
                     $userService,
                     $jwtService,
                     $totpVerifier,
                     $tokenOutputSpec,
                     $responseTransformer,
-                );
+                $rateLimitService,
+            );
 
                 $userService
                     ->shouldReceive("getUserByEmail")
@@ -429,6 +481,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -436,6 +492,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $totpSecret = new TotpSecret(
@@ -472,6 +529,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -479,6 +540,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $totpSecret = new TotpSecret(
@@ -541,6 +603,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -548,6 +614,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $totpSecret = new TotpSecret(
@@ -590,14 +657,19 @@ describe("LoginController", function () {
                 $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
                 $responseTransformer = new JsonResponseTransformer();
                 $tokenOutputSpec = new TokenOutputSpec();
-                $controller = new LoginController(
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
+            $controller = new LoginController(
                     $inputSpec,
                     $userService,
                     $jwtService,
                     $totpVerifier,
                     $tokenOutputSpec,
                     $responseTransformer,
-                );
+                $rateLimitService,
+            );
 
                 $user = TestEntityFactory::createUser();
                 $userService->shouldReceive("getUserByEmail")->andReturn($user);
@@ -651,6 +723,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -658,6 +734,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $user = TestEntityFactory::createUser();
@@ -715,6 +792,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -722,6 +803,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             expect($controller)->toBeInstanceOf(
@@ -736,6 +818,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -743,6 +829,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             expect($controller)->toBeInstanceOf(
@@ -757,6 +844,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -764,6 +855,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             expect($controller)->toBeInstanceOf(
@@ -780,6 +872,10 @@ describe("LoginController", function () {
             $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
             $responseTransformer = new JsonResponseTransformer();
             $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+            $rateLimitService->shouldReceive("checkBlock")->andReturn(null);
+            $rateLimitService->shouldReceive("recordFailure")->andReturn(null);
+            $rateLimitService->shouldReceive("clearUsername")->andReturn(null);
             $controller = new LoginController(
                 $inputSpec,
                 $userService,
@@ -787,6 +883,7 @@ describe("LoginController", function () {
                 $totpVerifier,
                 $tokenOutputSpec,
                 $responseTransformer,
+                $rateLimitService,
             );
 
             $user = TestEntityFactory::createUser();
@@ -837,6 +934,387 @@ describe("LoginController", function () {
             $body = json_decode($response->getBody()->getContents(), true);
             expect($body["success"])->toBeTrue();
             expect($body["data"]["type"])->toBe("session");
+        });
+    });
+
+    describe("rate limiting integration", function () {
+        test(
+            "should check for rate limit blocks before authentication",
+            function () {
+                $inputSpec = new LoginInputSpec();
+                $userService = Mockery::mock(UserServiceInterface::class);
+                $jwtService = Mockery::mock(JwtServiceInterface::class);
+                $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
+                $responseTransformer = new JsonResponseTransformer();
+                $tokenOutputSpec = new TokenOutputSpec();
+                $rateLimitService = Mockery::mock(
+                    RateLimitServiceInterface::class,
+                );
+
+                $rateLimitService
+                    ->shouldReceive("checkBlock")
+                    ->with("test@example.com", "192.168.1.1")
+                    ->once()
+                    ->andThrow(new RateLimitExceededException());
+
+                $controller = new LoginController(
+                    $inputSpec,
+                    $userService,
+                    $jwtService,
+                    $totpVerifier,
+                    $tokenOutputSpec,
+                    $responseTransformer,
+                    $rateLimitService,
+                );
+
+                $request = new ServerRequest(
+                    uri: "http://example.com/api/auth/login",
+                    method: "POST",
+                    serverParams: ["REMOTE_ADDR" => "192.168.1.1"],
+                );
+                $request = $request->withParsedBody([
+                    "email" => "test@example.com",
+                    "password" => "password123",
+                    "remember_me" => false,
+                ]);
+
+                expect(fn() => $controller->execute($request))->toThrow(
+                    RateLimitExceededException::class,
+                );
+            },
+        );
+
+        test("should record failure on invalid password", function () {
+            $inputSpec = new LoginInputSpec();
+            $userService = Mockery::mock(UserServiceInterface::class);
+            $jwtService = Mockery::mock(JwtServiceInterface::class);
+            $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
+            $responseTransformer = new JsonResponseTransformer();
+            $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+
+            $rateLimitService
+                ->shouldReceive("checkBlock")
+                ->with("test@example.com", "192.168.1.1")
+                ->once();
+
+            $user = TestEntityFactory::createUser();
+            $userService->shouldReceive("getUserByEmail")->andReturn($user);
+            $userService->shouldReceive("verifyPassword")->andReturn(false);
+
+            $rateLimitService
+                ->shouldReceive("recordFailure")
+                ->with("test@example.com", "192.168.1.1")
+                ->once();
+
+            $controller = new LoginController(
+                $inputSpec,
+                $userService,
+                $jwtService,
+                $totpVerifier,
+                $tokenOutputSpec,
+                $responseTransformer,
+                $rateLimitService,
+            );
+
+            $request = new ServerRequest(
+                uri: "http://example.com/api/auth/login",
+                method: "POST",
+                serverParams: ["REMOTE_ADDR" => "192.168.1.1"],
+            );
+            $request = $request->withParsedBody([
+                "email" => "test@example.com",
+                "password" => "wrongpassword",
+                "remember_me" => false,
+            ]);
+
+            expect(fn() => $controller->execute($request))->toThrow(
+                \InvalidArgumentException::class,
+            );
+        });
+
+        test("should record failure on missing TOTP code", function () {
+            $inputSpec = new LoginInputSpec();
+            $userService = Mockery::mock(UserServiceInterface::class);
+            $jwtService = Mockery::mock(JwtServiceInterface::class);
+            $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
+            $responseTransformer = new JsonResponseTransformer();
+            $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+
+            $rateLimitService
+                ->shouldReceive("checkBlock")
+                ->with("test@example.com", "192.168.1.1")
+                ->once();
+
+            $totpSecret = new TotpSecret(
+                "JBSWY3DPEBLW64TMMQQQQQQQQQQQQQQQQQQQQQQQQQQ",
+            );
+            $user = TestEntityFactory::createUser(totpSecret: $totpSecret);
+            $userService->shouldReceive("getUserByEmail")->andReturn($user);
+            $userService->shouldReceive("verifyPassword")->andReturn(true);
+
+            $rateLimitService
+                ->shouldReceive("recordFailure")
+                ->with("test@example.com", "192.168.1.1")
+                ->once();
+
+            $controller = new LoginController(
+                $inputSpec,
+                $userService,
+                $jwtService,
+                $totpVerifier,
+                $tokenOutputSpec,
+                $responseTransformer,
+                $rateLimitService,
+            );
+
+            $request = new ServerRequest(
+                uri: "http://example.com/api/auth/login",
+                method: "POST",
+                serverParams: ["REMOTE_ADDR" => "192.168.1.1"],
+            );
+            $request = $request->withParsedBody([
+                "email" => "test@example.com",
+                "password" => "password123",
+                "remember_me" => false,
+                "totp_code" => "",
+            ]);
+
+            expect(fn() => $controller->execute($request))->toThrow(
+                \InvalidArgumentException::class,
+            );
+        });
+
+        test("should record failure on invalid TOTP code", function () {
+            $inputSpec = new LoginInputSpec();
+            $userService = Mockery::mock(UserServiceInterface::class);
+            $jwtService = Mockery::mock(JwtServiceInterface::class);
+            $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
+            $responseTransformer = new JsonResponseTransformer();
+            $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+
+            $rateLimitService
+                ->shouldReceive("checkBlock")
+                ->with("test@example.com", "192.168.1.1")
+                ->once();
+
+            $totpSecret = new TotpSecret(
+                "JBSWY3DPEBLW64TMMQQQQQQQQQQQQQQQQQQQQQQQQQQ",
+            );
+            $user = TestEntityFactory::createUser(totpSecret: $totpSecret);
+            $userService->shouldReceive("getUserByEmail")->andReturn($user);
+            $userService->shouldReceive("verifyPassword")->andReturn(true);
+            $totpVerifier->shouldReceive("verify")->andReturn(false);
+
+            $rateLimitService
+                ->shouldReceive("recordFailure")
+                ->with("test@example.com", "192.168.1.1")
+                ->once();
+
+            $controller = new LoginController(
+                $inputSpec,
+                $userService,
+                $jwtService,
+                $totpVerifier,
+                $tokenOutputSpec,
+                $responseTransformer,
+                $rateLimitService,
+            );
+
+            $request = new ServerRequest(
+                uri: "http://example.com/api/auth/login",
+                method: "POST",
+                serverParams: ["REMOTE_ADDR" => "192.168.1.1"],
+            );
+            $request = $request->withParsedBody([
+                "email" => "test@example.com",
+                "password" => "password123",
+                "remember_me" => false,
+                "totp_code" => "000000",
+            ]);
+
+            expect(fn() => $controller->execute($request))->toThrow(
+                \InvalidArgumentException::class,
+            );
+        });
+
+        test("should clear username on successful login", function () {
+            $inputSpec = new LoginInputSpec();
+            $userService = Mockery::mock(UserServiceInterface::class);
+            $jwtService = Mockery::mock(JwtServiceInterface::class);
+            $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
+            $responseTransformer = new JsonResponseTransformer();
+            $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+
+            $rateLimitService
+                ->shouldReceive("checkBlock")
+                ->with("test@example.com", "192.168.1.1")
+                ->once();
+
+            $user = TestEntityFactory::createUser();
+            $userService->shouldReceive("getUserByEmail")->andReturn($user);
+            $userService->shouldReceive("verifyPassword")->andReturn(true);
+
+            $now = new DateTimeImmutable();
+            $expiresAt = $now->modify("+24 hours");
+            $jwtToken = new JwtToken("test.jwt.token");
+            $claims = new TokenClaims(
+                $user->userId,
+                TokenType::SESSION_TOKEN,
+                $now,
+                $expiresAt,
+            );
+
+            $jwtService->shouldReceive("generate")->andReturn($jwtToken);
+            $jwtService->shouldReceive("verify")->andReturn($claims);
+
+            $rateLimitService
+                ->shouldReceive("clearUsername")
+                ->with("test@example.com")
+                ->once();
+
+            $controller = new LoginController(
+                $inputSpec,
+                $userService,
+                $jwtService,
+                $totpVerifier,
+                $tokenOutputSpec,
+                $responseTransformer,
+                $rateLimitService,
+            );
+
+            $request = new ServerRequest(
+                uri: "http://example.com/api/auth/login",
+                method: "POST",
+                serverParams: ["REMOTE_ADDR" => "192.168.1.1"],
+            );
+            $request = $request->withParsedBody([
+                "email" => "test@example.com",
+                "password" => "password123",
+                "remember_me" => false,
+            ]);
+
+            $response = $controller->execute($request);
+            expect($response->getStatusCode())->toBe(200);
+        });
+
+        test("should extract IP from REMOTE_ADDR server param", function () {
+            $inputSpec = new LoginInputSpec();
+            $userService = Mockery::mock(UserServiceInterface::class);
+            $jwtService = Mockery::mock(JwtServiceInterface::class);
+            $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
+            $responseTransformer = new JsonResponseTransformer();
+            $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+
+            $rateLimitService
+                ->shouldReceive("checkBlock")
+                ->with("test@example.com", "203.0.113.45")
+                ->once();
+
+            $user = TestEntityFactory::createUser();
+            $userService->shouldReceive("getUserByEmail")->andReturn($user);
+            $userService->shouldReceive("verifyPassword")->andReturn(true);
+
+            $now = new DateTimeImmutable();
+            $expiresAt = $now->modify("+24 hours");
+            $jwtToken = new JwtToken("test.jwt.token");
+            $claims = new TokenClaims(
+                $user->userId,
+                TokenType::SESSION_TOKEN,
+                $now,
+                $expiresAt,
+            );
+
+            $jwtService->shouldReceive("generate")->andReturn($jwtToken);
+            $jwtService->shouldReceive("verify")->andReturn($claims);
+
+            $rateLimitService->shouldReceive("clearUsername")->once();
+
+            $controller = new LoginController(
+                $inputSpec,
+                $userService,
+                $jwtService,
+                $totpVerifier,
+                $tokenOutputSpec,
+                $responseTransformer,
+                $rateLimitService,
+            );
+
+            $request = new ServerRequest(
+                uri: "http://example.com/api/auth/login",
+                method: "POST",
+                serverParams: ["REMOTE_ADDR" => "203.0.113.45"],
+            );
+            $request = $request->withParsedBody([
+                "email" => "test@example.com",
+                "password" => "password123",
+                "remember_me" => false,
+            ]);
+
+            $response = $controller->execute($request);
+            expect($response->getStatusCode())->toBe(200);
+        });
+
+        test("should use fallback IP when REMOTE_ADDR missing", function () {
+            $inputSpec = new LoginInputSpec();
+            $userService = Mockery::mock(UserServiceInterface::class);
+            $jwtService = Mockery::mock(JwtServiceInterface::class);
+            $totpVerifier = Mockery::mock(TotpVerifierInterface::class);
+            $responseTransformer = new JsonResponseTransformer();
+            $tokenOutputSpec = new TokenOutputSpec();
+            $rateLimitService = Mockery::mock(RateLimitServiceInterface::class);
+
+            $rateLimitService
+                ->shouldReceive("checkBlock")
+                ->with("test@example.com", "0.0.0.0")
+                ->once();
+
+            $user = TestEntityFactory::createUser();
+            $userService->shouldReceive("getUserByEmail")->andReturn($user);
+            $userService->shouldReceive("verifyPassword")->andReturn(true);
+
+            $now = new DateTimeImmutable();
+            $expiresAt = $now->modify("+24 hours");
+            $jwtToken = new JwtToken("test.jwt.token");
+            $claims = new TokenClaims(
+                $user->userId,
+                TokenType::SESSION_TOKEN,
+                $now,
+                $expiresAt,
+            );
+
+            $jwtService->shouldReceive("generate")->andReturn($jwtToken);
+            $jwtService->shouldReceive("verify")->andReturn($claims);
+
+            $rateLimitService->shouldReceive("clearUsername")->once();
+
+            $controller = new LoginController(
+                $inputSpec,
+                $userService,
+                $jwtService,
+                $totpVerifier,
+                $tokenOutputSpec,
+                $responseTransformer,
+                $rateLimitService,
+            );
+
+            $request = new ServerRequest(
+                uri: "http://example.com/api/auth/login",
+                method: "POST",
+                serverParams: [], // No REMOTE_ADDR
+            );
+            $request = $request->withParsedBody([
+                "email" => "test@example.com",
+                "password" => "password123",
+                "remember_me" => false,
+            ]);
+
+            $response = $controller->execute($request);
+            expect($response->getStatusCode())->toBe(200);
         });
     });
 });

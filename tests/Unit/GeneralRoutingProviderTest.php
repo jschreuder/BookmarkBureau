@@ -9,6 +9,7 @@ use jschreuder\BookmarkBureau\Service\FavoriteServiceInterface;
 use jschreuder\BookmarkBureau\Service\TagServiceInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
+use jschreuder\BookmarkBureau\Service\RateLimitServiceInterface;
 use jschreuder\BookmarkBureau\Service\TotpVerifierInterface;
 use jschreuder\Middle\Router\RouterInterface;
 use jschreuder\Middle\Controller\ControllerInterface;
@@ -41,6 +42,13 @@ describe("GeneralRoutingProvider", function () {
         $container
             ->shouldReceive("getTotpVerifier")
             ->andReturn(Mockery::mock(TotpVerifierInterface::class));
+        $container
+            ->shouldReceive("getRateLimitService")
+            ->andReturn(Mockery::mock(RateLimitServiceInterface::class));
+        $container
+            ->shouldReceive("config")
+            ->with("ratelimit.trust_proxy_headers")
+            ->andReturn(false);
         return $container;
     }
 

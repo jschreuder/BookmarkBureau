@@ -87,6 +87,8 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                 $this->container->getTotpVerifier(),
                 new TokenOutputSpec(),
                 new JsonResponseTransformer(),
+                $this->container->getRateLimitService(),
+                $this->container->config("ratelimit.trust_proxy_headers"),
             ),
         );
 
