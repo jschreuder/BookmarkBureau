@@ -121,6 +121,7 @@ final readonly class LoginController implements
                 statusCode: 200,
             );
         } catch (UserNotFoundException $e) {
+            $this->rateLimitService->recordFailure($email->value, $clientIp);
             throw new \InvalidArgumentException("Invalid credentials");
         }
     }
