@@ -9,9 +9,6 @@ use PDO;
 
 final class CreateRateLimitDatabaseCommand extends Command
 {
-    protected static ?string $defaultName = "security:create-ratelimit-db";
-    protected static ?string $defaultDescription = "Create rate limiting database tables";
-
     public function __construct(private PDO $rateLimitDb)
     {
         parent::__construct("security:create-ratelimit-db");
@@ -19,7 +16,9 @@ final class CreateRateLimitDatabaseCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription("Create rate limiting database tables (SQLite or MySQL)");
+        $this->setDescription(
+            "Create rate limiting database tables (SQLite or MySQL)",
+        );
     }
 
     protected function execute(
@@ -27,19 +26,27 @@ final class CreateRateLimitDatabaseCommand extends Command
         OutputInterface $output,
     ): int {
         try {
-            $output->writeln("<info>Creating rate limiting database tables...</info>");
+            $output->writeln(
+                "<info>Creating rate limiting database tables...</info>",
+            );
 
             // Check if we're using SQLite or MySQL
             $driver = $this->rateLimitDb->getAttribute(PDO::ATTR_DRIVER_NAME);
 
             if ($driver === "sqlite") {
                 $this->createSqliteTables();
-                $output->writeln("<info>✓ Created SQLite tables successfully</info>");
+                $output->writeln(
+                    "<info>✓ Created SQLite tables successfully</info>",
+                );
             } elseif ($driver === "mysql") {
                 $this->createMysqlTables();
-                $output->writeln("<info>✓ Created MySQL tables successfully</info>");
+                $output->writeln(
+                    "<info>✓ Created MySQL tables successfully</info>",
+                );
             } else {
-                $output->writeln("<error>Unsupported database driver: {$driver}</error>");
+                $output->writeln(
+                    "<error>Unsupported database driver: {$driver}</error>",
+                );
                 return Command::FAILURE;
             }
 
@@ -49,7 +56,9 @@ final class CreateRateLimitDatabaseCommand extends Command
 
             return Command::SUCCESS;
         } catch (\PDOException $e) {
-            $output->writeln("<error>Database error: {$e->getMessage()}</error>");
+            $output->writeln(
+                "<error>Database error: {$e->getMessage()}</error>",
+            );
             return Command::FAILURE;
         }
     }

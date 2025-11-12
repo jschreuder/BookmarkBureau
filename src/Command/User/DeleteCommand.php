@@ -13,9 +13,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 final class DeleteCommand extends Command
 {
-    protected static ?string $defaultName = "user:delete";
-    protected static ?string $defaultDescription = "Delete a user by email";
-
     public function __construct(private UserServiceInterface $userService)
     {
         parent::__construct("user:delete");

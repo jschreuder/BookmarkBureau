@@ -13,9 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class TotpCommand extends Command
 {
-    protected static ?string $defaultName = "user:totp";
-    protected static ?string $defaultDescription = "Manage TOTP for a user (enable/disable)";
-
     public function __construct(private UserServiceInterface $userService)
     {
         parent::__construct("user:totp");

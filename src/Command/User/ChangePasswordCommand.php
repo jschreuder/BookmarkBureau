@@ -13,8 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class ChangePasswordCommand extends Command
 {
     use PasswordPromptTrait;
-    protected static ?string $defaultName = "user:change-password";
-    protected static ?string $defaultDescription = "Change a user password by email";
 
     public function __construct(private UserServiceInterface $userService)
     {

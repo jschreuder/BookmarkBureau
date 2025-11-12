@@ -11,9 +11,6 @@ use Symfony\Component\Console\Helper\Table;
 
 final class ListCommand extends Command
 {
-    protected static ?string $defaultName = "user:list";
-    protected static ?string $defaultDescription = "List all users";
-
     public function __construct(private UserServiceInterface $userService)
     {
         parent::__construct("user:list");

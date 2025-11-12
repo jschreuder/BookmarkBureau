@@ -17,9 +17,6 @@ final class GenerateCliTokenCommand extends Command
 {
     use PasswordPromptTrait;
 
-    protected static ?string $defaultName = "user:generate-cli-token";
-    protected static ?string $defaultDescription = "Generate a CLI token for a user";
-
     public function __construct(
         private UserServiceInterface $userService,
         private JwtServiceInterface $jwtService,

@@ -15,8 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class CreateCommand extends Command
 {
     use PasswordPromptTrait;
-    protected static ?string $defaultName = "user:create";
-    protected static ?string $defaultDescription = "Create a new user";
 
     public function __construct(private UserServiceInterface $userService)
     {

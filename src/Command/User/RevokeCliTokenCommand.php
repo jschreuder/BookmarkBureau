@@ -13,9 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class RevokeCliTokenCommand extends Command
 {
-    protected static ?string $defaultName = "user:revoke-cli-token";
-    protected static ?string $defaultDescription = "Revoke a CLI token by JTI";
-
     public function __construct(
         private JwtJtiRepositoryInterface $jwtJtiRepository,
     ) {
