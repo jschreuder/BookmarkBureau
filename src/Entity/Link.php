@@ -5,6 +5,7 @@ namespace jschreuder\BookmarkBureau\Entity;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Ramsey\Uuid\UuidInterface;
+use jschreuder\BookmarkBureau\Collection\TagCollection;
 
 final class Link
 {
@@ -39,6 +40,9 @@ final class Link
         }
     }
 
+    // Modifications should be done through the TagRepository
+    public readonly TagCollection $tags;
+
     public readonly DateTimeInterface $createdAt;
 
     public private(set) DateTimeInterface $updatedAt;
@@ -50,7 +54,8 @@ final class Link
         string $description,
         ?Value\Icon $icon,
         DateTimeInterface $createdAt,
-        DateTimeInterface $updatedAt
+        DateTimeInterface $updatedAt,
+        TagCollection $tags,
     )
     {
         $this->linkId = $linkId;
@@ -60,6 +65,7 @@ final class Link
         $this->icon = $icon;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
+        $this->tags = $tags;
     }
 
     public function markAsUpdated(): void

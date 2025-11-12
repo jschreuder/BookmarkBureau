@@ -5,9 +5,11 @@ namespace jschreuder\BookmarkBureau\Repository;
 use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Collection\TagCollection;
 use jschreuder\BookmarkBureau\Collection\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
@@ -18,6 +20,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     public function __construct(
         private readonly PDO $pdo,
         private readonly LinkEntityMapper $mapper,
+        private readonly TagEntityMapper $tagMapper,
     ) {}
 
     /**
@@ -26,40 +29,40 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     #[\Override]
     public function findById(UuidInterface $linkId): Link
     {
-        $sql = SqlBuilder::buildSelect(
-            "links",
-            $this->mapper->getFields(),
-            "link_id = :link_id LIMIT 1",
+        $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
+        $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
+        $statement = $this->pdo->prepare(
+            "SELECT {$fields}, {$tagFields} FROM links l
+             LEFT JOIN link_tags lt ON l.link_id = lt.link_id
+             LEFT JOIN tags t ON lt.tag_name = t.tag_name
+             WHERE l.link_id = :link_id",
         );
-        $statement = $this->pdo->prepare($sql);
         $statement->execute([":link_id" => $linkId->getBytes()]);
 
-        $row = $statement->fetch(PDO::FETCH_ASSOC);
-        if ($row === false) {
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($rows)) {
             throw LinkNotFoundException::forId($linkId);
         }
 
-        return $this->mapper->mapToEntity($row);
+        return $this->buildLinkFromRows($rows)[0];
     }
 
     #[\Override]
     public function findAll(int $limit = 100, int $offset = 0): LinkCollection
     {
-        $sql = SqlBuilder::buildSelect(
-            "links",
-            $this->mapper->getFields(),
-            null,
-            "created_at DESC",
-            $limit,
-            $offset,
+        $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
+        $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
+        $statement = $this->pdo->prepare(
+            "SELECT {$fields}, {$tagFields} FROM links l
+             LEFT JOIN link_tags lt ON l.link_id = lt.link_id
+             LEFT JOIN tags t ON lt.tag_name = t.tag_name
+             ORDER BY l.created_at DESC
+             LIMIT ? OFFSET ?",
         );
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute();
+        $statement->execute([$limit, $offset]);
 
-        $links = [];
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $links[] = $this->mapper->mapToEntity($row);
-        }
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $links = $this->buildLinkFromRows($rows);
 
         return new LinkCollection(...$links);
     }
@@ -72,21 +75,20 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     public function search(string $query, int $limit = 100): LinkCollection
     {
         $searchTerm = "%{$query}%";
-
-        $sql = SqlBuilder::buildSelect(
-            "links",
-            $this->mapper->getFields(),
-            "title LIKE ? OR description LIKE ?",
-            "created_at DESC",
+        $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
+        $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
+        $statement = $this->pdo->prepare(
+            "SELECT {$fields}, {$tagFields} FROM links l
+             LEFT JOIN link_tags lt ON l.link_id = lt.link_id
+             LEFT JOIN tags t ON lt.tag_name = t.tag_name
+             WHERE l.title LIKE ? OR l.description LIKE ?
+             ORDER BY l.created_at DESC
+             LIMIT ?",
         );
-        $sql .= " LIMIT ?";
-        $statement = $this->pdo->prepare($sql);
         $statement->execute([$searchTerm, $searchTerm, $limit]);
 
-        $links = [];
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $links[] = $this->mapper->mapToEntity($row);
-        }
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $links = $this->buildLinkFromRows($rows);
 
         return new LinkCollection(...$links);
     }
@@ -110,10 +112,13 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             $tagNames->toArray(),
         );
         $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
+        $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
         $query =
-            "SELECT " .
-            $fields .
-            " FROM links l WHERE l.link_id IN (" .
+            "SELECT {$fields}, {$tagFields}
+             FROM links l
+             LEFT JOIN link_tags lt ON l.link_id = lt.link_id
+             LEFT JOIN tags t ON lt.tag_name = t.tag_name
+             WHERE l.link_id IN (" .
             implode(" INTERSECT ", $intersectQueries) .
             ") ORDER BY l.created_at DESC";
 
@@ -125,10 +130,8 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             ),
         );
 
-        $links = [];
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $links[] = $this->mapper->mapToEntity($row);
-        }
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $links = $this->buildLinkFromRows($rows);
 
         return new LinkCollection(...$links);
     }
@@ -141,15 +144,19 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     public function findByCategoryId(UuidInterface $categoryId): LinkCollection
     {
         $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
+        $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
         $statement = $this->pdo->prepare(
-            "SELECT {$fields} FROM links l
+            "SELECT {$fields}, {$tagFields} FROM links l
              INNER JOIN category_links cl ON l.link_id = cl.link_id
+             LEFT JOIN link_tags lt ON l.link_id = lt.link_id
+             LEFT JOIN tags t ON lt.tag_name = t.tag_name
              WHERE cl.category_id = :category_id
              ORDER BY cl.sort_order ASC",
         );
         $statement->execute([":category_id" => $categoryId->getBytes()]);
 
-        if ($statement->rowCount() === 0) {
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($rows)) {
             // Verify the category exists
             $categoryCheck = $this->pdo->prepare(
                 "SELECT 1 FROM categories WHERE category_id = :category_id LIMIT 1",
@@ -162,10 +169,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             }
         }
 
-        $links = [];
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $links[] = $this->mapper->mapToEntity($row);
-        }
+        $links = $this->buildLinkFromRows($rows);
 
         return new LinkCollection(...$links);
     }
@@ -220,5 +224,68 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
 
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         return (int) $result["count"];
+    }
+
+    /**
+     * Build Link entities from query results with tags
+     * Handles multiple rows per link (one row per tag) by:
+     * 1. Deduplicating link rows
+     * 2. Collecting tags for each link into a TagCollection
+     * 3. Mapping to Link entities with their tags
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, Link>
+     */
+    private function buildLinkFromRows(array $rows): array
+    {
+        if (empty($rows)) {
+            return [];
+        }
+
+        // Group rows by link_id to handle multiple tags per link
+        $groupedByLink = [];
+        foreach ($rows as $row) {
+            $linkId = $row["link_id"];
+            if (!isset($groupedByLink[$linkId])) {
+                $groupedByLink[$linkId] = [
+                    "linkRow" => $row,
+                    "tagRows" => [],
+                ];
+            }
+            // Only collect tag data if a tag was actually joined
+            if ($row["tag_name"] !== null) {
+                $groupedByLink[$linkId]["tagRows"][] = $row;
+            }
+        }
+
+        // Build Link entities with their tags
+        $links = [];
+        $tagObjects = [];
+        foreach ($groupedByLink as $group) {
+            $linkRow = $group["linkRow"];
+            $tagRows = $group["tagRows"];
+
+            // Map tags to Tag entities
+            $tags = [];
+            foreach ($tagRows as $tagRow) {
+                $tagName = $tagRow["tag_name"];
+
+                if (!\array_key_exists($tagName, $tagObjects)) {
+                    $tagObject = $this->tagMapper->mapToEntity($tagRow);
+                    $tagObjects[$tagName] = $tagObject;
+                } else {
+                    $tagObject = $tagObjects[$tagName];
+                }
+
+                $tags[] = $tagObject;
+            }
+
+            // Map Link entity with its tags
+            $linkRow["tags"] = new TagCollection(...$tags);
+            $link = $this->mapper->mapToEntity($linkRow);
+            $links[] = $link;
+        }
+
+        return $links;
     }
 }

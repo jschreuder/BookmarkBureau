@@ -221,7 +221,11 @@ class ServiceContainer
 
     public function getLinkRepository(): LinkRepositoryInterface
     {
-        return new PdoLinkRepository($this->getDb(), new LinkEntityMapper());
+        return new PdoLinkRepository(
+            $this->getDb(),
+            new LinkEntityMapper(),
+            new TagEntityMapper(),
+        );
     }
 
     public function getTagRepository(): TagRepositoryInterface

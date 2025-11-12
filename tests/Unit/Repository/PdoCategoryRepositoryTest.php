@@ -4,6 +4,7 @@ use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Mapper\CategoryEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
@@ -74,7 +75,8 @@ describe("PdoCategoryRepository", function () {
             );
 
             CREATE TABLE tags (
-                tag_name TEXT PRIMARY KEY
+                tag_name TEXT PRIMARY KEY,
+                color TEXT
             );
 
             CREATE TABLE link_tags (
@@ -145,7 +147,11 @@ describe("PdoCategoryRepository", function () {
             $pdo,
             new DashboardEntityMapper(),
         );
-        $linkRepo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+        $linkRepo = new PdoLinkRepository(
+            $pdo,
+            new LinkEntityMapper(),
+            new TagEntityMapper(),
+        );
         $categoryRepo = new PdoCategoryRepository(
             $pdo,
             $dashboardRepo,

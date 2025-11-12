@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Entity\Mapper;
 
 use DateTimeImmutable;
 use Ramsey\Uuid\Uuid;
+use jschreuder\BookmarkBureau\Collection\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
@@ -39,6 +40,8 @@ final readonly class LinkEntityMapper implements EntityMapperInterface
     #[\Override]
     private function doMapToEntity(array $data): Link
     {
+        $tags = $data["tags"] ?? new TagCollection();
+
         return new Link(
             linkId: Uuid::fromBytes($data["link_id"]),
             url: new Url($data["url"]),
@@ -47,6 +50,7 @@ final readonly class LinkEntityMapper implements EntityMapperInterface
             icon: $data["icon"] !== null ? new Icon($data["icon"]) : null,
             createdAt: new DateTimeImmutable($data["created_at"]),
             updatedAt: new DateTimeImmutable($data["updated_at"]),
+            tags: $tags,
         );
     }
 

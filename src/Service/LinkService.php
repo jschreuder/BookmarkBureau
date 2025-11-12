@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Service;
 
 use DateTimeImmutable;
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Collection\TagCollection;
 use jschreuder\BookmarkBureau\Collection\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
@@ -53,6 +54,7 @@ final class LinkService implements LinkServiceInterface
                 $icon !== null ? new Icon($icon) : null,
                 new DateTimeImmutable(),
                 new DateTimeImmutable(),
+                new TagCollection(),
             );
 
             $this->linkRepository->save($link);

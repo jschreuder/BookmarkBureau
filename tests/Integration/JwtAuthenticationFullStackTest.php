@@ -293,6 +293,29 @@ describe("JWT Authentication Full Stack Integration", function () {
                 // Create tables
                 $pdo->exec(
                     <<<SQL
+                    CREATE TABLE IF NOT EXISTS links (
+                        link_id CHAR(16) PRIMARY KEY,
+                        url TEXT NOT NULL,
+                        title VARCHAR(255) NOT NULL,
+                        description TEXT NOT NULL,
+                        icon TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+
+                    CREATE TABLE IF NOT EXISTS tags (
+                        tag_name VARCHAR(100) PRIMARY KEY,
+                        color VARCHAR(7)
+                    );
+
+                    CREATE TABLE IF NOT EXISTS link_tags (
+                        link_id CHAR(16) NOT NULL,
+                        tag_name VARCHAR(100) NOT NULL,
+                        PRIMARY KEY (link_id, tag_name),
+                        FOREIGN KEY (link_id) REFERENCES links(link_id) ON DELETE CASCADE,
+                        FOREIGN KEY (tag_name) REFERENCES tags(tag_name) ON DELETE CASCADE
+                    );
+
                     CREATE TABLE IF NOT EXISTS dashboards (
                         dashboard_id CHAR(16) PRIMARY KEY,
                         title VARCHAR(255) NOT NULL,
@@ -300,6 +323,37 @@ describe("JWT Authentication Full Stack Integration", function () {
                         icon TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+
+                    CREATE TABLE IF NOT EXISTS categories (
+                        category_id CHAR(16) PRIMARY KEY,
+                        dashboard_id CHAR(16) NOT NULL,
+                        title VARCHAR(255) NOT NULL,
+                        color VARCHAR(7),
+                        sort_order INTEGER DEFAULT 0,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (dashboard_id) REFERENCES dashboards(dashboard_id) ON DELETE CASCADE
+                    );
+
+                    CREATE TABLE IF NOT EXISTS category_links (
+                        category_id CHAR(16) NOT NULL,
+                        link_id CHAR(16) NOT NULL,
+                        sort_order INTEGER DEFAULT 0,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        PRIMARY KEY (category_id, link_id),
+                        FOREIGN KEY (link_id) REFERENCES links(link_id) ON DELETE CASCADE,
+                        FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+                    );
+
+                    CREATE TABLE IF NOT EXISTS favorites (
+                        dashboard_id CHAR(16) NOT NULL,
+                        link_id CHAR(16) NOT NULL,
+                        sort_order INTEGER DEFAULT 0,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        PRIMARY KEY (dashboard_id, link_id),
+                        FOREIGN KEY (dashboard_id) REFERENCES dashboards(dashboard_id) ON DELETE CASCADE,
+                        FOREIGN KEY (link_id) REFERENCES links(link_id) ON DELETE CASCADE
                     )
                     SQL
                     ,
@@ -335,9 +389,32 @@ describe("JWT Authentication Full Stack Integration", function () {
             $stack = $container->getApp();
             $pdo = $container->getDb();
 
-            // Create dashboards table
+            // Create all tables
             $pdo->exec(
                 <<<SQL
+                CREATE TABLE IF NOT EXISTS links (
+                    link_id CHAR(16) PRIMARY KEY,
+                    url TEXT NOT NULL,
+                    title VARCHAR(255) NOT NULL,
+                    description TEXT NOT NULL,
+                    icon TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE TABLE IF NOT EXISTS tags (
+                    tag_name VARCHAR(100) PRIMARY KEY,
+                    color VARCHAR(7)
+                );
+
+                CREATE TABLE IF NOT EXISTS link_tags (
+                    link_id CHAR(16) NOT NULL,
+                    tag_name VARCHAR(100) NOT NULL,
+                    PRIMARY KEY (link_id, tag_name),
+                    FOREIGN KEY (link_id) REFERENCES links(link_id) ON DELETE CASCADE,
+                    FOREIGN KEY (tag_name) REFERENCES tags(tag_name) ON DELETE CASCADE
+                );
+
                 CREATE TABLE IF NOT EXISTS dashboards (
                     dashboard_id CHAR(16) PRIMARY KEY,
                     title VARCHAR(255) NOT NULL,
@@ -345,6 +422,37 @@ describe("JWT Authentication Full Stack Integration", function () {
                     icon TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE TABLE IF NOT EXISTS categories (
+                    category_id CHAR(16) PRIMARY KEY,
+                    dashboard_id CHAR(16) NOT NULL,
+                    title VARCHAR(255) NOT NULL,
+                    color VARCHAR(7),
+                    sort_order INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (dashboard_id) REFERENCES dashboards(dashboard_id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS category_links (
+                    category_id CHAR(16) NOT NULL,
+                    link_id CHAR(16) NOT NULL,
+                    sort_order INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (category_id, link_id),
+                    FOREIGN KEY (link_id) REFERENCES links(link_id) ON DELETE CASCADE,
+                    FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS favorites (
+                    dashboard_id CHAR(16) NOT NULL,
+                    link_id CHAR(16) NOT NULL,
+                    sort_order INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (dashboard_id, link_id),
+                    FOREIGN KEY (dashboard_id) REFERENCES dashboards(dashboard_id) ON DELETE CASCADE,
+                    FOREIGN KEY (link_id) REFERENCES links(link_id) ON DELETE CASCADE
                 )
                 SQL
                 ,

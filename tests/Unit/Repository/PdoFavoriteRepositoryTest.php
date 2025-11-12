@@ -3,6 +3,7 @@
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\FavoriteEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
@@ -71,7 +72,8 @@ describe("PdoFavoriteRepository", function () {
             );
 
             CREATE TABLE tags (
-                tag_name TEXT PRIMARY KEY
+                tag_name TEXT PRIMARY KEY,
+                color TEXT
             );
 
             CREATE TABLE link_tags (
@@ -143,7 +145,11 @@ describe("PdoFavoriteRepository", function () {
             $pdo,
             new DashboardEntityMapper(),
         );
-        $linkRepo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+        $linkRepo = new PdoLinkRepository(
+            $pdo,
+            new LinkEntityMapper(),
+            new TagEntityMapper(),
+        );
         $favoriteRepo = new PdoFavoriteRepository(
             $pdo,
             $dashboardRepo,

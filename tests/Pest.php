@@ -39,6 +39,7 @@
 |
 */
 
+use jschreuder\BookmarkBureau\Collection\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
@@ -93,6 +94,7 @@ class TestEntityFactory
         ?Icon $icon = null,
         ?DateTimeInterface $createdAt = null,
         ?DateTimeInterface $updatedAt = null,
+        ?TagCollection $tags = null,
     ): Link {
         return new Link(
             linkId: $id ?? Uuid::uuid4(),
@@ -104,6 +106,7 @@ class TestEntityFactory
                 new DateTimeImmutable("2024-01-01 12:00:00"),
             updatedAt: $updatedAt ??
                 new DateTimeImmutable("2024-01-01 12:00:00"),
+            tags: $tags ?? new TagCollection(),
         );
     }
 

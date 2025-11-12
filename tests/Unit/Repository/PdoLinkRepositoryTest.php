@@ -2,6 +2,7 @@
 
 use jschreuder\BookmarkBureau\Collection\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
@@ -30,7 +31,8 @@ describe("PdoLinkRepository", function () {
             );
 
             CREATE TABLE tags (
-                tag_name TEXT PRIMARY KEY
+                tag_name TEXT PRIMARY KEY,
+                color TEXT
             );
 
             CREATE TABLE link_tags (
@@ -95,7 +97,11 @@ describe("PdoLinkRepository", function () {
     describe("findById", function () {
         test("finds and returns a link by ID", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
             $link = TestEntityFactory::createLink();
 
             insertTestLink($pdo, $link);
@@ -112,7 +118,11 @@ describe("PdoLinkRepository", function () {
             "throws LinkNotFoundException when link does not exist",
             function () {
                 $pdo = createLinkDatabase();
-                $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+                $repo = new PdoLinkRepository(
+                    $pdo,
+                    new LinkEntityMapper(),
+                    new TagEntityMapper(),
+                );
                 $nonExistentId = Uuid::uuid4();
 
                 expect(fn() => $repo->findById($nonExistentId))->toThrow(
@@ -123,7 +133,11 @@ describe("PdoLinkRepository", function () {
 
         test("correctly maps nullable icon field", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
             $linkWithoutIcon = TestEntityFactory::createLink(icon: null);
 
             insertTestLink($pdo, $linkWithoutIcon);
@@ -137,7 +151,11 @@ describe("PdoLinkRepository", function () {
     describe("findAll", function () {
         test("returns all links ordered by created_at descending", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $link1 = TestEntityFactory::createLink(
                 createdAt: new DateTimeImmutable("2024-01-01 10:00:00"),
@@ -170,7 +188,11 @@ describe("PdoLinkRepository", function () {
 
         test("respects limit parameter", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             for ($i = 0; $i < 5; $i++) {
                 insertTestLink($pdo, TestEntityFactory::createLink());
@@ -183,7 +205,11 @@ describe("PdoLinkRepository", function () {
 
         test("respects offset parameter", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $link1 = TestEntityFactory::createLink();
             $link2 = TestEntityFactory::createLink();
@@ -200,7 +226,11 @@ describe("PdoLinkRepository", function () {
 
         test("returns empty collection when no links exist", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $collection = $repo->findAll();
 
@@ -211,7 +241,11 @@ describe("PdoLinkRepository", function () {
     describe("save", function () {
         test("inserts a new link", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
             $link = TestEntityFactory::createLink();
 
             $repo->save($link);
@@ -223,7 +257,11 @@ describe("PdoLinkRepository", function () {
 
         test("updates an existing link", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
             $link = TestEntityFactory::createLink();
 
             $repo->save($link);
@@ -239,7 +277,11 @@ describe("PdoLinkRepository", function () {
 
         test("preserves timestamps on insert", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
             $createdAt = new DateTimeImmutable("2024-01-01 10:00:00");
             $updatedAt = new DateTimeImmutable("2024-01-01 12:00:00");
             $link = TestEntityFactory::createLink(
@@ -260,7 +302,11 @@ describe("PdoLinkRepository", function () {
 
         test("saves links with null icon", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
             $link = TestEntityFactory::createLink(icon: null);
 
             $repo->save($link);
@@ -273,7 +319,11 @@ describe("PdoLinkRepository", function () {
     describe("delete", function () {
         test("deletes a link by ID", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
             $link = TestEntityFactory::createLink();
 
             $repo->save($link);
@@ -286,7 +336,11 @@ describe("PdoLinkRepository", function () {
 
         test("cascades delete to link_tags", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
             $link = TestEntityFactory::createLink();
 
             $repo->save($link);
@@ -319,7 +373,11 @@ describe("PdoLinkRepository", function () {
     describe("count", function () {
         test("returns the total number of links", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             insertTestLink($pdo, TestEntityFactory::createLink());
             insertTestLink($pdo, TestEntityFactory::createLink());
@@ -330,7 +388,11 @@ describe("PdoLinkRepository", function () {
 
         test("returns 0 when no links exist", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             expect($repo->count())->toBe(0);
         });
@@ -339,7 +401,11 @@ describe("PdoLinkRepository", function () {
     describe("findByTags", function () {
         test("returns empty collection when given empty tag list", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $collection = $repo->findByTags(new TagNameCollection());
 
@@ -348,7 +414,11 @@ describe("PdoLinkRepository", function () {
 
         test("returns empty collection when no tags match", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $link = TestEntityFactory::createLink();
             insertTestLink($pdo, $link);
@@ -364,7 +434,11 @@ describe("PdoLinkRepository", function () {
             "returns links matching all specified tags with AND condition",
             function () {
                 $pdo = createLinkDatabase();
-                $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+                $repo = new PdoLinkRepository(
+                    $pdo,
+                    new LinkEntityMapper(),
+                    new TagEntityMapper(),
+                );
 
                 $link1 = TestEntityFactory::createLink();
                 $link2 = TestEntityFactory::createLink();
@@ -433,7 +507,11 @@ describe("PdoLinkRepository", function () {
 
         test("finds links with single tag", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $link1 = TestEntityFactory::createLink();
             $link2 = TestEntityFactory::createLink();
@@ -458,12 +536,145 @@ describe("PdoLinkRepository", function () {
                 $link1->linkId->toString(),
             );
         });
+
+        test("loads tags with links", function () {
+            $pdo = createLinkDatabase();
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
+
+            $link = TestEntityFactory::createLink();
+            insertTestLink($pdo, $link);
+
+            // Insert tags
+            $pdo->prepare(
+                "INSERT INTO tags (tag_name, color) VALUES (?, ?)",
+            )->execute(["php", "#FF5733"]);
+            $pdo->prepare(
+                "INSERT INTO tags (tag_name, color) VALUES (?, ?)",
+            )->execute(["laravel", "#3498DB"]);
+
+            // Associate tags with link
+            $pdo->prepare(
+                "INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)",
+            )->execute([$link->linkId->getBytes(), "php"]);
+            $pdo->prepare(
+                "INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)",
+            )->execute([$link->linkId->getBytes(), "laravel"]);
+
+            // Find and verify tags are loaded
+            $found = $repo->findById($link->linkId);
+
+            expect($found->tags)->toHaveCount(2);
+            $tagNames = array_map(
+                fn(
+                    \jschreuder\BookmarkBureau\Entity\Tag $tag,
+                ) => (string) $tag->tagName,
+                iterator_to_array($found->tags),
+            );
+            expect($tagNames)->toContain("php");
+            expect($tagNames)->toContain("laravel");
+        });
+
+        test(
+            "finds links with multiple tags returns tags for each link",
+            function () {
+                $pdo = createLinkDatabase();
+                $repo = new PdoLinkRepository(
+                    $pdo,
+                    new LinkEntityMapper(),
+                    new TagEntityMapper(),
+                );
+
+                $link1 = TestEntityFactory::createLink();
+                $link2 = TestEntityFactory::createLink();
+
+                insertTestLink($pdo, $link1);
+                insertTestLink($pdo, $link2);
+
+                // Create tags
+                $pdo->prepare(
+                    "INSERT INTO tags (tag_name) VALUES (?)",
+                )->execute(["php"]);
+                $pdo->prepare(
+                    "INSERT INTO tags (tag_name) VALUES (?)",
+                )->execute(["laravel"]);
+                $pdo->prepare(
+                    "INSERT INTO tags (tag_name) VALUES (?)",
+                )->execute(["backend"]);
+
+                // Link1 has php and laravel tags
+                $pdo->prepare(
+                    "INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)",
+                )->execute([$link1->linkId->getBytes(), "php"]);
+                $pdo->prepare(
+                    "INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)",
+                )->execute([$link1->linkId->getBytes(), "laravel"]);
+
+                // Link2 has only backend tag
+                $pdo->prepare(
+                    "INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)",
+                )->execute([$link2->linkId->getBytes(), "backend"]);
+
+                // Find all links and verify each has correct tags
+                $collection = $repo->findAll();
+
+                expect($collection)->toHaveCount(2);
+                $links = iterator_to_array($collection);
+
+                // Find link1 and link2 in results
+                $foundLink1 =
+                    array_values(
+                        array_filter(
+                            $links,
+                            fn($l) => $l->linkId->toString() ===
+                                $link1->linkId->toString(),
+                        ),
+                    )[0] ?? null;
+                $foundLink2 =
+                    array_values(
+                        array_filter(
+                            $links,
+                            fn($l) => $l->linkId->toString() ===
+                                $link2->linkId->toString(),
+                        ),
+                    )[0] ?? null;
+
+                expect($foundLink1)->not->toBeNull();
+                expect($foundLink2)->not->toBeNull();
+
+                expect($foundLink1->tags)->toHaveCount(2);
+                $link1Tags = array_map(
+                    fn(
+                        \jschreuder\BookmarkBureau\Entity\Tag $tag,
+                    ) => (string) $tag->tagName,
+                    iterator_to_array($foundLink1->tags),
+                );
+                expect($link1Tags)->toContain("php");
+                expect($link1Tags)->toContain("laravel");
+
+                expect($foundLink2->tags)->toHaveCount(1);
+                $link2Tags = array_map(
+                    fn(
+                        \jschreuder\BookmarkBureau\Entity\Tag $tag,
+                    ) => (string) $tag->tagName,
+                    iterator_to_array($foundLink2->tags),
+                );
+                expect($link2Tags)->toContain("backend");
+            },
+        );
     });
 
     describe("findByCategoryId", function () {
         test("returns links in a category ordered by sort_order", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $dashboardId = Uuid::uuid4();
             $categoryId = Uuid::uuid4();
@@ -531,7 +742,11 @@ describe("PdoLinkRepository", function () {
             "throws CategoryNotFoundException when category does not exist",
             function () {
                 $pdo = createLinkDatabase();
-                $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+                $repo = new PdoLinkRepository(
+                    $pdo,
+                    new LinkEntityMapper(),
+                    new TagEntityMapper(),
+                );
                 $nonExistentCategoryId = Uuid::uuid4();
 
                 expect(
@@ -544,7 +759,11 @@ describe("PdoLinkRepository", function () {
             "returns empty collection for category with no links",
             function () {
                 $pdo = createLinkDatabase();
-                $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+                $repo = new PdoLinkRepository(
+                    $pdo,
+                    new LinkEntityMapper(),
+                    new TagEntityMapper(),
+                );
 
                 $dashboardId = Uuid::uuid4();
                 $categoryId = Uuid::uuid4();
@@ -576,7 +795,11 @@ describe("PdoLinkRepository", function () {
     describe("search", function () {
         test("searches links by title using LIKE", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $link1 = TestEntityFactory::createLink(
                 title: new Title("PHP Tutorial"),
@@ -607,7 +830,11 @@ describe("PdoLinkRepository", function () {
 
         test("searches links by description using LIKE", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $link1 = TestEntityFactory::createLink(
                 title: new Title("Tutorial 1"),
@@ -632,7 +859,11 @@ describe("PdoLinkRepository", function () {
 
         test("search is case-insensitive", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $link = TestEntityFactory::createLink(
                 title: new Title("PHP Tutorial"),
@@ -649,7 +880,11 @@ describe("PdoLinkRepository", function () {
 
         test("returns empty collection when no matches found", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             $link = TestEntityFactory::createLink(
                 title: new Title("PHP Tutorial"),
@@ -665,7 +900,11 @@ describe("PdoLinkRepository", function () {
 
         test("respects limit parameter", function () {
             $pdo = createLinkDatabase();
-            $repo = new PdoLinkRepository($pdo, new LinkEntityMapper());
+            $repo = new PdoLinkRepository(
+                $pdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
 
             for ($i = 0; $i < 5; $i++) {
                 insertTestLink(
