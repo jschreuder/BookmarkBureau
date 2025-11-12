@@ -1121,6 +1121,8 @@ $link = TestEntityFactory::createLink(title: 'Custom Title');
 8. ✅ **Authentication Controllers** - Login, token refresh
 9. ✅ **Middleware Pipeline** - JWT authentication + route protection
 10. ✅ **File Repositories** - FileUserRepository, FileJwtJtiRepository for CLI
+11. ✅ **Rate Limiting** - Application-level rate limiting with database tracking
+12. ✅ **Tags in Dashboard View** - Eager-loaded tags in LinkOutputSpec with LEFT JOIN optimization
 
 ### Minor Missing Pieces:
 
@@ -1144,6 +1146,13 @@ return $this->outputSpec->transform($dashboard); // Uses DashboardOutputSpec ✅
 
 #### 2. Tags in Dashboard View Response
 **Issue:** FullDashboardOutputSpec returns complete dashboard with categories and favorites, but links don't include their tags.
+**Solution Implemented:** 
+- Modified PdoLinkRepository to eagerly load tags via LEFT JOIN with link_tags and tags tables
+- Implemented buildLinkFromRows() method to aggregate multiple rows per link and deduplicate tags
+- Updated LinkEntity to include readonly TagCollection property
+- Updated LinkOutputSpec to include tags in the transformed output using TagOutputSpec
+- All repository methods (findById, findAll, search, findByTags, findByCategoryId) now eagerly fetch tags
+
 **Current Output:**
 ```json
 {
@@ -1152,23 +1161,34 @@ return $this->outputSpec->transform($dashboard); // Uses DashboardOutputSpec ✅
     {
       "id": "...",
       "links": [
-        {"id": "...", "url": "...", "title": "...", "description": "...", "icon": "..."}
-        // ❌ Missing: "tags": []
+        {
+          "id": "...",
+          "url": "...",
+          "title": "...",
+          "description": "...",
+          "icon": "...",
+          "tags": [
+            {"name": "tag1", "color": "#FF5733"},
+            {"name": "tag2", "color": "#33FF57"}
+          ]
+        }
       ]
     }
   ],
   "favorites": [
-    {"id": "...", "url": "...", "title": "..."}
-    // ❌ Missing: "tags": []
+    {
+      "id": "...",
+      "url": "...",
+      "title": "...",
+      "tags": [
+        {"name": "favorite-tag", "color": "#3357FF"}
+      ]
+    }
   ]
 }
 ```
-**Need:** Include tags array for each link (both in categories and favorites)
-**Status:** ❌ Not implemented
-**Options:**
-1. Modify FullDashboardOutputSpec to call TagService for each link (simple but N+1 queries)
-2. Add bulk tag fetching to DashboardService.getFullDashboard() (efficient)
-3. Create new service method that fetches all tags in one query for all links
+**Status:** ✅ **COMPLETED**
+**Performance:** Solves N+1 query problem with single LEFT JOIN query per repository method
 
 #### 3. Search/Filter Endpoints
 **Status:** Service methods exist but no exposed endpoints
