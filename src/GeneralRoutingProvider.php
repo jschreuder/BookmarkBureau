@@ -109,21 +109,21 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                 fn() => new LinkReadAction(
                     $this->container->getLinkService(),
                     new LinkInputSpec(),
-                    new LinkOutputSpec(),
+                    new LinkOutputSpec(new TagOutputSpec()),
                 ),
             )
             ->registerCreate(
                 fn() => new LinkCreateAction(
                     $this->container->getLinkService(),
                     new LinkInputSpec(),
-                    new LinkOutputSpec(),
+                    new LinkOutputSpec(new TagOutputSpec()),
                 ),
             )
             ->registerUpdate(
                 fn() => new LinkUpdateAction(
                     $this->container->getLinkService(),
                     new LinkInputSpec(),
-                    new LinkOutputSpec(),
+                    new LinkOutputSpec(new TagOutputSpec()),
                 ),
             )
             ->registerDelete(
@@ -199,7 +199,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                     new FullDashboardOutputSpec(
                         new DashboardOutputSpec(),
                         new CategoryOutputSpec(),
-                        new LinkOutputSpec(),
+                        new LinkOutputSpec(new TagOutputSpec()),
                     ),
                 ),
             )
@@ -298,7 +298,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                 new FullDashboardOutputSpec(
                     new DashboardOutputSpec(),
                     new CategoryOutputSpec(),
-                    new LinkOutputSpec(),
+                    new LinkOutputSpec(new TagOutputSpec()),
                 ),
             ),
             [],
