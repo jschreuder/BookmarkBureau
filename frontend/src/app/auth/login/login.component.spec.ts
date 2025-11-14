@@ -38,6 +38,7 @@ describe('LoginComponent', () => {
 
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
+    // Use markForCheck() to properly handle change detection
     fixture.detectChanges();
   });
 
@@ -226,7 +227,7 @@ describe('LoginComponent', () => {
       });
     });
 
-    it('should disable email and password fields when TOTP is required', () => {
+    it('should show TOTP field and set requiresTotpFirst when TOTP is required', () => {
       const error = {
         status: 400,
         error: { error: 'TOTP code required' },
@@ -238,8 +239,8 @@ describe('LoginComponent', () => {
       return new Promise<void>((resolve) => {
         setTimeout(() => {
           fixture.detectChanges();
-          expect(component.form.get('email')?.disabled).toBe(true);
-          expect(component.form.get('password')?.disabled).toBe(true);
+          expect(component.showTotpField).toBe(true);
+          expect(component.requiresTotpFirst).toBe(true);
           resolve();
         }, 50);
       });
@@ -302,8 +303,6 @@ describe('LoginComponent', () => {
       expect(component.showTotpField).toBe(false);
       expect(component.requiresTotpFirst).toBe(false);
       expect(component.errorMessage).toBe('');
-      expect(component.form.get('email')?.enabled).toBe(true);
-      expect(component.form.get('password')?.enabled).toBe(true);
     });
   });
 });

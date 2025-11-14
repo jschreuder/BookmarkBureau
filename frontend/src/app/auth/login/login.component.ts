@@ -103,8 +103,6 @@ export class LoginComponent {
           this.requiresTotpFirst = true;
           this.showTotpField = true;
           this.errorMessage = 'Please enter your TOTP code';
-          this.form.get('password')?.disable();
-          this.form.get('email')?.disable();
           return;
         }
 
@@ -131,8 +129,6 @@ export class LoginComponent {
       this.requiresTotpFirst = false;
       this.showTotpField = false;
       this.errorMessage = '';
-      this.form.get('email')?.enable();
-      this.form.get('password')?.enable();
     } else {
       this.router.navigate(['/dashboard']);
     }

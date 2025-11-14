@@ -15,19 +15,9 @@
         <!-- Email field -->
         <mat-form-field class="full-width">
           <mat-label>Email</mat-label>
-          <input
-            matInput
-            type="email"
-            formControlName="email"
-            placeholder="your@email.com"
-            [disabled]="isLoading"
-          />
-          <mat-error *ngIf="email?.hasError('required')">
-            Email is required
-          </mat-error>
-          <mat-error *ngIf="email?.hasError('email')">
-            Please enter a valid email
-          </mat-error>
+          <input matInput type="email" formControlName="email" placeholder="your@email.com" />
+          <mat-error *ngIf="email?.hasError('required')"> Email is required </mat-error>
+          <mat-error *ngIf="email?.hasError('email')"> Please enter a valid email </mat-error>
         </mat-form-field>
 
         <!-- Password field -->
@@ -38,11 +28,8 @@
             type="password"
             formControlName="password"
             placeholder="Enter your password"
-            [disabled]="isLoading"
           />
-          <mat-error *ngIf="password?.hasError('required')">
-            Password is required
-          </mat-error>
+          <mat-error *ngIf="password?.hasError('required')"> Password is required </mat-error>
           <mat-error *ngIf="password?.hasError('minlength')">
             Password must be at least 6 characters
           </mat-error>
@@ -61,7 +48,6 @@
               placeholder="Enter 6-digit code"
               maxlength="6"
               pattern="[0-9]*"
-              [disabled]="isLoading"
             />
             <mat-error *ngIf="totpCode?.hasError('pattern')">
               TOTP code must contain only digits
@@ -71,21 +57,14 @@
 
         <!-- TOTP toggle button -->
         <div class="totp-toggle">
-          <button
-            type="button"
-            mat-button
-            (click)="toggleTotpField()"
-            [disabled]="isLoading"
-          >
+          <button type="button" mat-button (click)="toggleTotpField()" [disabled]="isLoading">
             {{ showTotpField ? 'Hide TOTP' : 'Have a TOTP code?' }}
           </button>
         </div>
 
         <!-- Remember me checkbox -->
         <div class="checkbox-group">
-          <mat-checkbox formControlName="remember_me" [disabled]="isLoading">
-            Remember me for 7 days
-          </mat-checkbox>
+          <mat-checkbox formControlName="remember_me"> Remember me for 7 days </mat-checkbox>
         </div>
 
         <!-- Submit buttons -->
@@ -97,11 +76,7 @@
             class="full-width"
             [disabled]="!form.valid || isLoading"
           >
-            <mat-spinner
-              *ngIf="isLoading"
-              diameter="20"
-              class="button-spinner"
-            ></mat-spinner>
+            <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
             <span *ngIf="!isLoading">Sign In</span>
             <span *ngIf="isLoading">Signing In...</span>
           </button>
