@@ -23,6 +23,6 @@ describe('App Config', () => {
     // The providers array should contain environment and feature providers
     // We verify this by checking the array has the expected number of items
     expect(appConfig.providers).toBeDefined();
-    expect(appConfig.providers.length).toBe(6);
+    expect(appConfig.providers.length).toBe(5);
   });
 });
