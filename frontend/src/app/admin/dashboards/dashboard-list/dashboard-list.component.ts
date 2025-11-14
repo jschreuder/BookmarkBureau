@@ -26,7 +26,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
   template: `
     <div class="page-header">
@@ -91,83 +91,93 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
+                <button
+                  mat-icon-button
+                  matTooltip="View"
+                  (click)="navigateToView(dashboard.id)"
+                  color="accent"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
               </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
         </div>
       </mat-card-content>
     </mat-card>
   `,
-  styles: [`
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
+  styles: [
+    `
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
 
-    h1 {
-      margin: 0;
-    }
+      h1 {
+        margin: 0;
+      }
 
-    button mat-icon {
-      margin-right: 8px;
-    }
+      button mat-icon {
+        margin-right: 8px;
+      }
 
-    .loading-spinner {
-      display: flex;
-      justify-content: center;
-      padding: 40px;
-    }
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+      }
 
-    .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 40px;
-      text-align: center;
-      color: rgba(0, 0, 0, 0.54);
-    }
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 40px;
+        text-align: center;
+        color: rgba(0, 0, 0, 0.54);
+      }
 
-    .empty-state mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-      margin-bottom: 16px;
-      color: rgba(0, 0, 0, 0.26);
-    }
+      .empty-state mat-icon {
+        font-size: 64px;
+        width: 64px;
+        height: 64px;
+        margin-bottom: 16px;
+        color: rgba(0, 0, 0, 0.26);
+      }
 
-    .table-container {
-      overflow-x: auto;
-    }
+      .table-container {
+        overflow-x: auto;
+      }
 
-    .dashboards-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+      .dashboards-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-    .dashboards-table th {
-      font-weight: 600;
-      background-color: rgba(0, 0, 0, 0.04);
-    }
+      .dashboards-table th {
+        font-weight: 600;
+        background-color: rgba(0, 0, 0, 0.04);
+      }
 
-    .dashboards-table td {
-      padding: 16px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-    }
+      .dashboards-table td {
+        padding: 16px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      }
 
-    .no-icon {
-      color: rgba(0, 0, 0, 0.38);
-    }
+      .no-icon {
+        color: rgba(0, 0, 0, 0.38);
+      }
 
-    button[mat-icon-button] {
-      margin: 0 4px;
-    }
-  `]
+      button[mat-icon-button] {
+        margin: 0 4px;
+      }
+    `,
+  ],
 })
 export class AdminDashboardListComponent implements OnInit {
   private readonly apiService = inject(ApiService);
@@ -194,12 +204,16 @@ export class AdminDashboardListComponent implements OnInit {
         console.error('Error loading dashboards:', error);
         this.snackBar.open('Failed to load dashboards', 'Close', { duration: 5000 });
         this.loading = false;
-      }
+      },
     });
   }
 
   navigateToNew() {
     this.router.navigate(['/admin/dashboards/new']);
+  }
+
+  navigateToView(dashboardId: string) {
+    window.open(`/dashboard/${dashboardId}`, '_blank');
   }
 
   navigateToEdit(dashboardId: string) {
@@ -211,11 +225,11 @@ export class AdminDashboardListComponent implements OnInit {
       width: '400px',
       data: {
         title: 'Delete Dashboard',
-        message: `Are you sure you want to delete "${dashboard.title}"? This action cannot be undone.`
-      }
+        message: `Are you sure you want to delete "${dashboard.title}"? This action cannot be undone.`,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.apiService.deleteDashboard(dashboard.id).subscribe({
           next: () => {
@@ -225,7 +239,7 @@ export class AdminDashboardListComponent implements OnInit {
           error: (error) => {
             console.error('Error deleting dashboard:', error);
             this.snackBar.open('Failed to delete dashboard', 'Close', { duration: 5000 });
-          }
+          },
         });
       }
     });

@@ -9,9 +9,29 @@
     </div>
 
     <mat-nav-list class="menu-list">
-      <a mat-list-item *ngFor="let item of menuItems" [routerLink]="item.path" routerLinkActive="active-link">
+      <a
+        *ngFor="let item of menuItems"
+        mat-list-item
+        [routerLink]="item.path"
+        routerLinkActive="active-link"
+      >
         <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
         <span matListItemTitle>{{ item.label }}</span>
+      </a>
+
+      <!-- Divider before top dashboards -->
+      <mat-divider class="dashboard-divider"></mat-divider>
+
+      <!-- Top 10 dashboards -->
+      <a
+        *ngFor="let dashboard of topDashboards"
+        mat-list-item
+        [routerLink]="['/dashboard', dashboard.id]"
+        routerLinkActive="active-link"
+        class="dashboard-link"
+      >
+        <mat-icon matListItemIcon>article</mat-icon>
+        <span matListItemTitle>{{ dashboard.title }}</span>
       </a>
     </mat-nav-list>
 

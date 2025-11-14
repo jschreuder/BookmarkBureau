@@ -45,6 +45,27 @@
   .menu-list {
     flex: 1;
     padding-top: 8px;
+
+    .dashboard-divider {
+      margin: 8px 0;
+    }
+
+    .dashboard-link {
+      font-size: 13px;
+      height: 36px;
+      padding: 0 16px;
+      color: rgba(0, 0, 0, 0.6);
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
   }
 
   .sidenav-footer {
