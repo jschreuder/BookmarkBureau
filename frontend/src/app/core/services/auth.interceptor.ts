@@ -12,8 +12,6 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const auth = inject(AuthService);
   const token = auth.getToken();
 
-  console.log('[authInterceptor] Intercepting request:', request.url, 'Token present:', !!token);
-
   // Add token to request if available
   if (token) {
     request = request.clone({
@@ -21,9 +19,6 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('[authInterceptor] Token added to request');
-  } else {
-    console.log('[authInterceptor] No token available');
   }
 
   return next(request).pipe(

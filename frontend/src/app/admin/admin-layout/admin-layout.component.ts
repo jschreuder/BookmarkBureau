@@ -48,15 +48,21 @@ export class AdminLayoutComponent implements OnInit {
   }
 
   loadTopDashboards(): void {
-    this.apiService.listDashboards().subscribe((dashboards) => {
-      // Sort by updatedAt descending and take top 10
-      this.topDashboards = dashboards
-        .sort((a, b) => {
-          const dateA = new Date(a.updated_at).getTime();
-          const dateB = new Date(b.updated_at).getTime();
-          return dateB - dateA;
-        })
-        .slice(0, 10);
+    this.apiService.listDashboards().subscribe({
+      next: (dashboards) => {
+        // Sort by updatedAt descending and take top 10
+        this.topDashboards = dashboards
+          .sort((a, b) => {
+            const dateA = new Date(a.updated_at).getTime();
+            const dateB = new Date(b.updated_at).getTime();
+            return dateB - dateA;
+          })
+          .slice(0, 10);
+      },
+      error: () => {
+        // Handle error silently - dashboards will just be empty
+        this.topDashboards = [];
+      },
     });
   }
 }

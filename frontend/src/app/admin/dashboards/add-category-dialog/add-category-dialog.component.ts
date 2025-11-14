@@ -5,7 +5,6 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatColorPickerModule } from '@angular/material/color-picker';
 import { ApiService } from '../../../core/services/api.service';
 
 export interface AddCategoryDialogData {
@@ -22,7 +21,6 @@ export interface AddCategoryDialogData {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatColorPickerModule
   ],
   template: `
     <h2 mat-dialog-title>Add Category</h2>
@@ -30,15 +28,13 @@ export interface AddCategoryDialogData {
       <form [formGroup]="form">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Category Title</mat-label>
-          <input matInput formControlName="title" placeholder="e.g., Work, Personal, Blogs">
-          <mat-error *ngIf="form.get('title')?.hasError('required')">
-            Title is required
-          </mat-error>
+          <input matInput formControlName="title" placeholder="e.g., Work, Personal, Blogs" />
+          <mat-error *ngIf="form.get('title')?.hasError('required')"> Title is required </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Color (Optional)</mat-label>
-          <input matInput formControlName="color" type="color" placeholder="#667eea">
+          <input matInput formControlName="color" type="color" placeholder="#667eea" />
         </mat-form-field>
       </form>
     </mat-dialog-content>
@@ -54,21 +50,23 @@ export interface AddCategoryDialogData {
       </button>
     </mat-dialog-actions>
   `,
-  styles: [`
-    .full-width {
-      width: 100%;
-      margin-bottom: 16px;
-    }
+  styles: [
+    `
+      .full-width {
+        width: 100%;
+        margin-bottom: 16px;
+      }
 
-    mat-dialog-content {
-      min-width: 300px;
-    }
+      mat-dialog-content {
+        min-width: 300px;
+      }
 
-    mat-dialog-actions {
-      padding: 16px 0 0 0;
-      gap: 8px;
-    }
-  `]
+      mat-dialog-actions {
+        padding: 16px 0 0 0;
+        gap: 8px;
+      }
+    `,
+  ],
 })
 export class AddCategoryDialogComponent {
   private readonly apiService = inject(ApiService);
@@ -81,7 +79,7 @@ export class AddCategoryDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: AddCategoryDialogData) {
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(1)]],
-      color: ['#667eea']
+      color: ['#667eea'],
     });
   }
 
@@ -95,7 +93,7 @@ export class AddCategoryDialogComponent {
       dashboard_id: this.data.dashboardId,
       title: this.form.get('title')?.value,
       color: this.form.get('color')?.value || undefined,
-      sort_order: 0
+      sort_order: 0,
     };
 
     this.apiService.createCategory(categoryData).subscribe({
@@ -106,7 +104,7 @@ export class AddCategoryDialogComponent {
       error: (error) => {
         console.error('Error creating category:', error);
         this.loading = false;
-      }
+      },
     });
   }
 

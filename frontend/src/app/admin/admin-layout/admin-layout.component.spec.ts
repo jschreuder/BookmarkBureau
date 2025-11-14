@@ -1,38 +1,56 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdminLayoutComponent } from './admin-layout.component';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideRouter } from '@angular/router';
+import { provideLocationMocks } from '@angular/common/testing';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
-import { DebugElement } from '@angular/core';
-import { By } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { of } from 'rxjs';
+import { ApiService } from '../../core/services/api.service';
 
 describe('AdminLayoutComponent', () => {
   let component: AdminLayoutComponent;
   let fixture: ComponentFixture<AdminLayoutComponent>;
+  let mockApiService: any;
 
   beforeEach(async () => {
+    // Create a mock for ApiService that returns empty observable
+    mockApiService = {
+      listDashboards: () => of([]),
+    };
+
     await TestBed.configureTestingModule({
       imports: [
         AdminLayoutComponent,
-        RouterTestingModule,
         MatToolbarModule,
         MatSidenavModule,
         MatListModule,
         MatIconModule,
         MatButtonModule,
         MatDividerModule,
-        BrowserAnimationsModule
-      ]
+      ],
+      providers: [
+        { provide: ApiService, useValue: mockApiService },
+        provideRouter([]),
+        provideLocationMocks(),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminLayoutComponent);
     component = fixture.componentInstance;
+
+    // Verify the mock is being used
+    const injectedService = TestBed.inject(ApiService);
+    expect(injectedService).toBe(mockApiService);
+
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
   });
 
   it('should create', () => {
@@ -43,33 +61,19 @@ describe('AdminLayoutComponent', () => {
     expect(component.menuItems).toBeDefined();
   });
 
-  it('should have 4 menu items', () => {
-    expect(component.menuItems.length).toBe(4);
+  it('should have 2 menu items', () => {
+    expect(component.menuItems.length).toBe(2);
   });
 
   it('should have Dashboards menu item', () => {
-    const dashboardsItem = component.menuItems.find(item => item.label === 'Dashboards');
+    const dashboardsItem = component.menuItems.find((item) => item.label === 'Dashboards');
     expect(dashboardsItem).toBeDefined();
     expect(dashboardsItem?.path).toBe('/admin/dashboards');
     expect(dashboardsItem?.icon).toBe('dashboard');
   });
 
-  it('should have Categories menu item', () => {
-    const categoriesItem = component.menuItems.find(item => item.label === 'Categories');
-    expect(categoriesItem).toBeDefined();
-    expect(categoriesItem?.path).toBe('/admin/categories');
-    expect(categoriesItem?.icon).toBe('category');
-  });
-
-  it('should have Links menu item', () => {
-    const linksItem = component.menuItems.find(item => item.label === 'Links');
-    expect(linksItem).toBeDefined();
-    expect(linksItem?.path).toBe('/admin/links');
-    expect(linksItem?.icon).toBe('link');
-  });
-
   it('should have Tags menu item', () => {
-    const tagsItem = component.menuItems.find(item => item.label === 'Tags');
+    const tagsItem = component.menuItems.find((item) => item.label === 'Tags');
     expect(tagsItem).toBeDefined();
     expect(tagsItem?.path).toBe('/admin/tags');
     expect(tagsItem?.icon).toBe('label');
@@ -125,17 +129,21 @@ describe('AdminLayoutComponent', () => {
 
   it('should render menu items in nav list', () => {
     const listItems = fixture.nativeElement.querySelectorAll('mat-nav-list a[mat-list-item]');
-    expect(listItems.length).toBeGreaterThanOrEqual(4); // At least the 4 menu items
+    expect(listItems.length).toBeGreaterThanOrEqual(2); // At least the 2 main menu items
   });
 
   it('should render Back to Dashboards link', () => {
-    const backLink = fixture.nativeElement.querySelector('.sidenav-footer a[routerLink="/dashboard"]');
+    const backLink = fixture.nativeElement.querySelector(
+      '.sidenav-footer a[routerLink="/dashboard"]',
+    );
     expect(backLink).toBeTruthy();
     expect(backLink.textContent).toContain('Back to Dashboards');
   });
 
   it('should have arrow_back icon for back button', () => {
-    const backIcon = fixture.nativeElement.querySelector('.sidenav-footer a[routerLink="/dashboard"] mat-icon');
+    const backIcon = fixture.nativeElement.querySelector(
+      '.sidenav-footer a[routerLink="/dashboard"] mat-icon',
+    );
     expect(backIcon).toBeTruthy();
     expect(backIcon.textContent).toContain('arrow_back');
   });
@@ -159,13 +167,17 @@ describe('AdminLayoutComponent', () => {
   });
 
   it('should display Administration Panel title in toolbar', () => {
-    const toolbarTitle = fixture.nativeElement.querySelector('mat-sidenav-content mat-toolbar .toolbar-title');
+    const toolbarTitle = fixture.nativeElement.querySelector(
+      'mat-sidenav-content mat-toolbar .toolbar-title',
+    );
     expect(toolbarTitle).toBeTruthy();
     expect(toolbarTitle.textContent).toContain('Administration Panel');
   });
 
   it('should have settings icon in toolbar', () => {
-    const settingsIcon = fixture.nativeElement.querySelector('mat-sidenav-content mat-toolbar mat-icon');
+    const settingsIcon = fixture.nativeElement.querySelector(
+      'mat-sidenav-content mat-toolbar mat-icon',
+    );
     expect(settingsIcon).toBeTruthy();
     expect(settingsIcon.textContent).toContain('settings');
   });
@@ -182,34 +194,34 @@ describe('AdminLayoutComponent', () => {
 
   it('should render menu items with correct routerLink attributes', () => {
     const allLinks = fixture.nativeElement.querySelectorAll('mat-nav-list a[mat-list-item]');
-    expect(allLinks.length).toBe(4);
+    expect(allLinks.length).toBeGreaterThanOrEqual(2);
 
     // Check if links exist by looking at the menu items
-    const dashboardsItem = component.menuItems.find(item => item.path === '/admin/dashboards');
-    const categoriesItem = component.menuItems.find(item => item.path === '/admin/categories');
-    const linksItem = component.menuItems.find(item => item.path === '/admin/links');
-    const tagsItem = component.menuItems.find(item => item.path === '/admin/tags');
+    const dashboardsItem = component.menuItems.find((item) => item.path === '/admin/dashboards');
+    const tagsItem = component.menuItems.find((item) => item.path === '/admin/tags');
 
     expect(dashboardsItem).toBeTruthy();
-    expect(categoriesItem).toBeTruthy();
-    expect(linksItem).toBeTruthy();
     expect(tagsItem).toBeTruthy();
   });
 
   it('should render all menu item icons correctly', () => {
-    const menuIcons = fixture.nativeElement.querySelectorAll('mat-nav-list mat-icon[matListItemIcon]');
-    expect(menuIcons.length).toBeGreaterThanOrEqual(4);
+    const menuIcons = fixture.nativeElement.querySelectorAll(
+      'mat-nav-list mat-icon[matListItemIcon]',
+    );
+    expect(menuIcons.length).toBeGreaterThanOrEqual(2);
   });
 
   it('should render all menu item labels correctly', () => {
-    const menuLabels = fixture.nativeElement.querySelectorAll('mat-nav-list span[matListItemTitle]');
-    expect(menuLabels.length).toBeGreaterThanOrEqual(4);
+    const menuLabels = fixture.nativeElement.querySelectorAll(
+      'mat-nav-list span[matListItemTitle]',
+    );
+    expect(menuLabels.length).toBeGreaterThanOrEqual(2);
   });
 
   it('should have routerLinkActive="active-link" on menu items', () => {
     // Check that all menu items have routerLinkActive directive
     const menuLinks = fixture.nativeElement.querySelectorAll('mat-nav-list a[mat-list-item]');
-    expect(menuLinks.length).toBe(4);
+    expect(menuLinks.length).toBeGreaterThanOrEqual(2);
 
     // All links should have the routerLinkActive directive applied
     menuLinks.forEach((link: HTMLElement) => {

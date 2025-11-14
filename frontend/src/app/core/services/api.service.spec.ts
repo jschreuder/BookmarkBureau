@@ -76,6 +76,7 @@ describe('ApiService', () => {
 
   afterEach(() => {
     httpMock.verify();
+    TestBed.resetTestingModule();
   });
 
   describe('Dashboard endpoints', () => {
@@ -90,7 +91,7 @@ describe('ApiService', () => {
         expect(dashboards[0]).toEqual(mockDashboard);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard/list`);
+      const req = httpMock.expectOne(`${apiBase}/dashboard`);
       expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });
@@ -104,7 +105,7 @@ describe('ApiService', () => {
         expect(dashboards).toEqual([]);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard/list`);
+      const req = httpMock.expectOne(`${apiBase}/dashboard`);
       req.flush(mockResponse);
     });
 
