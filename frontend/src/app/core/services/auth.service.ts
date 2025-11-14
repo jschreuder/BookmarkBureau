@@ -142,15 +142,6 @@ export class AuthService {
     localStorage.setItem(this.TOKEN_KEY, response.token);
     localStorage.setItem(this.EXPIRES_AT_KEY, expiresAtMs.toString());
     this.currentTokenSubject.next(response.token);
-
-    // Debug logging
-    console.log('Token stored:', {
-      token: response.token.substring(0, 20) + '...',
-      expiresAt: response.expires_at,
-      expiresAtMs,
-      expiresAtDate: new Date(expiresAtMs),
-      hasValidToken: this.hasValidToken(),
-    });
   }
 
   private clearToken(): void {

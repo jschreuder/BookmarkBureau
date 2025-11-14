@@ -14,7 +14,7 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
  * - Automatically stops monitoring when user logs out
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TokenRefreshService {
   private auth = inject(AuthService);
@@ -40,22 +40,17 @@ export class TokenRefreshService {
 
     // Monitor activity with debounce
     this.activity$
-      .pipe(
-        debounceTime(this.activityDebounceMs),
-        takeUntil(this.destroy$)
-      )
+      .pipe(debounceTime(this.activityDebounceMs), takeUntil(this.destroy$))
       .subscribe(() => {
         this.checkAndRefreshToken();
       });
 
     // Stop monitoring when user logs out
-    this.auth.isAuthenticated$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(isAuthenticated => {
-        if (!isAuthenticated) {
-          this.stopMonitoring();
-        }
-      });
+    this.auth.isAuthenticated$.pipe(takeUntil(this.destroy$)).subscribe((isAuthenticated) => {
+      if (!isAuthenticated) {
+        this.stopMonitoring();
+      }
+    });
   }
 
   /**
@@ -86,7 +81,7 @@ export class TokenRefreshService {
     this.ngZone.runOutsideAngular(() => {
       // User activity events
       const events = ['mousedown', 'keydown', 'touchstart', 'click'];
-      events.forEach(event => {
+      events.forEach((event) => {
         document.addEventListener(event, () => this.onActivity());
       });
     });
@@ -94,7 +89,7 @@ export class TokenRefreshService {
 
   private removeActivityListeners(): void {
     const events = ['mousedown', 'keydown', 'touchstart', 'click'];
-    events.forEach(event => {
+    events.forEach((event) => {
       document.removeEventListener(event, () => this.onActivity());
     });
   }
@@ -132,12 +127,12 @@ export class TokenRefreshService {
     this.ngZone.run(() => {
       this.auth.refreshToken().subscribe({
         next: () => {
-          console.log('Token refreshed successfully');
+          //console.log('Token refreshed successfully');
         },
         error: (error) => {
           console.error('Token refresh failed:', error);
           // Auth service already logs out on refresh failure
-        }
+        },
       });
     });
   }

@@ -41,18 +41,11 @@ export const authGuard: CanActivateFn = (
   const router = inject(Router);
 
   const hasToken = auth.hasValidToken();
-  console.log('Auth guard check:', {
-    hasToken,
-    storedToken: auth.getToken()?.substring(0, 20) + '...',
-    expiresAt: auth.getTokenExpiresAt(),
-    timeUntilExpiry: auth.getTimeUntilExpiry(),
-  });
 
   if (hasToken) {
     return true;
   }
 
-  console.log('Auth guard: No valid token, redirecting to login');
   router.navigate(['/login']);
   return false;
 };
