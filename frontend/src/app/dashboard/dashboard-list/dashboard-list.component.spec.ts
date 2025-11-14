@@ -5,21 +5,34 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
+import { ApiService } from '../../core/services/api.service';
+import { createMockApiService, createMockDashboards } from '../../../testing/test-helpers';
+import { of } from 'rxjs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { vi } from 'vitest';
 
 describe('DashboardListComponent', () => {
   let component: DashboardListComponent;
   let fixture: ComponentFixture<DashboardListComponent>;
+  let mockApiService: any;
 
   beforeEach(async () => {
+    mockApiService = createMockApiService();
+
+    // Mock the listDashboards method to return test data
+    mockApiService.listDashboards = vi.fn().mockReturnValue(of(createMockDashboards(3)));
+
     await TestBed.configureTestingModule({
       imports: [
         DashboardListComponent,
         RouterTestingModule,
+        HttpClientTestingModule,
         MatIconModule,
         MatCardModule,
         MatToolbarModule,
-        MatButtonModule
-      ]
+        MatButtonModule,
+      ],
+      providers: [{ provide: ApiService, useValue: mockApiService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardListComponent);
@@ -63,7 +76,9 @@ describe('DashboardListComponent', () => {
   });
 
   it('should have settings icon in Admin button', () => {
-    const settingsIcon = fixture.nativeElement.querySelector('button[routerLink="/admin"] mat-icon');
+    const settingsIcon = fixture.nativeElement.querySelector(
+      'button[routerLink="/admin"] mat-icon',
+    );
     expect(settingsIcon).toBeTruthy();
     expect(settingsIcon.textContent).toContain('settings');
   });
@@ -103,13 +118,13 @@ describe('DashboardListComponent', () => {
   it('should display dashboard card title', () => {
     const cardTitle = fixture.nativeElement.querySelector('.dashboard-card mat-card-title');
     expect(cardTitle).toBeTruthy();
-    expect(cardTitle.textContent).toContain('Dashboard list will be displayed here');
+    expect(cardTitle.textContent).toContain('Dashboard 1');
   });
 
   it('should display card content', () => {
     const cardContent = fixture.nativeElement.querySelector('.dashboard-card mat-card-content');
     expect(cardContent).toBeTruthy();
-    expect(cardContent.textContent).toContain('Click on a dashboard to view its bookmarks');
+    expect(cardContent.textContent).toContain('Test Description');
   });
 
   it('should have card actions section', () => {
@@ -117,19 +132,19 @@ describe('DashboardListComponent', () => {
     expect(cardActions).toBeTruthy();
   });
 
-  it('should have Create Dashboard button', () => {
+  it('should have View button', () => {
     const button = fixture.nativeElement.querySelector('.dashboard-card button[mat-button]');
     expect(button).toBeTruthy();
-    expect(button.textContent).toContain('Create Dashboard');
+    expect(button.textContent).toContain('View');
   });
 
-  it('should have add icon in Create Dashboard button', () => {
+  it('should have arrow_forward icon in View button', () => {
     const icon = fixture.nativeElement.querySelector('.dashboard-card button[mat-button] mat-icon');
     expect(icon).toBeTruthy();
-    expect(icon.textContent).toContain('add');
+    expect(icon.textContent).toContain('arrow_forward');
   });
 
-  it('should have Create Dashboard button with primary color', () => {
+  it('should have View button with primary color', () => {
     const button = fixture.nativeElement.querySelector('.dashboard-card button[color="primary"]');
     expect(button).toBeTruthy();
   });
@@ -155,8 +170,8 @@ describe('DashboardListComponent', () => {
     expect(actions).toBeTruthy();
   });
 
-  it('should display instruction text about using admin panel', () => {
+  it('should display dashboard description', () => {
     const cardContent = fixture.nativeElement.querySelector('.dashboard-card mat-card-content');
-    expect(cardContent.textContent).toContain('Use the Admin panel to create and manage your dashboards');
+    expect(cardContent.textContent).toContain('Test Description');
   });
 });

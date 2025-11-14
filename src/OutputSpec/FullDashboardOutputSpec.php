@@ -56,15 +56,18 @@ final readonly class FullDashboardOutputSpec implements OutputSpecInterface
 
             $categoriesArray[] = $categoryArray;
         }
-        $dashboardArray["categories"] = $categoriesArray;
 
         // Transform favorites
         $favoritesArray = [];
         foreach ($dashboardView->favorites as $favorite) {
             $favoritesArray[] = $this->linkOutputSpec->transform($favorite);
         }
-        $dashboardArray["favorites"] = $favoritesArray;
 
-        return $dashboardArray;
+        // Return structure matching the FullDashboard interface
+        return [
+            "dashboard" => $dashboardArray,
+            "categories" => $categoriesArray,
+            "favorites" => $favoritesArray,
+        ];
     }
 }

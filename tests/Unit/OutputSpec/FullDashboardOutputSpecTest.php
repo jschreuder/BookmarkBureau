@@ -132,14 +132,17 @@ describe("FullDashboardOutputSpec", function () {
 
                 expect($result)->toBeArray();
                 expect($result)->toHaveKeys([
+                    "dashboard",
+                    "categories",
+                    "favorites",
+                ]);
+                expect($result["dashboard"])->toHaveKeys([
                     "id",
                     "title",
                     "description",
                     "icon",
                     "created_at",
                     "updated_at",
-                    "categories",
-                    "favorites",
                 ]);
             },
         );
@@ -159,9 +162,13 @@ describe("FullDashboardOutputSpec", function () {
 
             $result = $spec->transform($dashboardView);
 
-            expect($result["id"])->toBe($dashboard->dashboardId->toString());
-            expect($result["title"])->toBe("My Dashboard");
-            expect($result["description"])->toBe($dashboard->description);
+            expect($result["dashboard"]["id"])->toBe(
+                $dashboard->dashboardId->toString(),
+            );
+            expect($result["dashboard"]["title"])->toBe("My Dashboard");
+            expect($result["dashboard"]["description"])->toBe(
+                $dashboard->description,
+            );
         });
 
         test("transforms empty categories and favorites", function () use (
@@ -378,7 +385,9 @@ describe("FullDashboardOutputSpec", function () {
                 $result = $spec->transform($dashboardView);
 
                 // Verify dashboard fields
-                expect($result["title"])->toBe("Complete Dashboard");
+                expect($result["dashboard"]["title"])->toBe(
+                    "Complete Dashboard",
+                );
 
                 // Verify categories structure
                 expect($result["categories"])->toHaveCount(2);
@@ -776,7 +785,7 @@ describe("FullDashboardOutputSpec", function () {
                 $result = $spec->transform($dashboardView);
 
                 // Verify all optional fields are preserved
-                expect($result["icon"])->toBe("dashboard-icon");
+                expect($result["dashboard"]["icon"])->toBe("dashboard-icon");
                 expect($result["categories"][0]["color"])->toBe("#ABCDEF");
                 expect($result["categories"][0]["links"][0]["icon"])->toBe(
                     "link-icon",
@@ -853,9 +862,11 @@ describe("FullDashboardOutputSpec", function () {
             $dashboardOutputSpec = new DashboardOutputSpec();
             $expectedDashboard = $dashboardOutputSpec->transform($dashboard);
 
-            expect($result["id"])->toBe($expectedDashboard["id"]);
-            expect($result["title"])->toBe($expectedDashboard["title"]);
-            expect($result["description"])->toBe(
+            expect($result["dashboard"]["id"])->toBe($expectedDashboard["id"]);
+            expect($result["dashboard"]["title"])->toBe(
+                $expectedDashboard["title"],
+            );
+            expect($result["dashboard"]["description"])->toBe(
                 $expectedDashboard["description"],
             );
 
