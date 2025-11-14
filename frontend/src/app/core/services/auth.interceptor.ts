@@ -1,104 +1,96 @@
-import { Injectable, inject } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-  HttpErrorResponse,
-} from '@angular/common/http';
-import { Observable, throwError, Subject } from 'rxjs';
-import { catchError, filter, take, switchMap } from 'rxjs/operators';
+import { inject } from '@angular/core';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { throwError, Subject } from 'rxjs';
+import { catchError, switchMap, take } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-  private auth = inject(AuthService);
-  private refreshTokenSubject = new Subject<string>();
-  private isRefreshing = false;
+// Shared state for managing token refresh
+let isRefreshing = false;
+const refreshTokenSubject = new Subject<string>();
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Add token to request if available
-    if (this.auth.getToken()) {
-      request = this.addTokenToRequest(request);
-    }
+export const authInterceptor: HttpInterceptorFn = (request, next) => {
+  const auth = inject(AuthService);
+  const token = auth.getToken();
 
-    return next.handle(request).pipe(catchError((error) => this.handleError(error, request, next)));
-  }
+  console.log('[authInterceptor] Intercepting request:', request.url, 'Token present:', !!token);
 
-  private addTokenToRequest(request: HttpRequest<any>): HttpRequest<any> {
-    const token = this.auth.getToken();
-    if (!token) {
-      return request;
-    }
-
-    return request.clone({
+  // Add token to request if available
+  if (token) {
+    request = request.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log('[authInterceptor] Token added to request');
+  } else {
+    console.log('[authInterceptor] No token available');
   }
 
-  private handleError(
-    error: HttpErrorResponse,
-    request: HttpRequest<any>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<any>> {
-    // Handle 401 Unauthorized responses
-    if (error.status === 401) {
-      return this.handle401Error(request, next);
-    }
+  return next(request).pipe(
+    catchError((error: HttpErrorResponse) => {
+      // Handle 401 Unauthorized responses
+      if (error.status === 401) {
+        return handle401Error(request, next, auth);
+      }
+      return throwError(() => error);
+    }),
+  );
+};
 
-    return throwError(() => error);
-  }
-
-  private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // If refresh is already in progress, queue the request
-    if (this.isRefreshing) {
-      return new Observable<HttpEvent<any>>((observer) => {
-        this.refreshTokenSubject
-          .pipe(
-            take(1),
-            switchMap((token) => {
-              const retryRequest = this.addTokenToRequest(request);
-              return next.handle(retryRequest);
-            }),
-            catchError((err) => {
-              observer.error(err);
-              return throwError(() => err);
-            }),
-          )
-          .subscribe({
-            next: (event) => observer.next(event),
-            error: (err) => observer.error(err),
-            complete: () => observer.complete(),
-          });
-      });
-    }
-
-    // Start refresh process
-    this.isRefreshing = true;
-
-    return new Observable<HttpEvent<any>>((observer) => {
-      this.auth
-        .refreshToken()
+function handle401Error(request: any, next: any, auth: AuthService) {
+  // If refresh is already in progress, queue the request
+  if (isRefreshing) {
+    return new Promise<any>((resolve, reject) => {
+      refreshTokenSubject
         .pipe(
-          switchMap((response) => {
-            this.isRefreshing = false;
-            this.refreshTokenSubject.next(response.token);
-            const retryRequest = this.addTokenToRequest(request);
-            return next.handle(retryRequest);
+          take(1),
+          switchMap((token) => {
+            const retryRequest = request.clone({
+              setHeaders: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            return next(retryRequest);
           }),
           catchError((err) => {
-            this.isRefreshing = false;
-            this.auth.logout();
+            reject(err);
             return throwError(() => err);
           }),
         )
         .subscribe({
-          next: (event) => observer.next(event),
-          error: (err) => observer.error(err),
-          complete: () => observer.complete(),
+          next: (event) => resolve(event),
+          error: (err) => reject(err),
         });
     });
   }
+
+  // Start refresh process
+  isRefreshing = true;
+
+  return new Promise<any>((resolve, reject) => {
+    auth
+      .refreshToken()
+      .pipe(
+        switchMap((response) => {
+          isRefreshing = false;
+          refreshTokenSubject.next(response.token);
+          const retryRequest = request.clone({
+            setHeaders: {
+              Authorization: `Bearer ${response.token}`,
+            },
+          });
+          return next(retryRequest);
+        }),
+        catchError((err) => {
+          isRefreshing = false;
+          auth.logout();
+          reject(err);
+          return throwError(() => err);
+        }),
+      )
+      .subscribe({
+        next: (event) => resolve(event),
+        error: (err) => reject(err),
+      });
+  });
 }

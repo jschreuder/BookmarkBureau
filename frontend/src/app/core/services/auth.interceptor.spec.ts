@@ -1,35 +1,36 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { HttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { AuthService } from './auth.service';
-import { AuthInterceptor } from './auth.interceptor';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { authInterceptor } from './auth.interceptor';
 import { vi } from 'vitest';
 
-describe('AuthInterceptor', () => {
+describe('authInterceptor', () => {
+  let httpTestingController: HttpTestingController;
   let httpClient: HttpClient;
-  let httpMock: HttpTestingController;
   let authService: Partial<AuthService>;
 
   beforeEach(() => {
     authService = {
       getToken: vi.fn(),
+      refreshToken: vi.fn(),
+      logout: vi.fn(),
     };
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
         { provide: AuthService, useValue: authService },
-        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
       ],
     });
 
+    httpTestingController = TestBed.inject(HttpTestingController);
     httpClient = TestBed.inject(HttpClient);
-    httpMock = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
-    httpMock.verify();
+    httpTestingController.verify();
   });
 
   describe('adding token to requests', () => {
@@ -38,7 +39,7 @@ describe('AuthInterceptor', () => {
 
       httpClient.get('/api/test').subscribe();
 
-      const req = httpMock.expectOne('/api/test');
+      const req = httpTestingController.expectOne('/api/test');
       expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
       req.flush({});
     });
@@ -48,7 +49,7 @@ describe('AuthInterceptor', () => {
 
       httpClient.get('/api/test').subscribe();
 
-      const req = httpMock.expectOne('/api/test');
+      const req = httpTestingController.expectOne('/api/test');
       expect(req.request.headers.get('Authorization')).toBeNull();
       req.flush({});
     });
@@ -58,9 +59,27 @@ describe('AuthInterceptor', () => {
 
       httpClient.get('/api/secure').subscribe();
 
-      const req = httpMock.expectOne('/api/secure');
+      const req = httpTestingController.expectOne('/api/secure');
       expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
       req.flush({});
+    });
+  });
+
+  describe('handling non-401 errors', () => {
+    it('should pass through non-401 errors', () => {
+      (authService.getToken as any).mockReturnValue('test-token');
+
+      let errorOccurred = false;
+      httpClient.get('/api/test').subscribe({
+        error: () => {
+          errorOccurred = true;
+        },
+      });
+
+      const req = httpTestingController.expectOne('/api/test');
+      req.flush('Not Found', { status: 404, statusText: 'Not Found' });
+
+      expect(errorOccurred).toBe(true);
     });
   });
 });
