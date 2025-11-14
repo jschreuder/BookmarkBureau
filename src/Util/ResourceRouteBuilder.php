@@ -118,7 +118,7 @@ final readonly class ResourceRouteBuilder
                 ? "{$this->resourceName}-{$suffix}"
                 : $this->resourceName;
 
-        $path = $this->pathSegment . $pathSuffix;
+        $path = "{$this->pathSegment}{$pathSuffix}";
 
         $controller = fn(): ControllerInterface => new ActionController(
             $actionFactory(),
