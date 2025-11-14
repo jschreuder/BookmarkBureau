@@ -8,7 +8,7 @@ import {
   Tag,
   Favorite,
   FullDashboard,
-  ApiResponse
+  ApiResponse,
 } from '../models';
 import { environment } from '../../../environments/environment';
 
@@ -24,7 +24,7 @@ describe('ApiService', () => {
     description: 'Home dashboard',
     icon: 'home',
     created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
+    updated_at: '2024-01-01T00:00:00Z',
   };
 
   const mockLink: Link = {
@@ -33,7 +33,7 @@ describe('ApiService', () => {
     title: 'Example Site',
     description: 'An example site',
     created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
+    updated_at: '2024-01-01T00:00:00Z',
   };
 
   const mockCategory: CategoryWithLinks = {
@@ -44,31 +44,31 @@ describe('ApiService', () => {
     sort_order: 1,
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
-    links: [mockLink]
+    links: [mockLink],
   };
 
   const mockTag: Tag = {
     tag_name: 'important',
-    color: '#FF5722'
+    color: '#FF5722',
   };
 
   const mockFavorite: Favorite = {
     dashboard_id: mockDashboard.id,
     link_id: mockLink.id,
     sort_order: 1,
-    created_at: '2024-01-01T00:00:00Z'
+    created_at: '2024-01-01T00:00:00Z',
   };
 
   const mockFullDashboard: FullDashboard = {
     dashboard: mockDashboard,
     categories: [mockCategory],
-    favorites: [mockLink]
+    favorites: [mockLink],
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ApiService]
+      providers: [ApiService],
     });
     service = TestBed.inject(ApiService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -82,39 +82,39 @@ describe('ApiService', () => {
     it('should list dashboards', () => {
       const mockResponse: ApiResponse<{ dashboards: Dashboard[] }> = {
         success: true,
-        data: { dashboards: [mockDashboard] }
+        data: { dashboards: [mockDashboard] },
       };
 
-      service.listDashboards().subscribe(dashboards => {
+      service.listDashboards().subscribe((dashboards) => {
         expect(dashboards.length).toBe(1);
         expect(dashboards[0]).toEqual(mockDashboard);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard`);
+      const req = httpMock.expectOne(`${apiBase}/dashboard/list`);
       expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });
 
     it('should return empty array when listDashboards returns null data', () => {
       const mockResponse: ApiResponse<{ dashboards: Dashboard[] }> = {
-        success: true
+        success: true,
       };
 
-      service.listDashboards().subscribe(dashboards => {
+      service.listDashboards().subscribe((dashboards) => {
         expect(dashboards).toEqual([]);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard`);
+      const req = httpMock.expectOne(`${apiBase}/dashboard/list`);
       req.flush(mockResponse);
     });
 
     it('should get single dashboard', () => {
       const mockResponse: ApiResponse<FullDashboard> = {
         success: true,
-        data: mockFullDashboard
+        data: mockFullDashboard,
       };
 
-      service.getDashboard(mockDashboard.id).subscribe(dashboard => {
+      service.getDashboard(mockDashboard.id).subscribe((dashboard) => {
         expect(dashboard).toEqual(mockFullDashboard);
       });
 
@@ -126,14 +126,14 @@ describe('ApiService', () => {
     it('should create dashboard', () => {
       const newDashboard: Partial<Dashboard> = {
         title: 'New Dashboard',
-        description: 'New description'
+        description: 'New description',
       };
       const mockResponse: ApiResponse<Dashboard> = {
         success: true,
-        data: mockDashboard
+        data: mockDashboard,
       };
 
-      service.createDashboard(newDashboard).subscribe(dashboard => {
+      service.createDashboard(newDashboard).subscribe((dashboard) => {
         expect(dashboard).toEqual(mockDashboard);
       });
 
@@ -145,14 +145,14 @@ describe('ApiService', () => {
 
     it('should update dashboard', () => {
       const updates: Partial<Dashboard> = {
-        title: 'Updated Title'
+        title: 'Updated Title',
       };
       const mockResponse: ApiResponse<Dashboard> = {
         success: true,
-        data: mockDashboard
+        data: mockDashboard,
       };
 
-      service.updateDashboard(mockDashboard.id, updates).subscribe(dashboard => {
+      service.updateDashboard(mockDashboard.id, updates).subscribe((dashboard) => {
         expect(dashboard).toEqual(mockDashboard);
       });
 
@@ -164,10 +164,10 @@ describe('ApiService', () => {
 
     it('should delete dashboard', () => {
       const mockResponse: ApiResponse<void> = {
-        success: true
+        success: true,
       };
 
-      service.deleteDashboard(mockDashboard.id).subscribe(result => {
+      service.deleteDashboard(mockDashboard.id).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
@@ -181,10 +181,10 @@ describe('ApiService', () => {
     it('should get category', () => {
       const mockResponse: ApiResponse<CategoryWithLinks> = {
         success: true,
-        data: mockCategory
+        data: mockCategory,
       };
 
-      service.getCategory(mockCategory.id).subscribe(category => {
+      service.getCategory(mockCategory.id).subscribe((category) => {
         expect(category).toEqual(mockCategory);
       });
 
@@ -195,14 +195,14 @@ describe('ApiService', () => {
 
     it('should create category', () => {
       const newCategory: Partial<CategoryWithLinks> = {
-        title: 'New Category'
+        title: 'New Category',
       };
       const mockResponse: ApiResponse<CategoryWithLinks> = {
         success: true,
-        data: mockCategory
+        data: mockCategory,
       };
 
-      service.createCategory(newCategory as any).subscribe(category => {
+      service.createCategory(newCategory as any).subscribe((category) => {
         expect(category).toEqual(mockCategory);
       });
 
@@ -214,14 +214,14 @@ describe('ApiService', () => {
 
     it('should update category', () => {
       const updates: Partial<CategoryWithLinks> = {
-        title: 'Updated Category'
+        title: 'Updated Category',
       };
       const mockResponse: ApiResponse<CategoryWithLinks> = {
         success: true,
-        data: mockCategory
+        data: mockCategory,
       };
 
-      service.updateCategory(mockCategory.id, updates as any).subscribe(category => {
+      service.updateCategory(mockCategory.id, updates as any).subscribe((category) => {
         expect(category).toEqual(mockCategory);
       });
 
@@ -233,10 +233,10 @@ describe('ApiService', () => {
 
     it('should delete category', () => {
       const mockResponse: ApiResponse<void> = {
-        success: true
+        success: true,
       };
 
-      service.deleteCategory(mockCategory.id).subscribe(result => {
+      service.deleteCategory(mockCategory.id).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
@@ -250,10 +250,10 @@ describe('ApiService', () => {
     it('should get link', () => {
       const mockResponse: ApiResponse<Link> = {
         success: true,
-        data: mockLink
+        data: mockLink,
       };
 
-      service.getLink(mockLink.id).subscribe(link => {
+      service.getLink(mockLink.id).subscribe((link) => {
         expect(link).toEqual(mockLink);
       });
 
@@ -265,14 +265,14 @@ describe('ApiService', () => {
     it('should create link', () => {
       const newLink: Partial<Link> = {
         url: 'https://example.com',
-        title: 'Example'
+        title: 'Example',
       };
       const mockResponse: ApiResponse<Link> = {
         success: true,
-        data: mockLink
+        data: mockLink,
       };
 
-      service.createLink(newLink).subscribe(link => {
+      service.createLink(newLink).subscribe((link) => {
         expect(link).toEqual(mockLink);
       });
 
@@ -284,14 +284,14 @@ describe('ApiService', () => {
 
     it('should update link', () => {
       const updates: Partial<Link> = {
-        title: 'Updated Title'
+        title: 'Updated Title',
       };
       const mockResponse: ApiResponse<Link> = {
         success: true,
-        data: mockLink
+        data: mockLink,
       };
 
-      service.updateLink(mockLink.id, updates).subscribe(link => {
+      service.updateLink(mockLink.id, updates).subscribe((link) => {
         expect(link).toEqual(mockLink);
       });
 
@@ -303,10 +303,10 @@ describe('ApiService', () => {
 
     it('should delete link', () => {
       const mockResponse: ApiResponse<void> = {
-        success: true
+        success: true,
       };
 
-      service.deleteLink(mockLink.id).subscribe(result => {
+      service.deleteLink(mockLink.id).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
@@ -320,10 +320,10 @@ describe('ApiService', () => {
     it('should get tag', () => {
       const mockResponse: ApiResponse<Tag> = {
         success: true,
-        data: mockTag
+        data: mockTag,
       };
 
-      service.getTag(mockTag.tag_name).subscribe(tag => {
+      service.getTag(mockTag.tag_name).subscribe((tag) => {
         expect(tag).toEqual(mockTag);
       });
 
@@ -334,14 +334,14 @@ describe('ApiService', () => {
 
     it('should create tag', () => {
       const newTag: Partial<Tag> = {
-        tag_name: 'new-tag'
+        tag_name: 'new-tag',
       };
       const mockResponse: ApiResponse<Tag> = {
         success: true,
-        data: mockTag
+        data: mockTag,
       };
 
-      service.createTag(newTag).subscribe(tag => {
+      service.createTag(newTag).subscribe((tag) => {
         expect(tag).toEqual(mockTag);
       });
 
@@ -353,14 +353,14 @@ describe('ApiService', () => {
 
     it('should update tag', () => {
       const updates: Partial<Tag> = {
-        tag_name: 'updated-tag'
+        tag_name: 'updated-tag',
       };
       const mockResponse: ApiResponse<Tag> = {
         success: true,
-        data: mockTag
+        data: mockTag,
       };
 
-      service.updateTag(mockTag.tag_name, updates).subscribe(tag => {
+      service.updateTag(mockTag.tag_name, updates).subscribe((tag) => {
         expect(tag).toEqual(mockTag);
       });
 
@@ -372,10 +372,10 @@ describe('ApiService', () => {
 
     it('should delete tag', () => {
       const mockResponse: ApiResponse<void> = {
-        success: true
+        success: true,
       };
 
-      service.deleteTag(mockTag.tag_name).subscribe(result => {
+      service.deleteTag(mockTag.tag_name).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
@@ -388,11 +388,11 @@ describe('ApiService', () => {
   describe('Link-Tag association endpoints', () => {
     it('should assign tag to link', () => {
       const mockResponse: ApiResponse<void> = {
-        success: true
+        success: true,
       };
       const tagData: Partial<Tag> = { tag_name: 'important' };
 
-      service.assignTagToLink(mockLink.id, tagData).subscribe(result => {
+      service.assignTagToLink(mockLink.id, tagData).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
@@ -404,10 +404,10 @@ describe('ApiService', () => {
 
     it('should remove tag from link', () => {
       const mockResponse: ApiResponse<void> = {
-        success: true
+        success: true,
       };
 
-      service.removeTagFromLink(mockLink.id, mockTag.tag_name).subscribe(result => {
+      service.removeTagFromLink(mockLink.id, mockTag.tag_name).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
@@ -421,10 +421,10 @@ describe('ApiService', () => {
     it('should add favorite', () => {
       const mockResponse: ApiResponse<Favorite> = {
         success: true,
-        data: mockFavorite
+        data: mockFavorite,
       };
 
-      service.addFavorite(mockDashboard.id, mockLink.id).subscribe(favorite => {
+      service.addFavorite(mockDashboard.id, mockLink.id).subscribe((favorite) => {
         expect(favorite).toEqual(mockFavorite);
       });
 
@@ -432,17 +432,17 @@ describe('ApiService', () => {
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({
         dashboard_id: mockDashboard.id,
-        link_id: mockLink.id
+        link_id: mockLink.id,
       });
       req.flush(mockResponse);
     });
 
     it('should remove favorite', () => {
       const mockResponse: ApiResponse<void> = {
-        success: true
+        success: true,
       };
 
-      service.removeFavorite(mockDashboard.id, mockLink.id).subscribe(result => {
+      service.removeFavorite(mockDashboard.id, mockLink.id).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
@@ -450,18 +450,18 @@ describe('ApiService', () => {
       expect(req.request.method).toBe('DELETE');
       expect(req.request.body).toEqual({
         dashboard_id: mockDashboard.id,
-        link_id: mockLink.id
+        link_id: mockLink.id,
       });
       req.flush(mockResponse);
     });
 
     it('should reorder favorites', () => {
       const mockResponse: ApiResponse<void> = {
-        success: true
+        success: true,
       };
       const favoriteOrder = { 'link-1': 1, 'link-2': 2 };
 
-      service.reorderFavorites(mockDashboard.id, favoriteOrder).subscribe(result => {
+      service.reorderFavorites(mockDashboard.id, favoriteOrder).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
@@ -469,7 +469,7 @@ describe('ApiService', () => {
       expect(req.request.method).toBe('PUT');
       expect(req.request.body).toEqual({
         dashboard_id: mockDashboard.id,
-        favorites: favoriteOrder
+        favorites: favoriteOrder,
       });
       req.flush(mockResponse);
     });
@@ -479,7 +479,7 @@ describe('ApiService', () => {
     it('should set Content-Type header to application/json for POST requests', () => {
       const mockResponse: ApiResponse<Dashboard> = {
         success: true,
-        data: mockDashboard
+        data: mockDashboard,
       };
 
       service.createDashboard({ title: 'Test' }).subscribe();
@@ -492,7 +492,7 @@ describe('ApiService', () => {
     it('should set Content-Type header to application/json for PUT requests', () => {
       const mockResponse: ApiResponse<Dashboard> = {
         success: true,
-        data: mockDashboard
+        data: mockDashboard,
       };
 
       service.updateDashboard(mockDashboard.id, { title: 'Updated' }).subscribe();
