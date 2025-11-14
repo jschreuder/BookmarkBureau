@@ -53,8 +53,6 @@
 
         .large-icon {
           font-size: 40px;
-          width: 40px;
-          height: 40px;
           color: #667eea;
         }
       }
@@ -76,12 +74,11 @@
     align-items: center;
     gap: 16px;
     padding: 16px 24px;
-    border: none;
+    border: none !important;
+    min-height: 56px;
 
     .section-icon {
       font-size: 24px;
-      width: 24px;
-      height: 24px;
       color: #667eea;
       flex-shrink: 0;
     }
@@ -91,10 +88,14 @@
       font-size: 20px;
       font-weight: 500;
       flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     button {
       flex-shrink: 0;
+      min-width: 40px;
     }
   }
 
@@ -114,8 +115,6 @@
 
   mat-icon {
     font-size: 48px;
-    width: 48px;
-    height: 48px;
     margin-bottom: 12px;
     color: rgba(0, 0, 0, 0.26);
   }
@@ -154,8 +153,6 @@
 
     .link-icon {
       font-size: 20px;
-      width: 20px;
-      height: 20px;
       flex-shrink: 0;
       color: #667eea;
       margin-top: 4px;
@@ -221,8 +218,6 @@
 
       .category-color {
         font-size: 20px;
-        width: 20px;
-        height: 20px;
         flex-shrink: 0;
       }
 

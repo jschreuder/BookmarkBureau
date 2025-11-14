@@ -30,10 +30,10 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
     MatSnackBarModule,
     MatChipsModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
   ],
   templateUrl: './dashboard-overview.component.html',
-  styleUrls: ['./dashboard-overview.component.scss']
+  styleUrls: ['./dashboard-overview.component.scss'],
 })
 export class DashboardOverviewComponent implements OnInit {
   private readonly apiService = inject(ApiService);
@@ -69,14 +69,16 @@ export class DashboardOverviewComponent implements OnInit {
         this.error = 'Failed to load dashboard';
         this.snackBar.open('Failed to load dashboard', 'Close', { duration: 5000 });
         this.loading = false;
-      }
+      },
     });
   }
 
   openAddCategoryDialog(): void {
     const dialogRef = this.dialog.open(AddCategoryDialogComponent, {
-      width: '400px',
-      data: { dashboardId: this.dashboardId }
+      width: '500px',
+      maxWidth: '90vw',
+      panelClass: 'add-category-dialog',
+      data: { dashboardId: this.dashboardId },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -89,8 +91,10 @@ export class DashboardOverviewComponent implements OnInit {
 
   openAddFavoriteDialog(): void {
     const dialogRef = this.dialog.open(AddLinkDialogComponent, {
-      width: '500px',
-      data: { dashboardId: this.dashboardId, isFavorite: true }
+      width: '600px',
+      maxWidth: '90vw',
+      panelClass: 'add-link-dialog',
+      data: { dashboardId: this.dashboardId, isFavorite: true },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -103,8 +107,10 @@ export class DashboardOverviewComponent implements OnInit {
 
   openAddLinkToCategoryDialog(category: CategoryWithLinks): void {
     const dialogRef = this.dialog.open(AddLinkDialogComponent, {
-      width: '500px',
-      data: { dashboardId: this.dashboardId, categoryId: category.id, isFavorite: false }
+      width: '600px',
+      maxWidth: '90vw',
+      panelClass: 'add-link-dialog',
+      data: { dashboardId: this.dashboardId, categoryId: category.id, isFavorite: false },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -120,8 +126,8 @@ export class DashboardOverviewComponent implements OnInit {
       width: '400px',
       data: {
         title: 'Delete Category',
-        message: `Are you sure you want to delete "${category.title}"? This action cannot be undone.`
-      }
+        message: `Are you sure you want to delete "${category.title}"? This action cannot be undone.`,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -134,7 +140,7 @@ export class DashboardOverviewComponent implements OnInit {
           error: (error) => {
             console.error('Error deleting category:', error);
             this.snackBar.open('Failed to delete category', 'Close', { duration: 5000 });
-          }
+          },
         });
       }
     });
@@ -145,8 +151,8 @@ export class DashboardOverviewComponent implements OnInit {
       width: '400px',
       data: {
         title: 'Remove from Favorites',
-        message: `Remove "${link.title}" from favorites?`
-      }
+        message: `Remove "${link.title}" from favorites?`,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -159,7 +165,7 @@ export class DashboardOverviewComponent implements OnInit {
           error: (error) => {
             console.error('Error removing favorite:', error);
             this.snackBar.open('Failed to remove favorite', 'Close', { duration: 5000 });
-          }
+          },
         });
       }
     });
@@ -170,8 +176,8 @@ export class DashboardOverviewComponent implements OnInit {
       width: '400px',
       data: {
         title: 'Remove Link',
-        message: `Remove "${linkTitle}" from this category?`
-      }
+        message: `Remove "${linkTitle}" from this category?`,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {

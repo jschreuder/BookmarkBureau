@@ -17,7 +17,7 @@
       <mat-card-header>
         <div class="header-content">
           <div class="header-title">
-            <mat-icon class="large-icon" *ngIf="fullDashboard.dashboard.icon">
+            <mat-icon class="large-icon" *ngIf="fullDashboard.dashboard?.icon">
               {{ fullDashboard.dashboard.icon }}
             </mat-icon>
             <h1>{{ fullDashboard.dashboard.title }}</h1>
@@ -32,7 +32,11 @@
       <mat-card-header>
         <mat-icon class="section-icon">star</mat-icon>
         <h2 class="section-title">Favorites</h2>
-        <button mat-icon-button (click)="openAddFavoriteDialog()" matTooltip="Add Link to Favorites">
+        <button
+          mat-icon-button
+          (click)="openAddFavoriteDialog()"
+          matTooltip="Add Link to Favorites"
+        >
           <mat-icon>add</mat-icon>
         </button>
       </mat-card-header>
