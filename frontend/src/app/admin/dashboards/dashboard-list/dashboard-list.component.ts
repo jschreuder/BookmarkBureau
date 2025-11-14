@@ -85,6 +85,14 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
                 </button>
                 <button
                   mat-icon-button
+                  matTooltip="Overview"
+                  (click)="navigateToOverview(dashboard.id)"
+                  color="primary"
+                >
+                  <mat-icon>dashboard</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
                   matTooltip="Delete"
                   (click)="delete(dashboard)"
                   color="warn"
@@ -214,6 +222,10 @@ export class AdminDashboardListComponent implements OnInit {
 
   navigateToView(dashboardId: string) {
     window.open(`/dashboard/${dashboardId}`, '_blank');
+  }
+
+  navigateToOverview(dashboardId: string) {
+    this.router.navigate(['/admin/dashboards', dashboardId, 'overview']);
   }
 
   navigateToEdit(dashboardId: string) {
