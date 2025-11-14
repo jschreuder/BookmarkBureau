@@ -31,6 +31,7 @@ use jschreuder\BookmarkBureau\InputSpec\LoginInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\FavoriteInputSpec;
+use jschreuder\BookmarkBureau\InputSpec\IdInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\LinkInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\LinkTagInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\ReorderFavoritesInputSpec;
@@ -108,7 +109,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerRead(
                 fn() => new LinkReadAction(
                     $this->container->getLinkService(),
-                    new LinkInputSpec(),
+                    new IdInputSpec(),
                     new LinkOutputSpec(new TagOutputSpec()),
                 ),
             )
@@ -195,12 +196,8 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerRead(
                 fn() => new DashboardReadAction(
                     $this->container->getDashboardService(),
-                    new DashboardInputSpec(),
-                    new FullDashboardOutputSpec(
-                        new DashboardOutputSpec(),
-                        new CategoryOutputSpec(),
-                        new LinkOutputSpec(new TagOutputSpec()),
-                    ),
+                    new IdInputSpec(),
+                    new DashboardOutputSpec(),
                 ),
             )
             ->registerCreate(
@@ -262,7 +259,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerRead(
                 fn() => new CategoryReadAction(
                     $this->container->getCategoryService(),
-                    new CategoryInputSpec(),
+                    new IdInputSpec(),
                     new CategoryOutputSpec(),
                 ),
             )
