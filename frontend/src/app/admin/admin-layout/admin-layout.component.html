@@ -26,7 +26,7 @@
       <a
         *ngFor="let dashboard of topDashboards"
         mat-list-item
-        [routerLink]="['/dashboard', dashboard.id]"
+        [routerLink]="['/admin/dashboards', dashboard.id, 'overview']"
         routerLinkActive="active-link"
         class="dashboard-link"
       >

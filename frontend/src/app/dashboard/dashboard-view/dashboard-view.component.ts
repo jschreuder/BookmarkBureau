@@ -62,7 +62,11 @@ import { Observable, catchError, of } from 'rxjs';
           <h2><mat-icon>star</mat-icon> Favorites</h2>
         </div>
         <div class="link-grid">
-          <mat-card class="link-card" *ngFor="let link of data.favorites">
+          <mat-card
+            class="link-card"
+            *ngFor="let link of data.favorites"
+            (click)="openLink(link.url)"
+          >
             <mat-card-content>
               <mat-icon color="accent" *ngIf="link.icon">
                 {{ link.icon }}
@@ -91,7 +95,11 @@ import { Observable, catchError, of } from 'rxjs';
           </mat-card-header>
           <mat-card-content>
             <div class="link-list">
-              <div class="link-item" *ngFor="let link of category.links">
+              <div
+                class="link-item"
+                *ngFor="let link of category.links"
+                (click)="openLink(link.url)"
+              >
                 <mat-icon *ngIf="link.icon">{{ link.icon }}</mat-icon>
                 <mat-icon *ngIf="!link.icon">link</mat-icon>
                 <div class="link-info">
@@ -369,5 +377,9 @@ export class DashboardViewComponent implements OnInit {
         return of(null);
       }),
     );
+  }
+
+  openLink(url: string): void {
+    window.open(url, '_blank');
   }
 }

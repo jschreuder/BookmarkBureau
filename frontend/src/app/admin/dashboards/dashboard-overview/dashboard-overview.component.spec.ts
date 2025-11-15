@@ -66,11 +66,7 @@ describe('DashboardOverviewComponent', () => {
     };
 
     activatedRoute = {
-      snapshot: {
-        paramMap: {
-          get: (key: string) => (key === 'id' ? 'test-id' : null),
-        },
-      },
+      paramMap: of({ get: (key: string) => (key === 'id' ? 'test-id' : null) }),
     };
 
     await TestBed.configureTestingModule({

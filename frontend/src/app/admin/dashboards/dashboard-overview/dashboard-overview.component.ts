@@ -47,13 +47,15 @@ export class DashboardOverviewComponent implements OnInit {
   error: string | null = null;
 
   ngOnInit(): void {
-    this.dashboardId = this.route.snapshot.paramMap.get('id') || '';
-    if (!this.dashboardId) {
-      this.error = 'Dashboard ID not found';
-      this.loading = false;
-      return;
-    }
-    this.loadDashboard();
+    this.route.paramMap.subscribe((params) => {
+      this.dashboardId = params.get('id') || '';
+      if (!this.dashboardId) {
+        this.error = 'Dashboard ID not found';
+        this.loading = false;
+        return;
+      }
+      this.loadDashboard();
+    });
   }
 
   loadDashboard(): void {

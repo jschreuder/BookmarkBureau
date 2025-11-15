@@ -189,4 +189,24 @@ describe('DashboardViewComponent', () => {
     expect(sections[0].classList.contains('favorites-section')).toBe(true);
     expect(sections[1].classList.contains('categories-section')).toBe(true);
   });
+
+  it('should open link in new window when clicking favorite card', () => {
+    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const linkCard = fixture.nativeElement.querySelector('.link-card');
+
+    linkCard.click();
+
+    expect(windowOpenSpy).toHaveBeenCalledWith('https://example1.com', '_blank');
+    windowOpenSpy.mockRestore();
+  });
+
+  it('should open link in new window when clicking category link item', () => {
+    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const linkItem = fixture.nativeElement.querySelector('.link-item');
+
+    linkItem.click();
+
+    expect(windowOpenSpy).toHaveBeenCalledWith('https://example1.com', '_blank');
+    windowOpenSpy.mockRestore();
+  });
 });
