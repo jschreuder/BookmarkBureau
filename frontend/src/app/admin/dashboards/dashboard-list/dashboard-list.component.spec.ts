@@ -24,7 +24,7 @@ describe('AdminDashboardListComponent', () => {
       description: 'Home dashboard',
       icon: 'home',
       created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z'
+      updated_at: '2024-01-01T00:00:00Z',
     },
     {
       id: '223e4567-e89b-12d3-a456-426614174000',
@@ -32,14 +32,14 @@ describe('AdminDashboardListComponent', () => {
       description: 'Work dashboard',
       icon: 'work',
       created_at: '2024-01-02T00:00:00Z',
-      updated_at: '2024-01-02T00:00:00Z'
-    }
+      updated_at: '2024-01-02T00:00:00Z',
+    },
   ];
 
   beforeEach(async () => {
     const apiServiceSpy = {
       listDashboards: vi.fn().mockReturnValue(of([])),
-      deleteDashboard: vi.fn()
+      deleteDashboard: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
@@ -48,11 +48,9 @@ describe('AdminDashboardListComponent', () => {
         RouterTestingModule,
         MatSnackBarModule,
         MatDialogModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
       ],
-      providers: [
-        { provide: ApiService, useValue: apiServiceSpy }
-      ]
+      providers: [{ provide: ApiService, useValue: apiServiceSpy }],
     }).compileComponents();
 
     apiService = TestBed.inject(ApiService) as any;
@@ -148,7 +146,11 @@ describe('AdminDashboardListComponent', () => {
 
     component.navigateToEdit(dashboardId);
 
-    expect(component['router'].navigate).toHaveBeenCalledWith(['/admin/dashboards', dashboardId, 'edit']);
+    expect(component['router'].navigate).toHaveBeenCalledWith([
+      '/admin/dashboards',
+      dashboardId,
+      'edit',
+    ]);
   });
 
   it('should display edit and delete buttons for each dashboard', () => {

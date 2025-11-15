@@ -25,26 +25,34 @@ export interface AddCategoryDialogData {
   template: `
     <h2 mat-dialog-title>Add Category</h2>
     <mat-dialog-content>
-      <form [formGroup]="form">
-        <mat-form-field appearance="outline" class="full-width">
+      <form [formGroup]="form" class="dialog-form">
+        <mat-form-field appearance="outline">
           <mat-label>Category Title</mat-label>
-          <input matInput formControlName="title" placeholder="e.g., Work, Personal, Blogs" />
-          <mat-error *ngIf="form.get('title')?.hasError('required')"> Title is required </mat-error>
+          <input
+            matInput
+            formControlName="title"
+            placeholder="e.g., Work, Personal, Blogs"
+            required
+          />
+          @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
+            <mat-error>Title is required</mat-error>
+          }
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline">
           <mat-label>Color (Optional)</mat-label>
           <input matInput formControlName="color" type="color" placeholder="#667eea" />
         </mat-form-field>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-button (click)="onCancel()" type="button">Cancel</button>
       <button
         mat-raised-button
         color="primary"
         (click)="onSubmit()"
         [disabled]="!form.valid || loading"
+        type="button"
       >
         {{ loading ? 'Creating...' : 'Create Category' }}
       </button>
@@ -52,18 +60,25 @@ export interface AddCategoryDialogData {
   `,
   styles: [
     `
-      .full-width {
-        width: 100%;
-        margin-bottom: 16px;
+      mat-dialog-content {
+        min-width: 400px;
+        padding: 20px 24px !important;
       }
 
-      mat-dialog-content {
-        min-width: 300px;
+      .dialog-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding-top: 8px;
+      }
+
+      mat-form-field {
+        width: 100%;
       }
 
       mat-dialog-actions {
-        padding: 16px 0 0 0;
-        gap: 8px;
+        padding: 8px 24px 16px !important;
+        margin: 0;
       }
     `,
   ],
@@ -85,6 +100,7 @@ export class AddCategoryDialogComponent {
 
   onSubmit(): void {
     if (!this.form.valid) {
+      this.form.markAllAsTouched();
       return;
     }
 

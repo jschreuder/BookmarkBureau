@@ -5,13 +5,8 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ApiService } from '../../../core/services/api.service';
 import { Link } from '../../../core/models';
-import { Observable } from 'rxjs';
-import { startWith, map, debounceTime } from 'rxjs/operators';
 
 export interface AddLinkDialogData {
   dashboardId: string;
@@ -29,73 +24,86 @@ export interface AddLinkDialogData {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSelectModule,
-    MatIconModule,
-    MatAutocompleteModule
   ],
   template: `
     <h2 mat-dialog-title>
       {{ data.isFavorite ? 'Add Link to Favorites' : 'Add Link to Category' }}
     </h2>
     <mat-dialog-content>
-      <form [formGroup]="form">
-        <mat-form-field appearance="outline" class="full-width">
+      <form [formGroup]="form" class="dialog-form">
+        <mat-form-field appearance="outline">
           <mat-label>URL</mat-label>
-          <input matInput formControlName="url" placeholder="https://example.com">
-          <mat-error *ngIf="form.get('url')?.hasError('required')">
-            URL is required
-          </mat-error>
-          <mat-error *ngIf="form.get('url')?.hasError('pattern')">
-            Please enter a valid URL
-          </mat-error>
+          <input matInput formControlName="url" placeholder="https://example.com" required />
+          @if (form.get('url')?.hasError('required') && form.get('url')?.touched) {
+            <mat-error>URL is required</mat-error>
+          }
+          @if (form.get('url')?.hasError('pattern') && form.get('url')?.touched) {
+            <mat-error>Please enter a valid URL</mat-error>
+          }
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline">
           <mat-label>Title</mat-label>
-          <input matInput formControlName="title" placeholder="Link title">
-          <mat-error *ngIf="form.get('title')?.hasError('required')">
-            Title is required
-          </mat-error>
+          <input matInput formControlName="title" placeholder="Link title" required />
+          @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
+            <mat-error>Title is required</mat-error>
+          }
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline">
           <mat-label>Description (Optional)</mat-label>
-          <textarea matInput formControlName="description" placeholder="Link description" rows="3"></textarea>
+          <textarea
+            matInput
+            formControlName="description"
+            placeholder="Link description"
+            rows="3"
+          ></textarea>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline">
           <mat-label>Icon (Optional)</mat-label>
-          <input matInput formControlName="icon" placeholder="e.g., link, language, book">
+          <input matInput formControlName="icon" placeholder="e.g., link, language, book" />
+          <mat-hint>Material icon name</mat-hint>
         </mat-form-field>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-button (click)="onCancel()" type="button">Cancel</button>
       <button
         mat-raised-button
         color="primary"
         (click)="onSubmit()"
         [disabled]="!form.valid || loading"
+        type="button"
       >
         {{ loading ? 'Adding...' : 'Add Link' }}
       </button>
     </mat-dialog-actions>
   `,
-  styles: [`
-    .full-width {
-      width: 100%;
-      margin-bottom: 16px;
-    }
+  styles: [
+    `
+      mat-dialog-content {
+        min-width: 500px;
+        padding: 20px 24px !important;
+      }
 
-    mat-dialog-content {
-      min-width: 400px;
-    }
+      .dialog-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding-top: 8px;
+      }
 
-    mat-dialog-actions {
-      padding: 16px 0 0 0;
-      gap: 8px;
-    }
-  `]
+      mat-form-field {
+        width: 100%;
+      }
+
+      mat-dialog-actions {
+        padding: 8px 24px 16px !important;
+        margin: 0;
+      }
+    `,
+  ],
 })
 export class AddLinkDialogComponent {
   private readonly apiService = inject(ApiService);
@@ -110,12 +118,13 @@ export class AddLinkDialogComponent {
       url: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]],
       title: ['', [Validators.required, Validators.minLength(1)]],
       description: [''],
-      icon: ['']
+      icon: [''],
     });
   }
 
   onSubmit(): void {
     if (!this.form.valid) {
+      this.form.markAllAsTouched();
       return;
     }
 
@@ -124,7 +133,7 @@ export class AddLinkDialogComponent {
       url: this.form.get('url')?.value,
       title: this.form.get('title')?.value,
       description: this.form.get('description')?.value || '',
-      icon: this.form.get('icon')?.value || undefined
+      icon: this.form.get('icon')?.value || undefined,
     };
 
     // First, create the link
@@ -137,22 +146,33 @@ export class AddLinkDialogComponent {
               this.loading = false;
               this.dialogRef.close(true);
             },
-            error: (error) => {
+            error: (error: unknown) => {
               console.error('Error adding favorite:', error);
               this.loading = false;
-            }
+            },
           });
         } else if (this.data.categoryId) {
-          // Add to category - this would need a backend endpoint
-          // For now, we'll just close and let the parent component reload
+          // Add to category
+          this.apiService.addLinkToCategory(this.data.categoryId, link.id).subscribe({
+            next: () => {
+              this.loading = false;
+              this.dialogRef.close(true);
+            },
+            error: (error: unknown) => {
+              console.error('Error adding link to category:', error);
+              this.loading = false;
+            },
+          });
+        } else {
+          // Just created the link, close dialog
           this.loading = false;
           this.dialogRef.close(true);
         }
       },
-      error: (error) => {
+      error: (error: unknown) => {
         console.error('Error creating link:', error);
         this.loading = false;
-      }
+      },
     });
   }
 

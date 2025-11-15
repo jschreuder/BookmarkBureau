@@ -109,7 +109,7 @@ describe('ApiService', () => {
       req.flush(mockResponse);
     });
 
-    it('should get single dashboard', () => {
+    it('should get full dashboard', () => {
       const mockResponse: ApiResponse<FullDashboard> = {
         success: true,
         data: mockFullDashboard,
@@ -117,6 +117,21 @@ describe('ApiService', () => {
 
       service.getDashboard(mockDashboard.id).subscribe((dashboard) => {
         expect(dashboard).toEqual(mockFullDashboard);
+      });
+
+      const req = httpMock.expectOne(`${apiBase}/${mockDashboard.id}`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+
+    it('should get basic dashboard', () => {
+      const mockResponse: ApiResponse<Dashboard> = {
+        success: true,
+        data: mockDashboard,
+      };
+
+      service.getDashboardBasic(mockDashboard.id).subscribe((dashboard) => {
+        expect(dashboard).toEqual(mockDashboard);
       });
 
       const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}`);

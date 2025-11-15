@@ -14,7 +14,7 @@ describe('DashboardFormComponent', () => {
   let component: DashboardFormComponent;
   let fixture: ComponentFixture<DashboardFormComponent>;
   let apiService: {
-    getDashboard: ReturnType<typeof vi.fn>;
+    getDashboardBasic: ReturnType<typeof vi.fn>;
     createDashboard: ReturnType<typeof vi.fn>;
     updateDashboard: ReturnType<typeof vi.fn>;
   };
@@ -26,20 +26,20 @@ describe('DashboardFormComponent', () => {
     description: 'Home dashboard',
     icon: 'home',
     created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
+    updated_at: '2024-01-01T00:00:00Z',
   };
 
   const mockFullDashboard: FullDashboard = {
     dashboard: mockDashboard,
     categories: [],
-    favorites: []
+    favorites: [],
   };
 
   beforeEach(async () => {
     const apiServiceSpy = {
-      getDashboard: vi.fn(),
+      getDashboardBasic: vi.fn(),
       createDashboard: vi.fn(),
-      updateDashboard: vi.fn()
+      updateDashboard: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
@@ -48,11 +48,9 @@ describe('DashboardFormComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
         MatSnackBarModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
       ],
-      providers: [
-        { provide: ApiService, useValue: apiServiceSpy }
-      ]
+      providers: [{ provide: ApiService, useValue: apiServiceSpy }],
     }).compileComponents();
 
     apiService = TestBed.inject(ApiService) as any;
@@ -119,7 +117,7 @@ describe('DashboardFormComponent', () => {
     component.form.patchValue({
       title: 'New Dashboard',
       description: 'A new dashboard',
-      icon: 'dashboard'
+      icon: 'dashboard',
     });
 
     component.onSubmit();
@@ -131,7 +129,7 @@ describe('DashboardFormComponent', () => {
   it('should not submit with invalid form', () => {
     component.form.patchValue({
       title: '',
-      description: ''
+      description: '',
     });
 
     component.onSubmit();
@@ -140,13 +138,13 @@ describe('DashboardFormComponent', () => {
   });
 
   it('should load dashboard in edit mode', () => {
-    apiService.getDashboard.mockReturnValue(of(mockFullDashboard));
+    apiService.getDashboardBasic.mockReturnValue(of(mockDashboard));
     component.isEditMode = true;
     component.dashboardId = mockDashboard.id;
 
     component.loadDashboard(mockDashboard.id);
 
-    expect(apiService.getDashboard).toHaveBeenCalledWith(mockDashboard.id);
+    expect(apiService.getDashboardBasic).toHaveBeenCalledWith(mockDashboard.id);
     expect(component.form.get('title')?.value).toBe(mockDashboard.title);
     expect(component.form.get('description')?.value).toBe(mockDashboard.description);
     expect(component.form.get('icon')?.value).toBe(mockDashboard.icon);
@@ -161,7 +159,7 @@ describe('DashboardFormComponent', () => {
     component.form.patchValue({
       title: 'Updated Title',
       description: 'Updated Description',
-      icon: 'updated-icon'
+      icon: 'updated-icon',
     });
 
     component.onSubmit();
@@ -177,7 +175,7 @@ describe('DashboardFormComponent', () => {
 
     component.form.patchValue({
       title: 'New Dashboard',
-      description: 'A new dashboard'
+      description: 'A new dashboard',
     });
 
     component.onSubmit();
@@ -197,7 +195,7 @@ describe('DashboardFormComponent', () => {
     component.dashboardId = mockDashboard.id;
     component.form.patchValue({
       title: 'Updated Title',
-      description: 'Updated Description'
+      description: 'Updated Description',
     });
 
     component.onSubmit();
@@ -235,7 +233,7 @@ describe('DashboardFormComponent', () => {
   it('should disable submit button when form is invalid', () => {
     component.form.patchValue({
       title: '',
-      description: ''
+      description: '',
     });
     fixture.detectChanges();
 
@@ -246,7 +244,7 @@ describe('DashboardFormComponent', () => {
   it('should enable submit button when form is valid', () => {
     component.form.patchValue({
       title: 'Valid Title',
-      description: 'Valid Description'
+      description: 'Valid Description',
     });
     fixture.detectChanges();
 

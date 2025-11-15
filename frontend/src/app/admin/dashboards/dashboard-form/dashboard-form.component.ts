@@ -24,7 +24,7 @@ import { ApiService } from '../../../core/services/api.service';
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   template: `
     <div class="form-header">
@@ -37,7 +37,7 @@ import { ApiService } from '../../../core/services/api.service';
           <!-- Title Field -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Title</mat-label>
-            <input matInput formControlName="title" required>
+            <input matInput formControlName="title" required />
             <mat-error *ngIf="form.get('title')?.hasError('required')">
               Title is required
             </mat-error>
@@ -52,12 +52,7 @@ import { ApiService } from '../../../core/services/api.service';
           <!-- Description Field -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Description</mat-label>
-            <textarea
-              matInput
-              formControlName="description"
-              rows="4"
-              required
-            ></textarea>
+            <textarea matInput formControlName="description" rows="4" required></textarea>
             <mat-error *ngIf="form.get('description')?.hasError('required')">
               Description is required
             </mat-error>
@@ -66,19 +61,13 @@ import { ApiService } from '../../../core/services/api.service';
           <!-- Icon Field -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Icon (Material Icon Name)</mat-label>
-            <input matInput formControlName="icon" placeholder="e.g., dashboard, home, settings">
+            <input matInput formControlName="icon" placeholder="e.g., dashboard, home, settings" />
             <mat-hint>Optional. Use Material Design icon names.</mat-hint>
           </mat-form-field>
 
           <!-- Form Actions -->
           <div class="form-actions">
-            <button
-              mat-raised-button
-              type="button"
-              (click)="onCancel()"
-            >
-              Cancel
-            </button>
+            <button mat-raised-button type="button" (click)="onCancel()">Cancel</button>
             <button
               mat-raised-button
               color="primary"
@@ -94,44 +83,46 @@ import { ApiService } from '../../../core/services/api.service';
       </mat-card-content>
     </mat-card>
   `,
-  styles: [`
-    .form-header {
-      margin-bottom: 24px;
-    }
+  styles: [
+    `
+      .form-header {
+        margin-bottom: 24px;
+      }
 
-    .form-header h1 {
-      margin: 0;
-    }
+      .form-header h1 {
+        margin: 0;
+      }
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
 
-    .full-width {
-      width: 100%;
-    }
+      .full-width {
+        width: 100%;
+      }
 
-    .form-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      margin-top: 24px;
-    }
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 24px;
+      }
 
-    button {
-      min-width: 100px;
-    }
+      button {
+        min-width: 100px;
+      }
 
-    mat-form-field {
-      display: block;
-    }
+      mat-form-field {
+        display: block;
+      }
 
-    mat-error {
-      font-size: 12px;
-    }
-  `]
+      mat-error {
+        font-size: 12px;
+      }
+    `,
+  ],
 })
 export class DashboardFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
@@ -149,12 +140,12 @@ export class DashboardFormComponent implements OnInit {
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(256)]],
       description: ['', [Validators.required]],
-      icon: ['']
+      icon: [''],
     });
   }
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id && id !== 'new') {
         this.isEditMode = true;
@@ -166,13 +157,12 @@ export class DashboardFormComponent implements OnInit {
 
   loadDashboard(id: string) {
     this.loading = true;
-    this.apiService.getDashboard(id).subscribe({
-      next: (dashboardView) => {
-        const dashboard = dashboardView.dashboard;
+    this.apiService.getDashboardBasic(id).subscribe({
+      next: (dashboard) => {
         this.form.patchValue({
           title: dashboard.title,
           description: dashboard.description,
-          icon: dashboard.icon || ''
+          icon: dashboard.icon || '',
         });
         this.loading = false;
       },
@@ -181,7 +171,7 @@ export class DashboardFormComponent implements OnInit {
         this.snackBar.open('Failed to load dashboard', 'Close', { duration: 5000 });
         this.loading = false;
         this.router.navigate(['/admin/dashboards']);
-      }
+      },
     });
   }
 
@@ -194,7 +184,7 @@ export class DashboardFormComponent implements OnInit {
     const data: Partial<Dashboard> = {
       title: this.form.get('title')?.value,
       description: this.form.get('description')?.value,
-      icon: this.form.get('icon')?.value || undefined
+      icon: this.form.get('icon')?.value || undefined,
     };
 
     if (this.isEditMode && this.dashboardId) {
@@ -207,7 +197,7 @@ export class DashboardFormComponent implements OnInit {
           console.error('Error updating dashboard:', error);
           this.snackBar.open('Failed to update dashboard', 'Close', { duration: 5000 });
           this.loading = false;
-        }
+        },
       });
     } else {
       this.apiService.createDashboard(data).subscribe({
@@ -219,7 +209,7 @@ export class DashboardFormComponent implements OnInit {
           console.error('Error creating dashboard:', error);
           this.snackBar.open('Failed to create dashboard', 'Close', { duration: 5000 });
           this.loading = false;
-        }
+        },
       });
     }
   }

@@ -27,7 +27,13 @@ export class ApiService {
 
   getDashboard(id: string): Observable<FullDashboard> {
     return this.http
-      .get<ApiResponse<FullDashboard>>(`${this.API_BASE}/dashboard/${id}`)
+      .get<ApiResponse<FullDashboard>>(`${this.API_BASE}/${id}`)
+      .pipe(map((response) => response.data!));
+  }
+
+  getDashboardBasic(id: string): Observable<Dashboard> {
+    return this.http
+      .get<ApiResponse<Dashboard>>(`${this.API_BASE}/dashboard/${id}`)
       .pipe(map((response) => response.data!));
   }
 
@@ -71,6 +77,20 @@ export class ApiService {
   deleteCategory(id: string): Observable<void> {
     return this.http
       .delete<ApiResponse<void>>(`${this.API_BASE}/category/${id}`)
+      .pipe(map(() => undefined));
+  }
+
+  addLinkToCategory(categoryId: string, linkId: string): Observable<void> {
+    return this.http
+      .post<
+        ApiResponse<void>
+      >(`${this.API_BASE}/category/${categoryId}/link`, { link_id: linkId }, this.httpOptions)
+      .pipe(map(() => undefined));
+  }
+
+  removeLinkFromCategory(categoryId: string, linkId: string): Observable<void> {
+    return this.http
+      .delete<ApiResponse<void>>(`${this.API_BASE}/category/${categoryId}/link/${linkId}`)
       .pipe(map(() => undefined));
   }
 

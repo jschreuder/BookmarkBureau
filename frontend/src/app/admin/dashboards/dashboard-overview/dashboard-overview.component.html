@@ -13,19 +13,17 @@
   <!-- Dashboard Content -->
   <ng-container *ngIf="fullDashboard && !loading">
     <!-- Dashboard Summary -->
-    <mat-card class="summary-card">
-      <mat-card-header>
-        <div class="header-content">
-          <div class="header-title">
-            <mat-icon class="large-icon" *ngIf="fullDashboard.dashboard?.icon">
-              {{ fullDashboard.dashboard.icon }}
-            </mat-icon>
-            <h1>{{ fullDashboard.dashboard.title }}</h1>
-          </div>
+    <div class="dashboard-header">
+      <div class="header-content">
+        <mat-icon class="dashboard-icon" *ngIf="fullDashboard.dashboard.icon">
+          {{ fullDashboard.dashboard.icon }}
+        </mat-icon>
+        <div class="header-text">
+          <h1>{{ fullDashboard.dashboard.title }}</h1>
           <p class="description">{{ fullDashboard.dashboard.description }}</p>
         </div>
-      </mat-card-header>
-    </mat-card>
+      </div>
+    </div>
 
     <!-- Favorites Section -->
     <mat-card class="section-card">
