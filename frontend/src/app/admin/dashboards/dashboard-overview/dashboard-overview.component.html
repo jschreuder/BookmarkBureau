@@ -44,7 +44,7 @@
           <mat-icon>bookmark_border</mat-icon>
           <p>No favorites yet</p>
         </div>
-        <div *ngIf="fullDashboard.favorites.length > 0" class="links-grid">
+        <div *ngIf="fullDashboard.favorites.length > 0" class="favorites-grid">
           <div *ngFor="let link of fullDashboard.favorites" class="link-item">
             <div class="link-content">
               <mat-icon *ngIf="link.icon" class="link-icon">{{ link.icon }}</mat-icon>
@@ -84,57 +84,59 @@
           <p>No categories yet</p>
         </div>
 
-        <div *ngFor="let category of fullDashboard.categories" class="category-section">
-          <div class="category-header">
-            <div class="category-info">
-              <mat-icon class="category-color" [style.color]="category.color || '#999'">
-                folder
-              </mat-icon>
-              <h3>{{ category.title }}</h3>
-              <span class="link-count">({{ category.links.length }})</span>
-            </div>
-            <div class="category-actions">
-              <button
-                mat-icon-button
-                (click)="openAddLinkToCategoryDialog(category)"
-                matTooltip="Add Link"
-                color="primary"
-              >
-                <mat-icon>add_link</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                (click)="removeCategory(category)"
-                matTooltip="Delete Category"
-                color="warn"
-              >
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </div>
-
-          <div class="category-links">
-            <div *ngIf="category.links.length === 0" class="empty-category">
-              <p>No links in this category</p>
-            </div>
-            <div *ngFor="let link of category.links" class="link-item">
-              <div class="link-content">
-                <mat-icon *ngIf="link.icon" class="link-icon">{{ link.icon }}</mat-icon>
-                <div class="link-details">
-                  <h4>{{ link.title }}</h4>
-                  <p class="url">{{ link.url }}</p>
-                  <p class="description" *ngIf="link.description">{{ link.description }}</p>
-                </div>
+        <div class="categories-grid">
+          <div *ngFor="let category of fullDashboard.categories" class="category-section">
+            <div class="category-header">
+              <div class="category-info">
+                <mat-icon class="category-color" [style.color]="category.color || '#999'">
+                  folder
+                </mat-icon>
+                <h3>{{ category.title }}</h3>
+                <span class="link-count">({{ category.links.length }})</span>
               </div>
-              <button
-                mat-icon-button
-                matTooltip="Remove"
-                (click)="removeLinkFromCategory(category.id, link.id, link.title)"
-                color="warn"
-                class="remove-btn"
-              >
-                <mat-icon>delete</mat-icon>
-              </button>
+              <div class="category-actions">
+                <button
+                  mat-icon-button
+                  (click)="openAddLinkToCategoryDialog(category)"
+                  matTooltip="Add Link"
+                  color="primary"
+                >
+                  <mat-icon>add_link</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  (click)="removeCategory(category)"
+                  matTooltip="Delete Category"
+                  color="warn"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="category-links">
+              <div *ngIf="category.links.length === 0" class="empty-category">
+                <p>No links in this category</p>
+              </div>
+              <div *ngFor="let link of category.links" class="link-item">
+                <div class="link-content">
+                  <mat-icon *ngIf="link.icon" class="link-icon">{{ link.icon }}</mat-icon>
+                  <div class="link-details">
+                    <h4>{{ link.title }}</h4>
+                    <p class="url">{{ link.url }}</p>
+                    <p class="description" *ngIf="link.description">{{ link.description }}</p>
+                  </div>
+                </div>
+                <button
+                  mat-icon-button
+                  matTooltip="Remove"
+                  (click)="removeLinkFromCategory(category.id, link.id, link.title)"
+                  color="warn"
+                  class="remove-btn"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
