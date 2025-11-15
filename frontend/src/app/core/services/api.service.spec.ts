@@ -627,20 +627,38 @@ describe('ApiService', () => {
     });
 
     it('should reorder favorites', () => {
-      const mockResponse: ApiResponse<void> = {
+      const mockFavorites: Favorite[] = [
+        {
+          dashboard_id: mockDashboard.id,
+          link_id: 'link-1',
+          sort_order: 1,
+          created_at: '2025-11-15T00:00:00Z',
+        },
+        {
+          dashboard_id: mockDashboard.id,
+          link_id: 'link-2',
+          sort_order: 2,
+          created_at: '2025-11-15T00:00:00Z',
+        },
+      ];
+      const mockResponse: ApiResponse<Favorite[]> = {
         success: true,
+        data: mockFavorites,
       };
-      const favoriteOrder = { 'link-1': 1, 'link-2': 2 };
+      const links = [
+        { link_id: 'link-1', sort_order: 1 },
+        { link_id: 'link-2', sort_order: 2 },
+      ];
 
-      service.reorderFavorites(mockDashboard.id, favoriteOrder).subscribe((result) => {
-        expect(result).toBeUndefined();
+      service.reorderFavorites(mockDashboard.id, links).subscribe((result) => {
+        expect(result).toEqual(mockFavorites);
       });
 
       const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}/favorites`);
       expect(req.request.method).toBe('PUT');
       expect(req.request.body).toEqual({
         dashboard_id: mockDashboard.id,
-        favorites: favoriteOrder,
+        links,
       });
       req.flush(mockResponse);
     });

@@ -147,9 +147,16 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
+  grid-auto-rows: max-content;
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  &.cdk-drop-list-dragging {
+    .cdk-drag-preview {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
   }
 }
 
@@ -162,9 +169,36 @@
   border-radius: 4px;
   background-color: #fafafa;
   transition: background-color 0.2s ease;
+  gap: 8px;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  &.cdk-drag-placeholder {
+    opacity: 0.4;
+    background-color: #e0e0e0;
+  }
+
+  &.cdk-drag-preview {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+  }
+
+  .drag-handle {
+    cursor: grab;
+    flex-shrink: 0;
+    color: rgba(0, 0, 0, 0.54);
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
   }
 
   .link-content {

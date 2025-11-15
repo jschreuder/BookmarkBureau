@@ -199,11 +199,14 @@ export class ApiService {
       .pipe(map(() => undefined));
   }
 
-  reorderFavorites(dashboardId: string, favorites: { [linkId: string]: number }): Observable<void> {
+  reorderFavorites(
+    dashboardId: string,
+    links: Array<{ link_id: string; sort_order: number }>,
+  ): Observable<Favorite[]> {
     return this.http
       .put<
-        ApiResponse<void>
-      >(`${this.API_BASE}/dashboard/${dashboardId}/favorites`, { dashboard_id: dashboardId, favorites }, this.httpOptions)
-      .pipe(map(() => undefined));
+        ApiResponse<Favorite[]>
+      >(`${this.API_BASE}/dashboard/${dashboardId}/favorites`, { dashboard_id: dashboardId, links }, this.httpOptions)
+      .pipe(map((response) => response.data || []));
   }
 }

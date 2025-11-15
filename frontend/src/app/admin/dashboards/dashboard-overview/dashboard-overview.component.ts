@@ -10,6 +10,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { FullDashboard, CategoryWithLinks, Link, Favorite } from '../../../core/models';
 import { ApiService } from '../../../core/services/api.service';
 import { AddCategoryDialogComponent } from '../add-category-dialog/add-category-dialog.component';
@@ -33,6 +34,7 @@ import { EditCategoryDialogComponent } from '../edit-category-dialog/edit-catego
     MatChipsModule,
     MatTooltipModule,
     MatDialogModule,
+    DragDropModule,
   ],
   templateUrl: './dashboard-overview.component.html',
   styleUrls: ['./dashboard-overview.component.scss'],
@@ -243,6 +245,36 @@ export class DashboardOverviewComponent implements OnInit {
         this.loadDashboard();
         this.snackBar.open('Link updated successfully', 'Close', { duration: 3000 });
       }
+    });
+  }
+
+  onFavoritesDropped(event: CdkDragDrop<Link[]>): void {
+    if (event.previousIndex === event.currentIndex || !this.fullDashboard) {
+      return;
+    }
+
+    // Reorder the local favorites array
+    const favorites = this.fullDashboard.favorites;
+    const [draggedItem] = favorites.splice(event.previousIndex, 1);
+    favorites.splice(event.currentIndex, 0, draggedItem);
+
+    // Build the reorder payload matching FavoriteReorderAction format
+    // Note: sort_order must be positive (1-indexed, not 0-indexed)
+    const links = favorites.map((link, index) => ({
+      link_id: link.id,
+      sort_order: index + 1,
+    }));
+
+    this.apiService.reorderFavorites(this.dashboardId, links).subscribe({
+      next: () => {
+        this.snackBar.open('Favorites reordered successfully', 'Close', { duration: 3000 });
+      },
+      error: (error) => {
+        console.error('Error reordering favorites:', error);
+        this.snackBar.open('Failed to reorder favorites', 'Close', { duration: 5000 });
+        // Reload dashboard to restore original order
+        this.loadDashboard();
+      },
     });
   }
 }

@@ -52,8 +52,22 @@
           <mat-icon>bookmark_border</mat-icon>
           <p>No favorites yet</p>
         </div>
-        <div *ngIf="fullDashboard.favorites.length > 0" class="favorites-grid">
-          <div *ngFor="let link of fullDashboard.favorites" class="link-item">
+        <div
+          *ngIf="fullDashboard.favorites.length > 0"
+          cdkDropList
+          class="favorites-grid"
+          (cdkDropListDropped)="onFavoritesDropped($event)"
+        >
+          <div *ngFor="let link of fullDashboard.favorites" class="link-item" cdkDrag>
+            <button
+              cdkDragHandle
+              mat-icon-button
+              matTooltip="Drag to reorder"
+              class="drag-handle"
+              type="button"
+            >
+              <mat-icon>drag_handle</mat-icon>
+            </button>
             <div class="link-content">
               <mat-icon *ngIf="link.icon" class="link-icon">{{ link.icon }}</mat-icon>
               <div class="link-details">
