@@ -4,6 +4,8 @@ namespace jschreuder\BookmarkBureau;
 
 use jschreuder\BookmarkBureau\Action\CategoryCreateAction;
 use jschreuder\BookmarkBureau\Action\CategoryDeleteAction;
+use jschreuder\BookmarkBureau\Action\CategoryLinkCreateAction;
+use jschreuder\BookmarkBureau\Action\CategoryLinkDeleteAction;
 use jschreuder\BookmarkBureau\Action\CategoryReadAction;
 use jschreuder\BookmarkBureau\Action\CategoryUpdateAction;
 use jschreuder\BookmarkBureau\Action\DashboardCreateAction;
@@ -27,8 +29,9 @@ use jschreuder\BookmarkBureau\Action\TagUpdateAction;
 use jschreuder\BookmarkBureau\Controller\DashboardViewController;
 use jschreuder\BookmarkBureau\Controller\LoginController;
 use jschreuder\BookmarkBureau\Controller\RefreshTokenController;
-use jschreuder\BookmarkBureau\InputSpec\LoginInputSpec;
+use jschreuder\BookmarkBureau\InputSpec\CategoryLinkInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\CategoryInputSpec;
+use jschreuder\BookmarkBureau\InputSpec\LoginInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\DashboardInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\FavoriteInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\IdInputSpec;
@@ -37,6 +40,7 @@ use jschreuder\BookmarkBureau\InputSpec\LinkTagInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\ReorderFavoritesInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\TagInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\TagNameInputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\CategoryLinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\FullDashboardOutputSpec;
@@ -281,6 +285,26 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                 fn() => new CategoryDeleteAction(
                     $this->container->getCategoryService(),
                     new CategoryInputSpec(),
+                ),
+            );
+
+        // Category-Link associations
+        new ResourceRouteBuilder(
+            $router,
+            "category_link",
+            "/category/{id}/link",
+        )
+            ->registerCreate(
+                fn() => new CategoryLinkCreateAction(
+                    $this->container->getCategoryService(),
+                    new CategoryLinkInputSpec(),
+                    new CategoryLinkOutputSpec(),
+                ),
+            )
+            ->registerDelete(
+                fn() => new CategoryLinkDeleteAction(
+                    $this->container->getCategoryService(),
+                    new CategoryLinkInputSpec(),
                 ),
             );
 

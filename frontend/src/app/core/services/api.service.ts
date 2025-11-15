@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { Dashboard, Category, Link, Tag, Favorite, FullDashboard, ApiResponse } from '../models';
 import { environment } from '../../../environments/environment';
 
@@ -92,6 +92,30 @@ export class ApiService {
     return this.http
       .delete<ApiResponse<void>>(`${this.API_BASE}/category/${categoryId}/link/${linkId}`)
       .pipe(map(() => undefined));
+  }
+
+  /**
+   * Create a link and add it to a category in a single operation
+   * Step 1: POST /api/link to create the link
+   * Step 2: POST /api/category/{categoryId}/link to associate it
+   * Returns the created Link on success, or throws error if either step fails
+   */
+  createLinkInCategory(categoryId: string, linkData: Partial<Link>): Observable<Link> {
+    return this.createLink(linkData).pipe(
+      switchMap((link) => this.addLinkToCategory(categoryId, link.id).pipe(map(() => link))),
+    );
+  }
+
+  /**
+   * Create a link and add it to dashboard favorites in a single operation
+   * Step 1: POST /api/link to create the link
+   * Step 2: POST /api/dashboard/{dashboardId}/favorites to add to favorites
+   * Returns the created Link on success, or throws error if either step fails
+   */
+  createLinkAsFavorite(dashboardId: string, linkData: Partial<Link>): Observable<Link> {
+    return this.createLink(linkData).pipe(
+      switchMap((link) => this.addFavorite(dashboardId, link.id).pipe(map(() => link))),
+    );
   }
 
   // Link endpoints

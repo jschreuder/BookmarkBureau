@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Service;
 
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
+use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
@@ -65,7 +66,7 @@ interface CategoryServiceInterface
     public function addLinkToCategory(
         UuidInterface $categoryId,
         UuidInterface $linkId,
-    ): void;
+    ): CategoryLink;
 
     /**
      * Remove a link from a category

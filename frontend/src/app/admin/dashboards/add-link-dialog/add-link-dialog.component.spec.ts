@@ -28,6 +28,8 @@ describe('AddLinkDialogComponent', () => {
       createLink: vi.fn().mockReturnValue(of(mockLink)),
       addFavorite: vi.fn().mockReturnValue(of({})),
       addLinkToCategory: vi.fn().mockReturnValue(of({})),
+      createLinkAsFavorite: vi.fn().mockReturnValue(of(mockLink)),
+      createLinkInCategory: vi.fn().mockReturnValue(of(mockLink)),
     };
 
     dialogRef = {
@@ -176,14 +178,12 @@ describe('AddLinkDialogComponent', () => {
 
       component.onSubmit();
 
-      expect(apiService.createLink).toHaveBeenCalledWith({
+      expect(apiService.createLinkAsFavorite).toHaveBeenCalledWith('test-dashboard-id', {
         url: 'https://example.com',
         title: 'Test Link',
         description: 'Test desc',
         icon: 'link',
       });
-
-      expect(apiService.addFavorite).toHaveBeenCalledWith('test-dashboard-id', 'link-id');
     });
 
     it('should close dialog with true on successful submission', async () => {
@@ -198,9 +198,9 @@ describe('AddLinkDialogComponent', () => {
       expect(dialogRef.close).toHaveBeenCalledWith(true);
     });
 
-    it('should handle API error gracefully when creating link', () => {
+    it('should handle API error gracefully when adding to favorites', () => {
       const error = { error: 'Test error' };
-      apiService.createLink = vi.fn().mockReturnValue(throwError(() => error));
+      apiService.createLinkAsFavorite = vi.fn().mockReturnValue(throwError(() => error));
 
       component.form.patchValue({
         url: 'https://example.com',
@@ -210,7 +210,7 @@ describe('AddLinkDialogComponent', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       component.onSubmit();
 
-      expect(consoleSpy).toHaveBeenCalledWith('Error creating link:', error);
+      expect(consoleSpy).toHaveBeenCalledWith('Error adding link:', error);
       expect(component.loading).toBe(false);
       expect(dialogRef.close).not.toHaveBeenCalled();
 
@@ -284,14 +284,18 @@ describe('AddLinkDialogComponent', () => {
 
       component.onSubmit();
 
-      expect(apiService.createLink).toHaveBeenCalled();
-      expect(apiService.addLinkToCategory).toHaveBeenCalledWith('test-category-id', 'link-id');
+      expect(apiService.createLinkInCategory).toHaveBeenCalledWith('test-category-id', {
+        url: 'https://example.com',
+        title: 'Test Link',
+        description: '',
+        icon: undefined,
+      });
       expect(apiService.addFavorite).not.toHaveBeenCalled();
     });
 
     it('should handle API error when adding to category', () => {
       const error = { error: 'Test error' };
-      apiService.addLinkToCategory = vi.fn().mockReturnValue(throwError(() => error));
+      apiService.createLinkInCategory = vi.fn().mockReturnValue(throwError(() => error));
 
       component.form.patchValue({
         url: 'https://example.com',
@@ -301,11 +305,9 @@ describe('AddLinkDialogComponent', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       component.onSubmit();
 
-      setTimeout(() => {
-        expect(consoleSpy).toHaveBeenCalledWith('Error adding link to category:', error);
-        expect(component.loading).toBe(false);
-        consoleSpy.mockRestore();
-      }, 100);
+      expect(consoleSpy).toHaveBeenCalledWith('Error adding link:', error);
+      expect(component.loading).toBe(false);
+      consoleSpy.mockRestore();
     });
   });
 
@@ -338,9 +340,16 @@ describe('AddLinkDialogComponent', () => {
 
       component.onSubmit();
 
-      expect(apiService.createLink).toHaveBeenCalled();
+      expect(apiService.createLink).toHaveBeenCalledWith({
+        url: 'https://example.com',
+        title: 'Test Link',
+        description: '',
+        icon: undefined,
+      });
       expect(apiService.addFavorite).not.toHaveBeenCalled();
       expect(apiService.addLinkToCategory).not.toHaveBeenCalled();
+      expect(apiService.createLinkAsFavorite).not.toHaveBeenCalled();
+      expect(apiService.createLinkInCategory).not.toHaveBeenCalled();
       expect(dialogRef.close).toHaveBeenCalledWith(true);
     });
   });

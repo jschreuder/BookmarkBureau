@@ -1,0 +1,43 @@
+<?php declare(strict_types=1);
+
+namespace jschreuder\BookmarkBureau\Action;
+
+use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
+use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
+use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
+use Ramsey\Uuid\Uuid;
+
+/**
+ * Add a link to a category. Expects the CategoryLinkInputSpec, but it can be
+ * replaced to modify filtering and validation.
+ */
+final readonly class CategoryLinkCreateAction implements ActionInterface
+{
+    public function __construct(
+        private CategoryServiceInterface $categoryService,
+        private InputSpecInterface $inputSpec,
+        private OutputSpecInterface $outputSpec,
+    ) {}
+
+    #[\Override]
+    public function filter(array $rawData): array
+    {
+        return $this->inputSpec->filter($rawData);
+    }
+
+    #[\Override]
+    public function validate(array $data): void
+    {
+        $this->inputSpec->validate($data);
+    }
+
+    #[\Override]
+    public function execute(array $data): array
+    {
+        $categoryLink = $this->categoryService->addLinkToCategory(
+            categoryId: Uuid::fromString($data["id"]),
+            linkId: Uuid::fromString($data["link_id"]),
+        );
+        return $this->outputSpec->transform($categoryLink);
+    }
+}

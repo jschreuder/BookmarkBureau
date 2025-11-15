@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { vi } from 'vitest';
 import { ApiService } from './api.service';
 import {
   Dashboard,
@@ -329,6 +330,160 @@ describe('ApiService', () => {
       const req = httpMock.expectOne(`${apiBase}/link/${mockLink.id}`);
       expect(req.request.method).toBe('DELETE');
       req.flush(mockResponse);
+    });
+  });
+
+  describe('Link-Category association compound operations', () => {
+    it('should create link and add to category', () => {
+      const newLink: Partial<Link> = {
+        url: 'https://example.com',
+        title: 'Example',
+      };
+      const linkResponse: ApiResponse<Link> = {
+        success: true,
+        data: mockLink,
+      };
+      const associationResponse: ApiResponse<void> = {
+        success: true,
+      };
+
+      service.createLinkInCategory(mockCategory.id, newLink).subscribe((link) => {
+        expect(link).toEqual(mockLink);
+      });
+
+      // First request: create link
+      const createReq = httpMock.expectOne(`${apiBase}/link`);
+      expect(createReq.request.method).toBe('POST');
+      expect(createReq.request.body).toEqual(newLink);
+      createReq.flush(linkResponse);
+
+      // Second request: add link to category
+      const associateReq = httpMock.expectOne(`${apiBase}/category/${mockCategory.id}/link`);
+      expect(associateReq.request.method).toBe('POST');
+      expect(associateReq.request.body).toEqual({ link_id: mockLink.id });
+      associateReq.flush(associationResponse);
+    });
+
+    it('should handle error when creating link fails', () => {
+      const newLink: Partial<Link> = {
+        url: 'https://example.com',
+        title: 'Example',
+      };
+
+      const errorSpy = vi.fn();
+      service.createLinkInCategory(mockCategory.id, newLink).subscribe({
+        error: errorSpy,
+      });
+
+      const createReq = httpMock.expectOne(`${apiBase}/link`);
+      createReq.error(new ErrorEvent('Network error'));
+
+      expect(errorSpy).toHaveBeenCalled();
+    });
+
+    it('should handle error when associating link to category fails', () => {
+      const newLink: Partial<Link> = {
+        url: 'https://example.com',
+        title: 'Example',
+      };
+      const linkResponse: ApiResponse<Link> = {
+        success: true,
+        data: mockLink,
+      };
+
+      const errorSpy = vi.fn();
+      service.createLinkInCategory(mockCategory.id, newLink).subscribe({
+        error: errorSpy,
+      });
+
+      // First request succeeds
+      const createReq = httpMock.expectOne(`${apiBase}/link`);
+      createReq.flush(linkResponse);
+
+      // Second request fails
+      const associateReq = httpMock.expectOne(`${apiBase}/category/${mockCategory.id}/link`);
+      associateReq.error(new ErrorEvent('Association failed'));
+
+      expect(errorSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('Link-Favorites compound operations', () => {
+    it('should create link and add to favorites', () => {
+      const newLink: Partial<Link> = {
+        url: 'https://example.com',
+        title: 'Example',
+      };
+      const linkResponse: ApiResponse<Link> = {
+        success: true,
+        data: mockLink,
+      };
+      const favoriteResponse: ApiResponse<Favorite> = {
+        success: true,
+        data: mockFavorite,
+      };
+
+      service.createLinkAsFavorite(mockDashboard.id, newLink).subscribe((link) => {
+        expect(link).toEqual(mockLink);
+      });
+
+      // First request: create link
+      const createReq = httpMock.expectOne(`${apiBase}/link`);
+      expect(createReq.request.method).toBe('POST');
+      expect(createReq.request.body).toEqual(newLink);
+      createReq.flush(linkResponse);
+
+      // Second request: add link to favorites
+      const favoriteReq = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}/favorites`);
+      expect(favoriteReq.request.method).toBe('POST');
+      expect(favoriteReq.request.body).toEqual({
+        dashboard_id: mockDashboard.id,
+        link_id: mockLink.id,
+      });
+      favoriteReq.flush(favoriteResponse);
+    });
+
+    it('should handle error when creating link fails in favorites', () => {
+      const newLink: Partial<Link> = {
+        url: 'https://example.com',
+        title: 'Example',
+      };
+
+      const errorSpy = vi.fn();
+      service.createLinkAsFavorite(mockDashboard.id, newLink).subscribe({
+        error: errorSpy,
+      });
+
+      const createReq = httpMock.expectOne(`${apiBase}/link`);
+      createReq.error(new ErrorEvent('Network error'));
+
+      expect(errorSpy).toHaveBeenCalled();
+    });
+
+    it('should handle error when adding link to favorites fails', () => {
+      const newLink: Partial<Link> = {
+        url: 'https://example.com',
+        title: 'Example',
+      };
+      const linkResponse: ApiResponse<Link> = {
+        success: true,
+        data: mockLink,
+      };
+
+      const errorSpy = vi.fn();
+      service.createLinkAsFavorite(mockDashboard.id, newLink).subscribe({
+        error: errorSpy,
+      });
+
+      // First request succeeds
+      const createReq = httpMock.expectOne(`${apiBase}/link`);
+      createReq.flush(linkResponse);
+
+      // Second request fails
+      const favoriteReq = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}/favorites`);
+      favoriteReq.error(new ErrorEvent('Favorite creation failed'));
+
+      expect(errorSpy).toHaveBeenCalled();
     });
   });
 

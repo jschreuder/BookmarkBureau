@@ -5,6 +5,7 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 import { Link } from '../../../core/models';
 
@@ -136,41 +137,26 @@ export class AddLinkDialogComponent {
       icon: this.form.get('icon')?.value || undefined,
     };
 
-    // First, create the link
-    this.apiService.createLink(linkData).subscribe({
-      next: (link) => {
-        if (this.data.isFavorite) {
-          // Add to favorites
-          this.apiService.addFavorite(this.data.dashboardId, link.id).subscribe({
-            next: () => {
-              this.loading = false;
-              this.dialogRef.close(true);
-            },
-            error: (error: unknown) => {
-              console.error('Error adding favorite:', error);
-              this.loading = false;
-            },
-          });
-        } else if (this.data.categoryId) {
-          // Add to category
-          this.apiService.addLinkToCategory(this.data.categoryId, link.id).subscribe({
-            next: () => {
-              this.loading = false;
-              this.dialogRef.close(true);
-            },
-            error: (error: unknown) => {
-              console.error('Error adding link to category:', error);
-              this.loading = false;
-            },
-          });
-        } else {
-          // Just created the link, close dialog
-          this.loading = false;
-          this.dialogRef.close(true);
-        }
+    let linkOperation: Observable<Link>;
+
+    if (this.data.isFavorite) {
+      // Create link and add to favorites in one operation
+      linkOperation = this.apiService.createLinkAsFavorite(this.data.dashboardId, linkData);
+    } else if (this.data.categoryId) {
+      // Create link and add to category in one operation
+      linkOperation = this.apiService.createLinkInCategory(this.data.categoryId, linkData);
+    } else {
+      // Just create the link
+      linkOperation = this.apiService.createLink(linkData);
+    }
+
+    linkOperation.subscribe({
+      next: () => {
+        this.loading = false;
+        this.dialogRef.close(true);
       },
       error: (error: unknown) => {
-        console.error('Error creating link:', error);
+        console.error('Error adding link:', error);
         this.loading = false;
       },
     });

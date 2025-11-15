@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Service;
 
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
+use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
@@ -142,11 +143,11 @@ final class CategoryService implements CategoryServiceInterface
     public function addLinkToCategory(
         UuidInterface $categoryId,
         UuidInterface $linkId,
-    ): void {
-        $this->unitOfWork->transactional(function () use (
+    ): CategoryLink {
+        return $this->unitOfWork->transactional(function () use (
             $categoryId,
             $linkId,
-        ): void {
+        ): CategoryLink {
             // Verify category exists
             $this->categoryRepository->findById($categoryId);
 
@@ -157,7 +158,7 @@ final class CategoryService implements CategoryServiceInterface
                 ) + 1;
 
             // Add link to category (will throw LinkNotFoundException if link doesn't exist)
-            $this->categoryRepository->addLink(
+            return $this->categoryRepository->addLink(
                 $categoryId,
                 $linkId,
                 $sortOrder,
