@@ -4,7 +4,7 @@
 
 Angular 20 SPA for BookmarkBureau bookmark management. Part of a monorepo with PHP backend at root.
 
-**Important** We are using Angular Material 20.2+. If you are unsure about how to use it, please refer to the official Angular Material documentation. Especially if code or tests is not working as expected.
+**Important** We are using Angular Material 20.2+. When building something new or bugfixing on the frontend, please refer to the official online Angular Material documentation for examples before continuing to write.
 
 **Build Output:** Builds to `../web/` directory (served alongside PHP backend)
 
