@@ -107,9 +107,7 @@
           <div *ngFor="let category of fullDashboard.categories" class="category-section">
             <div class="category-header">
               <div class="category-info">
-                <div class="category-color-box" [style.backgroundColor]="category.color || '#999'">
-                  <mat-icon class="category-color">folder</mat-icon>
-                </div>
+                <mat-icon class="category-color">folder</mat-icon>
                 <h3>{{ category.title }}</h3>
                 <span class="link-count">({{ category.links.length }})</span>
               </div>
