@@ -102,6 +102,7 @@ describe('EditCategoryDialogComponent', () => {
       expect(apiService.updateCategory).toHaveBeenCalledWith(mockCategory.id, {
         title: 'Updated Category',
         color: '#ff0000',
+        dashboard_id: mockCategory.dashboard_id,
       });
     });
 

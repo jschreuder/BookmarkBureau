@@ -122,6 +122,7 @@ export class EditCategoryDialogComponent {
     const categoryData: Partial<Category> = {
       title: this.form.get('title')?.value,
       color: this.form.get('color')?.value || undefined,
+      dashboard_id: this.data.category.dashboard_id,
     };
 
     this.apiService.updateCategory(this.data.category.id, categoryData).subscribe({
