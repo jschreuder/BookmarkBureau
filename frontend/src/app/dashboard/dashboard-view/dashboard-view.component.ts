@@ -79,7 +79,11 @@ import { Observable, catchError, of } from 'rxjs';
         <div class="categories-grid">
           <mat-card class="category-card" *ngFor="let category of data.categories">
             <mat-card-header [style.background-color]="category.color || '#667eea'">
-              <mat-icon mat-card-avatar class="category-icon" style="color: white;">
+              <mat-icon
+                mat-card-avatar
+                class="category-icon"
+                [style.color]="getTextColor(category.color)"
+              >
                 folder
               </mat-icon>
               <mat-card-title [style.color]="getTextColor(category.color)">{{
