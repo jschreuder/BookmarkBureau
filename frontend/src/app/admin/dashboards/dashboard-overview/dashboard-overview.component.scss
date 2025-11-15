@@ -34,11 +34,17 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 8px;
   color: white;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
 
   .header-content {
     display: flex;
     align-items: start;
     gap: 20px;
+    flex: 1;
+    min-width: 0;
 
     .dashboard-icon {
       font-size: 48px;
@@ -64,6 +70,15 @@
         opacity: 0.9;
         line-height: 1.5;
       }
+    }
+  }
+
+  .edit-dashboard-btn {
+    flex-shrink: 0;
+    color: white;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
     }
   }
 }
@@ -160,7 +175,9 @@
     min-width: 0;
 
     .link-icon {
-      font-size: 20px;
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
       flex-shrink: 0;
       color: #667eea;
       margin-top: 4px;
@@ -194,9 +211,16 @@
     }
   }
 
-  .remove-btn {
+  .link-actions {
+    display: flex;
+    gap: 4px;
     flex-shrink: 0;
     margin-left: 8px;
+  }
+
+  .edit-btn,
+  .remove-btn {
+    flex-shrink: 0;
   }
 }
 

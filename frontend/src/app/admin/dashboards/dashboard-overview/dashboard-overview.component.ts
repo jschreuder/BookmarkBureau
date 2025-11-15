@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +15,8 @@ import { ApiService } from '../../../core/services/api.service';
 import { AddCategoryDialogComponent } from '../add-category-dialog/add-category-dialog.component';
 import { AddLinkDialogComponent } from '../add-link-dialog/add-link-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { EditLinkDialogComponent } from '../edit-link-dialog/edit-link-dialog.component';
+import { EditCategoryDialogComponent } from '../edit-category-dialog/edit-category-dialog.component';
 
 @Component({
   selector: 'app-dashboard-overview',
@@ -38,6 +40,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 export class DashboardOverviewComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
 
@@ -187,6 +190,58 @@ export class DashboardOverviewComponent implements OnInit {
         // Call API to remove link from category (assuming similar endpoint exists)
         this.snackBar.open('Link removed from category', 'Close', { duration: 3000 });
         this.loadDashboard();
+      }
+    });
+  }
+
+  editDashboard(): void {
+    this.router.navigate(['/admin/dashboards', this.dashboardId, 'edit']);
+  }
+
+  editFavorite(link: Link): void {
+    const dialogRef = this.dialog.open(EditLinkDialogComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      panelClass: 'edit-link-dialog',
+      data: { link },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.loadDashboard();
+        this.snackBar.open('Favorite updated successfully', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  editCategory(category: CategoryWithLinks): void {
+    const dialogRef = this.dialog.open(EditCategoryDialogComponent, {
+      width: '400px',
+      maxWidth: '90vw',
+      panelClass: 'edit-category-dialog',
+      data: { category },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.loadDashboard();
+        this.snackBar.open('Category updated successfully', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  editLinkInCategory(link: Link): void {
+    const dialogRef = this.dialog.open(EditLinkDialogComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      panelClass: 'edit-link-dialog',
+      data: { link },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.loadDashboard();
+        this.snackBar.open('Link updated successfully', 'Close', { duration: 3000 });
       }
     });
   }

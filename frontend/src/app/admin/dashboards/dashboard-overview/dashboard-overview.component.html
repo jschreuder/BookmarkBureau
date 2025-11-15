@@ -23,6 +23,14 @@
           <p class="description">{{ fullDashboard.dashboard.description }}</p>
         </div>
       </div>
+      <button
+        mat-icon-button
+        (click)="editDashboard()"
+        matTooltip="Edit Dashboard"
+        class="edit-dashboard-btn"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
     </div>
 
     <!-- Favorites Section -->
@@ -54,15 +62,26 @@
                 <p class="description" *ngIf="link.description">{{ link.description }}</p>
               </div>
             </div>
-            <button
-              mat-icon-button
-              matTooltip="Remove"
-              (click)="removeFavorite(link)"
-              color="warn"
-              class="remove-btn"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
+            <div class="link-actions">
+              <button
+                mat-icon-button
+                matTooltip="Edit"
+                (click)="editFavorite(link)"
+                color="primary"
+                class="edit-btn"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                matTooltip="Remove"
+                (click)="removeFavorite(link)"
+                color="warn"
+                class="remove-btn"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
       </mat-card-content>
@@ -105,6 +124,14 @@
                 </button>
                 <button
                   mat-icon-button
+                  (click)="editCategory(category)"
+                  matTooltip="Edit Category"
+                  color="primary"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
                   (click)="removeCategory(category)"
                   matTooltip="Delete Category"
                   color="warn"
@@ -127,15 +154,26 @@
                     <p class="description" *ngIf="link.description">{{ link.description }}</p>
                   </div>
                 </div>
-                <button
-                  mat-icon-button
-                  matTooltip="Remove"
-                  (click)="removeLinkFromCategory(category.id, link.id, link.title)"
-                  color="warn"
-                  class="remove-btn"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
+                <div class="link-actions">
+                  <button
+                    mat-icon-button
+                    matTooltip="Edit"
+                    (click)="editLinkInCategory(link)"
+                    color="primary"
+                    class="edit-btn"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    matTooltip="Remove"
+                    (click)="removeLinkFromCategory(category.id, link.id, link.title)"
+                    color="warn"
+                    class="remove-btn"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
