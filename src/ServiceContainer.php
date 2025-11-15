@@ -92,6 +92,7 @@ class ServiceContainer
             new RequireAuthenticationMiddleware([
                 "home", // GET / - API info endpoint
                 "auth.login", // POST /auth/login - User login
+                "dashboard-view", // GET /{id} - Public dashboard view
                 // All other routes require authentication
             ]),
             new JwtAuthenticationMiddleware($this->getJwtService()),
