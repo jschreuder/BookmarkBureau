@@ -25,19 +25,6 @@ import { Observable, catchError, of } from 'rxjs';
     MatProgressSpinnerModule,
   ],
   template: `
-    <mat-toolbar color="primary" class="mat-elevation-z4">
-      <button mat-icon-button routerLink="/dashboard" aria-label="Back to dashboards">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-      <mat-icon class="logo-icon">bookmark</mat-icon>
-      <span class="app-title">Bookmark Bureau</span>
-      <span class="spacer"></span>
-      <button mat-button routerLink="/admin">
-        <mat-icon>settings</mat-icon>
-        <span>Admin</span>
-      </button>
-    </mat-toolbar>
-
     <div class="container loading" *ngIf="(dashboard$ | async) === null">
       <mat-spinner></mat-spinner>
       <p>Loading dashboard...</p>
@@ -89,30 +76,37 @@ import { Observable, catchError, of } from 'rxjs';
           <h2><mat-icon>folder</mat-icon> Categories</h2>
         </div>
 
-        <mat-card class="category-card" *ngFor="let category of data.categories">
-          <mat-card-header>
-            <mat-card-title>{{ category.title }}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="link-list">
-              <div
-                class="link-item"
-                *ngFor="let link of category.links"
-                (click)="openLink(link.url)"
-              >
-                <mat-icon *ngIf="link.icon">{{ link.icon }}</mat-icon>
-                <mat-icon *ngIf="!link.icon">link</mat-icon>
-                <div class="link-info">
-                  <h4>{{ link.title }}</h4>
-                  <p class="link-url">{{ link.url }}</p>
-                  <mat-chip-set *ngIf="link.tags && link.tags.length > 0">
-                    <mat-chip *ngFor="let tag of link.tags">{{ tag.tag_name }}</mat-chip>
-                  </mat-chip-set>
+        <div class="categories-grid">
+          <mat-card class="category-card" *ngFor="let category of data.categories">
+            <mat-card-header [style.background-color]="category.color || '#667eea'">
+              <mat-icon mat-card-avatar class="category-icon" style="color: white;">
+                folder
+              </mat-icon>
+              <mat-card-title [style.color]="getTextColor(category.color)">{{
+                category.title
+              }}</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="link-list">
+                <div
+                  class="link-item"
+                  *ngFor="let link of category.links"
+                  (click)="openLink(link.url)"
+                >
+                  <mat-icon *ngIf="link.icon">{{ link.icon }}</mat-icon>
+                  <mat-icon *ngIf="!link.icon">link</mat-icon>
+                  <div class="link-info">
+                    <h4>{{ link.title }}</h4>
+                    <p class="link-url">{{ link.url }}</p>
+                    <mat-chip-set *ngIf="link.tags && link.tags.length > 0">
+                      <mat-chip *ngFor="let tag of link.tags">{{ tag.tag_name }}</mat-chip>
+                    </mat-chip-set>
+                  </div>
                 </div>
               </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
+            </mat-card-content>
+          </mat-card>
+        </div>
       </section>
 
       <div
@@ -141,23 +135,6 @@ import { Observable, catchError, of } from 'rxjs';
   `,
   styles: [
     `
-      .logo-icon {
-        margin-right: 8px;
-      }
-
-      .app-title {
-        font-size: 20px;
-        font-weight: 500;
-      }
-
-      .spacer {
-        flex: 1 1 auto;
-      }
-
-      button mat-icon {
-        margin-right: 4px;
-      }
-
       .container {
         padding: 24px;
         max-width: 1200px;
@@ -227,16 +204,19 @@ import { Observable, catchError, of } from 'rxjs';
       }
 
       .link-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
       }
 
       .link-card {
+        flex: 0 1 auto;
         transition:
           transform 0.2s,
           box-shadow 0.2s;
         cursor: pointer;
+        border-radius: 24px;
+        padding: 8px 16px;
       }
 
       .link-card:hover {
@@ -246,39 +226,83 @@ import { Observable, catchError, of } from 'rxjs';
 
       .link-card mat-card-content {
         display: flex;
-        gap: 12px;
-        align-items: start;
+        gap: 8px;
+        align-items: center;
+        flex-direction: row;
+        text-align: left;
+        padding: 0;
       }
 
       .link-card mat-icon {
-        font-size: 32px;
-        width: 32px;
-        height: 32px;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
       }
 
-      .link-info h3 {
-        margin: 0 0 4px 0;
-        font-size: 16px;
-        font-weight: 500;
-      }
-
-      .link-url {
-        margin: 0 0 8px 0;
-        font-size: 12px;
-        color: rgba(0, 0, 0, 0.6);
-        overflow: hidden;
-        text-overflow: ellipsis;
+      .link-info {
+        display: flex;
+        align-items: center;
+        gap: 0;
         white-space: nowrap;
       }
 
-      .link-description {
+      .link-info h3 {
         margin: 0;
         font-size: 14px;
-        color: rgba(0, 0, 0, 0.7);
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .link-url {
+        display: none;
+      }
+
+      .link-description {
+        display: none;
+      }
+
+      .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+
+      @media (max-width: 1200px) {
+        .categories-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .categories-grid {
+          grid-template-columns: 1fr;
+        }
       }
 
       .category-card {
-        margin-bottom: 16px;
+        margin-bottom: 0;
+        overflow: hidden;
+      }
+
+      .category-card ::ng-deep .mat-card-header {
+        align-items: center;
+        padding: 14px 24px !important;
+        margin: 0 !important;
+      }
+
+      .category-card ::ng-deep .mat-card-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .category-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+        margin-right: 6px;
       }
 
       .link-list {
@@ -381,5 +405,23 @@ export class DashboardViewComponent implements OnInit {
 
   openLink(url: string): void {
     window.open(url, '_blank');
+  }
+
+  getTextColor(hexColor: string | undefined): string {
+    if (!hexColor) {
+      return 'white';
+    }
+
+    // Convert hex to RGB
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    // Calculate luminance using relative luminance formula
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // Return white text for dark backgrounds, black text for light backgrounds
+    return luminance > 0.5 ? '#000000' : '#ffffff';
   }
 }

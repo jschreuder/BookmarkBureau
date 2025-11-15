@@ -60,25 +60,6 @@ describe('DashboardViewComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render toolbar with Bookmark Bureau title', () => {
-    const toolbar = fixture.nativeElement.querySelector('mat-toolbar');
-    expect(toolbar).toBeTruthy();
-    expect(toolbar.textContent).toContain('Bookmark Bureau');
-  });
-
-  it('should have back button in toolbar', () => {
-    const backButton = fixture.nativeElement.querySelector(
-      'button[aria-label="Back to dashboards"]',
-    );
-    expect(backButton).toBeTruthy();
-  });
-
-  it('should have Admin button in toolbar linking to /admin', () => {
-    const adminButton = fixture.nativeElement.querySelector('button[routerLink="/admin"]');
-    expect(adminButton).toBeTruthy();
-    expect(adminButton.textContent).toContain('Admin');
-  });
-
   it('should render dashboard header section', () => {
     const header = fixture.nativeElement.querySelector('.dashboard-header');
     expect(header).toBeTruthy();
@@ -176,11 +157,6 @@ describe('DashboardViewComponent', () => {
       (chip) => (chip as HTMLElement).textContent,
     );
     expect(chipTexts.length).toBe(0);
-  });
-
-  it('should use Material toolbar with primary color', () => {
-    const toolbar = fixture.nativeElement.querySelector('mat-toolbar[color="primary"]');
-    expect(toolbar).toBeTruthy();
   });
 
   it('should render all sections in correct order', () => {
