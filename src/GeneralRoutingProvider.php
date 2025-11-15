@@ -301,7 +301,10 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                     new CategoryLinkOutputSpec(),
                 ),
             )
-            ->registerDelete(
+            ->registerCustom(
+                "DELETE",
+                "delete",
+                "",
                 fn() => new CategoryLinkDeleteAction(
                     $this->container->getCategoryService(),
                     new CategoryLinkInputSpec(),
