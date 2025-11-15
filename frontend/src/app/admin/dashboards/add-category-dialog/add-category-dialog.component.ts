@@ -5,6 +5,7 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { ApiService } from '../../../core/services/api.service';
 
 export interface AddCategoryDialogData {
@@ -21,6 +22,7 @@ export interface AddCategoryDialogData {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatIconModule,
   ],
   template: `
     <h2 mat-dialog-title>Add Category</h2>
@@ -42,6 +44,17 @@ export interface AddCategoryDialogData {
         <mat-form-field appearance="outline">
           <mat-label>Color (Optional)</mat-label>
           <input matInput formControlName="color" type="color" placeholder="#667eea" />
+          @if (form.get('color')?.value) {
+            <button
+              matSuffix
+              mat-icon-button
+              type="button"
+              (click)="clearColor()"
+              aria-label="Clear color"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          }
         </mat-form-field>
       </form>
     </mat-dialog-content>
@@ -94,7 +107,7 @@ export class AddCategoryDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: AddCategoryDialogData) {
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(1)]],
-      color: ['#667eea'],
+      color: [''],
     });
   }
 
@@ -126,5 +139,9 @@ export class AddCategoryDialogComponent {
 
   onCancel(): void {
     this.dialogRef.close(false);
+  }
+
+  clearColor(): void {
+    this.form.patchValue({ color: '' });
   }
 }

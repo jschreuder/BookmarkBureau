@@ -54,9 +54,9 @@ describe('AddCategoryDialogComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize form with empty title and default color', () => {
+  it('should initialize form with empty title and empty color', () => {
     expect(component.form.get('title')?.value).toBe('');
-    expect(component.form.get('color')?.value).toBe('#667eea');
+    expect(component.form.get('color')?.value).toBe('');
   });
 
   it('should have form invalid when title is empty', () => {
@@ -217,5 +217,32 @@ describe('AddCategoryDialogComponent', () => {
 
     const callArgs = apiService.createCategory.mock.calls[0][0];
     expect(callArgs.color).toBeUndefined();
+  });
+
+  it('should clear color when clearColor is called', () => {
+    component.form.patchValue({ color: '#ff0000' });
+    expect(component.form.get('color')?.value).toBe('#ff0000');
+
+    component.clearColor();
+
+    expect(component.form.get('color')?.value).toBe('');
+  });
+
+  it('should hide clear button when color is empty', () => {
+    component.form.patchValue({ color: '' });
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement;
+    const clearButton = compiled.querySelector('button[aria-label="Clear color"]');
+    expect(clearButton).toBeFalsy();
+  });
+
+  it('should show clear button when color has a value', () => {
+    component.form.patchValue({ color: '#ff0000' });
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement;
+    const clearButton = compiled.querySelector('button[aria-label="Clear color"]');
+    expect(clearButton).toBeTruthy();
   });
 });
