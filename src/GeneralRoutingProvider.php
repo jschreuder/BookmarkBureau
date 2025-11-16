@@ -134,7 +134,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerDelete(
                 fn() => new LinkDeleteAction(
                     $this->container->getLinkService(),
-                    new LinkInputSpec(),
+                    new IdInputSpec(),
                 ),
             );
 

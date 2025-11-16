@@ -179,20 +179,20 @@ export class DashboardOverviewComponent implements OnInit {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
-        title: 'Remove Link',
-        message: `Remove "${linkTitle}" from this category?`,
+        title: 'Delete Link',
+        message: `Delete "${linkTitle}" from this category?`,
       },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.apiService.removeLinkFromCategory(categoryId, linkId).subscribe({
+        this.apiService.deleteLink(linkId).subscribe({
           next: () => {
-            this.snackBar.open('Link removed from category', 'Close', { duration: 3000 });
+            this.snackBar.open('Link deleted successfully', 'Close', { duration: 3000 });
             this.loadDashboard();
           },
           error: (_error) => {
-            this.snackBar.open('Failed to remove link from category', 'Close', { duration: 5000 });
+            this.snackBar.open('Failed to delete link', 'Close', { duration: 5000 });
           },
         });
       }
