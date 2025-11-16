@@ -5,7 +5,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { vi } from 'vitest';
 import { EditLinkDialogComponent } from './edit-link-dialog.component';
 import { ApiService } from '../../../core/services/api.service';
@@ -47,7 +46,6 @@ describe('EditLinkDialogComponent', () => {
         MatInputModule,
         MatButtonModule,
         MatSnackBarModule,
-        BrowserAnimationsModule,
       ],
       providers: [
         { provide: ApiService, useValue: apiService },

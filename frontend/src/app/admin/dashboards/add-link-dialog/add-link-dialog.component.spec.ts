@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { AddLinkDialogComponent } from './add-link-dialog.component';
@@ -51,7 +50,7 @@ describe('AddLinkDialogComponent', () => {
 
     beforeEach(async () => {
       await TestBed.configureTestingModule({
-        imports: [AddLinkDialogComponent, MatSnackBarModule, BrowserAnimationsModule],
+        imports: [AddLinkDialogComponent, MatSnackBarModule],
         providers: [
           { provide: ApiService, useValue: apiService },
           { provide: MatDialogRef, useValue: dialogRef },
@@ -262,7 +261,7 @@ describe('AddLinkDialogComponent', () => {
 
     beforeEach(async () => {
       await TestBed.configureTestingModule({
-        imports: [AddLinkDialogComponent, MatSnackBarModule, BrowserAnimationsModule],
+        imports: [AddLinkDialogComponent, MatSnackBarModule],
         providers: [
           { provide: ApiService, useValue: apiService },
           { provide: MatDialogRef, useValue: dialogRef },
@@ -324,7 +323,7 @@ describe('AddLinkDialogComponent', () => {
 
     beforeEach(async () => {
       await TestBed.configureTestingModule({
-        imports: [AddLinkDialogComponent, BrowserAnimationsModule],
+        imports: [AddLinkDialogComponent],
         providers: [
           { provide: ApiService, useValue: apiService },
           { provide: MatDialogRef, useValue: dialogRef },

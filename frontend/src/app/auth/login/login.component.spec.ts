@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { LoginComponent } from './login.component';
 import { AuthService, TokenResponse } from '../../core/services/auth.service';
 import { of, throwError } from 'rxjs';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { vi } from 'vitest';
 
 describe('LoginComponent', () => {
@@ -29,7 +28,7 @@ describe('LoginComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [LoginComponent, ReactiveFormsModule, BrowserAnimationsModule],
+      imports: [LoginComponent, ReactiveFormsModule],
       providers: [
         { provide: AuthService, useValue: authService },
         { provide: Router, useValue: router },

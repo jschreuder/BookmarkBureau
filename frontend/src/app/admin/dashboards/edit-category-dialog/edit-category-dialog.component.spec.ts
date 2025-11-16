@@ -6,7 +6,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { vi } from 'vitest';
 import { EditCategoryDialogComponent } from './edit-category-dialog.component';
 import { ApiService } from '../../../core/services/api.service';
@@ -49,7 +48,6 @@ describe('EditCategoryDialogComponent', () => {
         MatButtonModule,
         MatIconModule,
         MatSnackBarModule,
-        BrowserAnimationsModule,
       ],
       providers: [
         { provide: ApiService, useValue: apiService },

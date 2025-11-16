@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmDialogComponent, ConfirmDialogData } from './confirm-dialog.component';
 import { vi } from 'vitest';
 
@@ -11,21 +10,18 @@ describe('ConfirmDialogComponent', () => {
 
   const mockData: ConfirmDialogData = {
     title: 'Confirm Action',
-    message: 'Are you sure you want to proceed?'
+    message: 'Are you sure you want to proceed?',
   };
 
   beforeEach(async () => {
     mockDialogRef = { close: vi.fn() };
 
     await TestBed.configureTestingModule({
-      imports: [
-        ConfirmDialogComponent,
-        BrowserAnimationsModule
-      ],
+      imports: [ConfirmDialogComponent],
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
-        { provide: MAT_DIALOG_DATA, useValue: mockData }
-      ]
+        { provide: MAT_DIALOG_DATA, useValue: mockData },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ConfirmDialogComponent);

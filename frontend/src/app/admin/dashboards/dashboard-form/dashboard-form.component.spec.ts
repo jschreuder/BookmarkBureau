@@ -2,13 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
+import { convertToParamMap } from '@angular/router';
 import { DashboardFormComponent } from './dashboard-form.component';
 import { ApiService } from '../../../core/services/api.service';
-import { FullDashboard, Dashboard } from '../../../core/models';
+import { Dashboard } from '../../../core/models';
 
 describe('DashboardFormComponent', () => {
   let component: DashboardFormComponent;
@@ -18,7 +17,6 @@ describe('DashboardFormComponent', () => {
     createDashboard: ReturnType<typeof vi.fn>;
     updateDashboard: ReturnType<typeof vi.fn>;
   };
-  let activatedRoute: ActivatedRoute;
 
   const mockDashboard: Dashboard = {
     id: '123e4567-e89b-12d3-a456-426614174000',
@@ -29,12 +27,6 @@ describe('DashboardFormComponent', () => {
     updated_at: '2024-01-01T00:00:00Z',
   };
 
-  const mockFullDashboard: FullDashboard = {
-    dashboard: mockDashboard,
-    categories: [],
-    favorites: [],
-  };
-
   beforeEach(async () => {
     const apiServiceSpy = {
       getDashboardBasic: vi.fn(),
@@ -43,18 +35,19 @@ describe('DashboardFormComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [
-        DashboardFormComponent,
-        ReactiveFormsModule,
-        RouterTestingModule,
-        MatSnackBarModule,
-        BrowserAnimationsModule,
+      imports: [DashboardFormComponent, ReactiveFormsModule, MatSnackBarModule],
+      providers: [
+        { provide: ApiService, useValue: apiServiceSpy },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            paramMap: of(convertToParamMap({})),
+          },
+        },
       ],
-      providers: [{ provide: ApiService, useValue: apiServiceSpy }],
     }).compileComponents();
 
     apiService = TestBed.inject(ApiService) as any;
-    activatedRoute = TestBed.inject(ActivatedRoute);
     fixture = TestBed.createComponent(DashboardFormComponent);
     component = fixture.componentInstance;
   });

@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { AddCategoryDialogComponent } from './add-category-dialog.component';
@@ -43,7 +42,7 @@ describe('AddCategoryDialogComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [AddCategoryDialogComponent, MatSnackBarModule, BrowserAnimationsModule],
+      imports: [AddCategoryDialogComponent, MatSnackBarModule],
       providers: [
         { provide: ApiService, useValue: apiService },
         { provide: MatDialogRef, useValue: dialogRef },
