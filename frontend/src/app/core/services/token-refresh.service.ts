@@ -127,10 +127,9 @@ export class TokenRefreshService {
     this.ngZone.run(() => {
       this.auth.refreshToken().subscribe({
         next: () => {
-          //console.log('Token refreshed successfully');
+          // Token refresh succeeded, auth service handles state
         },
         error: (error) => {
-          console.error('Token refresh failed:', error);
           // Auth service already logs out on refresh failure
         },
       });

@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { vi } from 'vitest';
 import { EditLinkDialogComponent } from './edit-link-dialog.component';
@@ -16,6 +17,7 @@ describe('EditLinkDialogComponent', () => {
   let fixture: ComponentFixture<EditLinkDialogComponent>;
   let apiService: any;
   let dialogRef: any;
+  let snackBar: any;
   const mockLink: Link = {
     id: '1',
     url: 'https://example.com',
@@ -33,6 +35,9 @@ describe('EditLinkDialogComponent', () => {
     dialogRef = {
       close: vi.fn(),
     };
+    snackBar = {
+      open: vi.fn().mockReturnValue({} as any),
+    };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -41,12 +46,14 @@ describe('EditLinkDialogComponent', () => {
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
+        MatSnackBarModule,
         BrowserAnimationsModule,
       ],
       providers: [
         { provide: ApiService, useValue: apiService },
         { provide: MatDialogRef, useValue: dialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { link: mockLink } },
+        { provide: MatSnackBar, useValue: snackBar },
       ],
     }).compileComponents();
 
@@ -140,14 +147,14 @@ describe('EditLinkDialogComponent', () => {
       expect(component.loading).toBe(false);
     });
 
-    it('should handle API errors', () => {
+    it('should handle API errors', async () => {
       const error = new Error('Update failed');
       apiService.updateLink.mockReturnValue(throwError(() => error));
-      vi.spyOn(console, 'error').mockImplementation(() => {});
 
       component.onSubmit();
+      fixture.detectChanges();
+      await fixture.whenStable();
 
-      expect(console.error).toHaveBeenCalledWith('Error updating link:', error);
       expect(component.loading).toBe(false);
     });
 

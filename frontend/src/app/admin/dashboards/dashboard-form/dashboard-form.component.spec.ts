@@ -171,7 +171,6 @@ describe('DashboardFormComponent', () => {
   it('should handle error on create', () => {
     const error = new Error('Create failed');
     apiService.createDashboard.mockReturnValue(throwError(() => error));
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     component.form.patchValue({
       title: 'New Dashboard',
@@ -180,16 +179,12 @@ describe('DashboardFormComponent', () => {
 
     component.onSubmit();
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error creating dashboard:', error);
     expect(component.loading).toBe(false);
-
-    consoleErrorSpy.mockRestore();
   });
 
   it('should handle error on update', () => {
     const error = new Error('Update failed');
     apiService.updateDashboard.mockReturnValue(throwError(() => error));
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     component.isEditMode = true;
     component.dashboardId = mockDashboard.id;
@@ -200,10 +195,7 @@ describe('DashboardFormComponent', () => {
 
     component.onSubmit();
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error updating dashboard:', error);
     expect(component.loading).toBe(false);
-
-    consoleErrorSpy.mockRestore();
   });
 
   it('should navigate to list on cancel', () => {

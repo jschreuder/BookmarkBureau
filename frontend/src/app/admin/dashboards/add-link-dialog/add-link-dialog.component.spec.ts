@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
@@ -12,6 +13,7 @@ describe('AddLinkDialogComponent', () => {
   let fixture: ComponentFixture<AddLinkDialogComponent>;
   let apiService: any;
   let dialogRef: any;
+  let snackBar: any;
 
   const mockLink: Link = {
     id: 'link-id',
@@ -35,6 +37,10 @@ describe('AddLinkDialogComponent', () => {
     dialogRef = {
       close: vi.fn(),
     };
+
+    snackBar = {
+      open: vi.fn().mockReturnValue({} as any),
+    };
   });
 
   describe('with favorite data', () => {
@@ -45,11 +51,12 @@ describe('AddLinkDialogComponent', () => {
 
     beforeEach(async () => {
       await TestBed.configureTestingModule({
-        imports: [AddLinkDialogComponent, BrowserAnimationsModule],
+        imports: [AddLinkDialogComponent, MatSnackBarModule, BrowserAnimationsModule],
         providers: [
           { provide: ApiService, useValue: apiService },
           { provide: MatDialogRef, useValue: dialogRef },
           { provide: MAT_DIALOG_DATA, useValue: mockDialogData },
+          { provide: MatSnackBar, useValue: snackBar },
         ],
       }).compileComponents();
 
@@ -198,7 +205,7 @@ describe('AddLinkDialogComponent', () => {
       expect(dialogRef.close).toHaveBeenCalledWith(true);
     });
 
-    it('should handle API error gracefully when adding to favorites', () => {
+    it('should handle API error gracefully when adding to favorites', async () => {
       const error = { error: 'Test error' };
       apiService.createLinkAsFavorite = vi.fn().mockReturnValue(throwError(() => error));
 
@@ -207,14 +214,12 @@ describe('AddLinkDialogComponent', () => {
         title: 'Test Link',
       });
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       component.onSubmit();
+      fixture.detectChanges();
+      await fixture.whenStable();
 
-      expect(consoleSpy).toHaveBeenCalledWith('Error adding link:', error);
       expect(component.loading).toBe(false);
       expect(dialogRef.close).not.toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
     });
 
     it('should mark form as touched when submitting with invalid data', () => {
@@ -257,11 +262,12 @@ describe('AddLinkDialogComponent', () => {
 
     beforeEach(async () => {
       await TestBed.configureTestingModule({
-        imports: [AddLinkDialogComponent, BrowserAnimationsModule],
+        imports: [AddLinkDialogComponent, MatSnackBarModule, BrowserAnimationsModule],
         providers: [
           { provide: ApiService, useValue: apiService },
           { provide: MatDialogRef, useValue: dialogRef },
           { provide: MAT_DIALOG_DATA, useValue: mockDialogData },
+          { provide: MatSnackBar, useValue: snackBar },
         ],
       }).compileComponents();
 
@@ -293,7 +299,7 @@ describe('AddLinkDialogComponent', () => {
       expect(apiService.addFavorite).not.toHaveBeenCalled();
     });
 
-    it('should handle API error when adding to category', () => {
+    it('should handle API error when adding to category', async () => {
       const error = { error: 'Test error' };
       apiService.createLinkInCategory = vi.fn().mockReturnValue(throwError(() => error));
 
@@ -302,12 +308,11 @@ describe('AddLinkDialogComponent', () => {
         title: 'Test Link',
       });
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       component.onSubmit();
+      fixture.detectChanges();
+      await fixture.whenStable();
 
-      expect(consoleSpy).toHaveBeenCalledWith('Error adding link:', error);
       expect(component.loading).toBe(false);
-      consoleSpy.mockRestore();
     });
   });
 

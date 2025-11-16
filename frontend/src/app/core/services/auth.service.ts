@@ -49,7 +49,6 @@ export class AuthService {
       tap((response) => this.storeToken(response)),
       tap(() => this.isAuthenticatedSubject.next(true)),
       catchError((error) => {
-        console.error('Login failed:', error);
         return throwError(() => error);
       }),
     );

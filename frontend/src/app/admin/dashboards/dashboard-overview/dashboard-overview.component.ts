@@ -72,7 +72,6 @@ export class DashboardOverviewComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading dashboard:', error);
         this.error = 'Failed to load dashboard';
         this.snackBar.open('Failed to load dashboard', 'Close', { duration: 5000 });
         this.loading = false;
@@ -145,7 +144,6 @@ export class DashboardOverviewComponent implements OnInit {
             this.loadDashboard();
           },
           error: (error) => {
-            console.error('Error deleting category:', error);
             this.snackBar.open('Failed to delete category', 'Close', { duration: 5000 });
           },
         });
@@ -170,7 +168,6 @@ export class DashboardOverviewComponent implements OnInit {
             this.loadDashboard();
           },
           error: (error) => {
-            console.error('Error removing favorite:', error);
             this.snackBar.open('Failed to remove favorite', 'Close', { duration: 5000 });
           },
         });
@@ -270,7 +267,6 @@ export class DashboardOverviewComponent implements OnInit {
         this.snackBar.open('Favorites reordered successfully', 'Close', { duration: 3000 });
       },
       error: (error) => {
-        console.error('Error reordering favorites:', error);
         this.snackBar.open('Failed to reorder favorites', 'Close', { duration: 5000 });
         // Reload dashboard to restore original order
         this.loadDashboard();

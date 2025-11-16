@@ -167,7 +167,6 @@ export class DashboardFormComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading dashboard:', error);
         this.snackBar.open('Failed to load dashboard', 'Close', { duration: 5000 });
         this.loading = false;
         this.router.navigate(['/admin/dashboards']);
@@ -194,7 +193,6 @@ export class DashboardFormComponent implements OnInit {
           this.router.navigate(['/admin/dashboards']);
         },
         error: (error) => {
-          console.error('Error updating dashboard:', error);
           this.snackBar.open('Failed to update dashboard', 'Close', { duration: 5000 });
           this.loading = false;
         },
@@ -206,7 +204,6 @@ export class DashboardFormComponent implements OnInit {
           this.router.navigate(['/admin/dashboards']);
         },
         error: (error) => {
-          console.error('Error creating dashboard:', error);
           this.snackBar.open('Failed to create dashboard', 'Close', { duration: 5000 });
           this.loading = false;
         },

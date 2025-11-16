@@ -5,6 +5,7 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Link } from '../../../core/models';
 import { ApiService } from '../../../core/services/api.service';
 
@@ -22,6 +23,7 @@ export interface EditLinkDialogData {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatSnackBarModule,
   ],
   template: `
     <h2 mat-dialog-title>Edit Link</h2>
@@ -105,16 +107,14 @@ export class EditLinkDialogComponent {
   private readonly apiService = inject(ApiService);
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<EditLinkDialogComponent>);
+  private readonly snackBar = inject(MatSnackBar);
 
   form: FormGroup;
   loading = false;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: EditLinkDialogData) {
     this.form = this.fb.group({
-      url: [
-        data.link.url,
-        [Validators.required, Validators.pattern(/^https?:\/\/.+/)],
-      ],
+      url: [data.link.url, [Validators.required, Validators.pattern(/^https?:\/\/.+/)]],
       title: [data.link.title, [Validators.required, Validators.minLength(1)]],
       description: [data.link.description || ''],
       icon: [data.link.icon || ''],
@@ -141,8 +141,8 @@ export class EditLinkDialogComponent {
         this.dialogRef.close(true);
       },
       error: (error: unknown) => {
-        console.error('Error updating link:', error);
         this.loading = false;
+        this.snackBar.open('Failed to update link', 'Close', { duration: 5000 });
       },
     });
   }

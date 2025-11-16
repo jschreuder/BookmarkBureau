@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../../core/services/api.service';
 
 export interface AddCategoryDialogData {
@@ -23,6 +24,7 @@ export interface AddCategoryDialogData {
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatSnackBarModule,
   ],
   template: `
     <h2 mat-dialog-title>Add Category</h2>
@@ -100,6 +102,7 @@ export class AddCategoryDialogComponent {
   private readonly apiService = inject(ApiService);
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<AddCategoryDialogComponent>);
+  private readonly snackBar = inject(MatSnackBar);
 
   form: FormGroup;
   loading = false;
@@ -131,8 +134,8 @@ export class AddCategoryDialogComponent {
         this.dialogRef.close(true);
       },
       error: (error) => {
-        console.error('Error creating category:', error);
         this.loading = false;
+        this.snackBar.open('Failed to create category', 'Close', { duration: 5000 });
       },
     });
   }

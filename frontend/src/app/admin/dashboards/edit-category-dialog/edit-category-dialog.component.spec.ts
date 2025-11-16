@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { vi } from 'vitest';
 import { EditCategoryDialogComponent } from './edit-category-dialog.component';
@@ -17,6 +18,7 @@ describe('EditCategoryDialogComponent', () => {
   let fixture: ComponentFixture<EditCategoryDialogComponent>;
   let apiService: any;
   let dialogRef: any;
+  let snackBar: any;
   const mockCategory: Category = {
     id: '1',
     dashboard_id: 'dashboard-1',
@@ -34,6 +36,9 @@ describe('EditCategoryDialogComponent', () => {
     dialogRef = {
       close: vi.fn(),
     };
+    snackBar = {
+      open: vi.fn().mockReturnValue({ onAction: () => of(void 0) } as any),
+    };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -43,12 +48,14 @@ describe('EditCategoryDialogComponent', () => {
         MatInputModule,
         MatButtonModule,
         MatIconModule,
+        MatSnackBarModule,
         BrowserAnimationsModule,
       ],
       providers: [
         { provide: ApiService, useValue: apiService },
         { provide: MatDialogRef, useValue: dialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { category: mockCategory } },
+        { provide: MatSnackBar, useValue: snackBar },
       ],
     }).compileComponents();
 
@@ -129,14 +136,14 @@ describe('EditCategoryDialogComponent', () => {
       expect(component.loading).toBe(false);
     });
 
-    it('should handle API errors', () => {
+    it('should handle API errors', async () => {
       const error = new Error('Update failed');
       apiService.updateCategory.mockReturnValue(throwError(() => error));
-      vi.spyOn(console, 'error').mockImplementation(() => {});
 
       component.onSubmit();
+      fixture.detectChanges();
+      await fixture.whenStable();
 
-      expect(console.error).toHaveBeenCalledWith('Error updating category:', error);
       expect(component.loading).toBe(false);
     });
 

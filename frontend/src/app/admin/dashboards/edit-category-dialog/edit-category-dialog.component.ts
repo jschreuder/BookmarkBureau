@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Category } from '../../../core/models';
 import { ApiService } from '../../../core/services/api.service';
 
@@ -24,6 +25,7 @@ export interface EditCategoryDialogData {
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatSnackBarModule,
   ],
   template: `
     <h2 mat-dialog-title>Edit Category</h2>
@@ -101,6 +103,7 @@ export class EditCategoryDialogComponent {
   private readonly apiService = inject(ApiService);
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<EditCategoryDialogComponent>);
+  private readonly snackBar = inject(MatSnackBar);
 
   form: FormGroup;
   loading = false;
@@ -131,8 +134,8 @@ export class EditCategoryDialogComponent {
         this.dialogRef.close(true);
       },
       error: (error) => {
-        console.error('Error updating category:', error);
         this.loading = false;
+        this.snackBar.open('Failed to update category', 'Close', { duration: 5000 });
       },
     });
   }

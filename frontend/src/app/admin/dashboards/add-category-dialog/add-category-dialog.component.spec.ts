@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
@@ -12,6 +13,7 @@ describe('AddCategoryDialogComponent', () => {
   let fixture: ComponentFixture<AddCategoryDialogComponent>;
   let apiService: any;
   let dialogRef: any;
+  let snackBar: any;
 
   const mockDialogData = {
     dashboardId: 'test-dashboard-id',
@@ -36,12 +38,17 @@ describe('AddCategoryDialogComponent', () => {
       close: vi.fn(),
     };
 
+    snackBar = {
+      open: vi.fn().mockReturnValue({} as any),
+    };
+
     await TestBed.configureTestingModule({
-      imports: [AddCategoryDialogComponent, BrowserAnimationsModule],
+      imports: [AddCategoryDialogComponent, MatSnackBarModule, BrowserAnimationsModule],
       providers: [
         { provide: ApiService, useValue: apiService },
         { provide: MatDialogRef, useValue: dialogRef },
         { provide: MAT_DIALOG_DATA, useValue: mockDialogData },
+        { provide: MatSnackBar, useValue: snackBar },
       ],
     }).compileComponents();
 
@@ -171,7 +178,7 @@ describe('AddCategoryDialogComponent', () => {
     expect(component.loading).toBe(false);
   });
 
-  it('should handle API error gracefully', () => {
+  it('should handle API error gracefully', async () => {
     const error = { error: 'Test error' };
     apiService.createCategory = vi.fn().mockReturnValue(throwError(() => error));
 
@@ -179,14 +186,12 @@ describe('AddCategoryDialogComponent', () => {
       title: 'New Category',
     });
 
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     component.onSubmit();
+    fixture.detectChanges();
+    await fixture.whenStable();
 
-    expect(consoleSpy).toHaveBeenCalledWith('Error creating category:', error);
     expect(component.loading).toBe(false);
     expect(dialogRef.close).not.toHaveBeenCalled();
-
-    consoleSpy.mockRestore();
   });
 
   it('should mark form as touched when submitting with invalid data', () => {

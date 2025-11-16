@@ -5,6 +5,7 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 import { Link } from '../../../core/models';
@@ -25,6 +26,7 @@ export interface AddLinkDialogData {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatSnackBarModule,
   ],
   template: `
     <h2 mat-dialog-title>
@@ -110,6 +112,7 @@ export class AddLinkDialogComponent {
   private readonly apiService = inject(ApiService);
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<AddLinkDialogComponent>);
+  private readonly snackBar = inject(MatSnackBar);
 
   form: FormGroup;
   loading = false;
@@ -156,8 +159,8 @@ export class AddLinkDialogComponent {
         this.dialogRef.close(true);
       },
       error: (error: unknown) => {
-        console.error('Error adding link:', error);
         this.loading = false;
+        this.snackBar.open('Failed to add link', 'Close', { duration: 5000 });
       },
     });
   }

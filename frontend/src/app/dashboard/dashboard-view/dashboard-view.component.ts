@@ -400,7 +400,6 @@ export class DashboardViewComponent implements OnInit {
 
     this.dashboard$ = this.apiService.getDashboard(dashboardId).pipe(
       catchError((error) => {
-        console.error('Error loading dashboard:', error);
         this.error$ = of(error?.error?.error || 'Failed to load dashboard');
         return of(null);
       }),

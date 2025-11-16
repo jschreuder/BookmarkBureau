@@ -121,15 +121,11 @@ describe('AdminDashboardListComponent', () => {
   it('should handle error loading dashboards', () => {
     const error = new Error('Load failed');
     apiService.listDashboards.mockReturnValue(throwError(() => error));
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     component.loadDashboards();
     fixture.detectChanges();
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error loading dashboards:', error);
     expect(component.loading).toBe(false);
-
-    consoleErrorSpy.mockRestore();
   });
 
   it('should navigate to new dashboard form', () => {
