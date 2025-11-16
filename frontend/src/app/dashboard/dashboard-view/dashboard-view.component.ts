@@ -387,7 +387,7 @@ export class DashboardViewComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   dashboard$!: Observable<FullDashboard | null>;
-  error$!: Observable<string | null>;
+  error$: Observable<string | null> = of(null);
 
   ngOnInit(): void {
     const dashboardId = this.route.snapshot.paramMap.get('id');

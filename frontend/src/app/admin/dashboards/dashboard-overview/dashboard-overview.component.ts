@@ -186,9 +186,15 @@ export class DashboardOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        // Call API to remove link from category (assuming similar endpoint exists)
-        this.snackBar.open('Link removed from category', 'Close', { duration: 3000 });
-        this.loadDashboard();
+        this.apiService.removeLinkFromCategory(categoryId, linkId).subscribe({
+          next: () => {
+            this.snackBar.open('Link removed from category', 'Close', { duration: 3000 });
+            this.loadDashboard();
+          },
+          error: (_error) => {
+            this.snackBar.open('Failed to remove link from category', 'Close', { duration: 5000 });
+          },
+        });
       }
     });
   }

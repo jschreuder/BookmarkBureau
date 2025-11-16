@@ -133,7 +133,7 @@ export class AddCategoryDialogComponent {
         this.loading = false;
         this.dialogRef.close(true);
       },
-      error: (error) => {
+      error: (_error) => {
         this.loading = false;
         this.snackBar.open('Failed to create category', 'Close', { duration: 5000 });
       },

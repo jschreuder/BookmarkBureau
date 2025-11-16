@@ -95,11 +95,11 @@ export class LoginComponent {
         this.isLoading = false;
         this.router.navigate(['/admin']);
       },
-      error: (error) => {
+      error: (httpError) => {
         this.isLoading = false;
 
         // Check if error indicates TOTP is required
-        if (error.status === 400 && error.error?.error?.includes('TOTP code required')) {
+        if (httpError.status === 400 && httpError.error?.error?.includes('TOTP code required')) {
           this.requiresTotpFirst = true;
           this.showTotpField = true;
           this.errorMessage = 'Please enter your TOTP code';
@@ -107,9 +107,9 @@ export class LoginComponent {
         }
 
         // Handle other errors
-        if (error.status === 400) {
+        if (httpError.status === 400) {
           this.errorMessage = 'Invalid credentials. Please check your email and password.';
-        } else if (error.status === 0) {
+        } else if (httpError.status === 0) {
           this.errorMessage = 'Network error. Please check your connection and try again.';
         } else {
           this.errorMessage = 'Login failed. Please try again.';

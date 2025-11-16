@@ -24,6 +24,7 @@ export class TokenRefreshService {
   private activity$ = new Subject<void>();
   private isMonitoring = false;
   private activityDebounceMs = 5000; // Debounce activity for 5 seconds
+  private activityHandlers: Map<string, () => void> = new Map();
 
   /**
    * Initialize activity monitoring and watch for logout
@@ -82,16 +83,18 @@ export class TokenRefreshService {
       // User activity events
       const events = ['mousedown', 'keydown', 'touchstart', 'click'];
       events.forEach((event) => {
-        document.addEventListener(event, () => this.onActivity());
+        const handler = () => this.onActivity();
+        this.activityHandlers.set(event, handler);
+        document.addEventListener(event, handler);
       });
     });
   }
 
   private removeActivityListeners(): void {
-    const events = ['mousedown', 'keydown', 'touchstart', 'click'];
-    events.forEach((event) => {
-      document.removeEventListener(event, () => this.onActivity());
+    this.activityHandlers.forEach((handler, event) => {
+      document.removeEventListener(event, handler);
     });
+    this.activityHandlers.clear();
   }
 
   private onActivity(): void {
