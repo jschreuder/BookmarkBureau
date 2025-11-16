@@ -1,18 +1,16 @@
 <?php
 
-use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 
 describe("LinkOutputSpec", function () {
     // Helper to create a LinkOutputSpec with all dependencies
-    $createSpec = function () {
-        return new LinkOutputSpec(new TagOutputSpec());
-    };
+    $createSpec = fn() => new LinkOutputSpec(new TagOutputSpec());
 
     describe("initialization", function () use ($createSpec) {
         test("creates OutputSpec instance", function () use ($createSpec) {
@@ -24,9 +22,7 @@ describe("LinkOutputSpec", function () {
         test("implements OutputSpecInterface", function () use ($createSpec) {
             $spec = $createSpec();
 
-            expect($spec)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface::class,
-            );
+            expect($spec)->toBeInstanceOf(OutputSpecInterface::class);
         });
 
         test("is readonly", function () use ($createSpec) {
@@ -361,9 +357,7 @@ describe("LinkOutputSpec", function () {
             $interface = $spec;
             $link = TestEntityFactory::createLink();
 
-            expect($interface)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface::class,
-            );
+            expect($interface)->toBeInstanceOf(OutputSpecInterface::class);
 
             $result = $interface->transform($link);
 

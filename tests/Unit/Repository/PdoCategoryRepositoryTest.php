@@ -10,6 +10,8 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
+use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\PdoCategoryRepository;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
@@ -454,9 +456,9 @@ describe("PdoCategoryRepository", function () {
         test(
             "throws DashboardNotFoundException when dashboard foreign key constraint fails on insert",
             function () {
-                $mockPdo = \Mockery::mock(PDO::class);
-                $checkStmt = \Mockery::mock(\PDOStatement::class);
-                $insertStmt = \Mockery::mock(\PDOStatement::class);
+                $mockPdo = Mockery::mock(PDO::class);
+                $checkStmt = Mockery::mock(\PDOStatement::class);
+                $insertStmt = Mockery::mock(\PDOStatement::class);
 
                 $dashboard = TestEntityFactory::createDashboard();
                 $category = TestEntityFactory::createCategory(
@@ -491,12 +493,10 @@ describe("PdoCategoryRepository", function () {
                     })
                     ->andReturn($insertStmt);
 
-                $mockDashboardRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class,
+                $mockDashboardRepo = Mockery::mock(
+                    DashboardRepositoryInterface::class,
                 );
-                $mockLinkRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class,
-                );
+                $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
                 $repo = new PdoCategoryRepository(
                     $mockPdo,
                     $mockDashboardRepo,
@@ -514,9 +514,9 @@ describe("PdoCategoryRepository", function () {
         test(
             "re-throws PDOException when not a foreign key constraint error on insert",
             function () {
-                $mockPdo = \Mockery::mock(PDO::class);
-                $checkStmt = \Mockery::mock(\PDOStatement::class);
-                $insertStmt = \Mockery::mock(\PDOStatement::class);
+                $mockPdo = Mockery::mock(PDO::class);
+                $checkStmt = Mockery::mock(\PDOStatement::class);
+                $insertStmt = Mockery::mock(\PDOStatement::class);
 
                 $dashboard = TestEntityFactory::createDashboard();
                 $category = TestEntityFactory::createCategory(
@@ -551,12 +551,10 @@ describe("PdoCategoryRepository", function () {
                     })
                     ->andReturn($insertStmt);
 
-                $mockDashboardRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class,
+                $mockDashboardRepo = Mockery::mock(
+                    DashboardRepositoryInterface::class,
                 );
-                $mockLinkRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class,
-                );
+                $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
                 $repo = new PdoCategoryRepository(
                     $mockPdo,
                     $mockDashboardRepo,
@@ -717,14 +715,12 @@ describe("PdoCategoryRepository", function () {
         test(
             "re-throws PDOException when not a foreign key constraint error",
             function () {
-                $mockPdo = \Mockery::mock(PDO::class);
-                $mockDashboardRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class,
+                $mockPdo = Mockery::mock(PDO::class);
+                $mockDashboardRepo = Mockery::mock(
+                    DashboardRepositoryInterface::class,
                 );
-                $mockLinkRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class,
-                );
-                $insertStmt = \Mockery::mock(\PDOStatement::class);
+                $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
+                $insertStmt = Mockery::mock(\PDOStatement::class);
 
                 $category = TestEntityFactory::createCategory();
                 $link = TestEntityFactory::createLink();

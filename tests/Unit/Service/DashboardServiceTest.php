@@ -5,6 +5,7 @@ use jschreuder\BookmarkBureau\Collection\CategoryLinkCollection;
 use jschreuder\BookmarkBureau\Collection\DashboardCollection;
 use jschreuder\BookmarkBureau\Collection\DashboardWithCategoriesAndFavorites;
 use jschreuder\BookmarkBureau\Collection\FavoriteCollection;
+use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
@@ -402,9 +403,7 @@ describe("DashboardService", function () {
                 "test-icon",
             );
 
-            expect($result)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Dashboard::class,
-            );
+            expect($result)->toBeInstanceOf(Dashboard::class);
             expect($result->title->value)->toBe("Test Dashboard");
             expect($result->description)->toBe("Test Description");
             expect($result->icon?->value)->toBe("test-icon");
@@ -866,9 +865,7 @@ describe("DashboardService", function () {
                 "New Dashboard",
                 "Description",
             );
-            expect($created)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Dashboard::class,
-            );
+            expect($created)->toBeInstanceOf(Dashboard::class);
 
             // List
             $all = $service->listAllDashboards();
@@ -880,9 +877,7 @@ describe("DashboardService", function () {
                 "Updated Dashboard",
                 "Updated Description",
             );
-            expect($updated)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Dashboard::class,
-            );
+            expect($updated)->toBeInstanceOf(Dashboard::class);
 
             // Delete
             $service->deleteDashboard($dashboardId);

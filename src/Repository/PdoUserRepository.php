@@ -46,9 +46,8 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
      * @throws UserNotFoundException when user doesn't exist
      */
     #[\Override]
-    public function findByEmail(
-        \jschreuder\BookmarkBureau\Entity\Value\Email $email,
-    ): User {
+    public function findByEmail(Email $email): User
+    {
         $sql = SqlBuilder::buildSelect(
             "users",
             $this->mapper->getFields(),

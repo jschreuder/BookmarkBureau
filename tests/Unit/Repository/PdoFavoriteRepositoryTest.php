@@ -7,6 +7,8 @@ use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
+use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
 use jschreuder\BookmarkBureau\Repository\PdoFavoriteRepository;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
@@ -365,14 +367,12 @@ describe("PdoFavoriteRepository", function () {
         test(
             "throws DashboardNotFoundException when dashboard foreign key constraint fails",
             function () {
-                $mockPdo = \Mockery::mock(PDO::class);
-                $mockDashboardRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class,
+                $mockPdo = Mockery::mock(PDO::class);
+                $mockDashboardRepo = Mockery::mock(
+                    DashboardRepositoryInterface::class,
                 );
-                $mockLinkRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class,
-                );
-                $insertStmt = \Mockery::mock(\PDOStatement::class);
+                $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
+                $insertStmt = Mockery::mock(\PDOStatement::class);
 
                 $dashboard = TestEntityFactory::createDashboard();
                 $link = TestEntityFactory::createLink();
@@ -422,14 +422,12 @@ describe("PdoFavoriteRepository", function () {
         test(
             "throws LinkNotFoundException when link foreign key constraint fails",
             function () {
-                $mockPdo = \Mockery::mock(PDO::class);
-                $mockDashboardRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class,
+                $mockPdo = Mockery::mock(PDO::class);
+                $mockDashboardRepo = Mockery::mock(
+                    DashboardRepositoryInterface::class,
                 );
-                $mockLinkRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class,
-                );
-                $insertStmt = \Mockery::mock(\PDOStatement::class);
+                $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
+                $insertStmt = Mockery::mock(\PDOStatement::class);
 
                 $dashboard = TestEntityFactory::createDashboard();
                 $link = TestEntityFactory::createLink();
@@ -479,14 +477,12 @@ describe("PdoFavoriteRepository", function () {
         test(
             "re-throws PDOException when not a foreign key constraint error",
             function () {
-                $mockPdo = \Mockery::mock(PDO::class);
-                $mockDashboardRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface::class,
+                $mockPdo = Mockery::mock(PDO::class);
+                $mockDashboardRepo = Mockery::mock(
+                    DashboardRepositoryInterface::class,
                 );
-                $mockLinkRepo = \Mockery::mock(
-                    \jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface::class,
-                );
-                $insertStmt = \Mockery::mock(\PDOStatement::class);
+                $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
+                $insertStmt = Mockery::mock(\PDOStatement::class);
 
                 $dashboard = TestEntityFactory::createDashboard();
                 $link = TestEntityFactory::createLink();

@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 
 use jschreuder\BookmarkBureau\Command\User\ChangePasswordCommand;
+use jschreuder\BookmarkBureau\Entity\Value\Email;
+use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -14,11 +16,7 @@ describe("ChangePasswordCommand", function () {
 
             $email = "test@example.com";
             $newPassword = "newpassword123";
-            $user = TestEntityFactory::createUser(
-                email: new \jschreuder\BookmarkBureau\Entity\Value\Email(
-                    $email,
-                ),
-            );
+            $user = TestEntityFactory::createUser(email: new Email($email));
 
             $userService
                 ->shouldReceive("getUserByEmail")
@@ -49,11 +47,7 @@ describe("ChangePasswordCommand", function () {
 
             $email = "test@example.com";
             $interactivePassword = "interactivenewpass789";
-            $user = TestEntityFactory::createUser(
-                email: new \jschreuder\BookmarkBureau\Entity\Value\Email(
-                    $email,
-                ),
-            );
+            $user = TestEntityFactory::createUser(email: new Email($email));
 
             $userService
                 ->shouldReceive("getUserByEmail")
@@ -83,9 +77,7 @@ describe("ChangePasswordCommand", function () {
 
             $userService
                 ->shouldReceive("getUserByEmail")
-                ->andThrow(
-                    new \jschreuder\BookmarkBureau\Exception\UserNotFoundException(),
-                );
+                ->andThrow(new UserNotFoundException());
 
             $tester = new CommandTester($command);
             $statusCode = $tester->execute([
@@ -117,11 +109,7 @@ describe("ChangePasswordCommand", function () {
             $command->setHelperSet(new HelperSet([new QuestionHelper()]));
 
             $email = "test@example.com";
-            $user = TestEntityFactory::createUser(
-                email: new \jschreuder\BookmarkBureau\Entity\Value\Email(
-                    $email,
-                ),
-            );
+            $user = TestEntityFactory::createUser(email: new Email($email));
 
             $userService
                 ->shouldReceive("getUserByEmail")

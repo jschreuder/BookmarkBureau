@@ -1,6 +1,7 @@
 <?php
 
 use jschreuder\BookmarkBureau\Collection\UserCollection;
+use jschreuder\BookmarkBureau\Entity\User;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
@@ -51,9 +52,7 @@ describe("UserService", function () {
 
                 $result = $service->createUser($email, $plainPassword);
 
-                expect($result)->toBeInstanceOf(
-                    \jschreuder\BookmarkBureau\Entity\User::class,
-                );
+                expect($result)->toBeInstanceOf(User::class);
                 expect($result->email)->toBe($email);
                 expect($result->passwordHash)->toBe($hashedPassword);
                 expect($result->totpSecret)->toBeNull();

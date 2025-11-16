@@ -5,48 +5,58 @@ use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\InputSpec\CategoryLinkInputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
-describe('CategoryLinkDeleteAction', function () {
-    describe('filter method', function () {
-        test('trims whitespace from id and link_id', function () {
+describe("CategoryLinkDeleteAction", function () {
+    describe("filter method", function () {
+        test("trims whitespace from id and link_id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryLinkInputSpec();
-            $action = new CategoryLinkDeleteAction($categoryService, $inputSpec);
+            $action = new CategoryLinkDeleteAction(
+                $categoryService,
+                $inputSpec,
+            );
             $categoryId = Uuid::uuid4();
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                'id' => "  {$categoryId->toString()}  ",
-                'link_id' => "  {$linkId->toString()}  ",
+                "id" => "  {$categoryId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
             ]);
 
-            expect($filtered['id'])->toBe($categoryId->toString());
-            expect($filtered['link_id'])->toBe($linkId->toString());
+            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["link_id"])->toBe($linkId->toString());
         });
 
-        test('handles missing keys with appropriate defaults', function () {
+        test("handles missing keys with appropriate defaults", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryLinkInputSpec();
-            $action = new CategoryLinkDeleteAction($categoryService, $inputSpec);
+            $action = new CategoryLinkDeleteAction(
+                $categoryService,
+                $inputSpec,
+            );
 
             $filtered = $action->filter([]);
 
-            expect($filtered['id'])->toBe('');
-            expect($filtered['link_id'])->toBe('');
+            expect($filtered["id"])->toBe("");
+            expect($filtered["link_id"])->toBe("");
         });
     });
 
-    describe('validate method', function () {
-        test('passes validation with valid data', function () {
+    describe("validate method", function () {
+        test("passes validation with valid data", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryLinkInputSpec();
-            $action = new CategoryLinkDeleteAction($categoryService, $inputSpec);
+            $action = new CategoryLinkDeleteAction(
+                $categoryService,
+                $inputSpec,
+            );
             $categoryId = Uuid::uuid4();
             $linkId = Uuid::uuid4();
 
             $data = [
-                'id' => $categoryId->toString(),
-                'link_id' => $linkId->toString(),
+                "id" => $categoryId->toString(),
+                "link_id" => $linkId->toString(),
             ];
 
             try {
@@ -57,121 +67,157 @@ describe('CategoryLinkDeleteAction', function () {
             }
         });
 
-        test('throws validation error for invalid id UUID', function () {
+        test("throws validation error for invalid id UUID", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryLinkInputSpec();
-            $action = new CategoryLinkDeleteAction($categoryService, $inputSpec);
+            $action = new CategoryLinkDeleteAction(
+                $categoryService,
+                $inputSpec,
+            );
 
             $data = [
-                'id' => 'not-a-uuid',
-                'link_id' => Uuid::uuid4()->toString(),
+                "id" => "not-a-uuid",
+                "link_id" => Uuid::uuid4()->toString(),
             ];
 
-            expect(fn() => $action->validate($data))
-                ->toThrow(ValidationFailedException::class);
+            expect(fn() => $action->validate($data))->toThrow(
+                ValidationFailedException::class,
+            );
         });
 
-        test('throws validation error for invalid link_id UUID', function () {
+        test("throws validation error for invalid link_id UUID", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryLinkInputSpec();
-            $action = new CategoryLinkDeleteAction($categoryService, $inputSpec);
+            $action = new CategoryLinkDeleteAction(
+                $categoryService,
+                $inputSpec,
+            );
 
             $data = [
-                'id' => Uuid::uuid4()->toString(),
-                'link_id' => 'not-a-uuid',
+                "id" => Uuid::uuid4()->toString(),
+                "link_id" => "not-a-uuid",
             ];
 
-            expect(fn() => $action->validate($data))
-                ->toThrow(ValidationFailedException::class);
+            expect(fn() => $action->validate($data))->toThrow(
+                ValidationFailedException::class,
+            );
         });
 
-        test('throws validation error for missing id', function () {
+        test("throws validation error for missing id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryLinkInputSpec();
-            $action = new CategoryLinkDeleteAction($categoryService, $inputSpec);
+            $action = new CategoryLinkDeleteAction(
+                $categoryService,
+                $inputSpec,
+            );
 
             $data = [
-                'link_id' => Uuid::uuid4()->toString(),
+                "link_id" => Uuid::uuid4()->toString(),
             ];
 
-            expect(fn() => $action->validate($data))
-                ->toThrow(ValidationFailedException::class);
+            expect(fn() => $action->validate($data))->toThrow(
+                ValidationFailedException::class,
+            );
         });
 
-        test('throws validation error for missing link_id', function () {
+        test("throws validation error for missing link_id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $inputSpec = new CategoryLinkInputSpec();
-            $action = new CategoryLinkDeleteAction($categoryService, $inputSpec);
+            $action = new CategoryLinkDeleteAction(
+                $categoryService,
+                $inputSpec,
+            );
 
             $data = [
-                'id' => Uuid::uuid4()->toString(),
+                "id" => Uuid::uuid4()->toString(),
             ];
 
-            expect(fn() => $action->validate($data))
-                ->toThrow(ValidationFailedException::class);
+            expect(fn() => $action->validate($data))->toThrow(
+                ValidationFailedException::class,
+            );
         });
     });
 
-    describe('execute method', function () {
-        test('executes with valid data and returns empty array', function () {
+    describe("execute method", function () {
+        test("executes with valid data and returns empty array", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $categoryId = Uuid::uuid4();
             $linkId = Uuid::uuid4();
 
-            $categoryService->shouldReceive('removeLinkFromCategory')
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class), \Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+            $categoryService
+                ->shouldReceive("removeLinkFromCategory")
+                ->with(
+                    Mockery::type(UuidInterface::class),
+                    Mockery::type(UuidInterface::class),
+                )
                 ->andReturn(null);
 
             $inputSpec = new CategoryLinkInputSpec();
-            $action = new CategoryLinkDeleteAction($categoryService, $inputSpec);
+            $action = new CategoryLinkDeleteAction(
+                $categoryService,
+                $inputSpec,
+            );
 
             $result = $action->execute([
-                'id' => $categoryId->toString(),
-                'link_id' => $linkId->toString(),
+                "id" => $categoryId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect($result)->toBe([]);
         });
 
-        test('calls service with correct UUID arguments', function () {
+        test("calls service with correct UUID arguments", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $categoryId = Uuid::uuid4();
             $linkId = Uuid::uuid4();
 
-            $categoryService->shouldReceive('removeLinkFromCategory')
+            $categoryService
+                ->shouldReceive("removeLinkFromCategory")
                 ->with(
-                    Mockery::on(fn($arg) => $arg->toString() === $categoryId->toString()),
-                    Mockery::on(fn($arg) => $arg->toString() === $linkId->toString())
+                    Mockery::on(
+                        fn($arg) => $arg->toString() ===
+                            $categoryId->toString(),
+                    ),
+                    Mockery::on(
+                        fn($arg) => $arg->toString() === $linkId->toString(),
+                    ),
                 )
                 ->andReturn(null);
 
             $inputSpec = new CategoryLinkInputSpec();
-            $action = new CategoryLinkDeleteAction($categoryService, $inputSpec);
+            $action = new CategoryLinkDeleteAction(
+                $categoryService,
+                $inputSpec,
+            );
 
             $action->execute([
-                'id' => $categoryId->toString(),
-                'link_id' => $linkId->toString(),
+                "id" => $categoryId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect(true)->toBeTrue(); // Mockery validates the call
         });
     });
 
-    describe('integration scenarios', function () {
-        test('full workflow: filter, validate, and execute', function () {
+    describe("integration scenarios", function () {
+        test("full workflow: filter, validate, and execute", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
             $categoryId = Uuid::uuid4();
             $linkId = Uuid::uuid4();
 
-            $categoryService->shouldReceive('removeLinkFromCategory')
+            $categoryService
+                ->shouldReceive("removeLinkFromCategory")
                 ->andReturn(null);
 
             $inputSpec = new CategoryLinkInputSpec();
-            $action = new CategoryLinkDeleteAction($categoryService, $inputSpec);
+            $action = new CategoryLinkDeleteAction(
+                $categoryService,
+                $inputSpec,
+            );
 
             $rawData = [
-                'id' => "  {$categoryId->toString()}  ",
-                'link_id' => "  {$linkId->toString()}  ",
+                "id" => "  {$categoryId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);

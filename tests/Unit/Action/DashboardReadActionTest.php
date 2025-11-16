@@ -1,11 +1,14 @@
 <?php
 
 use jschreuder\BookmarkBureau\Action\DashboardReadAction;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\InputSpec\IdInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 describe("DashboardReadAction", function () {
     describe("filter method", function () {
@@ -167,7 +170,7 @@ describe("DashboardReadAction", function () {
 
             $dashboardService
                 ->shouldReceive("getDashboard")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->once()
                 ->andReturn($dashboard);
 
@@ -194,7 +197,7 @@ describe("DashboardReadAction", function () {
 
             $dashboardService
                 ->shouldReceive("getDashboard")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($dashboard);
 
             $inputSpec = new IdInputSpec();
@@ -228,7 +231,7 @@ describe("DashboardReadAction", function () {
 
                 $dashboardService
                     ->shouldReceive("getDashboard")
-                    ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                    ->with(Mockery::type(UuidInterface::class))
                     ->once()
                     ->andReturn($dashboard);
 
@@ -253,18 +256,14 @@ describe("DashboardReadAction", function () {
             $dashboardId = Uuid::uuid4();
             $dashboard = TestEntityFactory::createDashboard(
                 id: $dashboardId,
-                title: new \jschreuder\BookmarkBureau\Entity\Value\Title(
-                    "Test Dashboard",
-                ),
+                title: new Title("Test Dashboard"),
                 description: "Test Description",
-                icon: new \jschreuder\BookmarkBureau\Entity\Value\Icon(
-                    "test-icon",
-                ),
+                icon: new Icon("test-icon"),
             );
 
             $dashboardService
                 ->shouldReceive("getDashboard")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($dashboard);
 
             $inputSpec = new IdInputSpec();
@@ -323,7 +322,7 @@ describe("DashboardReadAction", function () {
 
             $dashboardService
                 ->shouldReceive("getDashboard")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->once()
                 ->andReturn($dashboard);
 
@@ -358,7 +357,7 @@ describe("DashboardReadAction", function () {
 
             $dashboardService
                 ->shouldReceive("getDashboard")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->once()
                 ->andReturn($dashboard);
 

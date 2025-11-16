@@ -10,6 +10,7 @@ use jschreuder\Middle\Controller\RequestFilterInterface;
 use jschreuder\Middle\Controller\RequestValidatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Ramsey\Uuid\Uuid;
 use Respect\Validation\Validator as v;
 
 /**
@@ -62,7 +63,7 @@ final readonly class DashboardViewController implements
     public function execute(ServerRequestInterface $request): ResponseInterface
     {
         $data = (array) $request->getParsedBody();
-        $dashboardId = \Ramsey\Uuid\Uuid::fromString($data["id"]);
+        $dashboardId = Uuid::fromString($data["id"]);
 
         // Fetch the complete dashboard view (dashboard + categories with links + favorites)
         $dashboardView = $this->dashboardService->getFullDashboard(

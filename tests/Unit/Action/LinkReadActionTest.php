@@ -1,13 +1,16 @@
 <?php
 
 use jschreuder\BookmarkBureau\Action\LinkReadAction;
-use jschreuder\BookmarkBureau\Entity\Link;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\Title;
+use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\InputSpec\IdInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 describe("LinkReadAction", function () {
     describe("filter method", function () {
@@ -180,7 +183,7 @@ describe("LinkReadAction", function () {
 
             $linkService
                 ->shouldReceive("getLink")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->once()
                 ->andReturn($link);
 
@@ -203,7 +206,7 @@ describe("LinkReadAction", function () {
 
             $linkService
                 ->shouldReceive("getLink")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
             $inputSpec = new IdInputSpec();
@@ -229,18 +232,14 @@ describe("LinkReadAction", function () {
             $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(
                 id: $linkId,
-                url: new \jschreuder\BookmarkBureau\Entity\Value\Url(
-                    "https://example.com",
-                ),
-                title: new \jschreuder\BookmarkBureau\Entity\Value\Title(
-                    "Test Link",
-                ),
+                url: new Url("https://example.com"),
+                title: new Title("Test Link"),
                 description: "Test Description",
             );
 
             $linkService
                 ->shouldReceive("getLink")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
             $inputSpec = new IdInputSpec();
@@ -266,7 +265,7 @@ describe("LinkReadAction", function () {
 
                 $linkService
                     ->shouldReceive("getLink")
-                    ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                    ->with(Mockery::type(UuidInterface::class))
                     ->once()
                     ->andReturn($link);
 
@@ -317,7 +316,7 @@ describe("LinkReadAction", function () {
 
             $linkService
                 ->shouldReceive("getLink")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
             $inputSpec = new IdInputSpec();
@@ -336,14 +335,12 @@ describe("LinkReadAction", function () {
             $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(
                 id: $linkId,
-                icon: new \jschreuder\BookmarkBureau\Entity\Value\Icon(
-                    "test-icon",
-                ),
+                icon: new Icon("test-icon"),
             );
 
             $linkService
                 ->shouldReceive("getLink")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
             $inputSpec = new IdInputSpec();
@@ -370,7 +367,7 @@ describe("LinkReadAction", function () {
 
             $linkService
                 ->shouldReceive("getLink")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
             $inputSpec = new IdInputSpec();
@@ -398,7 +395,7 @@ describe("LinkReadAction", function () {
 
             $linkService
                 ->shouldReceive("getLink")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->once()
                 ->andReturn($link);
 
@@ -429,7 +426,7 @@ describe("LinkReadAction", function () {
 
             $linkService
                 ->shouldReceive("getLink")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->once()
                 ->andReturn($link);
 
@@ -465,7 +462,7 @@ describe("LinkReadAction", function () {
 
             $linkService
                 ->shouldReceive("getLink")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
             $inputSpec = new IdInputSpec();
@@ -511,21 +508,15 @@ describe("LinkReadAction", function () {
             $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(
                 id: $linkId,
-                url: new \jschreuder\BookmarkBureau\Entity\Value\Url(
-                    "https://test.example.com",
-                ),
-                title: new \jschreuder\BookmarkBureau\Entity\Value\Title(
-                    "Integration Test",
-                ),
+                url: new Url("https://test.example.com"),
+                title: new Title("Integration Test"),
                 description: "Full workflow test",
-                icon: new \jschreuder\BookmarkBureau\Entity\Value\Icon(
-                    "workflow-icon",
-                ),
+                icon: new Icon("workflow-icon"),
             );
 
             $linkService
                 ->shouldReceive("getLink")
-                ->with(\Mockery::type(\Ramsey\Uuid\UuidInterface::class))
+                ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
             $inputSpec = new IdInputSpec();

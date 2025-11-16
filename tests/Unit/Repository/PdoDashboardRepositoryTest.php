@@ -1,9 +1,11 @@
 <?php
 
+use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use Ramsey\Uuid\Uuid;
 
 describe("PdoDashboardRepository", function () {
@@ -152,9 +154,7 @@ describe("PdoDashboardRepository", function () {
                 $pdo,
                 new DashboardEntityMapper(),
             );
-            $icon = new \jschreuder\BookmarkBureau\Entity\Value\Icon(
-                "dashboard-icon",
-            );
+            $icon = new Icon("dashboard-icon");
             $dashboardWithIcon = TestEntityFactory::createDashboard(
                 icon: $icon,
             );
@@ -319,7 +319,7 @@ describe("PdoDashboardRepository", function () {
             $dashboardId = Uuid::uuid4();
 
             // Create dashboard and manually set icon to null before saving
-            $dashboard = new \jschreuder\BookmarkBureau\Entity\Dashboard(
+            $dashboard = new Dashboard(
                 dashboardId: $dashboardId,
                 title: new Title("Test Dashboard"),
                 description: "Test Description",
@@ -340,9 +340,7 @@ describe("PdoDashboardRepository", function () {
                 $pdo,
                 new DashboardEntityMapper(),
             );
-            $icon = new \jschreuder\BookmarkBureau\Entity\Value\Icon(
-                "custom-icon",
-            );
+            $icon = new Icon("custom-icon");
             $dashboard = TestEntityFactory::createDashboard(icon: $icon);
 
             $repo->save($dashboard);
@@ -362,9 +360,7 @@ describe("PdoDashboardRepository", function () {
 
             $repo->save($dashboard);
 
-            $newIcon = new \jschreuder\BookmarkBureau\Entity\Value\Icon(
-                "updated-icon",
-            );
+            $newIcon = new Icon("updated-icon");
             $dashboard->icon = $newIcon;
             $repo->save($dashboard);
 
@@ -378,9 +374,7 @@ describe("PdoDashboardRepository", function () {
                 $pdo,
                 new DashboardEntityMapper(),
             );
-            $icon = new \jschreuder\BookmarkBureau\Entity\Value\Icon(
-                "initial-icon",
-            );
+            $icon = new Icon("initial-icon");
             $dashboard = TestEntityFactory::createDashboard(icon: $icon);
 
             $repo->save($dashboard);

@@ -2,8 +2,11 @@
 
 use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
 use jschreuder\BookmarkBureau\Exception\ResponseTransformerException;
+use jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec;
+use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
+use jschreuder\BookmarkBureau\Response\ResponseTransformerInterface;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 
@@ -273,7 +276,7 @@ describe("JsonResponseTransformer", function () {
             $transformer = new JsonResponseTransformer();
 
             expect($transformer)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Response\ResponseTransformerInterface::class,
+                ResponseTransformerInterface::class,
             );
         });
 
@@ -385,7 +388,7 @@ describe("JsonResponseTransformer", function () {
 
         test("transforms output from CategoryOutputSpec", function () {
             $transformer = new JsonResponseTransformer();
-            $spec = new \jschreuder\BookmarkBureau\OutputSpec\CategoryOutputSpec();
+            $spec = new CategoryOutputSpec();
             $category = TestEntityFactory::createCategory();
 
             $outputData = $spec->transform($category);
@@ -406,7 +409,7 @@ describe("JsonResponseTransformer", function () {
 
         test("transforms output from DashboardOutputSpec", function () {
             $transformer = new JsonResponseTransformer();
-            $spec = new \jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec();
+            $spec = new DashboardOutputSpec();
             $dashboard = TestEntityFactory::createDashboard();
 
             $outputData = $spec->transform($dashboard);

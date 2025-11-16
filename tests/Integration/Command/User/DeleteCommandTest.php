@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 
 use jschreuder\BookmarkBureau\Command\User\DeleteCommand;
+use jschreuder\BookmarkBureau\Entity\Value\Email;
+use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -14,11 +16,7 @@ describe("DeleteCommand", function () {
             $command->setHelperSet(new HelperSet([new QuestionHelper()]));
 
             $email = "test@example.com";
-            $user = TestEntityFactory::createUser(
-                email: new \jschreuder\BookmarkBureau\Entity\Value\Email(
-                    $email,
-                ),
-            );
+            $user = TestEntityFactory::createUser(email: new Email($email));
 
             $userService
                 ->shouldReceive("getUserByEmail")
@@ -44,11 +42,7 @@ describe("DeleteCommand", function () {
             $command->setHelperSet(new HelperSet([new QuestionHelper()]));
 
             $email = "test@example.com";
-            $user = TestEntityFactory::createUser(
-                email: new \jschreuder\BookmarkBureau\Entity\Value\Email(
-                    $email,
-                ),
-            );
+            $user = TestEntityFactory::createUser(email: new Email($email));
 
             $userService
                 ->shouldReceive("getUserByEmail")
@@ -73,9 +67,7 @@ describe("DeleteCommand", function () {
 
             $userService
                 ->shouldReceive("getUserByEmail")
-                ->andThrow(
-                    new \jschreuder\BookmarkBureau\Exception\UserNotFoundException(),
-                );
+                ->andThrow(new UserNotFoundException());
 
             $tester = new CommandTester($command);
             $statusCode = $tester->execute(["email" => $email]);

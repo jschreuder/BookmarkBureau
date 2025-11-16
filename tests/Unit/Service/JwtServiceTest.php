@@ -1,5 +1,7 @@
 <?php
 
+use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
+use jschreuder\BookmarkBureau\Entity\Value\TokenClaims;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Service\LcobucciJwtService;
 use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
@@ -60,9 +62,7 @@ describe("JwtService", function () {
             $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::SESSION_TOKEN);
 
-            expect($token)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Value\JwtToken::class,
-            );
+            expect($token)->toBeInstanceOf(JwtToken::class);
             expect((string) $token)->toBeString();
             expect((string) $token)->not()->toBeEmpty();
         });
@@ -80,9 +80,7 @@ describe("JwtService", function () {
             $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::REMEMBER_ME_TOKEN);
 
-            expect($token)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Value\JwtToken::class,
-            );
+            expect($token)->toBeInstanceOf(JwtToken::class);
             expect((string) $token)->toBeString();
         });
 
@@ -99,9 +97,7 @@ describe("JwtService", function () {
             $service = createJwtService(clock: $clock);
             $token = $service->generate($user, TokenType::CLI_TOKEN);
 
-            expect($token)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Value\JwtToken::class,
-            );
+            expect($token)->toBeInstanceOf(JwtToken::class);
             expect((string) $token)->toBeString();
         });
     });
@@ -123,9 +119,7 @@ describe("JwtService", function () {
             $clock->shouldReceive("now")->andReturn($now);
             $claims = $service->verify($token);
 
-            expect($claims)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Value\TokenClaims::class,
-            );
+            expect($claims)->toBeInstanceOf(TokenClaims::class);
             expect($claims->userId->toString())->toBe(
                 $user->userId->toString(),
             );
@@ -153,9 +147,7 @@ describe("JwtService", function () {
 
             $claims = $service->verify($token);
 
-            expect($claims)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Value\TokenClaims::class,
-            );
+            expect($claims)->toBeInstanceOf(TokenClaims::class);
             expect($claims->userId->toString())->toBe(
                 $user->userId->toString(),
             );
@@ -200,7 +192,7 @@ describe("JwtService", function () {
 
                 $service = createJwtService(clock: $clock);
 
-                $fakeToken = new \jschreuder\BookmarkBureau\Entity\Value\JwtToken(
+                $fakeToken = new JwtToken(
                     "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.wrongsignature",
                 );
 
@@ -220,9 +212,7 @@ describe("JwtService", function () {
             $clock->shouldReceive("now")->andReturn($now);
 
             $service = createJwtService(clock: $clock);
-            $fakeToken = new \jschreuder\BookmarkBureau\Entity\Value\JwtToken(
-                "not.a.jwt",
-            );
+            $fakeToken = new JwtToken("not.a.jwt");
 
             expect(fn() => $service->verify($fakeToken))->toThrow(
                 InvalidTokenException::class,
@@ -256,9 +246,7 @@ describe("JwtService", function () {
                 $refreshedToken = $service->refresh($claims);
                 $refreshedClaims = $service->verify($refreshedToken);
 
-                expect($refreshedToken)->toBeInstanceOf(
-                    \jschreuder\BookmarkBureau\Entity\Value\JwtToken::class,
-                );
+                expect($refreshedToken)->toBeInstanceOf(JwtToken::class);
                 expect((string) $refreshedToken)
                     ->not()
                     ->toBe((string) $originalToken);

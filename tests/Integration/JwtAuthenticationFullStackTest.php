@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\GeneralRoutingProvider;
 use jschreuder\Middle\Router\RoutingProviderCollection;
 use Laminas\Diactoros\ServerRequestFactory;
@@ -129,10 +130,7 @@ describe("JWT Authentication Full Stack Integration", function () {
             $unitOfWork->commit();
 
             // Generate a valid token
-            $token = $jwtService->generate(
-                $testUser,
-                \jschreuder\BookmarkBureau\Entity\Value\TokenType::SESSION_TOKEN,
-            );
+            $token = $jwtService->generate($testUser, TokenType::SESSION_TOKEN);
 
             // Make authenticated request to a protected endpoint
             $request = ServerRequestFactory::fromGlobals();
@@ -208,7 +206,7 @@ describe("JWT Authentication Full Stack Integration", function () {
             // Generate remember-me token
             $token = $jwtService->generate(
                 $testUser,
-                \jschreuder\BookmarkBureau\Entity\Value\TokenType::REMEMBER_ME_TOKEN,
+                TokenType::REMEMBER_ME_TOKEN,
             );
 
             // Refresh token
@@ -368,7 +366,7 @@ describe("JWT Authentication Full Stack Integration", function () {
                 // Generate a valid token
                 $token = $jwtService->generate(
                     $testUser,
-                    \jschreuder\BookmarkBureau\Entity\Value\TokenType::SESSION_TOKEN,
+                    TokenType::SESSION_TOKEN,
                 );
 
                 $request = ServerRequestFactory::fromGlobals();

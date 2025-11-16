@@ -10,8 +10,8 @@ $container = require __DIR__ . '/../config/app_init.php';
 $app = $container->getApp();
 
 // Register routing
-new \jschreuder\Middle\Router\RoutingProviderCollection(
-  new \jschreuder\BookmarkBureau\GeneralRoutingProvider($container),
+new jschreuder\Middle\Router\RoutingProviderCollection(
+  new jschreuder\BookmarkBureau\GeneralRoutingProvider($container),
 )->registerRoutes($container->GetAppRouter());
 
 // Create request from globals

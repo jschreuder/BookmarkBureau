@@ -1,6 +1,9 @@
 <?php declare(strict_types=1);
 
 use jschreuder\BookmarkBureau\Command\User\CreateCommand;
+use jschreuder\BookmarkBureau\Entity\Value\Email;
+use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
+use jschreuder\BookmarkBureau\Exception\DuplicateEmailException;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -14,11 +17,7 @@ describe("CreateCommand", function () {
 
             $email = "test@example.com";
             $password = "testpassword123";
-            $user = TestEntityFactory::createUser(
-                email: new \jschreuder\BookmarkBureau\Entity\Value\Email(
-                    $email,
-                ),
-            );
+            $user = TestEntityFactory::createUser(email: new Email($email));
 
             $userService
                 ->shouldReceive("createUser")
@@ -46,11 +45,7 @@ describe("CreateCommand", function () {
 
             $email = "test@example.com";
             $interactivePassword = "interactivepassword456";
-            $user = TestEntityFactory::createUser(
-                email: new \jschreuder\BookmarkBureau\Entity\Value\Email(
-                    $email,
-                ),
-            );
+            $user = TestEntityFactory::createUser(email: new Email($email));
 
             $userService
                 ->shouldReceive("createUser")
@@ -99,9 +94,7 @@ describe("CreateCommand", function () {
 
             $userService
                 ->shouldReceive("createUser")
-                ->andThrow(
-                    new \jschreuder\BookmarkBureau\Exception\DuplicateEmailException(),
-                );
+                ->andThrow(new DuplicateEmailException());
 
             $tester = new CommandTester($command);
             $statusCode = $tester->execute([
@@ -133,14 +126,8 @@ describe("CreateCommand", function () {
 
             $email = "test@example.com";
             $password = "testpassword123";
-            $user = TestEntityFactory::createUser(
-                email: new \jschreuder\BookmarkBureau\Entity\Value\Email(
-                    $email,
-                ),
-            );
-            $totpSecret = new \jschreuder\BookmarkBureau\Entity\Value\TotpSecret(
-                "JBSWY3DPEBLW64TMMQ",
-            );
+            $user = TestEntityFactory::createUser(email: new Email($email));
+            $totpSecret = new TotpSecret("JBSWY3DPEBLW64TMMQ");
 
             $userService
                 ->shouldReceive("createUser")

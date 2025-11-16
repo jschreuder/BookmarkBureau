@@ -2,6 +2,7 @@
 
 use jschreuder\BookmarkBureau\Collection\CategoryCollection;
 use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
@@ -116,9 +117,7 @@ describe("CategoryService", function () {
                 "#FF5733",
             );
 
-            expect($result)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Category::class,
-            );
+            expect($result)->toBeInstanceOf(Category::class);
             expect($result->title->value)->toBe("New Category");
             expect($result->color?->value)->toBe("#FF5733");
             expect($result->sortOrder)->toBe(3);

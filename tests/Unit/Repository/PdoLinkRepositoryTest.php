@@ -3,6 +3,7 @@
 use jschreuder\BookmarkBureau\Collection\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Tag;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
@@ -569,9 +570,7 @@ describe("PdoLinkRepository", function () {
 
             expect($found->tags)->toHaveCount(2);
             $tagNames = array_map(
-                fn(
-                    \jschreuder\BookmarkBureau\Entity\Tag $tag,
-                ) => (string) $tag->tagName,
+                fn(Tag $tag) => (string) $tag->tagName,
                 iterator_to_array($found->tags),
             );
             expect($tagNames)->toContain("php");
@@ -647,9 +646,7 @@ describe("PdoLinkRepository", function () {
 
                 expect($foundLink1->tags)->toHaveCount(2);
                 $link1Tags = array_map(
-                    fn(
-                        \jschreuder\BookmarkBureau\Entity\Tag $tag,
-                    ) => (string) $tag->tagName,
+                    fn(Tag $tag) => (string) $tag->tagName,
                     iterator_to_array($foundLink1->tags),
                 );
                 expect($link1Tags)->toContain("php");
@@ -657,9 +654,7 @@ describe("PdoLinkRepository", function () {
 
                 expect($foundLink2->tags)->toHaveCount(1);
                 $link2Tags = array_map(
-                    fn(
-                        \jschreuder\BookmarkBureau\Entity\Tag $tag,
-                    ) => (string) $tag->tagName,
+                    fn(Tag $tag) => (string) $tag->tagName,
                     iterator_to_array($foundLink2->tags),
                 );
                 expect($link2Tags)->toContain("backend");

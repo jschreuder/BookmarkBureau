@@ -12,16 +12,17 @@ use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
+use jschreuder\BookmarkBureau\Entity\Value\Icon;
+use jschreuder\BookmarkBureau\Entity\Value\Url;
+use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 
 describe("FullDashboardOutputSpec", function () {
     // Helper to create a FullDashboardOutputSpec with all dependencies
-    $createSpec = function () {
-        return new FullDashboardOutputSpec(
-            new DashboardOutputSpec(),
-            new CategoryOutputSpec(),
-            new LinkOutputSpec(new TagOutputSpec()),
-        );
-    };
+    $createSpec = fn() => new FullDashboardOutputSpec(
+        new DashboardOutputSpec(),
+        new CategoryOutputSpec(),
+        new LinkOutputSpec(new TagOutputSpec()),
+    );
 
     describe("initialization", function () use ($createSpec) {
         test("creates OutputSpec instance", function () use ($createSpec) {
@@ -33,9 +34,7 @@ describe("FullDashboardOutputSpec", function () {
         test("implements OutputSpecInterface", function () use ($createSpec) {
             $spec = $createSpec();
 
-            expect($spec)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface::class,
-            );
+            expect($spec)->toBeInstanceOf(OutputSpecInterface::class);
         });
 
         test("is readonly", function () use ($createSpec) {
@@ -424,9 +423,7 @@ describe("FullDashboardOutputSpec", function () {
                 dashboard: $dashboard,
             );
             $link = TestEntityFactory::createLink(
-                url: new \jschreuder\BookmarkBureau\Entity\Value\Url(
-                    "https://example.com",
-                ),
+                url: new Url("https://example.com"),
                 title: new Title("Example"),
                 description: "Example description",
             );
@@ -473,9 +470,7 @@ describe("FullDashboardOutputSpec", function () {
             $spec = $createSpec();
             $dashboard = TestEntityFactory::createDashboard();
             $favorite = TestEntityFactory::createLink(
-                url: new \jschreuder\BookmarkBureau\Entity\Value\Url(
-                    "https://favorite.com",
-                ),
+                url: new Url("https://favorite.com"),
                 title: new Title("Favorite Link"),
                 description: "Favorite description",
             );
@@ -738,9 +733,7 @@ describe("FullDashboardOutputSpec", function () {
                 $dashboard = TestEntityFactory::createDashboard(
                     title: new Title("Complex Dashboard"),
                     description: "A dashboard with all optional fields set",
-                    icon: new \jschreuder\BookmarkBureau\Entity\Value\Icon(
-                        "dashboard-icon",
-                    ),
+                    icon: new Icon("dashboard-icon"),
                 );
 
                 $category = TestEntityFactory::createCategory(
@@ -750,25 +743,17 @@ describe("FullDashboardOutputSpec", function () {
                 );
 
                 $link = TestEntityFactory::createLink(
-                    url: new \jschreuder\BookmarkBureau\Entity\Value\Url(
-                        "https://complex.example.com",
-                    ),
+                    url: new Url("https://complex.example.com"),
                     title: new Title("Complex Link"),
                     description: "A link with all fields",
-                    icon: new \jschreuder\BookmarkBureau\Entity\Value\Icon(
-                        "link-icon",
-                    ),
+                    icon: new Icon("link-icon"),
                 );
 
                 $favorite = TestEntityFactory::createLink(
-                    url: new \jschreuder\BookmarkBureau\Entity\Value\Url(
-                        "https://favorite.example.com",
-                    ),
+                    url: new Url("https://favorite.example.com"),
                     title: new Title("Complex Favorite"),
                     description: "A favorite with all fields",
-                    icon: new \jschreuder\BookmarkBureau\Entity\Value\Icon(
-                        "favorite-icon",
-                    ),
+                    icon: new Icon("favorite-icon"),
                 );
 
                 $categoryWithLinks = new CategoryWithLinks(
@@ -826,9 +811,7 @@ describe("FullDashboardOutputSpec", function () {
                 new LinkCollection(),
             );
 
-            expect($interface)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface::class,
-            );
+            expect($interface)->toBeInstanceOf(OutputSpecInterface::class);
 
             $result = $interface->transform($dashboardView);
 

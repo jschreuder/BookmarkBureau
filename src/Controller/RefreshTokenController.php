@@ -5,6 +5,7 @@ namespace jschreuder\BookmarkBureau\Controller;
 use jschreuder\BookmarkBureau\Entity\Value\TokenResponse;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\OutputSpec\TokenOutputSpec;
+use jschreuder\BookmarkBureau\Response\ResponseTransformerInterface;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\Middle\Controller\ControllerInterface;
@@ -18,7 +19,7 @@ final readonly class RefreshTokenController implements ControllerInterface
         private JwtServiceInterface $jwtService,
         private UserServiceInterface $userService,
         private TokenOutputSpec $tokenOutputSpec,
-        private \jschreuder\BookmarkBureau\Response\ResponseTransformerInterface $responseTransformer,
+        private ResponseTransformerInterface $responseTransformer,
     ) {}
 
     #[\Override]

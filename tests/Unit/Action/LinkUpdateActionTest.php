@@ -8,6 +8,7 @@ use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 describe("LinkUpdateAction", function () {
     describe("filter method", function () {
@@ -480,7 +481,7 @@ describe("LinkUpdateAction", function () {
                 $linkService
                     ->shouldReceive("updateLink")
                     ->with(
-                        Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                        Mockery::type(UuidInterface::class),
                         "https://example.com",
                         "Test Title",
                         "Test Description",
@@ -562,7 +563,7 @@ describe("LinkUpdateAction", function () {
             $linkService
                 ->shouldReceive("updateLink")
                 ->with(
-                    \Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                    Mockery::type(UuidInterface::class),
                     "https://example.com",
                     "Test Title",
                     "Long description",
@@ -599,7 +600,7 @@ describe("LinkUpdateAction", function () {
                 $linkService
                     ->shouldReceive("updateLink")
                     ->with(
-                        \Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                        Mockery::type(UuidInterface::class),
                         "https://example.com",
                         "Test Title",
                         "Test Description",
@@ -637,11 +638,11 @@ describe("LinkUpdateAction", function () {
                 $linkService
                     ->shouldReceive("updateLink")
                     ->with(
-                        \Mockery::type(\Ramsey\Uuid\UuidInterface::class),
-                        \Mockery::any(),
-                        \Mockery::any(),
-                        \Mockery::any(),
-                        \Mockery::any(),
+                        Mockery::type(UuidInterface::class),
+                        Mockery::any(),
+                        Mockery::any(),
+                        Mockery::any(),
+                        Mockery::any(),
                     )
                     ->andReturn($link);
 
@@ -678,7 +679,7 @@ describe("LinkUpdateAction", function () {
             $linkService
                 ->shouldReceive("updateLink")
                 ->with(
-                    \Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                    Mockery::type(UuidInterface::class),
                     "https://example.com",
                     "Test Title",
                     "Test Description",
@@ -723,7 +724,7 @@ describe("LinkUpdateAction", function () {
             $linkService
                 ->shouldReceive("updateLink")
                 ->with(
-                    \Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                    Mockery::type(UuidInterface::class),
                     "https://example.com",
                     "Test Title",
                     "Test Description",

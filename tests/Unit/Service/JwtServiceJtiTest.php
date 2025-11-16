@@ -1,5 +1,7 @@
 <?php
 
+use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
+use jschreuder\BookmarkBureau\Entity\Value\TokenClaims;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Service\LcobucciJwtService;
 use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
@@ -9,6 +11,7 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Psr\Clock\ClockInterface;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 function createJwtConfigForJti(
     string $secret = "test-secret-key-32-bytes-long!!!",
@@ -58,9 +61,7 @@ describe("LcobucciJwtService with JTI", function () {
             $service = createJwtServiceWithJti($jtiRepository, clock: $clock);
             $token = $service->generate($user, TokenType::CLI_TOKEN);
 
-            expect($token)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Value\JwtToken::class,
-            );
+            expect($token)->toBeInstanceOf(JwtToken::class);
             expect((string) $token)->toBeString();
         });
 
@@ -89,9 +90,7 @@ describe("LcobucciJwtService with JTI", function () {
             $service = createJwtServiceWithJti($jtiRepository, clock: $clock);
             $token = $service->generate($user, TokenType::CLI_TOKEN);
 
-            expect($token)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Value\JwtToken::class,
-            );
+            expect($token)->toBeInstanceOf(JwtToken::class);
         });
 
         test("does not save JTI for non-CLI tokens", function () {
@@ -110,9 +109,7 @@ describe("LcobucciJwtService with JTI", function () {
             $service = createJwtServiceWithJti($jtiRepository, clock: $clock);
             $token = $service->generate($user, TokenType::SESSION_TOKEN);
 
-            expect($token)->toBeInstanceOf(
-                \jschreuder\BookmarkBureau\Entity\Value\JwtToken::class,
-            );
+            expect($token)->toBeInstanceOf(JwtToken::class);
         });
     });
 
@@ -206,9 +203,7 @@ describe("LcobucciJwtService with JTI", function () {
                 $config->signer(),
                 $config->signingKey(),
             );
-            $token = new \jschreuder\BookmarkBureau\Entity\Value\JwtToken(
-                $tokenObj->toString(),
-            );
+            $token = new JwtToken($tokenObj->toString());
 
             $clock->shouldReceive("now")->andReturn($now);
 
@@ -246,9 +241,7 @@ describe("LcobucciJwtService with JTI", function () {
                 $claims = $service->verify($token);
 
                 expect($claims->jti)->not()->toBeNull();
-                expect($claims->jti)->toBeInstanceOf(
-                    \Ramsey\Uuid\UuidInterface::class,
-                );
+                expect($claims->jti)->toBeInstanceOf(UuidInterface::class);
             },
         );
     });
@@ -289,7 +282,7 @@ describe("LcobucciJwtService with JTI", function () {
         });
 
         test("fails to refresh CLI token without JTI", function () {
-            $claims = new \jschreuder\BookmarkBureau\Entity\Value\TokenClaims(
+            $claims = new TokenClaims(
                 Uuid::uuid4(),
                 TokenType::CLI_TOKEN,
                 new DateTimeImmutable(),
