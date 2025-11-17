@@ -3,8 +3,9 @@
 namespace jschreuder\BookmarkBureau\Entity\Value;
 
 use InvalidArgumentException;
+use jschreuder\BookmarkBureau\Entity\Value\ValueEqualityInterface;
 
-final readonly class Email
+final readonly class Email implements ValueEqualityInterface
 {
     use StringValueTrait;
 

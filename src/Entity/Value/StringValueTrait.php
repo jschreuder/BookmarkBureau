@@ -10,4 +10,12 @@ trait StringValueTrait
     {
         return $this->value;
     }
+
+    public function equals(object $value): bool
+    {
+        return match (true) {
+            !$value instanceof self => false,
+            default => $value->value === $this->value,
+        };
+    }
 }

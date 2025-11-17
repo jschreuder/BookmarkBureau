@@ -13,7 +13,7 @@ final class Tag implements EntityEqualityInterface
     {
         return match (true) {
             !$entity instanceof self => false,
-            default => $entity->tagName->value === $this->tagName->value,
+            default => $entity->tagName->equals($this->tagName),
         };
     }
 }

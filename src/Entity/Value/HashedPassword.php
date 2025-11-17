@@ -2,7 +2,9 @@
 
 namespace jschreuder\BookmarkBureau\Entity\Value;
 
-final readonly class HashedPassword
+use jschreuder\BookmarkBureau\Entity\Value\ValueEqualityInterface;
+
+final readonly class HashedPassword implements ValueEqualityInterface
 {
     use StringValueTrait;
 

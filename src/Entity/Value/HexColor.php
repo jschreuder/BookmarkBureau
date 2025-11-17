@@ -3,8 +3,9 @@
 namespace jschreuder\BookmarkBureau\Entity\Value;
 
 use InvalidArgumentException;
+use jschreuder\BookmarkBureau\Entity\Value\ValueEqualityInterface;
 
-final readonly class HexColor
+final readonly class HexColor implements ValueEqualityInterface
 {
     use StringValueTrait;
 

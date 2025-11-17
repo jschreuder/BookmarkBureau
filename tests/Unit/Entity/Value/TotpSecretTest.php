@@ -157,4 +157,73 @@ describe("TotpSecret Value Object", function () {
             expect(strlen($secret->value))->toBe(16);
         });
     });
+
+    describe("equals method", function () {
+        test("equals returns true for same TOTP secret value", function () {
+            $secret1 = new TotpSecret("JBSWY3DPEHPK3PXP");
+            $secret2 = new TotpSecret("JBSWY3DPEHPK3PXP");
+
+            expect($secret1->equals($secret2))->toBeTrue();
+        });
+
+        test(
+            "equals returns false for different TOTP secret values",
+            function () {
+                $secret1 = new TotpSecret("JBSWY3DPEHPK3PXP");
+                $secret2 = new TotpSecret("JBSWY3DPEHPK3PXQ");
+
+                expect($secret1->equals($secret2))->toBeFalse();
+            },
+        );
+
+        test(
+            "equals returns true when comparing normalized uppercase secrets",
+            function () {
+                $secret1 = new TotpSecret("JBSWY3DPEHPK3PXP");
+                $secret2 = new TotpSecret("jbswy3dpehpk3pxp");
+
+                expect($secret1->equals($secret2))->toBeTrue();
+            },
+        );
+
+        test(
+            "equals returns true for mixed case inputs that normalize to same value",
+            function () {
+                $secret1 = new TotpSecret("JbSwY3DpEhPk3PxP");
+                $secret2 = new TotpSecret("JBSWY3DPEHPK3PXP");
+
+                expect($secret1->equals($secret2))->toBeTrue();
+            },
+        );
+
+        test(
+            "equals returns false when comparing with different type",
+            function () {
+                $secret = new TotpSecret("JBSWY3DPEHPK3PXP");
+                $stdObject = new stdClass();
+
+                expect($secret->equals($stdObject))->toBeFalse();
+            },
+        );
+
+        test(
+            "equals returns false when comparing with non-value object",
+            function () {
+                $secret = new TotpSecret("JBSWY3DPEHPK3PXP");
+                $tagName = new \jschreuder\BookmarkBureau\Entity\Value\TagName(
+                    "github",
+                );
+
+                expect($secret->equals($tagName))->toBeFalse();
+            },
+        );
+
+        test("equals respects case normalization", function () {
+            // Both should normalize to the same uppercase value
+            $secret1 = new TotpSecret("jbswy3dpehpk3pxp");
+            $secret2 = new TotpSecret("JbSwY3DpEhPk3PxP");
+
+            expect($secret1->equals($secret2))->toBeTrue();
+        });
+    });
 });

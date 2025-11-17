@@ -2,7 +2,9 @@
 
 namespace jschreuder\BookmarkBureau\Entity\Value;
 
-final readonly class JwtToken
+use jschreuder\BookmarkBureau\Entity\Value\ValueEqualityInterface;
+
+final readonly class JwtToken implements ValueEqualityInterface
 {
     use StringValueTrait;
 
