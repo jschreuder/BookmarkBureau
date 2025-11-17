@@ -525,4 +525,85 @@ describe("User Entity", function () {
             },
         );
     });
+
+    describe("equals method", function () {
+        test("equals returns true for same user ID", function () {
+            $userId = Uuid::uuid4();
+            $email = new Email("user@example.com");
+            $passwordHash = new HashedPassword(
+                password_hash("password", PASSWORD_ARGON2ID),
+            );
+
+            $user1 = new User(
+                $userId,
+                $email,
+                $passwordHash,
+                null,
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+            );
+
+            $user2 = new User(
+                $userId,
+                new Email("different@example.com"),
+                new HashedPassword(
+                    password_hash("different", PASSWORD_ARGON2ID),
+                ),
+                null,
+                new DateTimeImmutable("2024-01-02 12:00:00"),
+                new DateTimeImmutable("2024-01-02 12:00:00"),
+            );
+
+            expect($user1->equals($user2))->toBeTrue();
+        });
+
+        test("equals returns false for different user IDs", function () {
+            $userId1 = Uuid::uuid4();
+            $userId2 = Uuid::uuid4();
+            $email = new Email("user@example.com");
+            $passwordHash = new HashedPassword(
+                password_hash("password", PASSWORD_ARGON2ID),
+            );
+
+            $user1 = new User(
+                $userId1,
+                $email,
+                $passwordHash,
+                null,
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+            );
+
+            $user2 = new User(
+                $userId2,
+                $email,
+                $passwordHash,
+                null,
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+            );
+
+            expect($user1->equals($user2))->toBeFalse();
+        });
+
+        test(
+            "equals returns false when comparing with different type",
+            function () {
+                $user = TestEntityFactory::createUser();
+                $dashboard = TestEntityFactory::createDashboard();
+
+                expect($user->equals($dashboard))->toBeFalse();
+            },
+        );
+
+        test(
+            "equals returns false when comparing with non-entity object",
+            function () {
+                $user = TestEntityFactory::createUser();
+                $stdObject = new stdClass();
+
+                expect($user->equals($stdObject))->toBeFalse();
+            },
+        );
+    });
 });

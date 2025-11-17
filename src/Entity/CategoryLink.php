@@ -2,10 +2,9 @@
 
 namespace jschreuder\BookmarkBureau\Entity;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 
-final class CategoryLink
+final class CategoryLink implements EntityEqualityInterface
 {
 
     public readonly Category $category;
@@ -31,5 +30,14 @@ final class CategoryLink
         $this->link = $link;
         $this->sortOrder = $sortOrder;
         $this->createdAt = $createdAt;
+    }
+
+    public function equals(object $entity): bool
+    {
+        return match (true) {
+            !$entity instanceof self => false,
+            default => $entity->category->categoryId->equals($this->category->categoryId)
+                && $entity->link->linkId->equals($this->link->linkId),
+        };
     }
 }

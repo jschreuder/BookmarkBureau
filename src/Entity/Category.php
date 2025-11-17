@@ -6,7 +6,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Ramsey\Uuid\UuidInterface;
 
-final class Category
+final class Category implements EntityEqualityInterface
 {
 
     public readonly UuidInterface $categoryId;
@@ -60,5 +60,13 @@ final class Category
     public function markAsUpdated(): void
     {
         $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function equals(object $entity): bool
+    {
+        return match (true) {
+            !$entity instanceof self => false,
+            default => $entity->categoryId->equals($this->categoryId),
+        };
     }
 }

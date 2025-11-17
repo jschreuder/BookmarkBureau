@@ -6,7 +6,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Ramsey\Uuid\UuidInterface;
 
-final class User
+final class User implements EntityEqualityInterface
 {
     public readonly UuidInterface $userId;
 
@@ -85,5 +85,13 @@ final class User
     private function markAsUpdated(): void
     {
         $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function equals(object $entity): bool
+    {
+        return match (true) {
+            !$entity instanceof self => false,
+            default => $entity->userId->equals($this->userId),
+        };
     }
 }

@@ -6,7 +6,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Ramsey\Uuid\UuidInterface;
 
-final class Dashboard
+final class Dashboard implements EntityEqualityInterface
 {
 
     public readonly UuidInterface $dashboardId;
@@ -56,5 +56,13 @@ final class Dashboard
     public function markAsUpdated(): void
     {
         $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function equals(object $entity): bool
+    {
+        return match (true) {
+            !$entity instanceof self => false,
+            default => $entity->dashboardId->equals($this->dashboardId),
+        };
     }
 }

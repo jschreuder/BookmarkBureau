@@ -4,53 +4,64 @@ use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Entity\Link;
 
-describe('Favorite Entity', function () {
-    describe('construction', function () {
-        test('creates a favorite with all properties', function () {
+describe("Favorite Entity", function () {
+    describe("construction", function () {
+        test("creates a favorite with all properties", function () {
             $dashboard = TestEntityFactory::createDashboard();
             $link = TestEntityFactory::createLink();
             $sortOrder = 5;
-            $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
+            $createdAt = new DateTimeImmutable("2024-01-01 10:00:00");
 
             $favorite = new Favorite($dashboard, $link, $sortOrder, $createdAt);
 
             expect($favorite)->toBeInstanceOf(Favorite::class);
         });
 
-        test('stores all properties correctly during construction', function () {
-            $dashboard = TestEntityFactory::createDashboard();
-            $link = TestEntityFactory::createLink();
-            $sortOrder = 5;
-            $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
+        test(
+            "stores all properties correctly during construction",
+            function () {
+                $dashboard = TestEntityFactory::createDashboard();
+                $link = TestEntityFactory::createLink();
+                $sortOrder = 5;
+                $createdAt = new DateTimeImmutable("2024-01-01 10:00:00");
 
-            $favorite = new Favorite($dashboard, $link, $sortOrder, $createdAt);
+                $favorite = new Favorite(
+                    $dashboard,
+                    $link,
+                    $sortOrder,
+                    $createdAt,
+                );
 
-            expect($favorite->dashboard)->toBe($dashboard);
-            expect($favorite->link)->toBe($link);
-            expect($favorite->sortOrder)->toBe($sortOrder);
-            expect($favorite->createdAt)->toBe($createdAt);
-        });
+                expect($favorite->dashboard)->toBe($dashboard);
+                expect($favorite->link)->toBe($link);
+                expect($favorite->sortOrder)->toBe($sortOrder);
+                expect($favorite->createdAt)->toBe($createdAt);
+            },
+        );
     });
 
-    describe('dashboard getter', function () {
-        test('getDashboard returns the Dashboard object', function () {
+    describe("dashboard getter", function () {
+        test("getDashboard returns the Dashboard object", function () {
             $dashboard = TestEntityFactory::createDashboard();
-            $favorite = TestEntityFactory::createFavorite(dashboard: $dashboard);
+            $favorite = TestEntityFactory::createFavorite(
+                dashboard: $dashboard,
+            );
 
             expect($favorite->dashboard)->toBe($dashboard);
             expect($favorite->dashboard)->toBeInstanceOf(Dashboard::class);
         });
 
-        test('dashboard is readonly and cannot be modified', function () {
+        test("dashboard is readonly and cannot be modified", function () {
             $favorite = TestEntityFactory::createFavorite();
 
-            expect(fn() => $favorite->dashboard = TestEntityFactory::createDashboard())
-                ->toThrow(Error::class);
+            expect(
+                fn() => ($favorite->dashboard = TestEntityFactory::createDashboard()),
+            )->toThrow(Error::class);
         });
     });
 
-    describe('link getter', function () {
-        test('getLink returns the Link object', function () {
+    describe("link getter", function () {
+        test("getLink returns the Link object", function () {
             $link = TestEntityFactory::createLink();
             $favorite = TestEntityFactory::createFavorite(link: $link);
 
@@ -58,23 +69,26 @@ describe('Favorite Entity', function () {
             expect($favorite->link)->toBeInstanceOf(Link::class);
         });
 
-        test('link is readonly and cannot be modified', function () {
+        test("link is readonly and cannot be modified", function () {
             $favorite = TestEntityFactory::createFavorite();
 
-            expect(fn() => $favorite->link = TestEntityFactory::createLink())
-                ->toThrow(Error::class);
+            expect(
+                fn() => ($favorite->link = TestEntityFactory::createLink()),
+            )->toThrow(Error::class);
         });
     });
 
-    describe('sortOrder getter and setter', function () {
-        test('getSortOrder returns the sort order', function () {
+    describe("sortOrder getter and setter", function () {
+        test("getSortOrder returns the sort order", function () {
             $sortOrder = 42;
-            $favorite = TestEntityFactory::createFavorite(sortOrder: $sortOrder);
+            $favorite = TestEntityFactory::createFavorite(
+                sortOrder: $sortOrder,
+            );
 
             expect($favorite->sortOrder)->toBe($sortOrder);
         });
 
-        test('setSortOrder updates the sort order', function () {
+        test("setSortOrder updates the sort order", function () {
             $favorite = TestEntityFactory::createFavorite();
             $newSortOrder = 10;
 
@@ -83,7 +97,7 @@ describe('Favorite Entity', function () {
             expect($favorite->sortOrder)->toBe($newSortOrder);
         });
 
-        test('setSortOrder works with zero', function () {
+        test("setSortOrder works with zero", function () {
             $favorite = TestEntityFactory::createFavorite();
 
             $favorite->sortOrder = 0;
@@ -91,7 +105,7 @@ describe('Favorite Entity', function () {
             expect($favorite->sortOrder)->toBe(0);
         });
 
-        test('setSortOrder works with negative values', function () {
+        test("setSortOrder works with negative values", function () {
             $favorite = TestEntityFactory::createFavorite();
 
             $favorite->sortOrder = -5;
@@ -100,48 +114,56 @@ describe('Favorite Entity', function () {
         });
     });
 
-    describe('createdAt getter', function () {
-        test('getCreatedAt returns the creation timestamp', function () {
-            $createdAt = new DateTimeImmutable('2024-01-01 10:00:00');
-            $favorite = TestEntityFactory::createFavorite(createdAt: $createdAt);
+    describe("createdAt getter", function () {
+        test("getCreatedAt returns the creation timestamp", function () {
+            $createdAt = new DateTimeImmutable("2024-01-01 10:00:00");
+            $favorite = TestEntityFactory::createFavorite(
+                createdAt: $createdAt,
+            );
 
             expect($favorite->createdAt)->toBe($createdAt);
-            expect($favorite->createdAt)->toBeInstanceOf(DateTimeInterface::class);
+            expect($favorite->createdAt)->toBeInstanceOf(
+                DateTimeInterface::class,
+            );
         });
 
-        test('createdAt is readonly and cannot be modified', function () {
+        test("createdAt is readonly and cannot be modified", function () {
             $favorite = TestEntityFactory::createFavorite();
 
-            expect(fn() => $favorite->createdAt = new DateTimeImmutable())
-                ->toThrow(Error::class);
+            expect(
+                fn() => ($favorite->createdAt = new DateTimeImmutable()),
+            )->toThrow(Error::class);
         });
     });
 
-    describe('immutability constraints', function () {
-        test('dashboard cannot be modified', function () {
+    describe("immutability constraints", function () {
+        test("dashboard cannot be modified", function () {
             $favorite = TestEntityFactory::createFavorite();
 
-            expect(fn() => $favorite->dashboard = TestEntityFactory::createDashboard())
-                ->toThrow(Error::class);
+            expect(
+                fn() => ($favorite->dashboard = TestEntityFactory::createDashboard()),
+            )->toThrow(Error::class);
         });
 
-        test('link cannot be modified', function () {
+        test("link cannot be modified", function () {
             $favorite = TestEntityFactory::createFavorite();
 
-            expect(fn() => $favorite->link = TestEntityFactory::createLink())
-                ->toThrow(Error::class);
+            expect(
+                fn() => ($favorite->link = TestEntityFactory::createLink()),
+            )->toThrow(Error::class);
         });
 
-        test('createdAt cannot be modified', function () {
+        test("createdAt cannot be modified", function () {
             $favorite = TestEntityFactory::createFavorite();
 
-            expect(fn() => $favorite->createdAt = new DateTimeImmutable())
-                ->toThrow(Error::class);
+            expect(
+                fn() => ($favorite->createdAt = new DateTimeImmutable()),
+            )->toThrow(Error::class);
         });
     });
 
-    describe('multiple setters', function () {
-        test('can update sortOrder multiple times', function () {
+    describe("multiple setters", function () {
+        test("can update sortOrder multiple times", function () {
             $favorite = TestEntityFactory::createFavorite();
             $sortOrder1 = 5;
             $sortOrder2 = 15;
@@ -156,5 +178,89 @@ describe('Favorite Entity', function () {
             $favorite->sortOrder = $sortOrder3;
             expect($favorite->sortOrder)->toBe($sortOrder3);
         });
+    });
+
+    describe("equals method", function () {
+        test("equals returns true for same dashboard and link", function () {
+            $dashboard = TestEntityFactory::createDashboard();
+            $link = TestEntityFactory::createLink();
+
+            $favorite1 = new Favorite(
+                $dashboard,
+                $link,
+                5,
+                new DateTimeImmutable("2024-01-01 10:00:00"),
+            );
+            $favorite2 = new Favorite(
+                $dashboard,
+                $link,
+                10,
+                new DateTimeImmutable("2024-01-02 10:00:00"),
+            );
+
+            expect($favorite1->equals($favorite2))->toBeTrue();
+        });
+
+        test("equals returns false for different dashboard", function () {
+            $dashboard1 = TestEntityFactory::createDashboard();
+            $dashboard2 = TestEntityFactory::createDashboard();
+            $link = TestEntityFactory::createLink();
+
+            $favorite1 = new Favorite(
+                $dashboard1,
+                $link,
+                5,
+                new DateTimeImmutable("2024-01-01 10:00:00"),
+            );
+            $favorite2 = new Favorite(
+                $dashboard2,
+                $link,
+                5,
+                new DateTimeImmutable("2024-01-01 10:00:00"),
+            );
+
+            expect($favorite1->equals($favorite2))->toBeFalse();
+        });
+
+        test("equals returns false for different link", function () {
+            $dashboard = TestEntityFactory::createDashboard();
+            $link1 = TestEntityFactory::createLink();
+            $link2 = TestEntityFactory::createLink();
+
+            $favorite1 = new Favorite(
+                $dashboard,
+                $link1,
+                5,
+                new DateTimeImmutable("2024-01-01 10:00:00"),
+            );
+            $favorite2 = new Favorite(
+                $dashboard,
+                $link2,
+                5,
+                new DateTimeImmutable("2024-01-01 10:00:00"),
+            );
+
+            expect($favorite1->equals($favorite2))->toBeFalse();
+        });
+
+        test(
+            "equals returns false when comparing with different type",
+            function () {
+                $favorite = TestEntityFactory::createFavorite();
+                $category = TestEntityFactory::createCategory();
+
+                expect($favorite->equals($category))->toBeFalse();
+            },
+        );
+
+        test(
+            "equals returns false when comparing with non-entity object",
+            function () {
+                $favorite = TestEntityFactory::createFavorite();
+                $stdObject = new stdClass();
+
+                expect($favorite->equals($stdObject))->toBeFalse();
+            },
+        );
     });
 });

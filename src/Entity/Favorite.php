@@ -2,10 +2,9 @@
 
 namespace jschreuder\BookmarkBureau\Entity;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 
-final class Favorite
+final class Favorite implements EntityEqualityInterface
 {
 
     public readonly Dashboard $dashboard;
@@ -31,5 +30,14 @@ final class Favorite
         $this->link = $link;
         $this->sortOrder = $sortOrder;
         $this->createdAt = $createdAt;
+    }
+
+    public function equals(object $entity): bool
+    {
+        return match (true) {
+            !$entity instanceof self => false,
+            default => $entity->dashboard->dashboardId->equals($this->dashboard->dashboardId)
+                && $entity->link->linkId->equals($this->link->linkId),
+        };
     }
 }

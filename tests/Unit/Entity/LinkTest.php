@@ -333,4 +333,87 @@ describe("Link Entity", function () {
             );
         });
     });
+
+    describe("equals method", function () {
+        test("equals returns true for same link ID", function () {
+            $linkId = Uuid::uuid4();
+            $url = new Url("https://example.com");
+            $title = new Title("Test Link");
+
+            $link1 = new Link(
+                $linkId,
+                $url,
+                $title,
+                "Description 1",
+                new Icon("icon1"),
+                new DateTimeImmutable("2024-01-01 10:00:00"),
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+                new \jschreuder\BookmarkBureau\Composite\TagCollection(),
+            );
+
+            $link2 = new Link(
+                $linkId,
+                new Url("https://different.com"),
+                new Title("Different Title"),
+                "Description 2",
+                new Icon("icon2"),
+                new DateTimeImmutable("2024-01-02 10:00:00"),
+                new DateTimeImmutable("2024-01-02 12:00:00"),
+                new \jschreuder\BookmarkBureau\Composite\TagCollection(),
+            );
+
+            expect($link1->equals($link2))->toBeTrue();
+        });
+
+        test("equals returns false for different link IDs", function () {
+            $linkId1 = Uuid::uuid4();
+            $linkId2 = Uuid::uuid4();
+            $url = new Url("https://example.com");
+            $title = new Title("Test Link");
+
+            $link1 = new Link(
+                $linkId1,
+                $url,
+                $title,
+                "Description",
+                new Icon("icon"),
+                new DateTimeImmutable("2024-01-01 10:00:00"),
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+                new \jschreuder\BookmarkBureau\Composite\TagCollection(),
+            );
+
+            $link2 = new Link(
+                $linkId2,
+                $url,
+                $title,
+                "Description",
+                new Icon("icon"),
+                new DateTimeImmutable("2024-01-01 10:00:00"),
+                new DateTimeImmutable("2024-01-01 12:00:00"),
+                new \jschreuder\BookmarkBureau\Composite\TagCollection(),
+            );
+
+            expect($link1->equals($link2))->toBeFalse();
+        });
+
+        test(
+            "equals returns false when comparing with different type",
+            function () {
+                $link = TestEntityFactory::createLink();
+                $category = TestEntityFactory::createCategory();
+
+                expect($link->equals($category))->toBeFalse();
+            },
+        );
+
+        test(
+            "equals returns false when comparing with non-entity object",
+            function () {
+                $link = TestEntityFactory::createLink();
+                $stdObject = new stdClass();
+
+                expect($link->equals($stdObject))->toBeFalse();
+            },
+        );
+    });
 });

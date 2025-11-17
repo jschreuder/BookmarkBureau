@@ -2,10 +2,18 @@
 
 namespace jschreuder\BookmarkBureau\Entity;
 
-final class Tag
+final class Tag implements EntityEqualityInterface
 {
     public function __construct(
         public readonly Value\TagName $tagName,
         public ?Value\HexColor $color,
     ) {}
+
+    public function equals(object $entity): bool
+    {
+        return match (true) {
+            !$entity instanceof self => false,
+            default => $entity->tagName->value === $this->tagName->value,
+        };
+    }
 }

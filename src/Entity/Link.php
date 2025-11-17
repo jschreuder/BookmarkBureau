@@ -7,7 +7,7 @@ use DateTimeInterface;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Composite\TagCollection;
 
-final class Link
+final class Link implements EntityEqualityInterface
 {
 
     public readonly UuidInterface $linkId;
@@ -71,5 +71,13 @@ final class Link
     public function markAsUpdated(): void
     {
         $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function equals(object $entity): bool
+    {
+        return match (true) {
+            !$entity instanceof self => false,
+            default => $entity->linkId->equals($this->linkId),
+        };
     }
 }
