@@ -122,10 +122,10 @@ PUT    /dashboard/{id}/favorites       Reorder favorites
 
 ### Architecture Highlights
 
-**Domain Layer**
-- *Value objects* with validation (Title, Url, HexColor, Icon)
-- *Rich entities* with property hooks (PHP 8.4)
-- *Type-safe compositions* (collections and aggregates)
+**Action Layer**
+- Consistent three-phase pattern (filter/validate/execute)
+- InputSpec/OutputSpec for HTTP boundaries
+- Zero coupling to HTTP framework
 
 **Service Layer**
 - Business logic coordination
@@ -137,10 +137,44 @@ PUT    /dashboard/{id}/favorites       Reorder favorites
 - Cross-database compatible (MySQL/SQLite)
 - Optimized queries, N+1 prevention
 
-**Action Layer**
-- Consistent three-phase pattern (filter/validate/execute)
-- InputSpec/OutputSpec for HTTP boundaries
-- Zero coupling to HTTP framework
+#### Domain Model Architecture
+
+BookmarkBureau's domain layer is built on three complementary abstractions:
+
+**Entity** → Domain objects with identity and lifecycle  
+Examples: `User`, `Link`, `Dashboard`, `Category`  
+- Mutable within transactions
+- Identity is based on ID property
+- Rich behaviors possible through methods
+- Properties publicly accessible, but limitations possible using readonly & PHP 8.4 property hooks
+
+**Value** → Immutable domain values without identity  
+Examples: `Url`, `Title`, `HexColor`, `Icon`, `TagName`  
+- Identity is based on full content
+- Self-validating basic structure on construction (only formatting)
+- Read only, cannot be changed after creation
+- Fail-fast validation prevents invalid states
+
+**Composite** → Type-safe compositions of entities and values  
+Examples: `LinkCollection`, `CategoryWithLinks`, `DashboardWithCategoriesAndFavorites`  
+- Readonly structures for returning complex data from services or repositories
+- Built from domain language, not database concerns
+- Aggregates for heterogeneous compositions
+- Collections are a subtype for homogeneous groups
+
+```php
+// Entity: mutable within transactions, identity-based
+$link = new Link($linkId, $url, $title, ...);
+$link->url = new Url('https://updated.example');
+
+// Value: immutable, self-validating, structural equality
+$url = new Url('https://example.com'); // Throws if invalid
+
+// Composite: readonly aggregation for specific use cases
+$view = new CategoryWithLinks($category, $links);
+```
+
+This three-pillar approach creates a complete domain language: Entities represent your business concepts, Values ensure correctness, and Composites provide type-safe data structures. Together they enable compile-time safety while remaining framework-agnostic and testable.
 
 ## Quick Start
 
@@ -189,7 +223,7 @@ curl http://localhost:8080/link/{id}
 ```
 /src
   /Action              CRUD operations following three-phase pattern
-  /Composite           Type-safe composition classes (collections, aggregates)
+  /Composite           Immutable data structures composing entities/values
   /Controller          HTTP controllers (generic ActionController)
   /Entity              Domain entities with value objects
   /Exception           Custom exception hierarchy
