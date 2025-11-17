@@ -123,9 +123,9 @@ PUT    /dashboard/{id}/favorites       Reorder favorites
 ### Architecture Highlights
 
 **Domain Layer**
-- Value objects with validation (Title, Url, HexColor, Icon)
-- Rich entities with property hooks (PHP 8.4)
-- Type-safe collections
+- *Value objects* with validation (Title, Url, HexColor, Icon)
+- *Rich entities* with property hooks (PHP 8.4)
+- *Type-safe compositions* (collections and aggregates)
 
 **Service Layer**
 - Business logic coordination
