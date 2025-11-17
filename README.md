@@ -189,7 +189,7 @@ curl http://localhost:8080/link/{id}
 ```
 /src
   /Action              CRUD operations following three-phase pattern
-  /Collection          Type-safe collection classes
+  /Composite           Type-safe composition classes (collections, aggregates)
   /Controller          HTTP controllers (generic ActionController)
   /Entity              Domain entities with value objects
   /Exception           Custom exception hierarchy

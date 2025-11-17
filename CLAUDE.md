@@ -23,6 +23,7 @@ BookmarkBureau is a bookmark management application demonstrating clean architec
 /                           - PHP backend root
 ├── src/                    - PHP source (108 files)
 │   ├── Entity/            - Domain models with business logic
+│   ├── Composite/         - Type-safe compositions (collections, aggregates)
 │   ├── Repository/        - Data access interfaces + PDO implementations
 │   ├── Service/           - Business logic coordination
 │   ├── Action/            - Request handlers (filter/validate/execute pattern)

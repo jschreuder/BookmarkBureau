@@ -890,26 +890,26 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Repository/`
 
 ---
 
-## 11. Collections
+## 11. Composites
 
-Located in: `/home/jschreuder/Development/BookmarkBureau/src/Collection/`
+Located in: `/home/jschreuder/Development/BookmarkBureau/src/Composite/`
 
-Immutable collection types for type-safe data handling (12 classes):
+Type-safe composition classes for organizing related domain objects (12 classes):
 
 - **DashboardCollection** - Multiple dashboards
 - **CategoryCollection** - Multiple categories
-- **CategoryWithLinks** - Single category with its links
+- **CategoryWithLinks** - Single category with its links (aggregate)
 - **CategoryWithLinksCollection** - Multiple categories with links
 - **CategoryLinkCollection** - Category-link associations
 - **LinkCollection** - Multiple links
 - **FavoriteCollection** - Favorite associations
 - **TagCollection** - Multiple tags
 - **TagNameCollection** - Tag names only
-- **DashboardWithCategoriesAndFavorites** - Complete dashboard view
+- **DashboardWithCategoriesAndFavorites** - Complete dashboard view (aggregate)
 - **UserCollection** - Multiple users
 - **CollectionTrait** - Shared functionality (iterator, count, map, filter, etc.)
 
-All collections implement `Countable` and `IteratorAggregate` interfaces.
+The Composite namespace encompasses both collection classes and aggregate objects that group related domain entities and values. The Collection subtype should use `CollectionTrait` and also implement `Countable` and `IteratorAggregate` interfaces. 
 
 ---
 
