@@ -39,7 +39,7 @@
 |
 */
 
-use jschreuder\BookmarkBureau\Collection\TagCollection;
+use jschreuder\BookmarkBureau\Composite\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Entity\Dashboard;

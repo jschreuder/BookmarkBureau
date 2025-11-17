@@ -2,7 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\OutputSpec;
 
-use jschreuder\BookmarkBureau\Collection\DashboardWithCategoriesAndFavorites;
+use jschreuder\BookmarkBureau\Composite\DashboardWithCategoriesAndFavorites;
 
 /**
  * Output specification for transforming a complete dashboard view into array format

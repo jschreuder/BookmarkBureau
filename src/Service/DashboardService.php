@@ -3,11 +3,11 @@
 namespace jschreuder\BookmarkBureau\Service;
 
 use DateTimeImmutable;
-use jschreuder\BookmarkBureau\Collection\CategoryWithLinks;
-use jschreuder\BookmarkBureau\Collection\CategoryWithLinksCollection;
-use jschreuder\BookmarkBureau\Collection\DashboardCollection;
-use jschreuder\BookmarkBureau\Collection\DashboardWithCategoriesAndFavorites;
-use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Composite\CategoryWithLinks;
+use jschreuder\BookmarkBureau\Composite\CategoryWithLinksCollection;
+use jschreuder\BookmarkBureau\Composite\DashboardCollection;
+use jschreuder\BookmarkBureau\Composite\DashboardWithCategoriesAndFavorites;
+use jschreuder\BookmarkBureau\Composite\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;

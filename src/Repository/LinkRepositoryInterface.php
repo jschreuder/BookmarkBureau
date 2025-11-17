@@ -2,8 +2,8 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use jschreuder\BookmarkBureau\Collection\LinkCollection;
-use jschreuder\BookmarkBureau\Collection\TagNameCollection;
+use jschreuder\BookmarkBureau\Composite\LinkCollection;
+use jschreuder\BookmarkBureau\Composite\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;

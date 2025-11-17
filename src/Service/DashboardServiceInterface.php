@@ -2,8 +2,8 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
-use jschreuder\BookmarkBureau\Collection\DashboardCollection;
-use jschreuder\BookmarkBureau\Collection\DashboardWithCategoriesAndFavorites;
+use jschreuder\BookmarkBureau\Composite\DashboardCollection;
+use jschreuder\BookmarkBureau\Composite\DashboardWithCategoriesAndFavorites;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use Ramsey\Uuid\UuidInterface;

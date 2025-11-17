@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 use jschreuder\BookmarkBureau\Command\User\ListCommand;
-use jschreuder\BookmarkBureau\Collection\UserCollection;
+use jschreuder\BookmarkBureau\Composite\UserCollection;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;

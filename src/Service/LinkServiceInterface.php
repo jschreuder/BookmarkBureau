@@ -2,7 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
-use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Composite\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use Ramsey\Uuid\UuidInterface;

@@ -1,6 +1,6 @@
 <?php
 
-use jschreuder\BookmarkBureau\Collection\TagNameCollection;
+use jschreuder\BookmarkBureau\Composite\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Tag;

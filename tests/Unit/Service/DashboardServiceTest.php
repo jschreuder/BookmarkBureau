@@ -1,10 +1,10 @@
 <?php
 
-use jschreuder\BookmarkBureau\Collection\CategoryCollection;
-use jschreuder\BookmarkBureau\Collection\CategoryLinkCollection;
-use jschreuder\BookmarkBureau\Collection\DashboardCollection;
-use jschreuder\BookmarkBureau\Collection\DashboardWithCategoriesAndFavorites;
-use jschreuder\BookmarkBureau\Collection\FavoriteCollection;
+use jschreuder\BookmarkBureau\Composite\CategoryCollection;
+use jschreuder\BookmarkBureau\Composite\CategoryLinkCollection;
+use jschreuder\BookmarkBureau\Composite\DashboardCollection;
+use jschreuder\BookmarkBureau\Composite\DashboardWithCategoriesAndFavorites;
+use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;

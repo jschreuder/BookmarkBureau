@@ -2,7 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use jschreuder\BookmarkBureau\Collection\TagCollection;
+use jschreuder\BookmarkBureau\Composite\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Tag;
 use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DuplicateTagException;

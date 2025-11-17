@@ -1,16 +1,16 @@
 <?php
 
-use jschreuder\BookmarkBureau\Collection\FavoriteCollection;
+use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 
-describe('FavoriteCollection', function () {
-    describe('construction', function () {
-        test('creates an empty collection', function () {
+describe("FavoriteCollection", function () {
+    describe("construction", function () {
+        test("creates an empty collection", function () {
             $collection = new FavoriteCollection();
 
             expect($collection)->toBeInstanceOf(FavoriteCollection::class);
         });
 
-        test('creates a collection with single favorite', function () {
+        test("creates a collection with single favorite", function () {
             $favorite = TestEntityFactory::createFavorite();
             $collection = new FavoriteCollection($favorite);
 
@@ -18,17 +18,21 @@ describe('FavoriteCollection', function () {
             expect($collection->count())->toBe(1);
         });
 
-        test('creates a collection with multiple favorites', function () {
+        test("creates a collection with multiple favorites", function () {
             $favorite1 = TestEntityFactory::createFavorite();
             $favorite2 = TestEntityFactory::createFavorite();
             $favorite3 = TestEntityFactory::createFavorite();
-            $collection = new FavoriteCollection($favorite1, $favorite2, $favorite3);
+            $collection = new FavoriteCollection(
+                $favorite1,
+                $favorite2,
+                $favorite3,
+            );
 
             expect($collection)->toBeInstanceOf(FavoriteCollection::class);
             expect($collection->count())->toBe(3);
         });
 
-        test('stores favorites in the collection', function () {
+        test("stores favorites in the collection", function () {
             $favorite1 = TestEntityFactory::createFavorite();
             $favorite2 = TestEntityFactory::createFavorite();
             $collection = new FavoriteCollection($favorite1, $favorite2);
@@ -39,15 +43,15 @@ describe('FavoriteCollection', function () {
         });
     });
 
-    describe('Countable interface', function () {
-        test('count returns zero for empty collection', function () {
+    describe("Countable interface", function () {
+        test("count returns zero for empty collection", function () {
             $collection = new FavoriteCollection();
 
             expect($collection->count())->toBe(0);
             expect(count($collection))->toBe(0);
         });
 
-        test('count returns correct number of favorites', function () {
+        test("count returns correct number of favorites", function () {
             $favorites = [
                 TestEntityFactory::createFavorite(),
                 TestEntityFactory::createFavorite(),
@@ -59,18 +63,21 @@ describe('FavoriteCollection', function () {
             expect(count($collection))->toBe(3);
         });
 
-        test('count works after collection construction with variadic args', function () {
-            $collection = new FavoriteCollection(
-                TestEntityFactory::createFavorite(),
-                TestEntityFactory::createFavorite()
-            );
+        test(
+            "count works after collection construction with variadic args",
+            function () {
+                $collection = new FavoriteCollection(
+                    TestEntityFactory::createFavorite(),
+                    TestEntityFactory::createFavorite(),
+                );
 
-            expect($collection->count())->toBe(2);
-        });
+                expect($collection->count())->toBe(2);
+            },
+        );
     });
 
-    describe('IteratorAggregate interface', function () {
-        test('can iterate over empty collection', function () {
+    describe("IteratorAggregate interface", function () {
+        test("can iterate over empty collection", function () {
             $collection = new FavoriteCollection();
 
             $iterations = 0;
@@ -81,11 +88,15 @@ describe('FavoriteCollection', function () {
             expect($iterations)->toBe(0);
         });
 
-        test('can iterate over collection with favorites', function () {
+        test("can iterate over collection with favorites", function () {
             $favorite1 = TestEntityFactory::createFavorite();
             $favorite2 = TestEntityFactory::createFavorite();
             $favorite3 = TestEntityFactory::createFavorite();
-            $collection = new FavoriteCollection($favorite1, $favorite2, $favorite3);
+            $collection = new FavoriteCollection(
+                $favorite1,
+                $favorite2,
+                $favorite3,
+            );
 
             $iterations = 0;
             $iteratedFavorites = [];
@@ -100,7 +111,7 @@ describe('FavoriteCollection', function () {
             expect($iteratedFavorites[2])->toBe($favorite3);
         });
 
-        test('maintains order during iteration', function () {
+        test("maintains order during iteration", function () {
             $favorites = [
                 TestEntityFactory::createFavorite(),
                 TestEntityFactory::createFavorite(),
@@ -117,28 +128,31 @@ describe('FavoriteCollection', function () {
         });
     });
 
-    describe('isEmpty method', function () {
-        test('returns true for empty collection', function () {
+    describe("isEmpty method", function () {
+        test("returns true for empty collection", function () {
             $collection = new FavoriteCollection();
 
             expect($collection->isEmpty())->toBeTrue();
         });
 
-        test('returns false for collection with one favorite', function () {
+        test("returns false for collection with one favorite", function () {
             $favorite = TestEntityFactory::createFavorite();
             $collection = new FavoriteCollection($favorite);
 
             expect($collection->isEmpty())->toBeFalse();
         });
 
-        test('returns false for collection with multiple favorites', function () {
-            $collection = new FavoriteCollection(
-                TestEntityFactory::createFavorite(),
-                TestEntityFactory::createFavorite(),
-                TestEntityFactory::createFavorite()
-            );
+        test(
+            "returns false for collection with multiple favorites",
+            function () {
+                $collection = new FavoriteCollection(
+                    TestEntityFactory::createFavorite(),
+                    TestEntityFactory::createFavorite(),
+                    TestEntityFactory::createFavorite(),
+                );
 
-            expect($collection->isEmpty())->toBeFalse();
-        });
+                expect($collection->isEmpty())->toBeFalse();
+            },
+        );
     });
 });

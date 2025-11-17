@@ -4,9 +4,9 @@ namespace jschreuder\BookmarkBureau\Repository;
 
 use PDO;
 use Ramsey\Uuid\UuidInterface;
-use jschreuder\BookmarkBureau\Collection\LinkCollection;
-use jschreuder\BookmarkBureau\Collection\TagCollection;
-use jschreuder\BookmarkBureau\Collection\TagNameCollection;
+use jschreuder\BookmarkBureau\Composite\LinkCollection;
+use jschreuder\BookmarkBureau\Composite\TagCollection;
+use jschreuder\BookmarkBureau\Composite\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;

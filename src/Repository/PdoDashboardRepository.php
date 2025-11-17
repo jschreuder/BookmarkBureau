@@ -4,7 +4,7 @@ namespace jschreuder\BookmarkBureau\Repository;
 
 use PDO;
 use Ramsey\Uuid\UuidInterface;
-use jschreuder\BookmarkBureau\Collection\DashboardCollection;
+use jschreuder\BookmarkBureau\Composite\DashboardCollection;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;

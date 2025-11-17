@@ -1,6 +1,6 @@
 <?php
 
-use jschreuder\BookmarkBureau\Collection\UserCollection;
+use jschreuder\BookmarkBureau\Composite\UserCollection;
 use jschreuder\BookmarkBureau\Entity\User;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;

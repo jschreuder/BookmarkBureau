@@ -1,7 +1,7 @@
 <?php
 
 use jschreuder\BookmarkBureau\Action\TagReadAction;
-use jschreuder\BookmarkBureau\Collection\TagCollection;
+use jschreuder\BookmarkBureau\Composite\TagCollection;
 use jschreuder\BookmarkBureau\Service\TagServiceInterface;
 use jschreuder\BookmarkBureau\InputSpec\TagNameInputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;

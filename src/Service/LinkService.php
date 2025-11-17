@@ -3,9 +3,9 @@
 namespace jschreuder\BookmarkBureau\Service;
 
 use DateTimeImmutable;
-use jschreuder\BookmarkBureau\Collection\LinkCollection;
-use jschreuder\BookmarkBureau\Collection\TagCollection;
-use jschreuder\BookmarkBureau\Collection\TagNameCollection;
+use jschreuder\BookmarkBureau\Composite\LinkCollection;
+use jschreuder\BookmarkBureau\Composite\TagCollection;
+use jschreuder\BookmarkBureau\Composite\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;

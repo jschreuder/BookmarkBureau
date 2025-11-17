@@ -1,7 +1,7 @@
 <?php
 
-use jschreuder\BookmarkBureau\Collection\CategoryCollection;
-use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Composite\CategoryCollection;
+use jschreuder\BookmarkBureau\Composite\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;

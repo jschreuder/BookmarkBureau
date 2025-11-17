@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace jschreuder\BookmarkBureau\Collection;
+namespace jschreuder\BookmarkBureau\Composite;
 
 use Countable;
 use IteratorAggregate;

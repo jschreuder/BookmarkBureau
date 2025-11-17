@@ -1,7 +1,7 @@
 <?php
 
 use jschreuder\BookmarkBureau\Action\DashboardListAction;
-use jschreuder\BookmarkBureau\Collection\DashboardCollection;
+use jschreuder\BookmarkBureau\Composite\DashboardCollection;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;

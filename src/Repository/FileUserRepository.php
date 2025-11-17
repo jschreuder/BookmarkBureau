@@ -2,7 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use jschreuder\BookmarkBureau\Collection\UserCollection;
+use jschreuder\BookmarkBureau\Composite\UserCollection;
 use jschreuder\BookmarkBureau\Entity\User;
 use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\Email;

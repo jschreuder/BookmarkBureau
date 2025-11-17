@@ -1,16 +1,16 @@
 <?php
 
-use jschreuder\BookmarkBureau\Collection\TagCollection;
+use jschreuder\BookmarkBureau\Composite\TagCollection;
 
-describe('TagCollection', function () {
-    describe('construction', function () {
-        test('creates an empty collection', function () {
+describe("TagCollection", function () {
+    describe("construction", function () {
+        test("creates an empty collection", function () {
             $collection = new TagCollection();
 
             expect($collection)->toBeInstanceOf(TagCollection::class);
         });
 
-        test('creates a collection with single tag', function () {
+        test("creates a collection with single tag", function () {
             $tag = TestEntityFactory::createTag();
             $collection = new TagCollection($tag);
 
@@ -18,7 +18,7 @@ describe('TagCollection', function () {
             expect($collection->count())->toBe(1);
         });
 
-        test('creates a collection with multiple tags', function () {
+        test("creates a collection with multiple tags", function () {
             $tag1 = TestEntityFactory::createTag();
             $tag2 = TestEntityFactory::createTag();
             $tag3 = TestEntityFactory::createTag();
@@ -28,7 +28,7 @@ describe('TagCollection', function () {
             expect($collection->count())->toBe(3);
         });
 
-        test('stores tags in the collection', function () {
+        test("stores tags in the collection", function () {
             $tag1 = TestEntityFactory::createTag();
             $tag2 = TestEntityFactory::createTag();
             $collection = new TagCollection($tag1, $tag2);
@@ -39,15 +39,15 @@ describe('TagCollection', function () {
         });
     });
 
-    describe('Countable interface', function () {
-        test('count returns zero for empty collection', function () {
+    describe("Countable interface", function () {
+        test("count returns zero for empty collection", function () {
             $collection = new TagCollection();
 
             expect($collection->count())->toBe(0);
             expect(count($collection))->toBe(0);
         });
 
-        test('count returns correct number of tags', function () {
+        test("count returns correct number of tags", function () {
             $tags = [
                 TestEntityFactory::createTag(),
                 TestEntityFactory::createTag(),
@@ -59,18 +59,21 @@ describe('TagCollection', function () {
             expect(count($collection))->toBe(3);
         });
 
-        test('count works after collection construction with variadic args', function () {
-            $collection = new TagCollection(
-                TestEntityFactory::createTag(),
-                TestEntityFactory::createTag()
-            );
+        test(
+            "count works after collection construction with variadic args",
+            function () {
+                $collection = new TagCollection(
+                    TestEntityFactory::createTag(),
+                    TestEntityFactory::createTag(),
+                );
 
-            expect($collection->count())->toBe(2);
-        });
+                expect($collection->count())->toBe(2);
+            },
+        );
     });
 
-    describe('IteratorAggregate interface', function () {
-        test('can iterate over empty collection', function () {
+    describe("IteratorAggregate interface", function () {
+        test("can iterate over empty collection", function () {
             $collection = new TagCollection();
 
             $iterations = 0;
@@ -81,7 +84,7 @@ describe('TagCollection', function () {
             expect($iterations)->toBe(0);
         });
 
-        test('can iterate over collection with tags', function () {
+        test("can iterate over collection with tags", function () {
             $tag1 = TestEntityFactory::createTag();
             $tag2 = TestEntityFactory::createTag();
             $tag3 = TestEntityFactory::createTag();
@@ -100,7 +103,7 @@ describe('TagCollection', function () {
             expect($iteratedTags[2])->toBe($tag3);
         });
 
-        test('maintains order during iteration', function () {
+        test("maintains order during iteration", function () {
             $tags = [
                 TestEntityFactory::createTag(),
                 TestEntityFactory::createTag(),
@@ -117,25 +120,25 @@ describe('TagCollection', function () {
         });
     });
 
-    describe('isEmpty method', function () {
-        test('returns true for empty collection', function () {
+    describe("isEmpty method", function () {
+        test("returns true for empty collection", function () {
             $collection = new TagCollection();
 
             expect($collection->isEmpty())->toBeTrue();
         });
 
-        test('returns false for collection with one tag', function () {
+        test("returns false for collection with one tag", function () {
             $tag = TestEntityFactory::createTag();
             $collection = new TagCollection($tag);
 
             expect($collection->isEmpty())->toBeFalse();
         });
 
-        test('returns false for collection with multiple tags', function () {
+        test("returns false for collection with multiple tags", function () {
             $collection = new TagCollection(
                 TestEntityFactory::createTag(),
                 TestEntityFactory::createTag(),
-                TestEntityFactory::createTag()
+                TestEntityFactory::createTag(),
             );
 
             expect($collection->isEmpty())->toBeFalse();

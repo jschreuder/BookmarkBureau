@@ -2,8 +2,8 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use jschreuder\BookmarkBureau\Collection\DashboardCollection;
-use jschreuder\BookmarkBureau\Collection\FavoriteCollection;
+use jschreuder\BookmarkBureau\Composite\DashboardCollection;
+use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;

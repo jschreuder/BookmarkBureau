@@ -5,7 +5,7 @@ namespace jschreuder\BookmarkBureau\Entity;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Ramsey\Uuid\UuidInterface;
-use jschreuder\BookmarkBureau\Collection\TagCollection;
+use jschreuder\BookmarkBureau\Composite\TagCollection;
 
 final class Link
 {

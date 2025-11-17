@@ -2,9 +2,9 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use jschreuder\BookmarkBureau\Collection\CategoryCollection;
-use jschreuder\BookmarkBureau\Collection\CategoryLinkCollection;
-use jschreuder\BookmarkBureau\Collection\LinkCollection;
+use jschreuder\BookmarkBureau\Composite\CategoryCollection;
+use jschreuder\BookmarkBureau\Composite\CategoryLinkCollection;
+use jschreuder\BookmarkBureau\Composite\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;

@@ -4,7 +4,7 @@ namespace jschreuder\BookmarkBureau\Repository;
 
 use PDO;
 use Ramsey\Uuid\UuidInterface;
-use jschreuder\BookmarkBureau\Collection\TagCollection;
+use jschreuder\BookmarkBureau\Composite\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Tag;
 use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Exception\TagNotFoundException;

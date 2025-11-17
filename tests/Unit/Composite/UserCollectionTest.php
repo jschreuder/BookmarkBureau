@@ -1,16 +1,16 @@
 <?php
 
-use jschreuder\BookmarkBureau\Collection\UserCollection;
+use jschreuder\BookmarkBureau\Composite\UserCollection;
 
-describe('UserCollection', function () {
-    describe('construction', function () {
-        test('creates an empty collection', function () {
+describe("UserCollection", function () {
+    describe("construction", function () {
+        test("creates an empty collection", function () {
             $collection = new UserCollection();
 
             expect($collection)->toBeInstanceOf(UserCollection::class);
         });
 
-        test('creates a collection with single user', function () {
+        test("creates a collection with single user", function () {
             $user = TestEntityFactory::createUser();
             $collection = new UserCollection($user);
 
@@ -18,7 +18,7 @@ describe('UserCollection', function () {
             expect($collection->count())->toBe(1);
         });
 
-        test('creates a collection with multiple users', function () {
+        test("creates a collection with multiple users", function () {
             $user1 = TestEntityFactory::createUser();
             $user2 = TestEntityFactory::createUser();
             $user3 = TestEntityFactory::createUser();
@@ -28,7 +28,7 @@ describe('UserCollection', function () {
             expect($collection->count())->toBe(3);
         });
 
-        test('stores users in the collection', function () {
+        test("stores users in the collection", function () {
             $user1 = TestEntityFactory::createUser();
             $user2 = TestEntityFactory::createUser();
             $collection = new UserCollection($user1, $user2);
@@ -39,15 +39,15 @@ describe('UserCollection', function () {
         });
     });
 
-    describe('Countable interface', function () {
-        test('count returns zero for empty collection', function () {
+    describe("Countable interface", function () {
+        test("count returns zero for empty collection", function () {
             $collection = new UserCollection();
 
             expect($collection->count())->toBe(0);
             expect(count($collection))->toBe(0);
         });
 
-        test('count returns correct number of users', function () {
+        test("count returns correct number of users", function () {
             $users = [
                 TestEntityFactory::createUser(),
                 TestEntityFactory::createUser(),
@@ -59,18 +59,21 @@ describe('UserCollection', function () {
             expect(count($collection))->toBe(3);
         });
 
-        test('count works after collection construction with variadic args', function () {
-            $collection = new UserCollection(
-                TestEntityFactory::createUser(),
-                TestEntityFactory::createUser()
-            );
+        test(
+            "count works after collection construction with variadic args",
+            function () {
+                $collection = new UserCollection(
+                    TestEntityFactory::createUser(),
+                    TestEntityFactory::createUser(),
+                );
 
-            expect($collection->count())->toBe(2);
-        });
+                expect($collection->count())->toBe(2);
+            },
+        );
     });
 
-    describe('IteratorAggregate interface', function () {
-        test('can iterate over empty collection', function () {
+    describe("IteratorAggregate interface", function () {
+        test("can iterate over empty collection", function () {
             $collection = new UserCollection();
 
             $iterations = 0;
@@ -81,7 +84,7 @@ describe('UserCollection', function () {
             expect($iterations)->toBe(0);
         });
 
-        test('can iterate over collection with users', function () {
+        test("can iterate over collection with users", function () {
             $user1 = TestEntityFactory::createUser();
             $user2 = TestEntityFactory::createUser();
             $user3 = TestEntityFactory::createUser();
@@ -100,7 +103,7 @@ describe('UserCollection', function () {
             expect($iteratedUsers[2])->toBe($user3);
         });
 
-        test('maintains order during iteration', function () {
+        test("maintains order during iteration", function () {
             $users = [
                 TestEntityFactory::createUser(),
                 TestEntityFactory::createUser(),
@@ -117,25 +120,25 @@ describe('UserCollection', function () {
         });
     });
 
-    describe('isEmpty method', function () {
-        test('returns true for empty collection', function () {
+    describe("isEmpty method", function () {
+        test("returns true for empty collection", function () {
             $collection = new UserCollection();
 
             expect($collection->isEmpty())->toBeTrue();
         });
 
-        test('returns false for collection with one user', function () {
+        test("returns false for collection with one user", function () {
             $user = TestEntityFactory::createUser();
             $collection = new UserCollection($user);
 
             expect($collection->isEmpty())->toBeFalse();
         });
 
-        test('returns false for collection with multiple users', function () {
+        test("returns false for collection with multiple users", function () {
             $collection = new UserCollection(
                 TestEntityFactory::createUser(),
                 TestEntityFactory::createUser(),
-                TestEntityFactory::createUser()
+                TestEntityFactory::createUser(),
             );
 
             expect($collection->isEmpty())->toBeFalse();
