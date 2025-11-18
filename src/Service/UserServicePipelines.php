@@ -15,7 +15,6 @@ final readonly class UserServicePipelines
         private ?PipelineInterface $createUser = null,
         private ?PipelineInterface $deleteUser = null,
         private ?PipelineInterface $changePassword = null,
-        private ?PipelineInterface $verifyPassword = null,
         private ?PipelineInterface $enableTotp = null,
         private ?PipelineInterface $disableTotp = null,
     ) {}
