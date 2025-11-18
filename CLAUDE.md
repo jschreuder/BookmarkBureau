@@ -25,7 +25,8 @@ BookmarkBureau is a bookmark management application demonstrating clean architec
 │   ├── Entity/            - Domain models with business logic
 │   ├── Composite/         - Type-safe compositions (collections, aggregates)
 │   ├── Repository/        - Data access interfaces + PDO implementations
-│   ├── Service/           - Business logic coordination
+│   ├── Service/           - Business logic coordination with OperationPipeline
+│   ├── OperationPipeline/ - Middleware pipeline for cross-cutting concerns (transactions, logging, etc.)
 │   ├── Action/            - Request handlers (filter/validate/execute pattern)
 │   ├── Controller/        - HTTP layer (ActionController, DashboardViewController)
 │   └── Util/              - Shared utilities (Filter, SqlFormat)
@@ -56,7 +57,7 @@ BookmarkBureau is a bookmark management application demonstrating clean architec
 
 1. **Domain** (`/src/Entity`) - Entities with business logic, Value Objects with validation
 2. **Repository** (`/src/Repository`) - Data access interfaces + PDO implementations
-3. **Service** (`/src/Service`) - Business logic coordination, UnitOfWork pattern
+3. **Service** (`/src/Service`) - Business logic coordination with OperationPipeline for cross-cutting concerns
 4. **Action** (`/src/Action`) - Three-phase request handlers: `filter() → validate() → execute()`
 5. **Controller** (`/src/Controller`) - HTTP layer, error handling
 
@@ -134,9 +135,10 @@ final readonly class ImplementationClass implements SpecificInterface
 - Interface-first design (use interfaces where replacing a service makes sense, not everywhere)
 - Final classes by default (no inheritance)
 - Override attribute for interface methods
-- Traits for sharing code between implementations (e.g., `UnitOfWorkTrait`, `OutputSpecTrait`, `CollectionTrait`)
+- Traits for sharing code between implementations (e.g., `OutputSpecTrait`, `CollectionTrait`)
 - Utility classes in `src/Util/` for shared functionality (e.g., `Filter` for input sanitization, `SqlFormat` for constants)
 - Use double quotes `"` for strings and interpolation with brackets `"{$value}"` where possible
+- OperationPipeline pattern for service cross-cutting concerns (transactions, logging, auditing, caching)
 
 ### Naming
 - Interfaces: `*Interface` (e.g., `DashboardServiceInterface`)
@@ -160,6 +162,7 @@ Skip when operations don't fit this mold. Complex operations should use Controll
 Example: `DashboardViewController` - implements `ControllerInterface` + filter/validate interfaces, but handles complex view composition that doesn't fit the Action pattern.
 
 ### Key Patterns - See Examples
+- **OperationPipeline for services**: Each service has `*ServicePipelines` companion class defining middleware per method. Replaced UnitOfWork. See `src/Service/DashboardService.php` + `src/Service/DashboardServicePipelines.php`
 - **Entity mutations with property hooks**: See `src/Entity/Link.php` - `set { markAsUpdated() }` pattern when entity has an updatedAt property
 - **Input filtering**: See `src/InputSpec/*` - uses `Util\Filter` fluent API for sanitization
 - **Route registration**: See `src/*RoutingProvider.php` - uses `Util\ResourceRouteBuilder` for RESTful routes

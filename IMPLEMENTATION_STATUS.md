@@ -79,7 +79,6 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Action/`
 - Input filtering via `InputSpecInterface`
 - Output transformation via `OutputSpecInterface`
 - Uses Ramsey UUID v4 for IDs
-- Transaction support via `UnitOfWorkInterface`
 
 ### Note on Dashboard Read vs. View:
 **DashboardReadAction** follows the standard Read pattern (like CategoryReadAction, LinkReadAction) and returns only the dashboard entity using DashboardOutputSpec. It uses the simpler `getDashboard()` method from DashboardService.
@@ -133,7 +132,7 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Controller/`
 
 Located in: `/home/jschreuder/Development/BookmarkBureau/src/Service/`
 
-All services implement corresponding interfaces and use `UnitOfWorkInterface` for transaction management.
+All services implement corresponding interfaces and use `OperationPipeline` with `PdoTransactionMiddleware` for transaction management.
 
 ### Core Domain Services (5 services - ✅ ALL FULLY IMPLEMENTED)
 
@@ -222,7 +221,7 @@ All services implement corresponding interfaces and use `UnitOfWorkInterface` fo
 
 ### Service Features:
 - All use dependency injection
-- Transaction support via `UnitOfWorkInterface`
+- Transaction support via `OperationPipeline` with `PdoTransactionMiddleware`
 - Repository pattern for data access
 - Proper exception handling with custom exceptions
 - Value objects for domain constraints
@@ -833,7 +832,7 @@ Located in: `/home/jschreuder/Development/BookmarkBureau/src/Repository/`
 - Interfaces define contracts
 - PDO implementations use parameterized queries + EntityMapper pattern
 - UUID binary storage via `$uuid->getBytes()`
-- Transaction support via UnitOfWork
+- Transactions managed by service-layer OperationPipeline (not repository responsibility)
 - File-based implementations for CLI (FileUserRepository, FileJwtJtiRepository)
 
 ### Repositories Implemented (9 repository pairs):
@@ -935,30 +934,76 @@ Custom exceptions for specific error cases (13 classes):
 #### Infrastructure Exceptions (4):
 - **ResponseTransformerException** - Output transformation failed (500)
 - **RepositoryStorageException** - Database operation failed (503)
-- **InactiveUnitOfWorkException** - Transaction not started (500)
+- **OperationPipelineException** - Pipeline execution error (500)
 - **IncompleteConfigException** - Missing configuration (500)
 
 All exceptions extend base Exception and include appropriate HTTP status codes for ErrorHandlerController.
 
 ---
 
-## 13. Unit of Work Pattern
+## 13. OperationPipeline Pattern (Replaced UnitOfWork)
 
-Located in: `/home/jschreuder/Development/BookmarkBureau/src/Service/UnitOfWork/`
+Located in: `/home/jschreuder/Development/BookmarkBureau/src/OperationPipeline/`
 
-Transaction management for service operations (4 classes):
+**Extensible middleware pipeline for service operations** - replaces the legacy UnitOfWork pattern with a more flexible, composable approach for cross-cutting concerns (8 classes):
 
-- **UnitOfWorkInterface** - Contract for transactions
-- **PdoUnitOfWork** - PDO-based implementation (BEGIN, COMMIT, ROLLBACK)
-- **NoOpUnitOfWork** - No-operation fallback (for testing)
-- **UnitOfWorkTrait** - Shared functionality for services
+### Core Components:
 
-All services wrap business logic in `transactional()` callbacks for ACID guarantees:
+- **PipelineInterface** - Contract for running operations through middleware
+- **Pipeline** - Composes middleware into decorator chain
+- **NoPipeline** - Null-object implementation (no middleware overhead)
+- **PipelineMiddlewareInterface** - Middleware contract
+- **OperationHandler** - Manages middleware execution chain
+
+### Built-in Middleware:
+
+- **PdoTransactionMiddleware** - Database transactions with nested transaction support (replaces PdoUnitOfWork)
+- **PsrLogMiddleware** - PSR-3 logging with configurable levels
+- **PipelineMiddlewareTrait** - Shared middleware functionality
+
+### Service Integration:
+
+Each service has a companion `*ServicePipelines` class (6 classes):
+- **DashboardServicePipelines** - Per-method pipelines for DashboardService
+- **CategoryServicePipelines** - Per-method pipelines for CategoryService
+- **LinkServicePipelines** - Per-method pipelines for LinkService
+- **FavoriteServicePipelines** - Per-method pipelines for FavoriteService
+- **TagServicePipelines** - Per-method pipelines for TagService
+- **UserServicePipelines** - Per-method pipelines for UserService
+
+**Pattern:**
 ```php
-$this->unitOfWork->transactional(function () use ($data) {
-    // All repository operations here are atomic
-});
+// Service with pipelines
+public function createDashboard(string $title, ...): Dashboard {
+    return $this->pipelines
+        ->createDashboard()
+        ->run(function () use ($title, ...): Dashboard {
+            $dashboard = new Dashboard(...);
+            $this->repo->save($dashboard);
+            return $dashboard;
+        });
+}
+
+// DI Container configures pipelines with SHARED PdoTransactionMiddleware
+public function getDefaultDbPipeline(): PipelineInterface {
+    return new Pipeline(new PdoTransactionMiddleware($this->getDb()));
+}
+
+public function getDashboardServicePipelines(): DashboardServicePipelines {
+    return new DashboardServicePipelines(
+        default: $this->getDefaultDbPipeline() // All services share same middleware
+    );
+}
 ```
+
+**Benefits over UnitOfWork:**
+- Per-operation middleware stacks (not one-size-fits-all)
+- Composable cross-cutting concerns (logging, caching, auditing)
+- Easy to extend without modifying services
+- Nested transaction support via shared PdoTransactionMiddleware instance
+- Testable with NoPipeline
+
+**Important:** All services must share the same `PdoTransactionMiddleware` instance (configured via `getDefaultDbPipeline()`) to properly track nested transaction levels when services call each other.
 
 ---
 
@@ -1042,7 +1087,7 @@ Symfony Console commands for user administration and security management (10 cla
 - **Repository Pattern** - Data access abstraction
 - **EntityMapper Pattern** - Entity ↔ row transformation
 - **Action Pattern** - HTTP request handling (filter → validate → execute)
-- **Unit of Work** - Transaction management
+- **OperationPipeline Pattern** - Middleware-based transaction and cross-cutting concerns management
 - **Dependency Injection** - Via compile-time container (no runtime string resolution)
 
 ### Utilities:
@@ -1314,8 +1359,8 @@ return $this->outputSpec->transform($dashboard); // Uses DashboardOutputSpec ✅
   /Middleware                   - 2 files (JWT auth + require auth)
   /Repository                   - 18 files (9 interfaces + 9 PDO + file implementations)
   /Response                     - 2 files (response transformers)
-  /Service                      - 20 files (10 interfaces + 10 implementations)
-  /Service/UnitOfWork           - 4 files (transaction management)
+  /Service                      - 26 files (10 interfaces + 10 implementations + 6 pipeline configs)
+  /OperationPipeline            - 8 files (pipeline pattern for middleware)
   /Util                         - 5 files (Filter, SqlFormat, SqlBuilder, ResourceRouteBuilder, IpAddress)
   GeneralRoutingProvider.php    - Route registration (24 routes)
   ServiceContainer.php          - DI container configuration
