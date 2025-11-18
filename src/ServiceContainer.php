@@ -38,6 +38,7 @@ use jschreuder\BookmarkBureau\Entity\Mapper\CategoryEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\FavoriteEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
+use jschreuder\BookmarkBureau\OperationPipeline\NoPipeline;
 use jschreuder\BookmarkBureau\OperationPipeline\Pipeline;
 use jschreuder\BookmarkBureau\OperationPipeline\PdoTransactionMiddleware;
 use jschreuder\BookmarkBureau\OperationPipeline\PipelineInterface;
@@ -55,10 +56,10 @@ use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\BookmarkBureau\Service\LinkServicePipelines;
 use jschreuder\BookmarkBureau\Service\TagService;
 use jschreuder\BookmarkBureau\Service\TagServiceInterface;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\PdoUnitOfWork;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
+use jschreuder\BookmarkBureau\Service\TagServicePipelines;
 use jschreuder\BookmarkBureau\Service\UserService;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
+use jschreuder\BookmarkBureau\Service\UserServicePipelines;
 use jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
 use jschreuder\BookmarkBureau\Service\PhpPasswordHasher;
 use jschreuder\BookmarkBureau\Service\TotpVerifierInterface;
@@ -222,11 +223,6 @@ class ServiceContainer
         return new PDO($dsn, $user, $pass, $options);
     }
 
-    public function getUnitOfWork(): UnitOfWorkInterface
-    {
-        return new PdoUnitOfWork($this->getDb());
-    }
-
     public function getDefaultDbPipeline(): PipelineInterface
     {
         return new Pipeline(new PdoTransactionMiddleware($this->getDb()));
@@ -295,8 +291,13 @@ class ServiceContainer
         return new TagService(
             $this->getTagRepository(),
             $this->getLinkRepository(),
-            $this->getUnitOfWork(),
+            $this->getTagServicePipelines(),
         );
+    }
+
+    public function getTagServicePipelines(): TagServicePipelines
+    {
+        return new TagServicePipelines(default: $this->getDefaultDbPipeline());
     }
 
     public function getCategoryService(): CategoryServiceInterface
@@ -378,8 +379,22 @@ class ServiceContainer
         return new UserService(
             $this->getUserRepository(),
             $this->getPasswordHasher(),
-            $this->getUnitOfWork(),
+            $this->getUserServicePipelines(),
         );
+    }
+
+    public function getUserServicePipelines(): UserServicePipelines
+    {
+        $storageType = $this->config("users.storage.type");
+
+        // Use NoPipeline for file-based storage, default DB pipeline for PDO storage
+        $defaultPipeline = match ($storageType) {
+            "file" => new NoPipeline(),
+            "pdo" => $this->getDefaultDbPipeline(),
+            default => new NoPipeline(),
+        };
+
+        return new UserServicePipelines(default: $defaultPipeline);
     }
 
     public function getClock(): ClockInterface

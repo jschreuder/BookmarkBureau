@@ -10,7 +10,7 @@ use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
 use jschreuder\BookmarkBureau\Service\UserService;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
+use jschreuder\BookmarkBureau\Service\UserServicePipelines;
 use Ramsey\Uuid\Uuid;
 
 describe("UserService", function () {
@@ -37,17 +37,10 @@ describe("UserService", function () {
                     ->with($plainPassword)
                     ->andReturn($hashedPassword);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
-
                 $service = new UserService(
                     $userRepository,
                     $passwordHasher,
-                    $unitOfWork,
+                    new UserServicePipelines(),
                 );
 
                 $result = $service->createUser($email, $plainPassword);
@@ -73,17 +66,10 @@ describe("UserService", function () {
 
                 $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
-
                 $service = new UserService(
                     $userRepository,
                     $passwordHasher,
-                    $unitOfWork,
+                    new UserServicePipelines(),
                 );
 
                 expect(
@@ -112,61 +98,15 @@ describe("UserService", function () {
                 ->with($plainPassword)
                 ->andReturn($hashedPassword);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $result = $service->createUser($email, $plainPassword);
 
             expect($result->passwordHash)->toBe($hashedPassword);
-        });
-
-        test("wraps user creation in a transaction", function () {
-            $email = new Email("test@example.com");
-            $plainPassword = "SecurePassword123!";
-            $hashedPassword = new HashedPassword(
-                password_hash($plainPassword, PASSWORD_ARGON2ID),
-            );
-
-            $userRepository = Mockery::mock(UserRepositoryInterface::class);
-            $userRepository
-                ->shouldReceive("existsByEmail")
-                ->with($email)
-                ->andReturn(false);
-            $userRepository->shouldReceive("save")->once();
-
-            $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $passwordHasher
-                ->shouldReceive("hash")
-                ->with($plainPassword)
-                ->andReturn($hashedPassword);
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new UserService(
-                $userRepository,
-                $passwordHasher,
-                $unitOfWork,
-            );
-
-            $service->createUser($email, $plainPassword);
-
-            expect(true)->toBeTrue(); // Mockery validates transactional was called
         });
     });
 
@@ -182,12 +122,11 @@ describe("UserService", function () {
                 ->andReturn($user);
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
 
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $result = $service->getUser($userId);
@@ -208,12 +147,10 @@ describe("UserService", function () {
                     ->andThrow(new UserNotFoundException("User not found"));
 
                 $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-
                 $service = new UserService(
                     $userRepository,
                     $passwordHasher,
-                    $unitOfWork,
+                    new UserServicePipelines(),
                 );
 
                 expect(fn() => $service->getUser($userId))->toThrow(
@@ -235,12 +172,11 @@ describe("UserService", function () {
                 ->andReturn($user);
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
 
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $result = $service->getUserByEmail($email);
@@ -261,12 +197,10 @@ describe("UserService", function () {
                     ->andThrow(new UserNotFoundException("User not found"));
 
                 $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-
                 $service = new UserService(
                     $userRepository,
                     $passwordHasher,
-                    $unitOfWork,
+                    new UserServicePipelines(),
                 );
 
                 expect(fn() => $service->getUserByEmail($email))->toThrow(
@@ -284,12 +218,11 @@ describe("UserService", function () {
                 ->andReturn(new UserCollection());
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
 
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $result = $service->listAllUsers();
@@ -310,12 +243,11 @@ describe("UserService", function () {
                 ->andReturn($userCollection);
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
 
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $result = $service->listAllUsers();
@@ -341,17 +273,11 @@ describe("UserService", function () {
             $userRepository->shouldReceive("delete")->with($user)->once();
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $service->deleteUser($userId);
@@ -371,17 +297,11 @@ describe("UserService", function () {
                     ->andThrow(new UserNotFoundException("User not found"));
 
                 $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
 
                 $service = new UserService(
                     $userRepository,
                     $passwordHasher,
-                    $unitOfWork,
+                    new UserServicePipelines(),
                 );
 
                 expect(fn() => $service->deleteUser($userId))->toThrow(
@@ -389,37 +309,6 @@ describe("UserService", function () {
                 );
             },
         );
-
-        test("wraps deletion in a transaction", function () {
-            $userId = Uuid::uuid4();
-            $user = TestEntityFactory::createUser(id: $userId);
-
-            $userRepository = Mockery::mock(UserRepositoryInterface::class);
-            $userRepository
-                ->shouldReceive("findById")
-                ->with($userId)
-                ->andReturn($user);
-            $userRepository->shouldReceive("delete")->once();
-
-            $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new UserService(
-                $userRepository,
-                $passwordHasher,
-                $unitOfWork,
-            );
-
-            $service->deleteUser($userId);
-
-            expect(true)->toBeTrue();
-        });
     });
 
     describe("changePassword method", function () {
@@ -444,17 +333,10 @@ describe("UserService", function () {
                 ->with($newPlainPassword)
                 ->andReturn($newHashedPassword);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $service->changePassword($userId, $newPlainPassword);
@@ -475,17 +357,11 @@ describe("UserService", function () {
                     ->andThrow(new UserNotFoundException("User not found"));
 
                 $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
 
                 $service = new UserService(
                     $userRepository,
                     $passwordHasher,
-                    $unitOfWork,
+                    new UserServicePipelines(),
                 );
 
                 expect(
@@ -496,46 +372,6 @@ describe("UserService", function () {
                 )->toThrow(UserNotFoundException::class);
             },
         );
-
-        test("wraps password change in a transaction", function () {
-            $userId = Uuid::uuid4();
-            $user = TestEntityFactory::createUser(id: $userId);
-            $newPlainPassword = "NewPassword456!";
-            $newHashedPassword = new HashedPassword(
-                password_hash($newPlainPassword, PASSWORD_ARGON2ID),
-            );
-
-            $userRepository = Mockery::mock(UserRepositoryInterface::class);
-            $userRepository
-                ->shouldReceive("findById")
-                ->with($userId)
-                ->andReturn($user);
-            $userRepository->shouldReceive("save")->once();
-
-            $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $passwordHasher
-                ->shouldReceive("hash")
-                ->with($newPlainPassword)
-                ->andReturn($newHashedPassword);
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new UserService(
-                $userRepository,
-                $passwordHasher,
-                $unitOfWork,
-            );
-
-            $service->changePassword($userId, $newPlainPassword);
-
-            expect(true)->toBeTrue();
-        });
     });
 
     describe("verifyPassword method", function () {
@@ -554,12 +390,10 @@ describe("UserService", function () {
                 ->with($plainPassword, $user->passwordHash)
                 ->andReturn(true);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $result = $service->verifyPassword($user, $plainPassword);
@@ -583,12 +417,10 @@ describe("UserService", function () {
                 ->with($wrongPassword, $user->passwordHash)
                 ->andReturn(false);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $result = $service->verifyPassword($user, $wrongPassword);
@@ -613,17 +445,11 @@ describe("UserService", function () {
             $userRepository->shouldReceive("save")->with($user)->once();
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $result = $service->enableTotp($userId);
@@ -648,17 +474,11 @@ describe("UserService", function () {
             $userRepository->shouldReceive("save")->once();
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $result = $service->enableTotp($userId);
@@ -681,17 +501,11 @@ describe("UserService", function () {
                     ->andThrow(new UserNotFoundException("User not found"));
 
                 $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
 
                 $service = new UserService(
                     $userRepository,
                     $passwordHasher,
-                    $unitOfWork,
+                    new UserServicePipelines(),
                 );
 
                 expect(fn() => $service->enableTotp($userId))->toThrow(
@@ -699,40 +513,6 @@ describe("UserService", function () {
                 );
             },
         );
-
-        test("wraps TOTP enablement in a transaction", function () {
-            $userId = Uuid::uuid4();
-            $user = TestEntityFactory::createUser(
-                id: $userId,
-                totpSecret: null,
-            );
-
-            $userRepository = Mockery::mock(UserRepositoryInterface::class);
-            $userRepository
-                ->shouldReceive("findById")
-                ->with($userId)
-                ->andReturn($user);
-            $userRepository->shouldReceive("save")->once();
-
-            $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new UserService(
-                $userRepository,
-                $passwordHasher,
-                $unitOfWork,
-            );
-
-            $service->enableTotp($userId);
-
-            expect(true)->toBeTrue();
-        });
     });
 
     describe("disableTotp method", function () {
@@ -752,17 +532,11 @@ describe("UserService", function () {
             $userRepository->shouldReceive("save")->with($user)->once();
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new UserService(
                 $userRepository,
                 $passwordHasher,
-                $unitOfWork,
+                new UserServicePipelines(),
             );
 
             $service->disableTotp($userId);
@@ -783,17 +557,11 @@ describe("UserService", function () {
                     ->andThrow(new UserNotFoundException("User not found"));
 
                 $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
 
                 $service = new UserService(
                     $userRepository,
                     $passwordHasher,
-                    $unitOfWork,
+                    new UserServicePipelines(),
                 );
 
                 expect(fn() => $service->disableTotp($userId))->toThrow(
@@ -801,40 +569,5 @@ describe("UserService", function () {
                 );
             },
         );
-
-        test("wraps TOTP disablement in a transaction", function () {
-            $userId = Uuid::uuid4();
-            $totpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
-            $user = TestEntityFactory::createUser(
-                id: $userId,
-                totpSecret: $totpSecret,
-            );
-
-            $userRepository = Mockery::mock(UserRepositoryInterface::class);
-            $userRepository
-                ->shouldReceive("findById")
-                ->with($userId)
-                ->andReturn($user);
-            $userRepository->shouldReceive("save")->once();
-
-            $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new UserService(
-                $userRepository,
-                $passwordHasher,
-                $unitOfWork,
-            );
-
-            $service->disableTotp($userId);
-
-            expect(true)->toBeTrue();
-        });
     });
 });

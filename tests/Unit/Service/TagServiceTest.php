@@ -10,7 +10,7 @@ use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\TagService;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
+use jschreuder\BookmarkBureau\Service\TagServicePipelines;
 use Ramsey\Uuid\Uuid;
 
 describe("TagService", function () {
@@ -27,12 +27,11 @@ describe("TagService", function () {
                 ->andReturn($tagCollection);
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
 
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->listAllTags();
@@ -51,12 +50,11 @@ describe("TagService", function () {
                 ->andReturn($tagCollection);
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
 
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->listAllTags();
@@ -87,12 +85,10 @@ describe("TagService", function () {
                 ->once()
                 ->andReturn($link);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->getTagsForLink($linkId);
@@ -120,12 +116,10 @@ describe("TagService", function () {
                 ->once()
                 ->andReturn($link);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->getTagsForLink($linkId);
@@ -146,12 +140,10 @@ describe("TagService", function () {
                     ->once()
                     ->andThrow(LinkNotFoundException::class);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-
                 $service = new TagService(
                     $tagRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    new TagServicePipelines(),
                 );
 
                 expect(fn() => $service->getTagsForLink($linkId))->toThrow(
@@ -167,17 +159,11 @@ describe("TagService", function () {
             $tagRepository->shouldReceive("save")->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->createTag("new-tag", "#FF5733");
@@ -192,17 +178,11 @@ describe("TagService", function () {
             $tagRepository->shouldReceive("save")->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->createTag("new-tag");
@@ -220,17 +200,11 @@ describe("TagService", function () {
                     ->andThrow(DuplicateTagException::class);
 
                 $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
 
                 $service = new TagService(
                     $tagRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    new TagServicePipelines(),
                 );
 
                 expect(
@@ -239,46 +213,16 @@ describe("TagService", function () {
             },
         );
 
-        test("wraps creation in a transaction", function () {
-            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository->shouldReceive("save")->once();
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new TagService(
-                $tagRepository,
-                $linkRepository,
-                $unitOfWork,
-            );
-
-            $service->createTag("new-tag", "#FF5733");
-
-            expect(true)->toBeTrue();
-        });
-
         test(
             "throws InvalidArgumentException on invalid color format",
             function () {
                 $tagRepository = Mockery::mock(TagRepositoryInterface::class);
                 $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
 
                 $service = new TagService(
                     $tagRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    new TagServicePipelines(),
                 );
 
                 expect(
@@ -301,17 +245,11 @@ describe("TagService", function () {
             $tagRepository->shouldReceive("save")->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->updateTag("my-tag", "#33FF57");
@@ -334,17 +272,11 @@ describe("TagService", function () {
             $tagRepository->shouldReceive("save")->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->updateTag("my-tag", null);
@@ -363,17 +295,11 @@ describe("TagService", function () {
                     ->andThrow(TagNotFoundException::class);
 
                 $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
 
                 $service = new TagService(
                     $tagRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    new TagServicePipelines(),
                 );
 
                 expect(
@@ -381,33 +307,6 @@ describe("TagService", function () {
                 )->toThrow(TagNotFoundException::class);
             },
         );
-
-        test("wraps update in a transaction", function () {
-            $tag = TestEntityFactory::createTag(tagName: new TagName("my-tag"));
-
-            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository->shouldReceive("findByName")->andReturn($tag);
-            $tagRepository->shouldReceive("save")->once();
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new TagService(
-                $tagRepository,
-                $linkRepository,
-                $unitOfWork,
-            );
-
-            $service->updateTag("my-tag", "#FF5733");
-
-            expect(true)->toBeTrue();
-        });
     });
 
     describe("deleteTag method", function () {
@@ -423,17 +322,11 @@ describe("TagService", function () {
             $tagRepository->shouldReceive("delete")->with($tag)->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $service->deleteTag("my-tag");
@@ -452,17 +345,11 @@ describe("TagService", function () {
                     ->andThrow(TagNotFoundException::class);
 
                 $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
 
                 $service = new TagService(
                     $tagRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    new TagServicePipelines(),
                 );
 
                 expect(fn() => $service->deleteTag("nonexistent-tag"))->toThrow(
@@ -470,33 +357,6 @@ describe("TagService", function () {
                 );
             },
         );
-
-        test("wraps deletion in a transaction", function () {
-            $tag = TestEntityFactory::createTag(tagName: new TagName("my-tag"));
-
-            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository->shouldReceive("findByName")->andReturn($tag);
-            $tagRepository->shouldReceive("delete");
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new TagService(
-                $tagRepository,
-                $linkRepository,
-                $unitOfWork,
-            );
-
-            $service->deleteTag("my-tag");
-
-            expect(true)->toBeTrue();
-        });
     });
 
     describe("assignTagToLink method", function () {
@@ -528,17 +388,10 @@ describe("TagService", function () {
                 ->once()
                 ->andReturn($link);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $service->assignTagToLink($linkId, "my-tag");
@@ -574,17 +427,10 @@ describe("TagService", function () {
                 ->once()
                 ->andReturn($link);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $service->assignTagToLink($linkId, "new-tag", "#FF5733");
@@ -618,17 +464,10 @@ describe("TagService", function () {
                 ->once()
                 ->andReturn($link);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $service->assignTagToLink($linkId, "my-tag");
@@ -649,17 +488,10 @@ describe("TagService", function () {
                     ->once()
                     ->andThrow(LinkNotFoundException::class);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
-
                 $service = new TagService(
                     $tagRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    new TagServicePipelines(),
                 );
 
                 expect(
@@ -667,40 +499,6 @@ describe("TagService", function () {
                 )->toThrow(LinkNotFoundException::class);
             },
         );
-
-        test("wraps assign operation in a transaction", function () {
-            $linkId = Uuid::uuid4();
-            $link = TestEntityFactory::createLink(id: $linkId);
-            $tag = TestEntityFactory::createTag(tagName: new TagName("my-tag"));
-
-            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository->shouldReceive("findByName")->andReturn($tag);
-            $tagRepository
-                ->shouldReceive("isAssignedToLinkId")
-                ->andReturn(false);
-            $tagRepository->shouldReceive("assignToLinkId");
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("findById")->andReturn($link);
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new TagService(
-                $tagRepository,
-                $linkRepository,
-                $unitOfWork,
-            );
-
-            $service->assignTagToLink($linkId, "my-tag");
-
-            expect(true)->toBeTrue();
-        });
     });
 
     describe("removeTagFromLink method", function () {
@@ -714,43 +512,11 @@ describe("TagService", function () {
                 ->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
-            );
-
-            $service->removeTagFromLink($linkId, "my-tag");
-
-            expect(true)->toBeTrue();
-        });
-
-        test("wraps remove operation in a transaction", function () {
-            $linkId = Uuid::uuid4();
-
-            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository->shouldReceive("removeFromLinkId");
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new TagService(
-                $tagRepository,
-                $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $service->removeTagFromLink($linkId, "my-tag");
@@ -773,12 +539,10 @@ describe("TagService", function () {
                 ->andReturn($tagCollection);
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->searchTags("api");
@@ -799,12 +563,10 @@ describe("TagService", function () {
                 ->andReturn($tagCollection);
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->searchTags("api", 5);
@@ -824,12 +586,10 @@ describe("TagService", function () {
                 ->andReturn($tagCollection);
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             $result = $service->searchTags("xyz");
@@ -872,18 +632,10 @@ describe("TagService", function () {
                 $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
                 $linkRepository->shouldReceive("findById")->andReturn($link);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->times(3) // create, assign, deleteTag (getTagsForLink and listAllTags don't wrap in transaction)
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
-
                 $service = new TagService(
                     $tagRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    new TagServicePipelines(),
                 );
 
                 // Create a tag
@@ -931,18 +683,11 @@ describe("TagService", function () {
                 ->andReturn($tag1);
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->times(2) // create twice (listAllTags and searchTags are not transactional)
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
 
             $service = new TagService(
                 $tagRepository,
                 $linkRepository,
-                $unitOfWork,
+                new TagServicePipelines(),
             );
 
             // Create multiple tags

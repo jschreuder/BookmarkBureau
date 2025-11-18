@@ -8,7 +8,6 @@ use jschreuder\BookmarkBureau\Service\TagServiceInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
 use jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
@@ -183,13 +182,6 @@ describe("ServiceContainer Integration", function () {
             $service = $container->getTagService();
 
             expect($service)->toBeInstanceOf(TagServiceInterface::class);
-        });
-
-        test("provides UnitOfWork instance", function () {
-            $container = TestContainerHelper::createContainerInstance();
-            $unitOfWork = $container->getUnitOfWork();
-
-            expect($unitOfWork)->toBeInstanceOf(UnitOfWorkInterface::class);
         });
 
         test("provides PasswordHasher instance", function () {

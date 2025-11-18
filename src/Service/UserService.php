@@ -10,7 +10,6 @@ use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Exception\DuplicateEmailException;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -19,41 +18,40 @@ final readonly class UserService implements UserServiceInterface
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private PasswordHasherInterface $passwordHasher,
-        private UnitOfWorkInterface $unitOfWork,
+        private UserServicePipelines $pipelines,
     ) {}
 
     #[\Override]
     public function createUser(Email $email, string $plainPassword): User
     {
-        return $this->unitOfWork->transactional(function () use (
-            $email,
-            $plainPassword,
-        ): User {
-            // Check if email already exists
-            if ($this->userRepository->existsByEmail($email)) {
-                throw new DuplicateEmailException(
-                    "Email already exists: {$email}",
+        return $this->pipelines
+            ->createUser()
+            ->run(function () use ($email, $plainPassword): User {
+                // Check if email already exists
+                if ($this->userRepository->existsByEmail($email)) {
+                    throw new DuplicateEmailException(
+                        "Email already exists: {$email}",
+                    );
+                }
+
+                // Hash the password
+                $passwordHash = $this->passwordHasher->hash($plainPassword);
+
+                // Create new user without TOTP
+                $now = new DateTimeImmutable();
+                $user = new User(
+                    userId: Uuid::uuid4(),
+                    email: $email,
+                    passwordHash: $passwordHash,
+                    totpSecret: null,
+                    createdAt: $now,
+                    updatedAt: $now,
                 );
-            }
 
-            // Hash the password
-            $passwordHash = $this->passwordHasher->hash($plainPassword);
-
-            // Create new user without TOTP
-            $now = new DateTimeImmutable();
-            $user = new User(
-                userId: Uuid::uuid4(),
-                email: $email,
-                passwordHash: $passwordHash,
-                totpSecret: null,
-                createdAt: $now,
-                updatedAt: $now,
-            );
-
-            // Persist to repository
-            $this->userRepository->save($user);
-            return $user;
-        });
+                // Persist to repository
+                $this->userRepository->save($user);
+                return $user;
+            });
     }
 
     /**
@@ -62,7 +60,9 @@ final readonly class UserService implements UserServiceInterface
     #[\Override]
     public function getUser(UuidInterface $userId): User
     {
-        return $this->userRepository->findById($userId);
+        return $this->pipelines
+            ->getUser()
+            ->run(fn() => $this->userRepository->findById($userId));
     }
 
     /**
@@ -71,13 +71,17 @@ final readonly class UserService implements UserServiceInterface
     #[\Override]
     public function getUserByEmail(Email $email): User
     {
-        return $this->userRepository->findByEmail($email);
+        return $this->pipelines
+            ->getUserByEmail()
+            ->run(fn() => $this->userRepository->findByEmail($email));
     }
 
     #[\Override]
     public function listAllUsers(): UserCollection
     {
-        return $this->userRepository->findAll();
+        return $this->pipelines
+            ->listAllUsers()
+            ->run(fn() => $this->userRepository->findAll());
     }
 
     /**
@@ -86,7 +90,7 @@ final readonly class UserService implements UserServiceInterface
     #[\Override]
     public function deleteUser(UuidInterface $userId): void
     {
-        $this->unitOfWork->transactional(function () use ($userId): void {
+        $this->pipelines->deleteUser()->run(function () use ($userId): void {
             $user = $this->userRepository->findById($userId);
             $this->userRepository->delete($user);
         });
@@ -100,21 +104,20 @@ final readonly class UserService implements UserServiceInterface
         UuidInterface $userId,
         string $plainPassword,
     ): void {
-        $this->unitOfWork->transactional(function () use (
-            $userId,
-            $plainPassword,
-        ): void {
-            $user = $this->userRepository->findById($userId);
+        $this->pipelines
+            ->changePassword()
+            ->run(function () use ($userId, $plainPassword): void {
+                $user = $this->userRepository->findById($userId);
 
-            // Hash the new password
-            $newPasswordHash = $this->passwordHasher->hash($plainPassword);
+                // Hash the new password
+                $newPasswordHash = $this->passwordHasher->hash($plainPassword);
 
-            // Update user's password using the entity method
-            $user->changePassword($newPasswordHash);
+                // Update user's password using the entity method
+                $user->changePassword($newPasswordHash);
 
-            // Persist changes
-            $this->userRepository->save($user);
-        });
+                // Persist changes
+                $this->userRepository->save($user);
+            });
     }
 
     #[\Override]
@@ -132,22 +135,22 @@ final readonly class UserService implements UserServiceInterface
     #[\Override]
     public function enableTotp(UuidInterface $userId): TotpSecret
     {
-        return $this->unitOfWork->transactional(function () use (
-            $userId,
-        ): TotpSecret {
-            $user = $this->userRepository->findById($userId);
+        return $this->pipelines
+            ->enableTotp()
+            ->run(function () use ($userId): TotpSecret {
+                $user = $this->userRepository->findById($userId);
 
-            // Generate a new TOTP secret
-            $totpSecret = $this->generateTotpSecret();
+                // Generate a new TOTP secret
+                $totpSecret = $this->generateTotpSecret();
 
-            // Update user's TOTP secret using the entity method
-            $user->changeTotpSecret($totpSecret);
+                // Update user's TOTP secret using the entity method
+                $user->changeTotpSecret($totpSecret);
 
-            // Persist changes
-            $this->userRepository->save($user);
+                // Persist changes
+                $this->userRepository->save($user);
 
-            return $totpSecret;
-        });
+                return $totpSecret;
+            });
     }
 
     /**
@@ -156,7 +159,7 @@ final readonly class UserService implements UserServiceInterface
     #[\Override]
     public function disableTotp(UuidInterface $userId): void
     {
-        $this->unitOfWork->transactional(function () use ($userId): void {
+        $this->pipelines->disableTotp()->run(function () use ($userId): void {
             $user = $this->userRepository->findById($userId);
 
             // Disable TOTP using the entity method

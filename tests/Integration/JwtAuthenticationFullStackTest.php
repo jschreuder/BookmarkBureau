@@ -73,12 +73,9 @@ describe("JWT Authentication Full Stack Integration", function () {
 
             // Create a test user first
             $userRepository = $container->getUserRepository();
-            $unitOfWork = $container->getUnitOfWork();
 
             $testUser = TestEntityFactory::createUser();
-            $unitOfWork->begin();
             $userRepository->save($testUser);
-            $unitOfWork->commit();
 
             // Simulate HTTP POST /auth/login
             $request = ServerRequestFactory::fromGlobals();
@@ -121,13 +118,10 @@ describe("JWT Authentication Full Stack Integration", function () {
             $stack = $container->getApp();
             $userRepository = $container->getUserRepository();
             $jwtService = $container->getJwtService();
-            $unitOfWork = $container->getUnitOfWork();
 
             // Create and save test user
             $testUser = TestEntityFactory::createUser();
-            $unitOfWork->begin();
             $userRepository->save($testUser);
-            $unitOfWork->commit();
 
             // Generate a valid token
             $token = $jwtService->generate($testUser, TokenType::SESSION_TOKEN);
@@ -195,13 +189,10 @@ describe("JWT Authentication Full Stack Integration", function () {
             $stack = $container->getApp();
             $userRepository = $container->getUserRepository();
             $jwtService = $container->getJwtService();
-            $unitOfWork = $container->getUnitOfWork();
 
             // Create and save test user
             $testUser = TestEntityFactory::createUser();
-            $unitOfWork->begin();
             $userRepository->save($testUser);
-            $unitOfWork->commit();
 
             // Generate remember-me token
             $token = $jwtService->generate(
@@ -286,7 +277,6 @@ describe("JWT Authentication Full Stack Integration", function () {
                 $pdo = $container->getDb();
                 $userRepository = $container->getUserRepository();
                 $jwtService = $container->getJwtService();
-                $unitOfWork = $container->getUnitOfWork();
 
                 // Create tables
                 $pdo->exec(
@@ -359,9 +349,7 @@ describe("JWT Authentication Full Stack Integration", function () {
 
                 // Create and save test user
                 $testUser = TestEntityFactory::createUser();
-                $unitOfWork->begin();
                 $userRepository->save($testUser);
-                $unitOfWork->commit();
 
                 // Generate a valid token
                 $token = $jwtService->generate(
