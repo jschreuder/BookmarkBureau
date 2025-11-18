@@ -4,7 +4,7 @@ use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
 use jschreuder\BookmarkBureau\Entity\Value\TokenClaims;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Exception\InvalidTokenException;
-use jschreuder\BookmarkBureau\Middleware\JwtAuthenticationMiddleware;
+use jschreuder\BookmarkBureau\HttpMiddleware\JwtAuthenticationMiddleware;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
 use jschreuder\Middle\Exception\AuthenticationException;
 use Laminas\Diactoros\ServerRequest;

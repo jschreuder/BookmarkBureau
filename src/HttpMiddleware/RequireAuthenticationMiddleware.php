@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace jschreuder\BookmarkBureau\Middleware;
+namespace jschreuder\BookmarkBureau\HttpMiddleware;
 
 use jschreuder\Middle\Exception\AuthenticationException;
 use Psr\Http\Message\ResponseInterface;

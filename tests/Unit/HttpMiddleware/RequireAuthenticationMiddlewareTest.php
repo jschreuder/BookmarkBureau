@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use jschreuder\BookmarkBureau\Middleware\RequireAuthenticationMiddleware;
+use jschreuder\BookmarkBureau\HttpMiddleware\RequireAuthenticationMiddleware;
 use jschreuder\Middle\Exception\AuthenticationException;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequest;
