@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace jschreuder\BookmarkBureau\OperationPipeline;
+namespace jschreuder\BookmarkBureau\OperationMiddleware;
 
+use jschreuder\BookmarkBureau\OperationPipeline\PipelineMiddlewareInterface;
 use PDO;
 use Throwable;
 

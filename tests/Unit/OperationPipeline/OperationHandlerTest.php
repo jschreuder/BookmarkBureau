@@ -127,7 +127,7 @@ describe("OperationHandler", function () {
             };
 
             $handler = new OperationHandler([$middleware1, $middleware2]);
-            $operation = fn($d) => (object) ["value" => $d->value . "-op"];
+            $operation = fn($d) => (object) ["value" => "{$d->value}-op"];
             $result = $handler->handle($operation, $data);
 
             expect($result->value)->toBe("original-m1-m2-op");

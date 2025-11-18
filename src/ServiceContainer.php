@@ -40,7 +40,7 @@ use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use jschreuder\BookmarkBureau\OperationPipeline\NoPipeline;
 use jschreuder\BookmarkBureau\OperationPipeline\Pipeline;
-use jschreuder\BookmarkBureau\OperationPipeline\PdoTransactionMiddleware;
+use jschreuder\BookmarkBureau\OperationMiddleware\PdoTransactionMiddleware;
 use jschreuder\BookmarkBureau\OperationPipeline\PipelineInterface;
 use jschreuder\BookmarkBureau\Service\CategoryService;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;

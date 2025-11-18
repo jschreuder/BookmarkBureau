@@ -1,6 +1,6 @@
 <?php
 
-use jschreuder\BookmarkBureau\OperationPipeline\PsrLogMiddleware;
+use jschreuder\BookmarkBureau\OperationMiddleware\PsrLogMiddleware;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 

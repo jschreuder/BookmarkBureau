@@ -1,6 +1,6 @@
 <?php
 
-use jschreuder\BookmarkBureau\OperationPipeline\PdoTransactionMiddleware;
+use jschreuder\BookmarkBureau\OperationMiddleware\PdoTransactionMiddleware;
 use jschreuder\BookmarkBureau\OperationPipeline\PipelineMiddlewareInterface;
 
 describe("PdoTransactionMiddleware", function () {
@@ -104,10 +104,11 @@ describe("PdoTransactionMiddleware", function () {
                 $data = new stdClass();
 
                 // Call process twice within the same operation to simulate nesting
-                $middleware->process($data, function ($d) use ($middleware) {
+                $middleware->process(
+                    $data,
                     // This creates a nested middleware chain through same instance
-                    return $middleware->process($d, fn($inner) => $inner);
-                });
+                    fn($d) => $middleware->process($d, fn($inner) => $inner),
+                );
 
                 expect(true)->toBeTrue();
             },
@@ -121,16 +122,16 @@ describe("PdoTransactionMiddleware", function () {
             $middleware = new PdoTransactionMiddleware($pdo);
             $data = new stdClass();
 
-            $middleware->process($data, function ($d) use ($middleware) {
-                return $middleware->process($d, function ($inner) use (
-                    $middleware,
-                ) {
-                    return $middleware->process(
+            $middleware->process(
+                $data,
+                fn($d) => $middleware->process(
+                    $d,
+                    fn($inner) => $middleware->process(
                         $inner,
                         fn($deepest) => $deepest,
-                    );
-                });
-            });
+                    ),
+                ),
+            );
 
             expect(true)->toBeTrue();
         });
@@ -144,18 +145,16 @@ describe("PdoTransactionMiddleware", function () {
             $data = new stdClass();
 
             expect(
-                fn() => $middleware->process($data, function ($d) use (
-                    $middleware,
-                ) {
-                    return $middleware->process($d, function ($inner) use (
-                        $middleware,
-                    ) {
-                        return $middleware->process(
+                fn() => $middleware->process(
+                    $data,
+                    fn($d) => $middleware->process(
+                        $d,
+                        fn($inner) => $middleware->process(
                             $inner,
                             fn($deepest) => throw new Exception("Deep failure"),
-                        );
-                    });
-                }),
+                        ),
+                    ),
+                ),
             )->toThrow(Exception::class, "Deep failure");
         });
 
@@ -174,14 +173,13 @@ describe("PdoTransactionMiddleware", function () {
 
                 // First operation that fails in nested chain
                 try {
-                    $middleware->process($data, function ($d) use (
-                        $middleware,
-                    ) {
-                        return $middleware->process(
+                    $middleware->process(
+                        $data,
+                        fn($d) => $middleware->process(
                             $d,
                             fn($inner) => throw new Exception("Failed"),
-                        );
-                    });
+                        ),
+                    );
                 } catch (Exception) {
                     // Expected
                 }
@@ -450,11 +448,10 @@ describe("PdoTransactionMiddleware", function () {
 
             $middleware = new PdoTransactionMiddleware($pdo);
 
-            $middleware->process(new stdClass(), function ($d) use (
-                $middleware,
-            ) {
-                return $middleware->process($d, fn($inner) => $inner);
-            });
+            $middleware->process(
+                new stdClass(),
+                fn($d) => $middleware->process($d, fn($inner) => $inner),
+            );
 
             expect($commitCount)->toBe(1);
         });
@@ -478,14 +475,13 @@ describe("PdoTransactionMiddleware", function () {
                 $middleware = new PdoTransactionMiddleware($pdo);
 
                 try {
-                    $middleware->process(new stdClass(), function ($d) use (
-                        $middleware,
-                    ) {
-                        return $middleware->process(
+                    $middleware->process(
+                        new stdClass(),
+                        fn($d) => $middleware->process(
                             $d,
                             fn($inner) => throw new Exception("Failed"),
-                        );
-                    });
+                        ),
+                    );
                 } catch (Exception) {
                     // Expected
                 }
