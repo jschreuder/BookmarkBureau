@@ -24,7 +24,7 @@ describe("OperationHandler", function () {
             };
 
             $middleware = new class implements PipelineMiddlewareInterface {
-                public function process(object $data, callable $next): object
+                public function process(?object $data, callable $next): ?object
                 {
                     $data->value += 10;
                     return $next($data);
@@ -48,9 +48,9 @@ describe("OperationHandler", function () {
                 $middleware1 = new class implements PipelineMiddlewareInterface
                 {
                     public function process(
-                        object $data,
+                        ?object $data,
                         callable $next,
-                    ): object {
+                    ): ?object {
                         $data->value += 10;
                         return $next($data);
                     }
@@ -59,9 +59,9 @@ describe("OperationHandler", function () {
                 $middleware2 = new class implements PipelineMiddlewareInterface
                 {
                     public function process(
-                        object $data,
+                        ?object $data,
                         callable $next,
-                    ): object {
+                    ): ?object {
                         $data->value *= 2;
                         return $next($data);
                     }
@@ -87,9 +87,9 @@ describe("OperationHandler", function () {
 
                 $middleware = new class implements PipelineMiddlewareInterface {
                     public function process(
-                        object $data,
+                        ?object $data,
                         callable $next,
-                    ): object {
+                    ): ?object {
                         $next($data);
                         // Call next again - should throw
                         return $next($data);
@@ -111,7 +111,7 @@ describe("OperationHandler", function () {
             };
 
             $middleware1 = new class implements PipelineMiddlewareInterface {
-                public function process(object $data, callable $next): object
+                public function process(?object $data, callable $next): ?object
                 {
                     $data->value .= "-m1";
                     return $next($data);
@@ -119,7 +119,7 @@ describe("OperationHandler", function () {
             };
 
             $middleware2 = new class implements PipelineMiddlewareInterface {
-                public function process(object $data, callable $next): object
+                public function process(?object $data, callable $next): ?object
                 {
                     $data->value .= "-m2";
                     return $next($data);
@@ -143,9 +143,9 @@ describe("OperationHandler", function () {
                 $middleware1 = new class implements PipelineMiddlewareInterface
                 {
                     public function process(
-                        object $data,
+                        ?object $data,
                         callable $next,
-                    ): object {
+                    ): ?object {
                         $result = $next($data);
                         $result->value *= 2;
                         return $result;
@@ -155,9 +155,9 @@ describe("OperationHandler", function () {
                 $middleware2 = new class implements PipelineMiddlewareInterface
                 {
                     public function process(
-                        object $data,
+                        ?object $data,
                         callable $next,
-                    ): object {
+                    ): ?object {
                         $result = $next($data);
                         $result->value += 10;
                         return $result;
@@ -185,9 +185,9 @@ describe("OperationHandler", function () {
                 $middleware1 = new class implements PipelineMiddlewareInterface
                 {
                     public function process(
-                        object $data,
+                        ?object $data,
                         callable $next,
-                    ): object {
+                    ): ?object {
                         $data->value *= 2;
                         $result = $next($data);
                         $result->value += 100;
@@ -198,9 +198,9 @@ describe("OperationHandler", function () {
                 $middleware2 = new class implements PipelineMiddlewareInterface
                 {
                     public function process(
-                        object $data,
+                        ?object $data,
                         callable $next,
-                    ): object {
+                    ): ?object {
                         $data->value *= 3;
                         $result = $next($data);
                         $result->value *= 2;
@@ -220,5 +220,116 @@ describe("OperationHandler", function () {
                 expect($result->value)->toBe(132);
             },
         );
+
+        test("should handle null data through middleware chain", function () {
+            $middleware = new class implements PipelineMiddlewareInterface {
+                public function process(?object $data, callable $next): ?object
+                {
+                    return $next($data);
+                }
+            };
+
+            $handler = new OperationHandler([$middleware]);
+            $operation = fn($d) => $d === null
+                ? (object) ["created" => true]
+                : $d;
+            $result = $handler->handle($operation, null);
+
+            expect($result->created)->toBeTrue();
+        });
+
+        test("should handle null returned from operation", function () {
+            $data = new class {
+                public int $value = 5;
+            };
+
+            $middleware = new class implements PipelineMiddlewareInterface {
+                public function process(?object $data, callable $next): ?object
+                {
+                    return $next($data);
+                }
+            };
+
+            $handler = new OperationHandler([$middleware]);
+            $operation = fn($d) => null;
+            $result = $handler->handle($operation, $data);
+
+            expect($result)->toBeNull();
+        });
+
+        test("should pass null through multiple middlewares", function () {
+            $middleware1 = new class implements PipelineMiddlewareInterface {
+                public function process(?object $data, callable $next): ?object
+                {
+                    expect($data)->toBeNull();
+                    return $next($data);
+                }
+            };
+
+            $middleware2 = new class implements PipelineMiddlewareInterface {
+                public function process(?object $data, callable $next): ?object
+                {
+                    expect($data)->toBeNull();
+                    return $next($data);
+                }
+            };
+
+            $handler = new OperationHandler([$middleware1, $middleware2]);
+            $operation = fn($d) => (object) ["created" => true];
+            $result = $handler->handle($operation, null);
+
+            expect($result->created)->toBeTrue();
+        });
+
+        test("should allow middleware to create object from null", function () {
+            $middleware = new class implements PipelineMiddlewareInterface {
+                public function process(?object $data, callable $next): ?object
+                {
+                    if ($data === null) {
+                        $data = (object) ["initialized" => true];
+                    }
+                    return $next($data);
+                }
+            };
+
+            $handler = new OperationHandler([$middleware]);
+            $operation = fn($d) => (object) [
+                "value" => $d->initialized ? 42 : 0,
+            ];
+            $result = $handler->handle($operation, null);
+
+            expect($result->value)->toBe(42);
+        });
+
+        test(
+            "should allow middleware to return null instead of calling next",
+            function () {
+                $middleware = new class implements PipelineMiddlewareInterface {
+                    public function process(
+                        ?object $data,
+                        callable $next,
+                    ): ?object {
+                        if ($data === null) {
+                            return null;
+                        }
+                        return $next($data);
+                    }
+                };
+
+                $handler = new OperationHandler([$middleware]);
+                $operation = fn($d) => (object) ["should" => "not run"];
+                $result = $handler->handle($operation, null);
+
+                expect($result)->toBeNull();
+            },
+        );
+
+        test("should handle no data parameter (defaults to null)", function () {
+            $handler = new OperationHandler([]);
+            $operation = fn($d) => (object) ["received_null" => $d === null];
+            $result = $handler->handle($operation);
+
+            expect($result->received_null)->toBeTrue();
+        });
     });
 });

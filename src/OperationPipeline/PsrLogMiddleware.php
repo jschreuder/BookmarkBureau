@@ -14,18 +14,19 @@ final readonly class PsrLogMiddleware implements PipelineMiddlewareInterface
     ) {}
 
     #[\Override]
-    public function process(object $data, callable $next): object
+    public function process(?object $data, callable $next): ?object
     {
+        $inputType = $data === null ? "null" : \get_class($data);
         $this->logger->log(
             level: $this->logLevel,
-            message: "{$this->operationName} started with object of type " .
-                \get_class($data),
+            message: "{$this->operationName} started with object of type {$inputType}",
         );
         $return = $next($data);
+
+        $outputType = $return === null ? "null" : \get_class($return);
         $this->logger->log(
             level: $this->logLevel,
-            message: "{$this->operationName} completed with object of type " .
-                \get_class($return),
+            message: "{$this->operationName} completed with object of type {$outputType}",
         );
         return $return;
     }

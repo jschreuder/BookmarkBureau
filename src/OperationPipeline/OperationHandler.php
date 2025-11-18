@@ -14,7 +14,7 @@ final class OperationHandler
         private readonly int $currentIndex = 0,
     ) {}
 
-    public function handle(Closure $operation, object $data): object
+    public function handle(Closure $operation, ?object $data = null): ?object
     {
         if ($this->called) {
             throw new OperationPipelineException(

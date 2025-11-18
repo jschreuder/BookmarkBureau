@@ -28,14 +28,14 @@ final readonly class Pipeline implements PipelineInterface
 
     public function withMiddleware(
         PipelineMiddlewareInterface $middleware,
-    ): PipelineInterface {
+    ): Pipeline {
         $newMiddlewares = $this->middlewares;
         array_push($newMiddlewares, $middleware);
         return new self(...$newMiddlewares);
     }
 
     #[\Override]
-    public function run(Closure $operation, object $data): object
+    public function run(Closure $operation, ?object $data = null): ?object
     {
         if (\count($this->middlewares) === 0) {
             return $operation($data);

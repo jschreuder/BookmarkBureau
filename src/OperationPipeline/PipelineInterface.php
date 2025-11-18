@@ -6,5 +6,5 @@ use Closure;
 
 interface PipelineInterface
 {
-    public function run(Closure $operation, object $data): object;
+    public function run(Closure $operation, ?object $data = null): ?object;
 }

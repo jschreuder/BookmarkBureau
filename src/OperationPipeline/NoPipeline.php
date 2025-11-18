@@ -14,7 +14,7 @@ use Closure;
 final class NoPipeline implements PipelineInterface
 {
     #[\Override]
-    public function run(Closure $operation, object $data): object
+    public function run(Closure $operation, ?object $data = null): ?object
     {
         return $operation($data);
     }

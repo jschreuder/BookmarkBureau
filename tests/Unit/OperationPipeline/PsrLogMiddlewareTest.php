@@ -281,6 +281,156 @@ describe("PsrLogMiddleware", function () {
         });
     });
 
+    describe("nullable data handling", function () {
+        test("handles null data as input", function () {
+            $logger = Mockery::mock(LoggerInterface::class);
+            $logger
+                ->shouldReceive("log")
+                ->with(
+                    LogLevel::DEBUG,
+                    "TestOperation started with object of type null",
+                )
+                ->once()
+                ->ordered();
+            $logger
+                ->shouldReceive("log")
+                ->with(
+                    LogLevel::DEBUG,
+                    "TestOperation completed with object of type null",
+                )
+                ->once()
+                ->ordered();
+
+            $middleware = new PsrLogMiddleware(
+                logger: $logger,
+                operationName: "TestOperation",
+            );
+            $result = $middleware->process(null, fn($data) => $data);
+
+            expect($result)->toBeNull();
+        });
+
+        test("returns null from next callable", function () {
+            $logger = Mockery::mock(LoggerInterface::class);
+            $logger->shouldReceive("log")->twice();
+
+            $middleware = new PsrLogMiddleware(
+                logger: $logger,
+                operationName: "TestOperation",
+            );
+            $inputObject = new stdClass();
+
+            $result = $middleware->process($inputObject, fn($data) => null);
+
+            expect($result)->toBeNull();
+        });
+
+        test("logs null as type when next callable returns null", function () {
+            $logger = Mockery::mock(LoggerInterface::class);
+            $logger
+                ->shouldReceive("log")
+                ->with(
+                    LogLevel::DEBUG,
+                    "ConvertToNull started with object of type stdClass",
+                )
+                ->once()
+                ->ordered();
+            $logger
+                ->shouldReceive("log")
+                ->with(
+                    LogLevel::DEBUG,
+                    "ConvertToNull completed with object of type null",
+                )
+                ->once()
+                ->ordered();
+
+            $middleware = new PsrLogMiddleware(
+                logger: $logger,
+                operationName: "ConvertToNull",
+            );
+            $testObject = new stdClass();
+            $middleware->process($testObject, fn($data) => null);
+        });
+
+        test("handles null data passed to next callable", function () {
+            $logger = Mockery::mock(LoggerInterface::class);
+            $logger->shouldReceive("log")->twice();
+
+            $middleware = new PsrLogMiddleware(
+                logger: $logger,
+                operationName: "ProcessNull",
+            );
+            $receivedData = "not set";
+
+            $middleware->process(null, function ($data) use (&$receivedData) {
+                $receivedData = $data;
+                return $data;
+            });
+
+            expect($receivedData)->toBeNull();
+        });
+
+        test(
+            "logs correct types for null input and object output",
+            function () {
+                $logger = Mockery::mock(LoggerInterface::class);
+                $logger
+                    ->shouldReceive("log")
+                    ->with(
+                        LogLevel::DEBUG,
+                        "Create started with object of type null",
+                    )
+                    ->once()
+                    ->ordered();
+                $logger
+                    ->shouldReceive("log")
+                    ->with(
+                        LogLevel::DEBUG,
+                        "Create completed with object of type stdClass",
+                    )
+                    ->once()
+                    ->ordered();
+
+                $middleware = new PsrLogMiddleware(
+                    logger: $logger,
+                    operationName: "Create",
+                );
+                $newObject = new stdClass();
+                $middleware->process(null, fn($data) => $newObject);
+            },
+        );
+
+        test(
+            "logs correct types for object input and null output",
+            function () {
+                $logger = Mockery::mock(LoggerInterface::class);
+                $logger
+                    ->shouldReceive("log")
+                    ->with(
+                        LogLevel::DEBUG,
+                        "Delete started with object of type stdClass",
+                    )
+                    ->once()
+                    ->ordered();
+                $logger
+                    ->shouldReceive("log")
+                    ->with(
+                        LogLevel::DEBUG,
+                        "Delete completed with object of type null",
+                    )
+                    ->once()
+                    ->ordered();
+
+                $middleware = new PsrLogMiddleware(
+                    logger: $logger,
+                    operationName: "Delete",
+                );
+                $testObject = new stdClass();
+                $middleware->process($testObject, fn($data) => null);
+            },
+        );
+    });
+
     describe("PipelineMiddlewareInterface implementation", function () {
         test("implements PipelineMiddlewareInterface", function () {
             $logger = Mockery::mock(LoggerInterface::class);
@@ -307,6 +457,20 @@ describe("PsrLogMiddleware", function () {
             $output = $middleware->process($input, fn($data) => $data);
 
             expect($output)->toBeInstanceOf(stdClass::class);
+        });
+
+        test("process method accepts null data", function () {
+            $logger = Mockery::mock(LoggerInterface::class);
+            $logger->shouldReceive("log")->twice();
+
+            $middleware = new PsrLogMiddleware(
+                logger: $logger,
+                operationName: "Test",
+            );
+
+            $output = $middleware->process(null, fn($data) => $data);
+
+            expect($output)->toBeNull();
         });
     });
 
@@ -362,5 +526,49 @@ describe("PsrLogMiddleware", function () {
                 );
             },
         );
+
+        test("logs null type for null input", function () {
+            $capturedMessages = [];
+            $logger = Mockery::mock(LoggerInterface::class);
+            $logger
+                ->shouldReceive("log")
+                ->andReturnUsing(function ($level, $message) use (
+                    &$capturedMessages,
+                ) {
+                    $capturedMessages[] = $message;
+                });
+
+            $middleware = new PsrLogMiddleware(
+                logger: $logger,
+                operationName: "NullTest",
+            );
+            $middleware->process(null, fn($data) => $data);
+
+            expect($capturedMessages[0])->toBe(
+                "NullTest started with object of type null",
+            );
+        });
+
+        test("logs null type for null output", function () {
+            $capturedMessages = [];
+            $logger = Mockery::mock(LoggerInterface::class);
+            $logger
+                ->shouldReceive("log")
+                ->andReturnUsing(function ($level, $message) use (
+                    &$capturedMessages,
+                ) {
+                    $capturedMessages[] = $message;
+                });
+
+            $middleware = new PsrLogMiddleware(
+                logger: $logger,
+                operationName: "NullTest",
+            );
+            $middleware->process(new stdClass(), fn($data) => null);
+
+            expect($capturedMessages[1])->toBe(
+                "NullTest completed with object of type null",
+            );
+        });
     });
 });

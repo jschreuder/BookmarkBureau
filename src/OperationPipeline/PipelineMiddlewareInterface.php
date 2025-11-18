@@ -4,5 +4,5 @@ namespace jschreuder\BookmarkBureau\OperationPipeline;
 
 interface PipelineMiddlewareInterface
 {
-    public function process(object $data, callable $next): object;
+    public function process(?object $data, callable $next): ?object;
 }
