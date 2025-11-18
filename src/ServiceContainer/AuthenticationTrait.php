@@ -8,6 +8,7 @@ use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
 use jschreuder\BookmarkBureau\Service\LcobucciJwtService;
 use jschreuder\BookmarkBureau\Service\OtphpTotpVerifier;
 use jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
+use jschreuder\BookmarkBureau\Service\PasswordHasherStrengthDecorator;
 use jschreuder\BookmarkBureau\Service\PhpPasswordHasher;
 use jschreuder\BookmarkBureau\Service\RateLimitServiceInterface;
 use jschreuder\BookmarkBureau\Service\LoginRateLimitService;
@@ -30,7 +31,10 @@ trait AuthenticationTrait
 
     public function getPasswordHasher(): PasswordHasherInterface
     {
-        return new PhpPasswordHasher();
+        return new PasswordHasherStrengthDecorator(
+            hasher: new PhpPasswordHasher(),
+            minLength: 12,
+        );
     }
 
     public function getClock(): ClockInterface

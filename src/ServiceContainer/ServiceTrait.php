@@ -28,6 +28,7 @@ use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
+use jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
 
 trait ServiceTrait
 {
@@ -40,7 +41,7 @@ trait ServiceTrait
     abstract public function getDashboardRepository(): DashboardRepositoryInterface;
     abstract public function getFavoriteRepository(): FavoriteRepositoryInterface;
     abstract public function getUserRepository(): UserRepositoryInterface;
-    abstract public function getPasswordHasher(): \jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
+    abstract public function getPasswordHasher(): PasswordHasherInterface;
 
     public function getLinkService(): LinkServiceInterface
     {
