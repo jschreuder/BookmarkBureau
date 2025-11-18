@@ -16,7 +16,6 @@ use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -26,7 +25,7 @@ final class DashboardService implements DashboardServiceInterface
         private readonly DashboardRepositoryInterface $dashboardRepository,
         private readonly CategoryRepositoryInterface $categoryRepository,
         private readonly FavoriteRepositoryInterface $favoriteRepository,
-        private readonly UnitOfWorkInterface $unitOfWork,
+        private readonly DashboardServicePipelines $pipelines,
     ) {}
 
     /**
@@ -94,24 +93,22 @@ final class DashboardService implements DashboardServiceInterface
         string $description,
         ?string $icon = null,
     ): Dashboard {
-        return $this->unitOfWork->transactional(function () use (
-            $title,
-            $description,
-            $icon,
-        ): Dashboard {
-            $dashboard = new Dashboard(
-                Uuid::uuid4(),
-                new Title($title),
-                $description,
-                $icon !== null ? new Icon($icon) : null,
-                new DateTimeImmutable(),
-                new DateTimeImmutable(),
-            );
+        return $this->pipelines
+            ->createDashboard()
+            ->run(function () use ($title, $description, $icon): Dashboard {
+                $dashboard = new Dashboard(
+                    Uuid::uuid4(),
+                    new Title($title),
+                    $description,
+                    $icon !== null ? new Icon($icon) : null,
+                    new DateTimeImmutable(),
+                    new DateTimeImmutable(),
+                );
 
-            $this->dashboardRepository->save($dashboard);
+                $this->dashboardRepository->save($dashboard);
 
-            return $dashboard;
-        });
+                return $dashboard;
+            });
     }
 
     /**
@@ -124,22 +121,24 @@ final class DashboardService implements DashboardServiceInterface
         string $description,
         ?string $icon = null,
     ): Dashboard {
-        return $this->unitOfWork->transactional(function () use (
-            $dashboardId,
-            $title,
-            $description,
-            $icon,
-        ): Dashboard {
-            $dashboard = $this->dashboardRepository->findById($dashboardId);
+        return $this->pipelines
+            ->updateDashboard()
+            ->run(function () use (
+                $dashboardId,
+                $title,
+                $description,
+                $icon,
+            ): Dashboard {
+                $dashboard = $this->dashboardRepository->findById($dashboardId);
 
-            $dashboard->title = new Title($title);
-            $dashboard->description = $description;
-            $dashboard->icon = $icon !== null ? new Icon($icon) : null;
+                $dashboard->title = new Title($title);
+                $dashboard->description = $description;
+                $dashboard->icon = $icon !== null ? new Icon($icon) : null;
 
-            $this->dashboardRepository->save($dashboard);
+                $this->dashboardRepository->save($dashboard);
 
-            return $dashboard;
-        });
+                return $dashboard;
+            });
     }
 
     /**
@@ -148,9 +147,11 @@ final class DashboardService implements DashboardServiceInterface
     #[\Override]
     public function deleteDashboard(UuidInterface $dashboardId): void
     {
-        $this->unitOfWork->transactional(function () use ($dashboardId): void {
-            $dashboard = $this->dashboardRepository->findById($dashboardId);
-            $this->dashboardRepository->delete($dashboard);
-        });
+        $this->pipelines
+            ->deleteDashboard()
+            ->run(function () use ($dashboardId): void {
+                $dashboard = $this->dashboardRepository->findById($dashboardId);
+                $this->dashboardRepository->delete($dashboard);
+            });
     }
 }

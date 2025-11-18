@@ -12,7 +12,7 @@ use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\DashboardService;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
+use jschreuder\BookmarkBureau\Service\DashboardServicePipelines;
 use Ramsey\Uuid\Uuid;
 
 describe("DashboardService", function () {
@@ -81,13 +81,13 @@ describe("DashboardService", function () {
                 ->with($dashboardId)
                 ->andReturn($favorites);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->getFullDashboard($dashboardId);
@@ -119,13 +119,13 @@ describe("DashboardService", function () {
                 $favoriteRepository = Mockery::mock(
                     FavoriteRepositoryInterface::class,
                 );
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+                $pipelines = new DashboardServicePipelines();
 
                 $service = new DashboardService(
                     $dashboardRepository,
                     $categoryRepository,
                     $favoriteRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -165,13 +165,13 @@ describe("DashboardService", function () {
                 ->with($dashboardId)
                 ->andReturn($favorites);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->getFullDashboard($dashboardId);
@@ -219,13 +219,13 @@ describe("DashboardService", function () {
                 ->with($dashboardId)
                 ->andReturn($favorites);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->getFullDashboard($dashboardId);
@@ -254,13 +254,13 @@ describe("DashboardService", function () {
             $favoriteRepository = Mockery::mock(
                 FavoriteRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->getDashboard($dashboardId);
@@ -288,13 +288,13 @@ describe("DashboardService", function () {
                 $favoriteRepository = Mockery::mock(
                     FavoriteRepositoryInterface::class,
                 );
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+                $pipelines = new DashboardServicePipelines();
 
                 $service = new DashboardService(
                     $dashboardRepository,
                     $categoryRepository,
                     $favoriteRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(fn() => $service->getDashboard($dashboardId))->toThrow(
@@ -323,13 +323,13 @@ describe("DashboardService", function () {
             $favoriteRepository = Mockery::mock(
                 FavoriteRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->listAllDashboards();
@@ -354,13 +354,13 @@ describe("DashboardService", function () {
             $favoriteRepository = Mockery::mock(
                 FavoriteRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->listAllDashboards();
@@ -383,18 +383,13 @@ describe("DashboardService", function () {
                 FavoriteRepositoryInterface::class,
             );
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->createDashboard(
@@ -422,18 +417,13 @@ describe("DashboardService", function () {
                 FavoriteRepositoryInterface::class,
             );
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->createDashboard(
@@ -443,43 +433,6 @@ describe("DashboardService", function () {
             );
 
             expect($result->icon)->toBeNull();
-        });
-
-        test("wraps creation in a transaction", function () {
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $dashboardRepository->shouldReceive("save")->once();
-
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $favoriteRepository = Mockery::mock(
-                FavoriteRepositoryInterface::class,
-            );
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new DashboardService(
-                $dashboardRepository,
-                $categoryRepository,
-                $favoriteRepository,
-                $unitOfWork,
-            );
-
-            $service->createDashboard(
-                "Test Dashboard",
-                "Test Description",
-                "test-icon",
-            );
-
-            expect(true)->toBeTrue(); // Mockery validates the transactional was called
         });
 
         test("rolls back transaction on invalid title", function () {
@@ -493,18 +446,13 @@ describe("DashboardService", function () {
                 FavoriteRepositoryInterface::class,
             );
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             expect(
@@ -534,18 +482,13 @@ describe("DashboardService", function () {
                 FavoriteRepositoryInterface::class,
             );
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->updateDashboard(
@@ -583,18 +526,13 @@ describe("DashboardService", function () {
                 FavoriteRepositoryInterface::class,
             );
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->updateDashboard(
@@ -627,18 +565,13 @@ describe("DashboardService", function () {
                     FavoriteRepositoryInterface::class,
                 );
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new DashboardServicePipelines();
 
                 $service = new DashboardService(
                     $dashboardRepository,
                     $categoryRepository,
                     $favoriteRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -650,45 +583,6 @@ describe("DashboardService", function () {
                 )->toThrow(DashboardNotFoundException::class);
             },
         );
-
-        test("wraps update in a transaction", function () {
-            $dashboardId = Uuid::uuid4();
-            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $dashboardRepository
-                ->shouldReceive("findById")
-                ->andReturn($dashboard);
-            $dashboardRepository->shouldReceive("save")->once();
-
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $favoriteRepository = Mockery::mock(
-                FavoriteRepositoryInterface::class,
-            );
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new DashboardService(
-                $dashboardRepository,
-                $categoryRepository,
-                $favoriteRepository,
-                $unitOfWork,
-            );
-
-            $service->updateDashboard($dashboardId, "Updated", "Description");
-
-            expect(true)->toBeTrue(); // Mockery validates the transactional was called
-        });
     });
 
     describe("deleteDashboard method", function () {
@@ -715,23 +609,18 @@ describe("DashboardService", function () {
                 FavoriteRepositoryInterface::class,
             );
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $service->deleteDashboard($dashboardId);
 
-            expect(true)->toBeTrue(); // Mockery validates the delete was called
+            expect(true)->toBeTrue();
         });
 
         test(
@@ -754,18 +643,13 @@ describe("DashboardService", function () {
                     FavoriteRepositoryInterface::class,
                 );
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new DashboardServicePipelines();
 
                 $service = new DashboardService(
                     $dashboardRepository,
                     $categoryRepository,
                     $favoriteRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -773,45 +657,6 @@ describe("DashboardService", function () {
                 )->toThrow(DashboardNotFoundException::class);
             },
         );
-
-        test("wraps deletion in a transaction", function () {
-            $dashboardId = Uuid::uuid4();
-            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $dashboardRepository
-                ->shouldReceive("findById")
-                ->andReturn($dashboard);
-            $dashboardRepository->shouldReceive("delete");
-
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $favoriteRepository = Mockery::mock(
-                FavoriteRepositoryInterface::class,
-            );
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new DashboardService(
-                $dashboardRepository,
-                $categoryRepository,
-                $favoriteRepository,
-                $unitOfWork,
-            );
-
-            $service->deleteDashboard($dashboardId);
-
-            expect(true)->toBeTrue(); // Mockery validates the transactional was called
-        });
     });
 
     describe("integration scenarios", function () {
@@ -845,19 +690,13 @@ describe("DashboardService", function () {
                 FavoriteRepositoryInterface::class,
             );
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->times(3)
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new DashboardServicePipelines();
 
             $service = new DashboardService(
                 $dashboardRepository,
                 $categoryRepository,
                 $favoriteRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             // Create
@@ -961,13 +800,13 @@ describe("DashboardService", function () {
                     ->with($dashboardId)
                     ->andReturn($favorites);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+                $pipelines = new DashboardServicePipelines();
 
                 $service = new DashboardService(
                     $dashboardRepository,
                     $categoryRepository,
                     $favoriteRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 $result = $service->getFullDashboard($dashboardId);

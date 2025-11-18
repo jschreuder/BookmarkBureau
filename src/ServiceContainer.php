@@ -38,10 +38,15 @@ use jschreuder\BookmarkBureau\Entity\Mapper\CategoryEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\FavoriteEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
+use jschreuder\BookmarkBureau\OperationPipeline\Pipeline;
+use jschreuder\BookmarkBureau\OperationPipeline\PdoTransactionMiddleware;
+use jschreuder\BookmarkBureau\OperationPipeline\PipelineInterface;
 use jschreuder\BookmarkBureau\Service\CategoryService;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
+use jschreuder\BookmarkBureau\Service\CategoryServicePipelines;
 use jschreuder\BookmarkBureau\Service\DashboardService;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
+use jschreuder\BookmarkBureau\Service\DashboardServicePipelines;
 use jschreuder\BookmarkBureau\Service\FavoriteService;
 use jschreuder\BookmarkBureau\Service\FavoriteServiceInterface;
 use jschreuder\BookmarkBureau\Service\LinkService;
@@ -220,6 +225,11 @@ class ServiceContainer
         return new PdoUnitOfWork($this->getDb());
     }
 
+    public function getDefaultDbPipeline(): PipelineInterface
+    {
+        return new Pipeline(new PdoTransactionMiddleware($this->getDb()));
+    }
+
     public function getLinkRepository(): LinkRepositoryInterface
     {
         return new PdoLinkRepository(
@@ -287,7 +297,14 @@ class ServiceContainer
         return new CategoryService(
             $this->getCategoryRepository(),
             $this->getDashboardRepository(),
-            $this->getUnitOfWork(),
+            $this->getCategoryServicePipelines(),
+        );
+    }
+
+    public function getCategoryServicePipelines(): CategoryServicePipelines
+    {
+        return new CategoryServicePipelines(
+            default: $this->getDefaultDbPipeline(),
         );
     }
 
@@ -297,7 +314,14 @@ class ServiceContainer
             $this->getDashboardRepository(),
             $this->getCategoryRepository(),
             $this->getFavoriteRepository(),
-            $this->getUnitOfWork(),
+            $this->getDashboardServicePipelines(),
+        );
+    }
+
+    public function getDashboardServicePipelines(): DashboardServicePipelines
+    {
+        return new DashboardServicePipelines(
+            default: $this->getDefaultDbPipeline(),
         );
     }
 

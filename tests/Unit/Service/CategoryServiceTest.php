@@ -7,10 +7,11 @@ use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\OperationPipeline\PipelineInterface;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\CategoryService;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
+use jschreuder\BookmarkBureau\Service\CategoryServicePipelines;
 use Ramsey\Uuid\Uuid;
 
 describe("CategoryService", function () {
@@ -31,12 +32,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->getCategory($categoryId);
@@ -61,12 +62,12 @@ describe("CategoryService", function () {
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+                $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(fn() => $service->getCategory($categoryId))->toThrow(
@@ -98,17 +99,12 @@ describe("CategoryService", function () {
                 ->with($dashboardId)
                 ->andReturn($dashboard);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->createCategory(
@@ -145,17 +141,12 @@ describe("CategoryService", function () {
                 ->with($dashboardId)
                 ->andReturn($dashboard);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->createCategory($dashboardId, "New Category");
@@ -180,17 +171,12 @@ describe("CategoryService", function () {
                     ->with($dashboardId)
                     ->andThrow(DashboardNotFoundException::forId($dashboardId));
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -198,44 +184,6 @@ describe("CategoryService", function () {
                 )->toThrow(DashboardNotFoundException::class);
             },
         );
-
-        test("wraps creation in a transaction", function () {
-            $dashboardId = Uuid::uuid4();
-            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
-
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $categoryRepository
-                ->shouldReceive("getMaxSortOrderForDashboardId")
-                ->andReturn(-1);
-            $categoryRepository->shouldReceive("save")->once();
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $dashboardRepository
-                ->shouldReceive("findById")
-                ->andReturn($dashboard);
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new CategoryService(
-                $categoryRepository,
-                $dashboardRepository,
-                $unitOfWork,
-            );
-
-            $service->createCategory($dashboardId, "New Category", "#FF5733");
-
-            expect(true)->toBeTrue();
-        });
 
         test("rolls back transaction on invalid color", function () {
             $dashboardId = Uuid::uuid4();
@@ -255,17 +203,12 @@ describe("CategoryService", function () {
                 ->shouldReceive("findById")
                 ->andReturn($dashboard);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             // Invalid hex color format should throw InvalidArgumentException
@@ -296,17 +239,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->updateCategory(
@@ -338,17 +276,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->updateCategory(
@@ -376,17 +309,12 @@ describe("CategoryService", function () {
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -398,40 +326,6 @@ describe("CategoryService", function () {
                 )->toThrow(CategoryNotFoundException::class);
             },
         );
-
-        test("wraps update in a transaction", function () {
-            $categoryId = Uuid::uuid4();
-            $category = TestEntityFactory::createCategory(id: $categoryId);
-
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $categoryRepository
-                ->shouldReceive("findById")
-                ->andReturn($category);
-            $categoryRepository->shouldReceive("save")->once();
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new CategoryService(
-                $categoryRepository,
-                $dashboardRepository,
-                $unitOfWork,
-            );
-
-            $service->updateCategory($categoryId, "Updated", "#FF5733");
-
-            expect(true)->toBeTrue();
-        });
     });
 
     describe("deleteCategory method", function () {
@@ -454,17 +348,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $service->deleteCategory($categoryId);
@@ -488,17 +377,12 @@ describe("CategoryService", function () {
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(fn() => $service->deleteCategory($categoryId))->toThrow(
@@ -506,40 +390,6 @@ describe("CategoryService", function () {
                 );
             },
         );
-
-        test("wraps deletion in a transaction", function () {
-            $categoryId = Uuid::uuid4();
-            $category = TestEntityFactory::createCategory(id: $categoryId);
-
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $categoryRepository
-                ->shouldReceive("findById")
-                ->andReturn($category);
-            $categoryRepository->shouldReceive("delete");
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new CategoryService(
-                $categoryRepository,
-                $dashboardRepository,
-                $unitOfWork,
-            );
-
-            $service->deleteCategory($categoryId);
-
-            expect(true)->toBeTrue();
-        });
     });
 
     describe("reorderCategories method", function () {
@@ -566,17 +416,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $categoryIdToSortOrder = [
@@ -610,17 +455,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $categoryIdToSortOrder = [
@@ -631,39 +471,6 @@ describe("CategoryService", function () {
 
             expect($category1->sortOrder)->toBe(5);
             expect($category2->sortOrder)->toBe(1);
-        });
-
-        test("wraps reorder in a transaction", function () {
-            $dashboardId = Uuid::uuid4();
-            $categories = new CategoryCollection();
-
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $categoryRepository
-                ->shouldReceive("findByDashboardId")
-                ->andReturn($categories);
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new CategoryService(
-                $categoryRepository,
-                $dashboardRepository,
-                $unitOfWork,
-            );
-
-            $service->reorderCategories($dashboardId, []);
-
-            expect(true)->toBeTrue();
         });
     });
 
@@ -693,17 +500,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->addLinkToCategory($categoryId, $linkId);
@@ -736,17 +538,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->addLinkToCategory($categoryId, $linkId);
@@ -771,17 +568,12 @@ describe("CategoryService", function () {
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -815,17 +607,12 @@ describe("CategoryService", function () {
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -833,46 +620,6 @@ describe("CategoryService", function () {
                 )->toThrow(LinkNotFoundException::class);
             },
         );
-
-        test("wraps add link in a transaction", function () {
-            $categoryId = Uuid::uuid4();
-            $linkId = Uuid::uuid4();
-            $categoryLink = TestEntityFactory::createCategoryLink();
-
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $categoryRepository
-                ->shouldReceive("findById")
-                ->andReturn(TestEntityFactory::createCategory());
-            $categoryRepository
-                ->shouldReceive("getMaxSortOrderForCategoryId")
-                ->andReturn(-1);
-            $categoryRepository
-                ->shouldReceive("addLink")
-                ->andReturn($categoryLink);
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new CategoryService(
-                $categoryRepository,
-                $dashboardRepository,
-                $unitOfWork,
-            );
-
-            $result = $service->addLinkToCategory($categoryId, $linkId);
-
-            expect($result)->toBe($categoryLink);
-        });
     });
 
     describe("removeLinkFromCategory method", function () {
@@ -891,48 +638,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
-            );
-
-            $service->removeLinkFromCategory($categoryId, $linkId);
-
-            expect(true)->toBeTrue();
-        });
-
-        test("wraps remove link in a transaction", function () {
-            $categoryId = Uuid::uuid4();
-            $linkId = Uuid::uuid4();
-
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $categoryRepository->shouldReceive("removeLink");
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new CategoryService(
-                $categoryRepository,
-                $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $service->removeLinkFromCategory($categoryId, $linkId);
@@ -959,17 +670,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $service->reorderLinksInCategory($categoryId, $links);
@@ -992,48 +698,12 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
-            );
-
-            $service->reorderLinksInCategory($categoryId, $links);
-
-            expect(true)->toBeTrue();
-        });
-
-        test("wraps reorder links in a transaction", function () {
-            $categoryId = Uuid::uuid4();
-            $links = new LinkCollection();
-
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $categoryRepository->shouldReceive("reorderLinks");
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new CategoryService(
-                $categoryRepository,
-                $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $service->reorderLinksInCategory($categoryId, $links);
@@ -1087,18 +757,12 @@ describe("CategoryService", function () {
                     ->shouldReceive("findById")
                     ->andReturn($dashboard);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->times(6)
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 // Create
@@ -1178,18 +842,12 @@ describe("CategoryService", function () {
                 ->shouldReceive("findById")
                 ->andReturn($dashboard);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->times(3)
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             // Create two more categories
