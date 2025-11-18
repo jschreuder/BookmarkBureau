@@ -49,8 +49,10 @@ use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServicePipelines;
 use jschreuder\BookmarkBureau\Service\FavoriteService;
 use jschreuder\BookmarkBureau\Service\FavoriteServiceInterface;
+use jschreuder\BookmarkBureau\Service\FavoriteServicePipelines;
 use jschreuder\BookmarkBureau\Service\LinkService;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
+use jschreuder\BookmarkBureau\Service\LinkServicePipelines;
 use jschreuder\BookmarkBureau\Service\TagService;
 use jschreuder\BookmarkBureau\Service\TagServiceInterface;
 use jschreuder\BookmarkBureau\Service\UnitOfWork\PdoUnitOfWork;
@@ -279,8 +281,13 @@ class ServiceContainer
     {
         return new LinkService(
             $this->getLinkRepository(),
-            $this->getUnitOfWork(),
+            $this->getLinkServicePipelines(),
         );
+    }
+
+    public function getLinkServicePipelines(): LinkServicePipelines
+    {
+        return new LinkServicePipelines(default: $this->getDefaultDbPipeline());
     }
 
     public function getTagService(): TagServiceInterface
@@ -331,7 +338,14 @@ class ServiceContainer
             $this->getFavoriteRepository(),
             $this->getDashboardRepository(),
             $this->getLinkRepository(),
-            $this->getUnitOfWork(),
+            $this->getFavoriteServicePipelines(),
+        );
+    }
+
+    public function getFavoriteServicePipelines(): FavoriteServicePipelines
+    {
+        return new FavoriteServicePipelines(
+            default: $this->getDefaultDbPipeline(),
         );
     }
 

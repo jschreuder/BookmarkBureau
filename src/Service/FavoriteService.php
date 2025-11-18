@@ -10,7 +10,6 @@ use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
 use Ramsey\Uuid\UuidInterface;
 
 final class FavoriteService implements FavoriteServiceInterface
@@ -19,7 +18,7 @@ final class FavoriteService implements FavoriteServiceInterface
         private readonly FavoriteRepositoryInterface $favoriteRepository,
         private readonly DashboardRepositoryInterface $dashboardRepository,
         private readonly LinkRepositoryInterface $linkRepository,
-        private readonly UnitOfWorkInterface $unitOfWork,
+        private readonly FavoriteServicePipelines $pipelines,
     ) {}
 
     /**
@@ -32,37 +31,38 @@ final class FavoriteService implements FavoriteServiceInterface
         UuidInterface $dashboardId,
         UuidInterface $linkId,
     ): Favorite {
-        return $this->unitOfWork->transactional(function () use (
-            $dashboardId,
-            $linkId,
-        ): Favorite {
-            // Verify dashboard exists
-            $this->dashboardRepository->findById($dashboardId);
+        return $this->pipelines
+            ->addFavorite()
+            ->run(function () use ($dashboardId, $linkId): Favorite {
+                // Verify dashboard exists
+                $this->dashboardRepository->findById($dashboardId);
 
-            // Verify link exists
-            $this->linkRepository->findById($linkId);
+                // Verify link exists
+                $this->linkRepository->findById($linkId);
 
-            // Check if already favorited
-            if ($this->favoriteRepository->isFavorite($dashboardId, $linkId)) {
-                throw FavoriteNotFoundException::forDashboardAndLink(
+                // Check if already favorited
+                if (
+                    $this->favoriteRepository->isFavorite($dashboardId, $linkId)
+                ) {
+                    throw FavoriteNotFoundException::forDashboardAndLink(
+                        $dashboardId,
+                        $linkId,
+                    );
+                }
+
+                // Get the next sort order
+                $sortOrder =
+                    $this->favoriteRepository->getMaxSortOrderForDashboardId(
+                        $dashboardId,
+                    ) + 1;
+
+                // Add the favorite and return it
+                return $this->favoriteRepository->addFavorite(
                     $dashboardId,
                     $linkId,
+                    $sortOrder,
                 );
-            }
-
-            // Get the next sort order
-            $sortOrder =
-                $this->favoriteRepository->getMaxSortOrderForDashboardId(
-                    $dashboardId,
-                ) + 1;
-
-            // Add the favorite and return it
-            return $this->favoriteRepository->addFavorite(
-                $dashboardId,
-                $linkId,
-                $sortOrder,
-            );
-        });
+            });
     }
 
     /**
@@ -73,12 +73,14 @@ final class FavoriteService implements FavoriteServiceInterface
         UuidInterface $dashboardId,
         UuidInterface $linkId,
     ): void {
-        $this->unitOfWork->transactional(function () use (
-            $dashboardId,
-            $linkId,
-        ): void {
-            $this->favoriteRepository->removeFavorite($dashboardId, $linkId);
-        });
+        $this->pipelines
+            ->removeFavorite()
+            ->run(function () use ($dashboardId, $linkId): void {
+                $this->favoriteRepository->removeFavorite(
+                    $dashboardId,
+                    $linkId,
+                );
+            });
     }
 
     #[\Override]
@@ -86,15 +88,19 @@ final class FavoriteService implements FavoriteServiceInterface
         UuidInterface $dashboardId,
         array $linkIdToSortOrder,
     ): FavoriteCollection {
-        return $this->unitOfWork->transactional(function () use (
-            $dashboardId,
-            $linkIdToSortOrder,
-        ): FavoriteCollection {
-            $this->favoriteRepository->reorderFavorites(
+        return $this->pipelines
+            ->reorderFavorites()
+            ->run(function () use (
                 $dashboardId,
                 $linkIdToSortOrder,
-            );
-            return $this->favoriteRepository->findByDashboardId($dashboardId);
-        });
+            ): FavoriteCollection {
+                $this->favoriteRepository->reorderFavorites(
+                    $dashboardId,
+                    $linkIdToSortOrder,
+                );
+                return $this->favoriteRepository->findByDashboardId(
+                    $dashboardId,
+                );
+            });
     }
 }

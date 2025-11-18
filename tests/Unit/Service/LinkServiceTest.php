@@ -12,7 +12,7 @@ use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\LinkService;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
+use jschreuder\BookmarkBureau\Service\LinkServicePipelines;
 use Ramsey\Uuid\Uuid;
 
 describe("LinkService", function () {
@@ -26,9 +26,9 @@ describe("LinkService", function () {
                 ->shouldReceive("findById")
                 ->with($linkId)
                 ->andReturn($link);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->getLink($linkId);
 
@@ -47,9 +47,9 @@ describe("LinkService", function () {
                     ->with($linkId)
                     ->andThrow(LinkNotFoundException::forId($linkId));
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+                $pipelines = new LinkServicePipelines();
 
-                $service = new LinkService($linkRepository, $unitOfWork);
+                $service = new LinkService($linkRepository, $pipelines);
 
                 expect(fn() => $service->getLink($linkId))->toThrow(
                     LinkNotFoundException::class,
@@ -63,14 +63,9 @@ describe("LinkService", function () {
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository->shouldReceive("save")->once();
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->createLink(
                 "https://example.com",
@@ -90,14 +85,9 @@ describe("LinkService", function () {
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository->shouldReceive("save")->once();
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->createLink(
                 "https://example.com",
@@ -114,55 +104,21 @@ describe("LinkService", function () {
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository->shouldReceive("save")->once();
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->createLink("https://example.com", "Test Title");
 
             expect($result->description)->toBe("");
         });
 
-        test("wraps creation in a transaction", function () {
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("save")->once();
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new LinkService($linkRepository, $unitOfWork);
-
-            $service->createLink(
-                "https://example.com",
-                "Test Title",
-                "Test Description",
-                "test-icon",
-            );
-
-            expect(true)->toBeTrue(); // Mockery validates the transactional was called
-        });
-
         test("rolls back transaction on invalid title", function () {
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             expect(
                 fn() => $service->createLink("https://example.com", "", "Test"),
@@ -182,14 +138,9 @@ describe("LinkService", function () {
                 ->andReturn($link);
             $linkRepository->shouldReceive("save")->once();
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->updateLink(
                 $linkId,
@@ -219,14 +170,9 @@ describe("LinkService", function () {
                 ->andReturn($link);
             $linkRepository->shouldReceive("save")->once();
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->updateLink(
                 $linkId,
@@ -250,14 +196,9 @@ describe("LinkService", function () {
                     ->with($linkId)
                     ->andThrow(LinkNotFoundException::forId($linkId));
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new LinkServicePipelines();
 
-                $service = new LinkService($linkRepository, $unitOfWork);
+                $service = new LinkService($linkRepository, $pipelines);
 
                 expect(
                     fn() => $service->updateLink(
@@ -269,34 +210,6 @@ describe("LinkService", function () {
                 )->toThrow(LinkNotFoundException::class);
             },
         );
-
-        test("wraps update in a transaction", function () {
-            $linkId = Uuid::uuid4();
-            $link = TestEntityFactory::createLink(id: $linkId);
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("findById")->andReturn($link);
-            $linkRepository->shouldReceive("save")->once();
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new LinkService($linkRepository, $unitOfWork);
-
-            $service->updateLink(
-                $linkId,
-                "https://updated.com",
-                "Updated",
-                "Desc",
-            );
-
-            expect(true)->toBeTrue(); // Mockery validates the transactional was called
-        });
     });
 
     describe("deleteLink method", function () {
@@ -311,14 +224,9 @@ describe("LinkService", function () {
                 ->andReturn($link);
             $linkRepository->shouldReceive("delete")->with($link)->once();
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $service->deleteLink($linkId);
 
@@ -336,43 +244,15 @@ describe("LinkService", function () {
                     ->with($linkId)
                     ->andThrow(LinkNotFoundException::forId($linkId));
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new LinkServicePipelines();
 
-                $service = new LinkService($linkRepository, $unitOfWork);
+                $service = new LinkService($linkRepository, $pipelines);
 
                 expect(fn() => $service->deleteLink($linkId))->toThrow(
                     LinkNotFoundException::class,
                 );
             },
         );
-
-        test("wraps deletion in a transaction", function () {
-            $linkId = Uuid::uuid4();
-            $link = TestEntityFactory::createLink(id: $linkId);
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("findById")->andReturn($link);
-            $linkRepository->shouldReceive("delete");
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new LinkService($linkRepository, $unitOfWork);
-
-            $service->deleteLink($linkId);
-
-            expect(true)->toBeTrue(); // Mockery validates the transactional was called
-        });
     });
 
     describe("searchLinks method", function () {
@@ -387,9 +267,9 @@ describe("LinkService", function () {
                 ->with("test query", 100)
                 ->andReturn($collection);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->searchLinks("test query");
 
@@ -406,9 +286,9 @@ describe("LinkService", function () {
                 ->with("test query", 50)
                 ->andReturn($collection);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->searchLinks("test query", 50);
 
@@ -421,9 +301,9 @@ describe("LinkService", function () {
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository->shouldReceive("search")->andReturn($collection);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->searchLinks("nonexistent");
 
@@ -443,9 +323,9 @@ describe("LinkService", function () {
                 ->with(Mockery::type(TagNameCollection::class))
                 ->andReturn($collection);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->findLinksByTag("test-tag");
 
@@ -462,9 +342,9 @@ describe("LinkService", function () {
                 ->with(Mockery::type(TagNameCollection::class))
                 ->andReturn($collection);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $service->findLinksByTag("example-tag");
 
@@ -479,9 +359,9 @@ describe("LinkService", function () {
                 ->shouldReceive("findByTags")
                 ->andReturn($collection);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->findLinksByTag("unused-tag");
 
@@ -501,9 +381,9 @@ describe("LinkService", function () {
                 ->with(100, 0)
                 ->andReturn($collection);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->listLinks();
 
@@ -521,9 +401,9 @@ describe("LinkService", function () {
                 ->with(25, 50)
                 ->andReturn($collection);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->listLinks(25, 50);
 
@@ -536,9 +416,9 @@ describe("LinkService", function () {
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository->shouldReceive("findAll")->andReturn($collection);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             $result = $service->listLinks();
 
@@ -568,15 +448,9 @@ describe("LinkService", function () {
                     ->andReturn($updatedLink);
                 $linkRepository->shouldReceive("delete")->once();
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->times(3)
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new LinkServicePipelines();
 
-                $service = new LinkService($linkRepository, $unitOfWork);
+                $service = new LinkService($linkRepository, $pipelines);
 
                 // Create
                 $created = $service->createLink(
@@ -618,15 +492,9 @@ describe("LinkService", function () {
                 ->with("example", 100)
                 ->andReturn($searchResults);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->times(2)
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new LinkServicePipelines();
 
-            $service = new LinkService($linkRepository, $unitOfWork);
+            $service = new LinkService($linkRepository, $pipelines);
 
             // Create
             $service->createLink(

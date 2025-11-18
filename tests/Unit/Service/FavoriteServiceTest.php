@@ -8,7 +8,7 @@ use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\FavoriteService;
-use jschreuder\BookmarkBureau\Service\UnitOfWork\UnitOfWorkInterface;
+use jschreuder\BookmarkBureau\Service\FavoriteServicePipelines;
 use Ramsey\Uuid\Uuid;
 
 describe("FavoriteService", function () {
@@ -62,18 +62,13 @@ describe("FavoriteService", function () {
                     ->once()
                     ->andReturn($link);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new FavoriteServicePipelines();
 
                 $service = new FavoriteService(
                     $favoriteRepository,
                     $dashboardRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 $service->addFavorite($dashboardId, $linkId);
@@ -127,18 +122,13 @@ describe("FavoriteService", function () {
                 ->once()
                 ->andReturn($link);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new FavoriteServicePipelines();
 
             $service = new FavoriteService(
                 $favoriteRepository,
                 $dashboardRepository,
                 $linkRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $service->addFavorite($dashboardId, $linkId);
@@ -183,18 +173,13 @@ describe("FavoriteService", function () {
                     ->once()
                     ->andReturn($link);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new FavoriteServicePipelines();
 
                 $service = new FavoriteService(
                     $favoriteRepository,
                     $dashboardRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -222,18 +207,13 @@ describe("FavoriteService", function () {
                     ->andThrow(DashboardNotFoundException::forId($dashboardId));
 
                 $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new FavoriteServicePipelines();
 
                 $service = new FavoriteService(
                     $favoriteRepository,
                     $dashboardRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -270,18 +250,13 @@ describe("FavoriteService", function () {
                     ->once()
                     ->andThrow(LinkNotFoundException::class);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new FavoriteServicePipelines();
 
                 $service = new FavoriteService(
                     $favoriteRepository,
                     $dashboardRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -289,57 +264,6 @@ describe("FavoriteService", function () {
                 )->toThrow(LinkNotFoundException::class);
             },
         );
-
-        test("wraps add favorite in a transaction", function () {
-            $dashboardId = Uuid::uuid4();
-            $linkId = Uuid::uuid4();
-            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
-            $link = TestEntityFactory::createLink(id: $linkId);
-            $favorite = TestEntityFactory::createFavorite(
-                dashboard: $dashboard,
-                link: $link,
-            );
-
-            $favoriteRepository = Mockery::mock(
-                FavoriteRepositoryInterface::class,
-            );
-            $favoriteRepository->shouldReceive("isFavorite")->andReturn(false);
-            $favoriteRepository
-                ->shouldReceive("getMaxSortOrderForDashboardId")
-                ->andReturn(-1);
-            $favoriteRepository
-                ->shouldReceive("addFavorite")
-                ->andReturn($favorite);
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $dashboardRepository
-                ->shouldReceive("findById")
-                ->andReturn($dashboard);
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("findById")->andReturn($link);
-
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new FavoriteService(
-                $favoriteRepository,
-                $dashboardRepository,
-                $linkRepository,
-                $unitOfWork,
-            );
-
-            $service->addFavorite($dashboardId, $linkId);
-
-            expect(true)->toBeTrue();
-        });
     });
 
     describe("removeFavorite method", function () {
@@ -359,18 +283,13 @@ describe("FavoriteService", function () {
                 DashboardRepositoryInterface::class,
             );
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new FavoriteServicePipelines();
 
             $service = new FavoriteService(
                 $favoriteRepository,
                 $dashboardRepository,
                 $linkRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $service->removeFavorite($dashboardId, $linkId);
@@ -397,18 +316,13 @@ describe("FavoriteService", function () {
                     DashboardRepositoryInterface::class,
                 );
                 $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new FavoriteServicePipelines();
 
                 $service = new FavoriteService(
                     $favoriteRepository,
                     $dashboardRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 expect(
@@ -416,39 +330,6 @@ describe("FavoriteService", function () {
                 )->toThrow(FavoriteNotFoundException::class);
             },
         );
-
-        test("wraps remove favorite in a transaction", function () {
-            $dashboardId = Uuid::uuid4();
-            $linkId = Uuid::uuid4();
-
-            $favoriteRepository = Mockery::mock(
-                FavoriteRepositoryInterface::class,
-            );
-            $favoriteRepository->shouldReceive("removeFavorite");
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new FavoriteService(
-                $favoriteRepository,
-                $dashboardRepository,
-                $linkRepository,
-                $unitOfWork,
-            );
-
-            $service->removeFavorite($dashboardId, $linkId);
-
-            expect(true)->toBeTrue();
-        });
     });
 
     describe("reorderFavorites method", function () {
@@ -487,18 +368,13 @@ describe("FavoriteService", function () {
                 DashboardRepositoryInterface::class,
             );
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new FavoriteServicePipelines();
 
             $service = new FavoriteService(
                 $favoriteRepository,
                 $dashboardRepository,
                 $linkRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->reorderFavorites(
@@ -529,59 +405,18 @@ describe("FavoriteService", function () {
                 DashboardRepositoryInterface::class,
             );
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new FavoriteServicePipelines();
 
             $service = new FavoriteService(
                 $favoriteRepository,
                 $dashboardRepository,
                 $linkRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             $result = $service->reorderFavorites($dashboardId, []);
 
             expect($result)->toHaveCount(0);
-        });
-
-        test("wraps reorder favorites in a transaction", function () {
-            $dashboardId = Uuid::uuid4();
-            $linkIdToSortOrder = [];
-
-            $favoriteRepository = Mockery::mock(
-                FavoriteRepositoryInterface::class,
-            );
-            $favoriteRepository->shouldReceive("reorderFavorites");
-            $favoriteRepository
-                ->shouldReceive("findByDashboardId")
-                ->andReturn(new FavoriteCollection());
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->once()
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
-
-            $service = new FavoriteService(
-                $favoriteRepository,
-                $dashboardRepository,
-                $linkRepository,
-                $unitOfWork,
-            );
-
-            $service->reorderFavorites($dashboardId, $linkIdToSortOrder);
-
-            expect(true)->toBeTrue();
         });
     });
 
@@ -647,19 +482,13 @@ describe("FavoriteService", function () {
                 ->times(2) // only for the two addFavorite calls
                 ->andReturn($link1, $link2);
 
-            $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-            $unitOfWork
-                ->shouldReceive("transactional")
-                ->times(4) // add 2 times, reorder, remove
-                ->andReturnUsing(function ($callback) {
-                    return $callback();
-                });
+            $pipelines = new FavoriteServicePipelines();
 
             $service = new FavoriteService(
                 $favoriteRepository,
                 $dashboardRepository,
                 $linkRepository,
-                $unitOfWork,
+                $pipelines,
             );
 
             // Add first favorite
@@ -735,19 +564,13 @@ describe("FavoriteService", function () {
                     ->times(2)
                     ->andReturn($link);
 
-                $unitOfWork = Mockery::mock(UnitOfWorkInterface::class);
-                $unitOfWork
-                    ->shouldReceive("transactional")
-                    ->times(2)
-                    ->andReturnUsing(function ($callback) {
-                        return $callback();
-                    });
+                $pipelines = new FavoriteServicePipelines();
 
                 $service = new FavoriteService(
                     $favoriteRepository,
                     $dashboardRepository,
                     $linkRepository,
-                    $unitOfWork,
+                    $pipelines,
                 );
 
                 // Add favorite first time
