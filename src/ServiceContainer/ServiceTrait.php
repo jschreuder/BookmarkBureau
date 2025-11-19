@@ -75,6 +75,7 @@ trait ServiceTrait
         return new CategoryService(
             $this->getCategoryRepository(),
             $this->getDashboardRepository(),
+            $this->getLinkRepository(),
             $this->getCategoryServicePipelines(),
         );
     }

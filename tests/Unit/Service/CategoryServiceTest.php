@@ -7,9 +7,9 @@ use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
-use jschreuder\BookmarkBureau\OperationPipeline\PipelineInterface;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
+use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\CategoryService;
 use jschreuder\BookmarkBureau\Service\CategoryServicePipelines;
 use Ramsey\Uuid\Uuid;
@@ -32,11 +32,13 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -62,11 +64,13 @@ describe("CategoryService", function () {
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
                 $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
+                    $linkRepository,
                     $pipelines,
                 );
 
@@ -99,11 +103,14 @@ describe("CategoryService", function () {
                 ->with($dashboardId)
                 ->andReturn($dashboard);
 
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -141,11 +148,14 @@ describe("CategoryService", function () {
                 ->with($dashboardId)
                 ->andReturn($dashboard);
 
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -171,11 +181,14 @@ describe("CategoryService", function () {
                     ->with($dashboardId)
                     ->andThrow(DashboardNotFoundException::forId($dashboardId));
 
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+
                 $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
+                    $linkRepository,
                     $pipelines,
                 );
 
@@ -203,11 +216,14 @@ describe("CategoryService", function () {
                 ->shouldReceive("findById")
                 ->andReturn($dashboard);
 
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -239,11 +255,13 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -276,11 +294,13 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -309,11 +329,13 @@ describe("CategoryService", function () {
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
                 $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
+                    $linkRepository,
                     $pipelines,
                 );
 
@@ -348,11 +370,13 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -377,11 +401,13 @@ describe("CategoryService", function () {
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
                 $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
+                    $linkRepository,
                     $pipelines,
                 );
 
@@ -416,11 +442,13 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -455,11 +483,13 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -493,18 +523,30 @@ describe("CategoryService", function () {
                 ->andReturn(4);
             $categoryRepository
                 ->shouldReceive("addLink")
-                ->with($categoryId, $linkId, 5)
+                ->with(
+                    Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                    Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                    5,
+                )
                 ->andReturn($categoryLink)
                 ->once();
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+            $linkRepository
+                ->shouldReceive("findById")
+                ->with($linkId)
+                ->andReturn(TestEntityFactory::createLink());
+
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -531,18 +573,30 @@ describe("CategoryService", function () {
                 ->andReturn(-1);
             $categoryRepository
                 ->shouldReceive("addLink")
-                ->with($categoryId, $linkId, 0)
+                ->with(
+                    Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                    Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                    0,
+                )
                 ->andReturn($categoryLink)
                 ->once();
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+            $linkRepository
+                ->shouldReceive("findById")
+                ->with($linkId)
+                ->andReturn(TestEntityFactory::createLink());
+
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -568,11 +622,13 @@ describe("CategoryService", function () {
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
                 $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
+                    $linkRepository,
                     $pipelines,
                 );
 
@@ -595,23 +651,23 @@ describe("CategoryService", function () {
                     ->shouldReceive("findById")
                     ->with($categoryId)
                     ->andReturn(TestEntityFactory::createCategory());
-                $categoryRepository
-                    ->shouldReceive("getMaxSortOrderForCategoryId")
-                    ->with($categoryId)
-                    ->andReturn(-1);
-                $categoryRepository
-                    ->shouldReceive("addLink")
-                    ->with($categoryId, $linkId, 0)
-                    ->andThrow(LinkNotFoundException::class);
 
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
+
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+                $linkRepository
+                    ->shouldReceive("findById")
+                    ->with($linkId)
+                    ->andThrow(LinkNotFoundException::forId($linkId));
+
                 $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
+                    $linkRepository,
                     $pipelines,
                 );
 
@@ -631,18 +687,31 @@ describe("CategoryService", function () {
                 CategoryRepositoryInterface::class,
             );
             $categoryRepository
+                ->shouldReceive("findById")
+                ->with($categoryId)
+                ->andReturn(TestEntityFactory::createCategory());
+            $categoryRepository
                 ->shouldReceive("removeLink")
-                ->with($categoryId, $linkId)
+                ->with(
+                    Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                    Mockery::type(\Ramsey\Uuid\UuidInterface::class),
+                )
                 ->once();
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+            $linkRepository
+                ->shouldReceive("findById")
+                ->with($linkId)
+                ->andReturn(TestEntityFactory::createLink());
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -670,11 +739,13 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -698,11 +769,13 @@ describe("CategoryService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
@@ -757,11 +830,17 @@ describe("CategoryService", function () {
                     ->shouldReceive("findById")
                     ->andReturn($dashboard);
 
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+                $linkRepository
+                    ->shouldReceive("findById")
+                    ->andReturn(TestEntityFactory::createLink());
+
                 $pipelines = new CategoryServicePipelines();
 
                 $service = new CategoryService(
                     $categoryRepository,
                     $dashboardRepository,
+                    $linkRepository,
                     $pipelines,
                 );
 
@@ -842,11 +921,14 @@ describe("CategoryService", function () {
                 ->shouldReceive("findById")
                 ->andReturn($dashboard);
 
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+
             $pipelines = new CategoryServicePipelines();
 
             $service = new CategoryService(
                 $categoryRepository,
                 $dashboardRepository,
+                $linkRepository,
                 $pipelines,
             );
 
