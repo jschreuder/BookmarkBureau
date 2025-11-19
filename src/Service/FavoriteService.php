@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
+use DateTimeImmutable;
 use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
@@ -31,38 +32,43 @@ final class FavoriteService implements FavoriteServiceInterface
         UuidInterface $dashboardId,
         UuidInterface $linkId,
     ): Favorite {
+        // Verify dashboard & link exist
+        $dashboard = $this->dashboardRepository->findById($dashboardId);
+        $link = $this->linkRepository->findById($linkId);
+
+        // Check if already favorited
+        if ($this->favoriteRepository->isFavorite($dashboardId, $linkId)) {
+            throw FavoriteNotFoundException::forDashboardAndLink(
+                $dashboardId,
+                $linkId,
+            );
+        }
+
+        // Get the next sort order
+        $sortOrder =
+            $this->favoriteRepository->getMaxSortOrderForDashboardId(
+                $dashboardId,
+            ) + 1;
+
+        $tempFavorite = new Favorite(
+            $dashboard,
+            $link,
+            $sortOrder,
+            new DateTimeImmutable(),
+        );
+
         return $this->pipelines
             ->addFavorite()
-            ->run(function () use ($dashboardId, $linkId): Favorite {
-                // Verify dashboard exists
-                $this->dashboardRepository->findById($dashboardId);
-
-                // Verify link exists
-                $this->linkRepository->findById($linkId);
-
-                // Check if already favorited
-                if (
-                    $this->favoriteRepository->isFavorite($dashboardId, $linkId)
-                ) {
-                    throw FavoriteNotFoundException::forDashboardAndLink(
-                        $dashboardId,
-                        $linkId,
-                    );
-                }
-
-                // Get the next sort order
-                $sortOrder =
-                    $this->favoriteRepository->getMaxSortOrderForDashboardId(
-                        $dashboardId,
-                    ) + 1;
-
-                // Add the favorite and return it
-                return $this->favoriteRepository->addFavorite(
-                    $dashboardId,
-                    $linkId,
-                    $sortOrder,
-                );
-            });
+            ->run(
+                fn(
+                    Favorite $favorite,
+                ): Favorite => $this->favoriteRepository->addFavorite(
+                    $favorite->dashboard->dashboardId,
+                    $favorite->link->linkId,
+                    $favorite->sortOrder,
+                ),
+                $tempFavorite,
+            );
     }
 
     /**
@@ -73,14 +79,25 @@ final class FavoriteService implements FavoriteServiceInterface
         UuidInterface $dashboardId,
         UuidInterface $linkId,
     ): void {
+        // Verify dashboard & link exist
+        $dashboard = $this->dashboardRepository->findById($dashboardId);
+        $link = $this->linkRepository->findById($linkId);
+
+        $removeFavorite = new Favorite(
+            $dashboard,
+            $link,
+            0,
+            new DateTimeImmutable(),
+        );
+
         $this->pipelines
             ->removeFavorite()
-            ->run(function () use ($dashboardId, $linkId): void {
+            ->run(function (Favorite $favorite): void {
                 $this->favoriteRepository->removeFavorite(
-                    $dashboardId,
-                    $linkId,
+                    $favorite->dashboard->dashboardId,
+                    $favorite->link->linkId,
                 );
-            });
+            }, $removeFavorite);
     }
 
     #[\Override]

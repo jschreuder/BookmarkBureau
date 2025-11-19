@@ -270,6 +270,8 @@ describe("FavoriteService", function () {
         test("removes a favorite from a dashboard", function () {
             $dashboardId = Uuid::uuid4();
             $linkId = Uuid::uuid4();
+            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
+            $link = TestEntityFactory::createLink(id: $linkId);
 
             $favoriteRepository = Mockery::mock(
                 FavoriteRepositoryInterface::class,
@@ -282,7 +284,19 @@ describe("FavoriteService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
+            $dashboardRepository
+                ->shouldReceive("findById")
+                ->with($dashboardId)
+                ->once()
+                ->andReturn($dashboard);
+
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+            $linkRepository
+                ->shouldReceive("findById")
+                ->with($linkId)
+                ->once()
+                ->andReturn($link);
+
             $pipelines = new FavoriteServicePipelines();
 
             $service = new FavoriteService(
@@ -302,6 +316,10 @@ describe("FavoriteService", function () {
             function () {
                 $dashboardId = Uuid::uuid4();
                 $linkId = Uuid::uuid4();
+                $dashboard = TestEntityFactory::createDashboard(
+                    id: $dashboardId,
+                );
+                $link = TestEntityFactory::createLink(id: $linkId);
 
                 $favoriteRepository = Mockery::mock(
                     FavoriteRepositoryInterface::class,
@@ -315,7 +333,19 @@ describe("FavoriteService", function () {
                 $dashboardRepository = Mockery::mock(
                     DashboardRepositoryInterface::class,
                 );
+                $dashboardRepository
+                    ->shouldReceive("findById")
+                    ->with($dashboardId)
+                    ->once()
+                    ->andReturn($dashboard);
+
                 $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+                $linkRepository
+                    ->shouldReceive("findById")
+                    ->with($linkId)
+                    ->once()
+                    ->andReturn($link);
+
                 $pipelines = new FavoriteServicePipelines();
 
                 $service = new FavoriteService(
@@ -473,14 +503,14 @@ describe("FavoriteService", function () {
             );
             $dashboardRepository
                 ->shouldReceive("findById")
-                ->times(2) // only for the two addFavorite calls, not for reorder or remove
+                ->times(3) // twice for addFavorite calls, once for removeFavorite
                 ->andReturn($dashboard);
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository
                 ->shouldReceive("findById")
-                ->times(2) // only for the two addFavorite calls
-                ->andReturn($link1, $link2);
+                ->times(3) // twice for addFavorite calls, once for removeFavorite
+                ->andReturn($link1, $link2, $link1);
 
             $pipelines = new FavoriteServicePipelines();
 
