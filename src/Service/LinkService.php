@@ -31,7 +31,12 @@ final class LinkService implements LinkServiceInterface
     {
         return $this->pipelines
             ->getLink()
-            ->run(fn() => $this->linkRepository->findById($linkId));
+            ->run(
+                fn(UuidInterface $lid): Link => $this->linkRepository->findById(
+                    $lid,
+                ),
+                $linkId,
+            );
     }
 
     #[\Override]
@@ -41,24 +46,21 @@ final class LinkService implements LinkServiceInterface
         string $description = "",
         ?string $icon = null,
     ): Link {
-        return $this->pipelines
-            ->createLink()
-            ->run(function () use ($url, $title, $description, $icon): Link {
-                $link = new Link(
-                    Uuid::uuid4(),
-                    new Url($url),
-                    new Title($title),
-                    $description,
-                    $icon !== null ? new Icon($icon) : null,
-                    new DateTimeImmutable(),
-                    new DateTimeImmutable(),
-                    new TagCollection(),
-                );
+        $newLink = new Link(
+            Uuid::uuid4(),
+            new Url($url),
+            new Title($title),
+            $description,
+            $icon !== null ? new Icon($icon) : null,
+            new DateTimeImmutable(),
+            new DateTimeImmutable(),
+            new TagCollection(),
+        );
 
-                $this->linkRepository->save($link);
-
-                return $link;
-            });
+        return $this->pipelines->createLink()->run(function (Link $link): Link {
+            $this->linkRepository->save($link);
+            return $link;
+        }, $newLink);
     }
 
     /**
@@ -72,26 +74,16 @@ final class LinkService implements LinkServiceInterface
         string $description = "",
         ?string $icon = null,
     ): Link {
-        return $this->pipelines
-            ->updateLink()
-            ->run(function () use (
-                $linkId,
-                $url,
-                $title,
-                $description,
-                $icon,
-            ): Link {
-                $link = $this->linkRepository->findById($linkId);
+        $updatedLink = $this->linkRepository->findById($linkId);
+        $updatedLink->url = new Url($url);
+        $updatedLink->title = new Title($title);
+        $updatedLink->description = $description;
+        $updatedLink->icon = $icon !== null ? new Icon($icon) : null;
 
-                $link->url = new Url($url);
-                $link->title = new Title($title);
-                $link->description = $description;
-                $link->icon = $icon !== null ? new Icon($icon) : null;
-
-                $this->linkRepository->save($link);
-
-                return $link;
-            });
+        return $this->pipelines->updateLink()->run(function (Link $link): Link {
+            $this->linkRepository->save($link);
+            return $link;
+        }, $updatedLink);
     }
 
     /**
@@ -100,10 +92,10 @@ final class LinkService implements LinkServiceInterface
     #[\Override]
     public function deleteLink(UuidInterface $linkId): void
     {
-        $this->pipelines->deleteLink()->run(function () use ($linkId): void {
-            $link = $this->linkRepository->findById($linkId);
+        $deleteLink = $this->linkRepository->findById($linkId);
+        $this->pipelines->deleteLink()->run(function (Link $link): void {
             $this->linkRepository->delete($link);
-        });
+        }, $deleteLink);
     }
 
     #[\Override]
@@ -111,18 +103,28 @@ final class LinkService implements LinkServiceInterface
     {
         return $this->pipelines
             ->searchLinks()
-            ->run(fn() => $this->linkRepository->search($query, $limit));
+            ->run(
+                fn(): LinkCollection => $this->linkRepository->search(
+                    $query,
+                    $limit,
+                ),
+            );
     }
 
     #[\Override]
     public function findLinksByTag(string $tagName): LinkCollection
     {
+        $searchTagNames = new TagNameCollection(new TagName($tagName));
         return $this->pipelines
             ->findLinksByTag()
-            ->run(function () use ($tagName): LinkCollection {
-                $tagNames = new TagNameCollection(new TagName($tagName));
-                return $this->linkRepository->findByTags($tagNames);
-            });
+            ->run(
+                fn(
+                    TagNameCollection $tagNames,
+                ): LinkCollection => $this->linkRepository->findByTags(
+                    $tagNames,
+                ),
+                $searchTagNames,
+            );
     }
 
     #[\Override]
