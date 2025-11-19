@@ -34,7 +34,14 @@ final class DashboardService implements DashboardServiceInterface
     #[\Override]
     public function getDashboard(UuidInterface $dashboardId): Dashboard
     {
-        return $this->dashboardRepository->findById($dashboardId);
+        return $this->pipelines
+            ->getDashboard()
+            ->run(
+                fn(
+                    UuidInterface $did,
+                ): Dashboard => $this->dashboardRepository->findById($did),
+                $dashboardId,
+            );
     }
 
     /**
@@ -46,45 +53,60 @@ final class DashboardService implements DashboardServiceInterface
     ): DashboardWithCategoriesAndFavorites {
         $dashboard = $this->dashboardRepository->findById($dashboardId);
 
-        // Get all categories for this dashboard
-        $categories = $this->categoryRepository->findByDashboardId(
-            $dashboardId,
-        );
+        return $this->pipelines
+            ->getFullDashboard()
+            ->run(function (
+                Dashboard $dashboard,
+            ): DashboardWithCategoriesAndFavorites {
+                // Get all categories for this dashboard
+                $categories = $this->categoryRepository->findByDashboardId(
+                    $dashboard->dashboardId,
+                );
 
-        // Build categories with their links
-        $categoriesWithLinks = [];
-        foreach ($categories as $category) {
-            $categoryLinks = $this->categoryRepository->findCategoryLinksForCategoryId(
-                $category->categoryId,
-            );
-            $links = new LinkCollection(
-                ...array_map(
-                    fn(CategoryLink $cl) => $cl->link,
-                    $categoryLinks->toArray(),
-                ),
-            );
-            $categoriesWithLinks[] = new CategoryWithLinks($category, $links);
-        }
+                // Build categories with their links
+                $categoriesWithLinks = [];
+                foreach ($categories as $category) {
+                    $categoryLinks = $this->categoryRepository->findCategoryLinksForCategoryId(
+                        $category->categoryId,
+                    );
+                    $links = new LinkCollection(
+                        ...array_map(
+                            fn(CategoryLink $cl) => $cl->link,
+                            $categoryLinks->toArray(),
+                        ),
+                    );
+                    $categoriesWithLinks[] = new CategoryWithLinks(
+                        $category,
+                        $links,
+                    );
+                }
 
-        // Get all favorites for this dashboard
-        $favorites = $this->favoriteRepository->findByDashboardId($dashboardId);
+                // Get all favorites for this dashboard
+                $favorites = $this->favoriteRepository->findByDashboardId(
+                    $dashboard->dashboardId,
+                );
 
-        return new DashboardWithCategoriesAndFavorites(
-            $dashboard,
-            new CategoryWithLinksCollection(...$categoriesWithLinks),
-            new LinkCollection(
-                ...array_map(
-                    fn($favorite) => $favorite->link,
-                    iterator_to_array($favorites),
-                ),
-            ),
-        );
+                return new DashboardWithCategoriesAndFavorites(
+                    $dashboard,
+                    new CategoryWithLinksCollection(...$categoriesWithLinks),
+                    new LinkCollection(
+                        ...array_map(
+                            fn($favorite) => $favorite->link,
+                            iterator_to_array($favorites),
+                        ),
+                    ),
+                );
+            }, $dashboard);
     }
 
     #[\Override]
     public function listAllDashboards(): DashboardCollection
     {
-        return $this->dashboardRepository->findAll();
+        return $this->pipelines
+            ->listAllDashboards()
+            ->run(
+                fn(): DashboardCollection => $this->dashboardRepository->findAll(),
+            );
     }
 
     #[\Override]
@@ -93,22 +115,21 @@ final class DashboardService implements DashboardServiceInterface
         string $description,
         ?string $icon = null,
     ): Dashboard {
+        $newDashboard = new Dashboard(
+            Uuid::uuid4(),
+            new Title($title),
+            $description,
+            $icon !== null ? new Icon($icon) : null,
+            new DateTimeImmutable(),
+            new DateTimeImmutable(),
+        );
+
         return $this->pipelines
             ->createDashboard()
-            ->run(function () use ($title, $description, $icon): Dashboard {
-                $dashboard = new Dashboard(
-                    Uuid::uuid4(),
-                    new Title($title),
-                    $description,
-                    $icon !== null ? new Icon($icon) : null,
-                    new DateTimeImmutable(),
-                    new DateTimeImmutable(),
-                );
-
+            ->run(function (Dashboard $dashboard): Dashboard {
                 $this->dashboardRepository->save($dashboard);
-
                 return $dashboard;
-            });
+            }, $newDashboard);
     }
 
     /**
@@ -121,24 +142,17 @@ final class DashboardService implements DashboardServiceInterface
         string $description,
         ?string $icon = null,
     ): Dashboard {
+        $updatedDashboard = $this->dashboardRepository->findById($dashboardId);
+        $updatedDashboard->title = new Title($title);
+        $updatedDashboard->description = $description;
+        $updatedDashboard->icon = $icon !== null ? new Icon($icon) : null;
+
         return $this->pipelines
             ->updateDashboard()
-            ->run(function () use (
-                $dashboardId,
-                $title,
-                $description,
-                $icon,
-            ): Dashboard {
-                $dashboard = $this->dashboardRepository->findById($dashboardId);
-
-                $dashboard->title = new Title($title);
-                $dashboard->description = $description;
-                $dashboard->icon = $icon !== null ? new Icon($icon) : null;
-
+            ->run(function (Dashboard $dashboard): Dashboard {
                 $this->dashboardRepository->save($dashboard);
-
                 return $dashboard;
-            });
+            }, $updatedDashboard);
     }
 
     /**
@@ -147,11 +161,11 @@ final class DashboardService implements DashboardServiceInterface
     #[\Override]
     public function deleteDashboard(UuidInterface $dashboardId): void
     {
+        $deleteDashboard = $this->dashboardRepository->findById($dashboardId);
         $this->pipelines
             ->deleteDashboard()
-            ->run(function () use ($dashboardId): void {
-                $dashboard = $this->dashboardRepository->findById($dashboardId);
+            ->run(function (Dashboard $dashboard): void {
                 $this->dashboardRepository->delete($dashboard);
-            });
+            }, $deleteDashboard);
     }
 }
