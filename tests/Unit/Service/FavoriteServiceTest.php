@@ -365,34 +365,23 @@ describe("FavoriteService", function () {
     describe("reorderFavorites method", function () {
         test("reorders favorites within a dashboard", function () {
             $dashboardId = Uuid::uuid4();
-            $linkId1 = Uuid::uuid4();
-            $linkId2 = Uuid::uuid4();
-            $linkId3 = Uuid::uuid4();
-
-            $linkIdToSortOrder = [
-                $linkId1->toString() => 2,
-                $linkId2->toString() => 0,
-                $linkId3->toString() => 1,
-            ];
 
             $favorite1 = TestEntityFactory::createFavorite(sortOrder: 2);
             $favorite2 = TestEntityFactory::createFavorite(sortOrder: 0);
             $favorite3 = TestEntityFactory::createFavorite(sortOrder: 1);
+            $favorites = new FavoriteCollection(
+                $favorite1,
+                $favorite2,
+                $favorite3,
+            );
 
             $favoriteRepository = Mockery::mock(
                 FavoriteRepositoryInterface::class,
             );
             $favoriteRepository
                 ->shouldReceive("reorderFavorites")
-                ->with($dashboardId, $linkIdToSortOrder)
+                ->with($dashboardId, \Mockery::type(FavoriteCollection::class))
                 ->once();
-            $favoriteRepository
-                ->shouldReceive("findByDashboardId")
-                ->with($dashboardId)
-                ->once()
-                ->andReturn(
-                    new FavoriteCollection($favorite1, $favorite2, $favorite3),
-                );
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
@@ -407,29 +396,22 @@ describe("FavoriteService", function () {
                 $pipelines,
             );
 
-            $result = $service->reorderFavorites(
-                $dashboardId,
-                $linkIdToSortOrder,
-            );
+            $service->reorderFavorites($dashboardId, $favorites);
 
-            expect($result)->toHaveCount(3);
+            expect(true)->toBeTrue();
         });
 
-        test("handles reordering with empty array", function () {
+        test("handles reordering with empty collection", function () {
             $dashboardId = Uuid::uuid4();
+            $favorites = new FavoriteCollection();
 
             $favoriteRepository = Mockery::mock(
                 FavoriteRepositoryInterface::class,
             );
             $favoriteRepository
                 ->shouldReceive("reorderFavorites")
-                ->with($dashboardId, [])
+                ->with($dashboardId, $favorites)
                 ->once();
-            $favoriteRepository
-                ->shouldReceive("findByDashboardId")
-                ->with($dashboardId)
-                ->once()
-                ->andReturn(new FavoriteCollection());
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
@@ -444,9 +426,9 @@ describe("FavoriteService", function () {
                 $pipelines,
             );
 
-            $result = $service->reorderFavorites($dashboardId, []);
+            $service->reorderFavorites($dashboardId, $favorites);
 
-            expect($result)->toHaveCount(0);
+            expect(true)->toBeTrue();
         });
     });
 
@@ -528,11 +510,11 @@ describe("FavoriteService", function () {
             $service->addFavorite($dashboardId, $linkId2);
 
             // Reorder
-            $linkIdToSortOrder = [
-                $linkId1->toString() => 1,
-                $linkId2->toString() => 0,
-            ];
-            $service->reorderFavorites($dashboardId, $linkIdToSortOrder);
+            $reorderedFavorites = new FavoriteCollection(
+                $favorite2,
+                $favorite1,
+            );
+            $service->reorderFavorites($dashboardId, $reorderedFavorites);
 
             // Remove first favorite
             $service->removeFavorite($dashboardId, $linkId1);

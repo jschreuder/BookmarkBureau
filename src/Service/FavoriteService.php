@@ -90,24 +90,33 @@ final class FavoriteService implements FavoriteServiceInterface
             }, $removeFavorite);
     }
 
+    /**
+     * @throws DashboardNotFoundException when dashboard doesn't exist
+     */
+    #[\Override]
+    public function getFavoritesForDashboardId(
+        UuidInterface $dashboardId,
+    ): FavoriteCollection {
+        // Verify dashboard exists
+        $this->dashboardRepository->findById($dashboardId);
+
+        return $this->favoriteRepository->findByDashboardId($dashboardId);
+    }
+
     #[\Override]
     public function reorderFavorites(
         UuidInterface $dashboardId,
-        array $linkIdToSortOrder,
-    ): FavoriteCollection {
-        return $this->pipelines
+        FavoriteCollection $favorites,
+    ): void {
+        $this->pipelines
             ->reorderFavorites()
-            ->run(function () use (
+            ->run(function (FavoriteCollection $favorites) use (
                 $dashboardId,
-                $linkIdToSortOrder,
-            ): FavoriteCollection {
+            ): void {
                 $this->favoriteRepository->reorderFavorites(
                     $dashboardId,
-                    $linkIdToSortOrder,
+                    $favorites,
                 );
-                return $this->favoriteRepository->findByDashboardId(
-                    $dashboardId,
-                );
-            });
+            }, $favorites);
     }
 }

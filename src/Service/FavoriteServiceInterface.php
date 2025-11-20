@@ -33,15 +33,23 @@ interface FavoriteServiceInterface
     ): void;
 
     /**
+     * Get all favorites for a dashboard
+     *
+     * @throws DashboardNotFoundException when dashboard doesn't exist
+     */
+    public function getFavoritesForDashboardId(
+        UuidInterface $dashboardId,
+    ): FavoriteCollection;
+
+    /**
      * Reorder favorites within a dashboard
-     * @todo make this work like reordering category-links
+     * The index (position) of each favorite in the collection becomes its sort order
      *
      * @param UuidInterface $dashboardId
-     * @param array<string, int> $linkIdToSortOrder Map of link UUID strings to sort orders
-     * @return FavoriteCollection The reordered favorites
+     * @param FavoriteCollection $favorites Favorites in the desired order
      */
     public function reorderFavorites(
         UuidInterface $dashboardId,
-        array $linkIdToSortOrder,
-    ): FavoriteCollection;
+        FavoriteCollection $favorites,
+    ): void;
 }

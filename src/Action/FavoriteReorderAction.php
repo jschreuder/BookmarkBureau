@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Action;
 
+use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\FavoriteServiceInterface;
@@ -34,22 +35,35 @@ final readonly class FavoriteReorderAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        // Transform the links array into a map of link_id => sort_order
-        $linkIdToSortOrder = [];
-        foreach ($data["links"] as $link) {
-            $linkIdToSortOrder[$link["link_id"]] = $link["sort_order"];
+        $dashboardId = Uuid::fromString($data["dashboard_id"]);
+
+        // Get current favorites and create a map by link_id for quick lookup
+        $currentFavorites = $this->favoriteService->getFavoritesForDashboardId(
+            $dashboardId,
+        );
+        $favoritesMap = [];
+        foreach ($currentFavorites as $favorite) {
+            $favoritesMap[$favorite->link->linkId->toString()] = $favorite;
         }
 
-        // Reorder and get the updated favorites
-        $reorderedFavorites = $this->favoriteService->reorderFavorites(
-            Uuid::fromString($data["dashboard_id"]),
-            $linkIdToSortOrder,
+        // Build the reordered collection based on the request order
+        $reorderedFavorites = [];
+        foreach ($data["links"] as $link) {
+            if (isset($favoritesMap[$link["link_id"]])) {
+                $reorderedFavorites[] = $favoritesMap[$link["link_id"]];
+            }
+        }
+
+        // Reorder the favorites
+        $this->favoriteService->reorderFavorites(
+            $dashboardId,
+            new FavoriteCollection(...$reorderedFavorites),
         );
 
         // Transform each favorite to array
         return array_map(
             fn($favorite) => $this->outputSpec->transform($favorite),
-            $reorderedFavorites->toArray(),
+            $reorderedFavorites,
         );
     }
 }

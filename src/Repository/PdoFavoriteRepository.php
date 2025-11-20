@@ -223,16 +223,25 @@ final readonly class PdoFavoriteRepository implements
 
     /**
      * Reorder favorites in a dashboard
-     * @param array<string, int> $linkIdToSortOrder Map of link UUID strings to sort orders
+     * The index (position) of each favorite in the collection becomes its sort order
+     * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     #[\Override]
     public function reorderFavorites(
         UuidInterface $dashboardId,
-        array $linkIdToSortOrder,
+        FavoriteCollection $favorites,
     ): void {
-        foreach ($linkIdToSortOrder as $linkIdString => $sortOrder) {
-            $linkId = Uuid::fromString($linkIdString);
-            $this->updateSortOrder($dashboardId, $linkId, $sortOrder);
+        // Verify dashboard exists
+        $this->dashboardRepository->findById($dashboardId);
+
+        $sortOrder = 0;
+        foreach ($favorites as $favorite) {
+            $this->updateSortOrder(
+                $dashboardId,
+                $favorite->link->linkId,
+                $sortOrder,
+            );
+            $sortOrder++;
         }
     }
 

@@ -67,12 +67,14 @@ interface FavoriteRepositoryInterface
 
     /**
      * Reorder favorites in a dashboard
-     * @todo make this work like reordering category-links
-     * @param array<string, int> $linkIdToSortOrder Map of link UUID strings to sort orders
+     * The index (position) of each favorite in the collection becomes its sort order
+     * @param UuidInterface $dashboardId
+     * @param FavoriteCollection $favorites Favorites in the desired order
+     * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     public function reorderFavorites(
         UuidInterface $dashboardId,
-        array $linkIdToSortOrder,
+        FavoriteCollection $favorites,
     ): void;
 
     /**

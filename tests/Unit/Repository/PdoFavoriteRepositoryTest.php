@@ -1,5 +1,6 @@
 <?php
 
+use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\FavoriteEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
@@ -657,7 +658,7 @@ describe("PdoFavoriteRepository", function () {
 
     describe("reorderFavorites", function () {
         test(
-            "reorders favorites in a dashboard from link ID to sort order map",
+            "reorders favorites in a dashboard by position in collection",
             function () {
                 $pdo = createFavoriteDatabase();
                 [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
@@ -692,23 +693,32 @@ describe("PdoFavoriteRepository", function () {
                     2,
                 );
 
-                $reorderMap = [
-                    $link3->linkId->toString() => 0,
-                    $link1->linkId->toString() => 1,
-                    $link2->linkId->toString() => 2,
-                ];
+                // Get current favorites and reorder them
+                $currentFavorites = $repo->findByDashboardId(
+                    $dashboard->dashboardId,
+                );
+                $favorites = iterator_to_array($currentFavorites);
+                // Reorder: link3, link1, link2
+                $reorderedFavorites = new FavoriteCollection(
+                    $favorites[2],
+                    $favorites[0],
+                    $favorites[1],
+                );
 
-                $repo->reorderFavorites($dashboard->dashboardId, $reorderMap);
+                $repo->reorderFavorites(
+                    $dashboard->dashboardId,
+                    $reorderedFavorites,
+                );
 
                 $collection = $repo->findByDashboardId($dashboard->dashboardId);
-                $favorites = iterator_to_array($collection);
-                expect($favorites[0]->link->linkId->toString())->toBe(
+                $reorderedArray = iterator_to_array($collection);
+                expect($reorderedArray[0]->link->linkId->toString())->toBe(
                     $link3->linkId->toString(),
                 );
-                expect($favorites[1]->link->linkId->toString())->toBe(
+                expect($reorderedArray[1]->link->linkId->toString())->toBe(
                     $link1->linkId->toString(),
                 );
-                expect($favorites[2]->link->linkId->toString())->toBe(
+                expect($reorderedArray[2]->link->linkId->toString())->toBe(
                     $link2->linkId->toString(),
                 );
             },

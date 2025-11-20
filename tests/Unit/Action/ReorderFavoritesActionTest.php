@@ -95,15 +95,19 @@ describe("ReorderFavoritesAction", function () {
                 $linkId2 = $favorite2->link->linkId->toString();
 
                 $favoriteService
+                    ->shouldReceive("getFavoritesForDashboardId")
+                    ->withAnyArgs()
+                    ->andReturn($collection);
+
+                $favoriteService
                     ->shouldReceive("reorderFavorites")
                     ->with(
                         Mockery::on(
                             fn($arg) => $arg->toString() ===
                                 $dashboardId->toString(),
                         ),
-                        [$linkId1 => 1, $linkId2 => 2],
-                    )
-                    ->andReturn($collection);
+                        \Mockery::type(FavoriteCollection::class),
+                    );
 
                 $inputSpec = new ReorderFavoritesInputSpec();
                 $outputSpec = new FavoriteOutputSpec();
@@ -132,8 +136,10 @@ describe("ReorderFavoritesAction", function () {
             $collection = new FavoriteCollection($favorite1, $favorite2);
 
             $favoriteService
-                ->shouldReceive("reorderFavorites")
+                ->shouldReceive("getFavoritesForDashboardId")
                 ->andReturn($collection);
+
+            $favoriteService->shouldReceive("reorderFavorites");
 
             $inputSpec = new ReorderFavoritesInputSpec();
             $outputSpec = new FavoriteOutputSpec();
@@ -171,8 +177,10 @@ describe("ReorderFavoritesAction", function () {
             $collection = new FavoriteCollection();
 
             $favoriteService
-                ->shouldReceive("reorderFavorites")
+                ->shouldReceive("getFavoritesForDashboardId")
                 ->andReturn($collection);
+
+            $favoriteService->shouldReceive("reorderFavorites");
 
             $inputSpec = new ReorderFavoritesInputSpec();
             $outputSpec = new FavoriteOutputSpec();
@@ -200,8 +208,10 @@ describe("ReorderFavoritesAction", function () {
             $collection = new FavoriteCollection($favorite1, $favorite2);
 
             $favoriteService
-                ->shouldReceive("reorderFavorites")
+                ->shouldReceive("getFavoritesForDashboardId")
                 ->andReturn($collection);
+
+            $favoriteService->shouldReceive("reorderFavorites");
 
             $inputSpec = new ReorderFavoritesInputSpec();
             $outputSpec = new FavoriteOutputSpec();
@@ -238,8 +248,10 @@ describe("ReorderFavoritesAction", function () {
             $collection = new FavoriteCollection($favorite1, $favorite2);
 
             $favoriteService
-                ->shouldReceive("reorderFavorites")
+                ->shouldReceive("getFavoritesForDashboardId")
                 ->andReturn($collection);
+
+            $favoriteService->shouldReceive("reorderFavorites");
 
             $inputSpec = new ReorderFavoritesInputSpec();
             $outputSpec = new FavoriteOutputSpec();
