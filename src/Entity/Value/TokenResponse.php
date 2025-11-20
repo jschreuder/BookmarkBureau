@@ -12,6 +12,7 @@ final readonly class TokenResponse implements ValueEqualityInterface
         public ?DateTimeInterface $expiresAt,
     ) {}
 
+    #[\Override]
     public function equals(object $value): bool
     {
         return match (true) {

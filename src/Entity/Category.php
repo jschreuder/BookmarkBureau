@@ -62,6 +62,7 @@ final class Category implements EntityEqualityInterface
         $this->updatedAt = new DateTimeImmutable();
     }
 
+    #[\Override]
     public function equals(object $entity): bool
     {
         return match (true) {

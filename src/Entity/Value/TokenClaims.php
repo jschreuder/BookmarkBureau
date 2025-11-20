@@ -24,6 +24,7 @@ final readonly class TokenClaims implements ValueEqualityInterface
         return $now >= $this->expiresAt;
     }
 
+    #[\Override]
     public function equals(object $value): bool
     {
         return match (true) {

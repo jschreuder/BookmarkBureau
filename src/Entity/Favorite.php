@@ -32,6 +32,7 @@ final class Favorite implements EntityEqualityInterface
         $this->createdAt = $createdAt;
     }
 
+    #[\Override]
     public function equals(object $entity): bool
     {
         return match (true) {

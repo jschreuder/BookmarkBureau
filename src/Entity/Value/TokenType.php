@@ -8,6 +8,7 @@ enum TokenType: string implements ValueEqualityInterface
     case SESSION_TOKEN = "session";
     case REMEMBER_ME_TOKEN = "remember_me";
 
+    #[\Override]
     public function equals(object $value): bool
     {
         return match (true) {

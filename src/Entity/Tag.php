@@ -9,6 +9,7 @@ final class Tag implements EntityEqualityInterface
         public ?Value\HexColor $color,
     ) {}
 
+    #[\Override]
     public function equals(object $entity): bool
     {
         return match (true) {
