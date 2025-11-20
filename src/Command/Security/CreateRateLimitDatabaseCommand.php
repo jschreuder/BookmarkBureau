@@ -2,10 +2,12 @@
 
 namespace jschreuder\BookmarkBureau\Command\Security;
 
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use PDO;
+use PDOException;
 
 final class CreateRateLimitDatabaseCommand extends Command
 {
@@ -39,14 +41,14 @@ final class CreateRateLimitDatabaseCommand extends Command
                 match ($driver) {
                     "sqlite" => $this->createSqliteTables(),
                     "mysql" => $this->createMysqlTables(),
-                    default => throw new \InvalidArgumentException(
+                    default => throw new InvalidArgumentException(
                         "Unsupported database driver: {$driver}",
                     ),
                 };
                 $output->writeln(
                     "<info>✓ Created {$driver} tables successfully</info>",
                 );
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");
                 return Command::FAILURE;
             }
@@ -56,7 +58,7 @@ final class CreateRateLimitDatabaseCommand extends Command
             $output->writeln("  - login_blocks");
 
             return Command::SUCCESS;
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $output->writeln(
                 "<error>Database error: {$e->getMessage()}</error>",
             );

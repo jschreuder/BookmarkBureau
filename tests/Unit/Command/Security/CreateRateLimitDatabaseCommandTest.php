@@ -16,7 +16,7 @@ describe("CreateRateLimitDatabaseCommand", function () {
 
             expect($statusCode)->toBe(0);
             expect($tester->getDisplay())->toContain(
-                "SQLite tables successfully",
+                "sqlite tables successfully",
             );
             expect($tester->getDisplay())->toContain("failed_login_attempts");
             expect($tester->getDisplay())->toContain("login_blocks");
@@ -71,7 +71,7 @@ describe("CreateRateLimitDatabaseCommand", function () {
             $statusCode2 = $tester->execute([]);
             expect($statusCode2)->toBe(0);
             expect($tester->getDisplay())->toContain(
-                "SQLite tables successfully",
+                "sqlite tables successfully",
             );
         });
     });
@@ -93,7 +93,7 @@ describe("CreateRateLimitDatabaseCommand", function () {
 
             expect($statusCode)->toBe(0);
             expect($tester->getDisplay())->toContain(
-                "MySQL tables successfully",
+                "mysql tables successfully",
             );
         });
     });
