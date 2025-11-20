@@ -106,12 +106,12 @@ final class CategoryService implements CategoryServiceInterface
     #[\Override]
     public function deleteCategory(UuidInterface $categoryId): void
     {
+        $deleteCategory = $this->categoryRepository->findById($categoryId);
         $this->pipelines
             ->deleteCategory()
-            ->run(function (UuidInterface $categoryId): void {
-                $category = $this->categoryRepository->findById($categoryId);
+            ->run(function (Category $category): void {
                 $this->categoryRepository->delete($category);
-            }, $categoryId);
+            }, $deleteCategory);
     }
 
     #[\Override]
