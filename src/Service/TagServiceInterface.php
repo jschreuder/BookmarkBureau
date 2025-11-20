@@ -52,7 +52,6 @@ interface TagServiceInterface
     public function assignTagToLink(
         UuidInterface $linkId,
         string $tagName,
-        ?string $color = null,
     ): void;
 
     /**

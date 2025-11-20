@@ -433,7 +433,7 @@ describe("TagService", function () {
                 new TagServicePipelines(),
             );
 
-            $service->assignTagToLink($linkId, "new-tag", "#FF5733");
+            $service->assignTagToLink($linkId, "new-tag");
 
             expect(true)->toBeTrue();
         });
@@ -504,6 +504,7 @@ describe("TagService", function () {
     describe("removeTagFromLink method", function () {
         test("removes a tag from a link", function () {
             $linkId = Uuid::uuid4();
+            $link = TestEntityFactory::createLink(id: $linkId);
 
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
             $tagRepository
@@ -512,6 +513,11 @@ describe("TagService", function () {
                 ->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+            $linkRepository
+                ->shouldReceive("findById")
+                ->with($linkId)
+                ->once()
+                ->andReturn($link);
 
             $service = new TagService(
                 $tagRepository,

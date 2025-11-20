@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
+use jschreuder\BookmarkBureau\Composite\LinkWithTagName;
 use jschreuder\BookmarkBureau\Composite\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Tag;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
@@ -26,7 +27,7 @@ final class TagService implements TagServiceInterface
     {
         return $this->pipelines
             ->listAllTags()
-            ->run(fn() => $this->tagRepository->findAll());
+            ->run(fn(): TagCollection => $this->tagRepository->findAll());
     }
 
     /**
@@ -37,12 +38,12 @@ final class TagService implements TagServiceInterface
     {
         return $this->pipelines
             ->getTagsForLink()
-            ->run(function () use ($linkId): TagCollection {
+            ->run(function (UuidInterface $lid): TagCollection {
                 // Verify link exists before fetching tags
-                $this->linkRepository->findById($linkId);
+                $this->linkRepository->findById($lid);
 
-                return $this->tagRepository->findTagsForLinkId($linkId);
-            });
+                return $this->tagRepository->findTagsForLinkId($lid);
+            }, $linkId);
     }
 
     /**
@@ -51,18 +52,15 @@ final class TagService implements TagServiceInterface
     #[\Override]
     public function createTag(string $tagName, ?string $color = null): Tag
     {
-        return $this->pipelines
-            ->createTag()
-            ->run(function () use ($tagName, $color): Tag {
-                $tag = new Tag(
-                    new TagName($tagName),
-                    $color !== null ? new HexColor($color) : null,
-                );
+        $newTag = new Tag(
+            new TagName($tagName),
+            $color !== null ? new HexColor($color) : null,
+        );
 
-                $this->tagRepository->save($tag);
-
-                return $tag;
-            });
+        return $this->pipelines->createTag()->run(function (Tag $tag): Tag {
+            $this->tagRepository->save($tag);
+            return $tag;
+        }, $newTag);
     }
 
     /**
@@ -71,17 +69,13 @@ final class TagService implements TagServiceInterface
     #[\Override]
     public function updateTag(string $tagName, ?string $color = null): Tag
     {
-        return $this->pipelines
-            ->updateTag()
-            ->run(function () use ($tagName, $color): Tag {
-                $tag = $this->tagRepository->findByName($tagName);
+        $updatedTag = $this->tagRepository->findByName($tagName);
+        $updatedTag->color = $color !== null ? new HexColor($color) : null;
 
-                $tag->color = $color !== null ? new HexColor($color) : null;
-
-                $this->tagRepository->save($tag);
-
-                return $tag;
-            });
+        return $this->pipelines->updateTag()->run(function (Tag $tag): Tag {
+            $this->tagRepository->save($tag);
+            return $tag;
+        }, $updatedTag);
     }
 
     /**
@@ -90,10 +84,10 @@ final class TagService implements TagServiceInterface
     #[\Override]
     public function deleteTag(string $tagName): void
     {
-        $this->pipelines->deleteTag()->run(function () use ($tagName): void {
-            $tag = $this->tagRepository->findByName($tagName);
+        $deleteTag = $this->tagRepository->findByName($tagName);
+        $this->pipelines->deleteTag()->run(function (Tag $tag): void {
             $this->tagRepository->delete($tag);
-        });
+        }, $deleteTag);
     }
 
     /**
@@ -103,33 +97,39 @@ final class TagService implements TagServiceInterface
     public function assignTagToLink(
         UuidInterface $linkId,
         string $tagName,
-        ?string $color = null,
     ): void {
+        $newLinkWithTag = new LinkWithTagName(
+            $this->linkRepository->findById($linkId),
+            new TagName($tagName),
+        );
+
         $this->pipelines
             ->assignTagToLink()
-            ->run(function () use ($linkId, $tagName, $color): void {
-                // Verify link exists
-                $this->linkRepository->findById($linkId);
-
+            ->run(function (LinkWithTagName $linkWithTag): void {
                 // Check if tag exists
                 try {
-                    $this->tagRepository->findByName($tagName);
+                    $this->tagRepository->findByName(
+                        $linkWithTag->tagName->value,
+                    );
                 } catch (TagNotFoundException) {
                     // Tag doesn't exist, create it
-                    $tag = new Tag(
-                        new TagName($tagName),
-                        $color !== null ? new HexColor($color) : null,
-                    );
+                    $tag = new Tag($linkWithTag->tagName, null);
                     $this->tagRepository->save($tag);
                 }
 
                 // Assign tag to link (only if not already assigned)
                 if (
-                    !$this->tagRepository->isAssignedToLinkId($linkId, $tagName)
+                    !$this->tagRepository->isAssignedToLinkId(
+                        $linkWithTag->link->linkId,
+                        $linkWithTag->tagName->value,
+                    )
                 ) {
-                    $this->tagRepository->assignToLinkId($linkId, $tagName);
+                    $this->tagRepository->assignToLinkId(
+                        $linkWithTag->link->linkId,
+                        $linkWithTag->tagName->value,
+                    );
                 }
-            });
+            }, $newLinkWithTag);
     }
 
     #[\Override]
@@ -137,11 +137,19 @@ final class TagService implements TagServiceInterface
         UuidInterface $linkId,
         string $tagName,
     ): void {
+        $deleteLinkWithTag = new LinkWithTagName(
+            $this->linkRepository->findById($linkId),
+            new TagName($tagName),
+        );
+
         $this->pipelines
             ->removeTagFromLink()
-            ->run(function () use ($linkId, $tagName): void {
-                $this->tagRepository->removeFromLinkId($linkId, $tagName);
-            });
+            ->run(function (LinkWithTagName $linkWithTag): void {
+                $this->tagRepository->removeFromLinkId(
+                    $linkWithTag->link->linkId,
+                    $linkWithTag->tagName->value,
+                );
+            }, $deleteLinkWithTag);
     }
 
     #[\Override]
@@ -149,6 +157,11 @@ final class TagService implements TagServiceInterface
     {
         return $this->pipelines
             ->searchTags()
-            ->run(fn() => $this->tagRepository->searchByName($query, $limit));
+            ->run(
+                fn(): TagCollection => $this->tagRepository->searchByName(
+                    $query,
+                    $limit,
+                ),
+            );
     }
 }
