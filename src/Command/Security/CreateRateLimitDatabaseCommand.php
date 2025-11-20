@@ -14,6 +14,7 @@ final class CreateRateLimitDatabaseCommand extends Command
         parent::__construct("security:create-ratelimit-db");
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this->setDescription(
@@ -21,6 +22,7 @@ final class CreateRateLimitDatabaseCommand extends Command
         );
     }
 
+    #[\Override]
     protected function execute(
         InputInterface $input,
         OutputInterface $output,

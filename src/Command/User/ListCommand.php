@@ -16,11 +16,13 @@ final class ListCommand extends Command
         parent::__construct("user:list");
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this->setDescription("List all users");
     }
 
+    #[\Override]
     protected function execute(
         InputInterface $input,
         OutputInterface $output,

@@ -21,6 +21,7 @@ final class CreateCommand extends Command
         parent::__construct("user:create");
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this->setDescription("Create a new user");
@@ -42,6 +43,7 @@ final class CreateCommand extends Command
             );
     }
 
+    #[\Override]
     protected function execute(
         InputInterface $input,
         OutputInterface $output,

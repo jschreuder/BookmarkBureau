@@ -18,6 +18,7 @@ final class TotpCommand extends Command
         parent::__construct("user:totp");
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this->setDescription("Manage TOTP for a user (enable/disable)");
@@ -32,6 +33,7 @@ final class TotpCommand extends Command
         );
     }
 
+    #[\Override]
     protected function execute(
         InputInterface $input,
         OutputInterface $output,

@@ -19,6 +19,7 @@ final class ChangePasswordCommand extends Command
         parent::__construct("user:change-password");
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this->setDescription("Change a user password by email");
@@ -33,6 +34,7 @@ final class ChangePasswordCommand extends Command
         );
     }
 
+    #[\Override]
     protected function execute(
         InputInterface $input,
         OutputInterface $output,

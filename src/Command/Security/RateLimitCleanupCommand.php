@@ -15,6 +15,7 @@ final class RateLimitCleanupCommand extends Command
         parent::__construct("security:ratelimit-cleanup");
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this->setDescription(
@@ -22,6 +23,7 @@ final class RateLimitCleanupCommand extends Command
         );
     }
 
+    #[\Override]
     protected function execute(
         InputInterface $input,
         OutputInterface $output,

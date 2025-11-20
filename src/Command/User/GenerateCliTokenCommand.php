@@ -24,6 +24,7 @@ final class GenerateCliTokenCommand extends Command
         parent::__construct("user:generate-cli-token");
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this->setDescription("Generate a CLI token for a user (no expiration)")
@@ -39,6 +40,7 @@ final class GenerateCliTokenCommand extends Command
             );
     }
 
+    #[\Override]
     protected function execute(
         InputInterface $input,
         OutputInterface $output,

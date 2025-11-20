@@ -18,6 +18,7 @@ final class DeleteCommand extends Command
         parent::__construct("user:delete");
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this->setDescription("Delete a user by email");
@@ -28,6 +29,7 @@ final class DeleteCommand extends Command
         );
     }
 
+    #[\Override]
     protected function execute(
         InputInterface $input,
         OutputInterface $output,

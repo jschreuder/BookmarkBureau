@@ -19,6 +19,7 @@ final class RevokeCliTokenCommand extends Command
         parent::__construct("user:revoke-cli-token");
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this->setDescription(
@@ -30,6 +31,7 @@ final class RevokeCliTokenCommand extends Command
         );
     }
 
+    #[\Override]
     protected function execute(
         InputInterface $input,
         OutputInterface $output,
