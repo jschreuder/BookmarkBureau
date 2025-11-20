@@ -2,8 +2,8 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
-use DateTimeImmutable;
 use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
+use jschreuder\BookmarkBureau\Composite\FavoriteParams;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
@@ -50,24 +50,19 @@ final class FavoriteService implements FavoriteServiceInterface
                 $dashboardId,
             ) + 1;
 
-        $tempFavorite = new Favorite(
-            $dashboard,
-            $link,
-            $sortOrder,
-            new DateTimeImmutable(),
-        );
+        $favoriteParams = new FavoriteParams($dashboard, $link, $sortOrder);
 
         return $this->pipelines
             ->addFavorite()
             ->run(
                 fn(
-                    Favorite $favorite,
+                    FavoriteParams $favorite,
                 ): Favorite => $this->favoriteRepository->addFavorite(
                     $favorite->dashboard->dashboardId,
                     $favorite->link->linkId,
                     $favorite->sortOrder,
                 ),
-                $tempFavorite,
+                $favoriteParams,
             );
     }
 
@@ -83,19 +78,14 @@ final class FavoriteService implements FavoriteServiceInterface
         $dashboard = $this->dashboardRepository->findById($dashboardId);
         $link = $this->linkRepository->findById($linkId);
 
-        $removeFavorite = new Favorite(
-            $dashboard,
-            $link,
-            0,
-            new DateTimeImmutable(),
-        );
+        $removeFavorite = new FavoriteParams($dashboard, $link);
 
         $this->pipelines
             ->removeFavorite()
-            ->run(function (Favorite $favorite): void {
+            ->run(function (FavoriteParams $favoriteParams): void {
                 $this->favoriteRepository->removeFavorite(
-                    $favorite->dashboard->dashboardId,
-                    $favorite->link->linkId,
+                    $favoriteParams->dashboard->dashboardId,
+                    $favoriteParams->link->linkId,
                 );
             }, $removeFavorite);
     }

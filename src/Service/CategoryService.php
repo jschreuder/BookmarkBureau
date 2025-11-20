@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Service;
 
 use DateTimeImmutable;
 use jschreuder\BookmarkBureau\Composite\CategoryCollection;
+use jschreuder\BookmarkBureau\Composite\CategoryLinkParams;
 use jschreuder\BookmarkBureau\Composite\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
@@ -163,24 +164,23 @@ final class CategoryService implements CategoryServiceInterface
                 $categoryId,
             ) + 1;
 
-        $tempCategoryLink = new CategoryLink(
+        $categoryLinkParams = new CategoryLinkParams(
             $category,
             $link,
             $sortOrder,
-            new DateTimeImmutable(),
         );
 
         return $this->pipelines
             ->addLinkToCategory()
             ->run(
                 fn(
-                    CategoryLink $categoryLink,
+                    CategoryLinkParams $categoryLink,
                 ): CategoryLink => $this->categoryRepository->addLink(
                     $categoryLink->category->categoryId,
                     $categoryLink->link->linkId,
                     $categoryLink->sortOrder,
                 ),
-                $tempCategoryLink,
+                $categoryLinkParams,
             );
     }
 
@@ -195,21 +195,16 @@ final class CategoryService implements CategoryServiceInterface
         // Verify category & link exist
         $category = $this->categoryRepository->findById($categoryId);
         $link = $this->linkRepository->findById($linkId);
-        $tempCategoryLink = new CategoryLink(
-            $category,
-            $link,
-            0,
-            new DateTimeImmutable(),
-        );
+        $categoryLinkParams = new CategoryLinkParams($category, $link);
 
         $this->pipelines
             ->removeLinkFromCategory()
-            ->run(function (CategoryLink $categoryLink): void {
+            ->run(function (CategoryLinkParams $categoryLink): void {
                 $this->categoryRepository->removeLink(
                     $categoryLink->category->categoryId,
                     $categoryLink->link->linkId,
                 );
-            }, $tempCategoryLink);
+            }, $categoryLinkParams);
     }
 
     #[\Override]
