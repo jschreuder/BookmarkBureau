@@ -2,7 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Composite;
 
-use Iterator;
+use Traversable;
 
 /**
  * Trait for creating type-safe collections of entities.
@@ -29,7 +29,7 @@ trait CollectionTrait
 {
     private readonly array $collection;
 
-    public function getIterator(): Iterator
+    public function getIterator(): Traversable
     {
         foreach ($this->collection as $item) {
             yield $item;
@@ -38,7 +38,7 @@ trait CollectionTrait
 
     public function count(): int
     {
-        return count($this->collection);
+        return \count($this->collection);
     }
 
     public function isEmpty(): bool
