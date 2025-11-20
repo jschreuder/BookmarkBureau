@@ -51,13 +51,13 @@ final class DashboardService implements DashboardServiceInterface
     public function getFullDashboard(
         UuidInterface $dashboardId,
     ): DashboardWithCategoriesAndFavorites {
-        $dashboard = $this->dashboardRepository->findById($dashboardId);
-
         return $this->pipelines
             ->getFullDashboard()
             ->run(function (
-                Dashboard $dashboard,
+                UuidInterface $did,
             ): DashboardWithCategoriesAndFavorites {
+                $dashboard = $this->dashboardRepository->findById($did);
+
                 // Get all categories for this dashboard
                 $categories = $this->categoryRepository->findByDashboardId(
                     $dashboard->dashboardId,
@@ -96,7 +96,7 @@ final class DashboardService implements DashboardServiceInterface
                         ),
                     ),
                 );
-            }, $dashboard);
+            }, $dashboardId);
     }
 
     #[\Override]
