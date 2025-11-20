@@ -14,13 +14,14 @@ final readonly class TokenOutputSpec implements OutputSpecInterface
         return $data instanceof TokenResponse;
     }
 
-    private function doTransform(object $data): array
+    #[\Override]
+    private function doTransform(object $tokenResponse): array
     {
-        /** @var TokenResponse $data */
+        /** @var TokenResponse $tokenResponse */
         return [
-            "token" => (string) $data->token,
-            "type" => $data->type,
-            "expires_at" => $data->expiresAt?->format("c"),
+            "token" => (string) $tokenResponse->token,
+            "type" => $tokenResponse->type,
+            "expires_at" => $tokenResponse->expiresAt?->format("c"),
         ];
     }
 }

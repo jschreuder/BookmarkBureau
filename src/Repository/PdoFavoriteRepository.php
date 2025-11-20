@@ -149,11 +149,9 @@ final readonly class PdoFavoriteRepository implements
     ): void {
         // Check if the favorite exists
         if (!$this->isFavorite($dashboardId, $linkId)) {
-            throw new FavoriteNotFoundException(
-                "Favorite not found: dashboard=" .
-                    $dashboardId->toString() .
-                    ", link=" .
-                    $linkId->toString(),
+            throw FavoriteNotFoundException::forDashboardAndLink(
+                $dashboardId,
+                $linkId,
             );
         }
 
@@ -197,11 +195,9 @@ final readonly class PdoFavoriteRepository implements
     ): void {
         // Check if the favorite exists
         if (!$this->isFavorite($dashboardId, $linkId)) {
-            throw new FavoriteNotFoundException(
-                "Favorite not found: dashboard=" .
-                    $dashboardId->toString() .
-                    ", link=" .
-                    $linkId->toString(),
+            throw FavoriteNotFoundException::forDashboardAndLink(
+                $dashboardId,
+                $linkId,
             );
         }
 
@@ -271,12 +267,10 @@ final readonly class PdoFavoriteRepository implements
             "d",
         );
         $statement = $this->pdo->prepare(
-            "SELECT DISTINCT " .
-                $dashboardFields .
-                ' FROM dashboards d
+            "SELECT DISTINCT {$dashboardFields} FROM dashboards d
              INNER JOIN favorites f ON d.dashboard_id = f.dashboard_id
              WHERE f.link_id = :link_id
-             ORDER BY d.title ASC',
+             ORDER BY d.title ASC",
         );
         $statement->execute([":link_id" => $linkId->getBytes()]);
 

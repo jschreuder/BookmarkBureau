@@ -18,7 +18,7 @@ final readonly class JwtAuthenticationMiddleware implements MiddlewareInterface
     #[\Override]
     public function process(
         ServerRequestInterface $request,
-        RequestHandlerInterface $requestHandler,
+        RequestHandlerInterface $handler,
     ): ResponseInterface {
         // Try to extract and verify JWT token from Authorization header
         $authHeader = $request->getHeaderLine("Authorization");
@@ -49,7 +49,7 @@ final readonly class JwtAuthenticationMiddleware implements MiddlewareInterface
 
         // If no Authorization header or token is valid, continue
         // Routes can check for 'authenticatedUser' attribute if they require auth
-        return $requestHandler->handle($request);
+        return $handler->handle($request);
     }
 
     private function extractTokenFromHeader(string $authHeader): JwtToken

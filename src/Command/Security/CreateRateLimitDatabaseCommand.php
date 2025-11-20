@@ -35,20 +35,19 @@ final class CreateRateLimitDatabaseCommand extends Command
             // Check if we're using SQLite or MySQL
             $driver = $this->rateLimitDb->getAttribute(PDO::ATTR_DRIVER_NAME);
 
-            if ($driver === "sqlite") {
-                $this->createSqliteTables();
+            try {
+                match ($driver) {
+                    "sqlite" => $this->createSqliteTables(),
+                    "mysql" => $this->createMysqlTables(),
+                    default => throw new \InvalidArgumentException(
+                        "Unsupported database driver: {$driver}",
+                    ),
+                };
                 $output->writeln(
-                    "<info>✓ Created SQLite tables successfully</info>",
+                    "<info>✓ Created {$driver} tables successfully</info>",
                 );
-            } elseif ($driver === "mysql") {
-                $this->createMysqlTables();
-                $output->writeln(
-                    "<info>✓ Created MySQL tables successfully</info>",
-                );
-            } else {
-                $output->writeln(
-                    "<error>Unsupported database driver: {$driver}</error>",
-                );
+            } catch (\InvalidArgumentException $e) {
+                $output->writeln("<error>{$e->getMessage()}</error>");
                 return Command::FAILURE;
             }
 

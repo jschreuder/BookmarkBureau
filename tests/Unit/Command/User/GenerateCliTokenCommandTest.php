@@ -5,8 +5,10 @@ use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
+use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
+use jschreuder\Middle\Exception\ValidationFailedException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\StringInput;
@@ -17,7 +19,12 @@ describe("GenerateCliTokenCommand", function () {
         test("has correct command name", function () {
             $userService = Mockery::mock(UserServiceInterface::class);
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $command = new GenerateCliTokenCommand($userService, $jwtService);
+            $inputSpec = Mockery::mock(InputSpecInterface::class);
+            $command = new GenerateCliTokenCommand(
+                $userService,
+                $jwtService,
+                $inputSpec,
+            );
 
             expect($command->getName())->toBe("user:generate-cli-token");
         });
@@ -25,7 +32,12 @@ describe("GenerateCliTokenCommand", function () {
         test("has correct description", function () {
             $userService = Mockery::mock(UserServiceInterface::class);
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $command = new GenerateCliTokenCommand($userService, $jwtService);
+            $inputSpec = Mockery::mock(InputSpecInterface::class);
+            $command = new GenerateCliTokenCommand(
+                $userService,
+                $jwtService,
+                $inputSpec,
+            );
 
             expect($command->getDescription())->toContain("CLI token");
         });
@@ -35,9 +47,21 @@ describe("GenerateCliTokenCommand", function () {
         test("generates CLI token with valid credentials", function () {
             $userService = Mockery::mock(UserServiceInterface::class);
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $command = new GenerateCliTokenCommand($userService, $jwtService);
+            $inputSpec = Mockery::mock(InputSpecInterface::class);
+            $command = new GenerateCliTokenCommand(
+                $userService,
+                $jwtService,
+                $inputSpec,
+            );
 
             $user = TestEntityFactory::createUser();
+
+            $inputSpec->shouldReceive("filter")->andReturn([
+                "email" => "test@example.com",
+                "password" => "password123",
+            ]);
+            $inputSpec->shouldReceive("validate")->andReturn(null);
+
             $userService
                 ->shouldReceive("getUserByEmail")
                 ->with(
@@ -72,9 +96,21 @@ describe("GenerateCliTokenCommand", function () {
         test("fails with invalid credentials", function () {
             $userService = Mockery::mock(UserServiceInterface::class);
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $command = new GenerateCliTokenCommand($userService, $jwtService);
+            $inputSpec = Mockery::mock(InputSpecInterface::class);
+            $command = new GenerateCliTokenCommand(
+                $userService,
+                $jwtService,
+                $inputSpec,
+            );
 
             $user = TestEntityFactory::createUser();
+
+            $inputSpec->shouldReceive("filter")->andReturn([
+                "email" => "test@example.com",
+                "password" => "wrongpassword",
+            ]);
+            $inputSpec->shouldReceive("validate")->andReturn(null);
+
             $userService
                 ->shouldReceive("getUserByEmail")
                 ->with(
@@ -101,7 +137,18 @@ describe("GenerateCliTokenCommand", function () {
         test("fails when user not found", function () {
             $userService = Mockery::mock(UserServiceInterface::class);
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $command = new GenerateCliTokenCommand($userService, $jwtService);
+            $inputSpec = Mockery::mock(InputSpecInterface::class);
+            $command = new GenerateCliTokenCommand(
+                $userService,
+                $jwtService,
+                $inputSpec,
+            );
+
+            $inputSpec->shouldReceive("filter")->andReturn([
+                "email" => "nonexistent@example.com",
+                "password" => "password123",
+            ]);
+            $inputSpec->shouldReceive("validate")->andReturn(null);
 
             $userService
                 ->shouldReceive("getUserByEmail")
@@ -127,7 +174,23 @@ describe("GenerateCliTokenCommand", function () {
         test("fails with invalid email format", function () {
             $userService = Mockery::mock(UserServiceInterface::class);
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $command = new GenerateCliTokenCommand($userService, $jwtService);
+            $inputSpec = Mockery::mock(InputSpecInterface::class);
+            $command = new GenerateCliTokenCommand(
+                $userService,
+                $jwtService,
+                $inputSpec,
+            );
+
+            $inputSpec->shouldReceive("filter")->andReturn([
+                "email" => "not-an-email",
+                "password" => "password123",
+            ]);
+            $inputSpec->shouldReceive("validate")->andThrow(
+                new ValidationFailedException([
+                    "email" =>
+                        "Email Value object must get a valid e-mail address",
+                ]),
+            );
 
             $input = new ArrayInput([
                 "email" => "not-an-email",
@@ -146,9 +209,21 @@ describe("GenerateCliTokenCommand", function () {
         test("generates CLI_TOKEN type", function () {
             $userService = Mockery::mock(UserServiceInterface::class);
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $command = new GenerateCliTokenCommand($userService, $jwtService);
+            $inputSpec = Mockery::mock(InputSpecInterface::class);
+            $command = new GenerateCliTokenCommand(
+                $userService,
+                $jwtService,
+                $inputSpec,
+            );
 
             $user = TestEntityFactory::createUser();
+
+            $inputSpec->shouldReceive("filter")->andReturn([
+                "email" => "test@example.com",
+                "password" => "password123",
+            ]);
+            $inputSpec->shouldReceive("validate")->andReturn(null);
+
             $userService->shouldReceive("getUserByEmail")->andReturn($user);
             $userService->shouldReceive("verifyPassword")->andReturn(true);
 
@@ -174,9 +249,21 @@ describe("GenerateCliTokenCommand", function () {
         test("displays token in output", function () {
             $userService = Mockery::mock(UserServiceInterface::class);
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $command = new GenerateCliTokenCommand($userService, $jwtService);
+            $inputSpec = Mockery::mock(InputSpecInterface::class);
+            $command = new GenerateCliTokenCommand(
+                $userService,
+                $jwtService,
+                $inputSpec,
+            );
 
             $user = TestEntityFactory::createUser();
+
+            $inputSpec->shouldReceive("filter")->andReturn([
+                "email" => "test@example.com",
+                "password" => "password123",
+            ]);
+            $inputSpec->shouldReceive("validate")->andReturn(null);
+
             $userService->shouldReceive("getUserByEmail")->andReturn($user);
             $userService->shouldReceive("verifyPassword")->andReturn(true);
 
@@ -199,7 +286,12 @@ describe("GenerateCliTokenCommand", function () {
         test("extends Symfony Command class", function () {
             $userService = Mockery::mock(UserServiceInterface::class);
             $jwtService = Mockery::mock(JwtServiceInterface::class);
-            $command = new GenerateCliTokenCommand($userService, $jwtService);
+            $inputSpec = Mockery::mock(InputSpecInterface::class);
+            $command = new GenerateCliTokenCommand(
+                $userService,
+                $jwtService,
+                $inputSpec,
+            );
 
             expect($command)->toBeInstanceOf(Command::class);
         });

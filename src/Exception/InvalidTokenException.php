@@ -2,4 +2,6 @@
 
 namespace jschreuder\BookmarkBureau\Exception;
 
-final class InvalidTokenException extends \Exception {}
+use RuntimeException;
+
+final class InvalidTokenException extends RuntimeException {}

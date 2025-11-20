@@ -19,7 +19,7 @@ final readonly class RequireAuthenticationMiddleware implements
     #[\Override]
     public function process(
         ServerRequestInterface $request,
-        RequestHandlerInterface $requestHandler,
+        RequestHandlerInterface $handler,
     ): ResponseInterface {
         $routeName = $request->getAttribute("route");
 
@@ -28,7 +28,7 @@ final readonly class RequireAuthenticationMiddleware implements
             $routeName !== null &&
             \in_array($routeName, $this->publicRoutes, true)
         ) {
-            return $requestHandler->handle($request);
+            return $handler->handle($request);
         }
 
         // For protected routes, require authenticatedUser attribute
@@ -41,6 +41,6 @@ final readonly class RequireAuthenticationMiddleware implements
             );
         }
 
-        return $requestHandler->handle($request);
+        return $handler->handle($request);
     }
 }

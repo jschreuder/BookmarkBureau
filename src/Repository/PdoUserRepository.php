@@ -34,9 +34,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         $row = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($row === false) {
-            throw new UserNotFoundException(
-                "User not found: " . $userId->toString(),
-            );
+            throw UserNotFoundException::forId($userId);
         }
 
         return $this->mapper->mapToEntity($row);
@@ -58,7 +56,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         $row = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($row === false) {
-            throw new UserNotFoundException("User not found: " . $email);
+            throw UserNotFoundException::forEmail($email);
         }
 
         return $this->mapper->mapToEntity($row);

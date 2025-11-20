@@ -22,6 +22,7 @@ final readonly class LinkOutputSpec implements OutputSpecInterface
     /**
      * @param  Link $link
      */
+    #[\Override]
     private function doTransform(object $link): array
     {
         return [

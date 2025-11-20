@@ -17,6 +17,7 @@ final readonly class TagOutputSpec implements OutputSpecInterface
     /**
      * @param  Tag $tag
      */
+    #[\Override]
     private function doTransform(object $tag): array
     {
         return [

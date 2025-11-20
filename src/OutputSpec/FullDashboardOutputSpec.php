@@ -33,6 +33,7 @@ final readonly class FullDashboardOutputSpec implements OutputSpecInterface
     /**
      * @param DashboardWithCategoriesAndFavorites $dashboardView
      */
+    #[\Override]
     private function doTransform(object $dashboardView): array
     {
         // Transform the base dashboard

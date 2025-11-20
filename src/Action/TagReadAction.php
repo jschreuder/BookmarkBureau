@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Action;
 
+use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
@@ -45,6 +46,6 @@ final readonly class TagReadAction implements ActionInterface
         }
         // If tag not found, let the service throw TagNotFoundException
         // We'll need to add a getTag method to TagService or handle this differently
-        throw new TagNotFoundException("Tag not found: " . $data["tag_name"]);
+        throw TagNotFoundException::forName(new TagName($data["tag_name"]));
     }
 }

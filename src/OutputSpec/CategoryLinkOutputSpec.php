@@ -18,6 +18,7 @@ final readonly class CategoryLinkOutputSpec implements OutputSpecInterface
     /**
      * @param CategoryLink $categoryLink
      */
+    #[\Override]
     private function doTransform(object $categoryLink): array
     {
         return [

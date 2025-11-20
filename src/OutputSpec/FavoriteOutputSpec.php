@@ -18,6 +18,7 @@ final readonly class FavoriteOutputSpec implements OutputSpecInterface
     /**
      * @param Favorite $favorite
      */
+    #[\Override]
     private function doTransform(object $favorite): array
     {
         return [

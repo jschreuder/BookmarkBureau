@@ -35,15 +35,11 @@ final class RateLimitCleanupCommand extends Command
 
             $deletedCount = $this->rateLimitService->cleanup();
 
-            if ($deletedCount > 0) {
-                $output->writeln(
-                    "<info>✓ Deleted {$deletedCount} expired record(s)</info>",
-                );
-            } else {
-                $output->writeln(
-                    "<comment>No expired records to delete</comment>",
-                );
-            }
+            $output->writeln(
+                $deletedCount > 0
+                    ? "<info>✓ Deleted {$deletedCount} expired record(s)</info>"
+                    : "<comment>No expired records to delete</comment>",
+            );
 
             return Command::SUCCESS;
         } catch (\Exception $e) {

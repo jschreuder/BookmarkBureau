@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Controller;
 
+use InvalidArgumentException;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\TokenResponse;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
@@ -71,7 +72,7 @@ final readonly class LoginController implements
                     $email->value,
                     $clientIp,
                 );
-                throw new \InvalidArgumentException("Invalid credentials");
+                throw new InvalidArgumentException("Invalid credentials");
             }
 
             // Verify TOTP if enabled on user account
@@ -82,7 +83,7 @@ final readonly class LoginController implements
                         $email->value,
                         $clientIp,
                     );
-                    throw new \InvalidArgumentException("TOTP code required");
+                    throw new InvalidArgumentException("TOTP code required");
                 }
                 if (
                     !$this->totpVerifier->verify($totpCode, $user->totpSecret)
@@ -91,7 +92,7 @@ final readonly class LoginController implements
                         $email->value,
                         $clientIp,
                     );
-                    throw new \InvalidArgumentException("Invalid TOTP code");
+                    throw new InvalidArgumentException("Invalid TOTP code");
                 }
             }
 
@@ -122,7 +123,7 @@ final readonly class LoginController implements
             );
         } catch (UserNotFoundException $e) {
             $this->rateLimitService->recordFailure($email->value, $clientIp);
-            throw new \InvalidArgumentException("Invalid credentials");
+            throw new InvalidArgumentException("Invalid credentials");
         }
     }
 }

@@ -35,7 +35,7 @@ final class FileUserRepository implements UserRepositoryInterface
         $userIdString = $userId->toString();
 
         if (!isset($this->users[$userIdString])) {
-            throw new UserNotFoundException("User not found: {$userIdString}");
+            throw UserNotFoundException::forId($userId);
         }
 
         return $this->users[$userIdString];
@@ -48,15 +48,14 @@ final class FileUserRepository implements UserRepositoryInterface
     public function findByEmail(Email $email): User
     {
         $this->loadUsers();
-        $emailString = (string) $email;
 
         foreach ($this->users as $user) {
-            if ((string) $user->email === $emailString) {
+            if ($user->email->equals($email)) {
                 return $user;
             }
         }
 
-        throw new UserNotFoundException("User not found: {$emailString}");
+        throw UserNotFoundException::forEmail($email);
     }
 
     /**

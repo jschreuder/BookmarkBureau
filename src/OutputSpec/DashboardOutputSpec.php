@@ -18,6 +18,7 @@ final readonly class DashboardOutputSpec implements OutputSpecInterface
     /**
      * @param  Dashboard $dashboard
      */
+    #[\Override]
     private function doTransform(object $dashboard): array
     {
         return [

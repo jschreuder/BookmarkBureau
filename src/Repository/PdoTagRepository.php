@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
+use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Composite\TagCollection;
@@ -35,7 +36,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
-            throw TagNotFoundException::forName($tagName);
+            throw TagNotFoundException::forName(new TagName($tagName));
         }
 
         return $this->mapper->mapToEntity($row);
@@ -151,8 +152,8 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
                     str_contains($e->getMessage(), "Duplicate entry") ||
                     str_contains($e->getMessage(), "UNIQUE constraint failed")
                 ) {
-                    throw new DuplicateTagException(
-                        "Tag already exists: {$tagNameValue}",
+                    throw DuplicateTagException::forName(
+                        new TagName($tagNameValue),
                     );
                 }
                 throw $e;
@@ -191,7 +192,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         );
         $tagCheck->execute([":tag_name" => $tagName]);
         if ($tagCheck->fetch() === false) {
-            throw TagNotFoundException::forName($tagName);
+            throw TagNotFoundException::forName(new TagName($tagName));
         }
 
         // Verify link exists
@@ -252,7 +253,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
                 if (str_contains($e->getMessage(), "link_id")) {
                     throw LinkNotFoundException::forId($linkId);
                 } else {
-                    throw TagNotFoundException::forName($tagName);
+                    throw TagNotFoundException::forName(new TagName($tagName));
                 }
             }
             throw $e;

@@ -2,4 +2,6 @@
 
 namespace jschreuder\BookmarkBureau\Exception;
 
-final class OperationPipelineException extends \Exception {}
+use RuntimeException;
+
+final class OperationPipelineException extends RuntimeException {}

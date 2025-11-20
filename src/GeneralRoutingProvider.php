@@ -73,6 +73,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             "home",
             "/",
             fn() => new class implements ControllerInterface {
+                #[\Override]
                 public function execute(
                     ServerRequestInterface $request,
                 ): ResponseInterface {

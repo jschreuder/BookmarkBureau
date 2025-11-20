@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Controller;
 
+use InvalidArgumentException;
 use jschreuder\BookmarkBureau\OutputSpec\FullDashboardOutputSpec;
 use jschreuder\BookmarkBureau\Response\ResponseTransformerInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
@@ -51,11 +52,11 @@ final readonly class DashboardViewController implements
 
         // Validate that ID is present and is a valid UUID
         if (!isset($data["id"])) {
-            throw new \InvalidArgumentException("Dashboard ID is required");
+            throw new InvalidArgumentException("Dashboard ID is required");
         }
 
         if (!v::uuid()->validate($data["id"])) {
-            throw new \InvalidArgumentException("Invalid dashboard ID format");
+            throw new InvalidArgumentException("Invalid dashboard ID format");
         }
     }
 

@@ -18,6 +18,7 @@ final readonly class CategoryOutputSpec implements OutputSpecInterface
     /**
      * @param  Category $category
      */
+    #[\Override]
     private function doTransform(object $category): array
     {
         return [

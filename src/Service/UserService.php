@@ -6,7 +6,6 @@ use DateTimeImmutable;
 use jschreuder\BookmarkBureau\Composite\UserCollection;
 use jschreuder\BookmarkBureau\Entity\User;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
-use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Exception\DuplicateEmailException;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
@@ -27,7 +26,7 @@ final readonly class UserService implements UserServiceInterface
     {
         // Check if email already exists
         if ($this->userRepository->existsByEmail($email)) {
-            throw new DuplicateEmailException("Email already exists: {$email}");
+            throw DuplicateEmailException::forEmail($email);
         }
 
         // Hash the password

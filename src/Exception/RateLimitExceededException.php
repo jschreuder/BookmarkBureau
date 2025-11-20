@@ -2,6 +2,8 @@
 
 namespace jschreuder\BookmarkBureau\Exception;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use RuntimeException;
 
 final class RateLimitExceededException extends RuntimeException
@@ -9,7 +11,7 @@ final class RateLimitExceededException extends RuntimeException
     public function __construct(
         private readonly ?string $blockedUsername = null,
         private readonly ?string $blockedIp = null,
-        private readonly ?\DateTimeInterface $expiresAt = null,
+        private readonly ?DateTimeInterface $expiresAt = null,
     ) {
         $message = "Rate limit exceeded. Too many failed login attempts.";
 
@@ -33,7 +35,7 @@ final class RateLimitExceededException extends RuntimeException
         return $this->blockedIp;
     }
 
-    public function getExpiresAt(): ?\DateTimeInterface
+    public function getExpiresAt(): ?DateTimeInterface
     {
         return $this->expiresAt;
     }
@@ -44,7 +46,7 @@ final class RateLimitExceededException extends RuntimeException
             return null;
         }
 
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
         $diff = $this->expiresAt->getTimestamp() - $now->getTimestamp();
 
         return max(0, $diff);

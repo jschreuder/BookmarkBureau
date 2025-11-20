@@ -6,8 +6,10 @@ use InvalidArgumentException;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
+use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
+use jschreuder\Middle\Exception\ValidationFailedException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +22,7 @@ final class GenerateCliTokenCommand extends Command
     public function __construct(
         private UserServiceInterface $userService,
         private JwtServiceInterface $jwtService,
+        private InputSpecInterface $inputSpec,
     ) {
         parent::__construct("user:generate-cli-token");
     }
@@ -49,9 +52,6 @@ final class GenerateCliTokenCommand extends Command
         $passwordArg = $input->getArgument("password");
 
         try {
-            $emailObj = new Email($email);
-            $user = $this->userService->getUserByEmail($emailObj);
-
             $password = $this->resolvePassword($input, $output, $passwordArg);
             if ($password === null) {
                 throw new InvalidArgumentException(
@@ -59,7 +59,24 @@ final class GenerateCliTokenCommand extends Command
                 );
             }
 
-            if (!$this->userService->verifyPassword($user, $password)) {
+            $rawData = [
+                "email" => $email,
+                "password" => $password,
+            ];
+
+            $filtered = $this->inputSpec->filter($rawData);
+            $this->inputSpec->validate($filtered);
+
+            $user = $this->userService->getUserByEmail(
+                new Email($filtered["email"]),
+            );
+
+            if (
+                !$this->userService->verifyPassword(
+                    $user,
+                    $filtered["password"],
+                )
+            ) {
                 throw new InvalidArgumentException(
                     "Invalid credentials for user: {$email}",
                 );
@@ -78,6 +95,11 @@ final class GenerateCliTokenCommand extends Command
             return Command::SUCCESS;
         } catch (UserNotFoundException) {
             $output->writeln("<error>User not found: {$email}</error>");
+        } catch (ValidationFailedException $e) {
+            $output->writeln("<error>Validation failed:</error>");
+            foreach ($e->getValidationErrors() as $message) {
+                $output->writeln("<error>  - {$message}</error>");
+            }
         } catch (InvalidArgumentException $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");
         }
