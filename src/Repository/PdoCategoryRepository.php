@@ -193,9 +193,8 @@ final readonly class PdoCategoryRepository implements
                         "foreign key constraint fails",
                     )
                 ) {
-                    throw new DashboardNotFoundException(
-                        "Dashboard not found: " .
-                            $category->dashboard->dashboardId->toString(),
+                    throw DashboardNotFoundException::forId(
+                        $category->dashboard->dashboardId,
                     );
                 }
                 throw $e;

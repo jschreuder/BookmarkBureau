@@ -34,9 +34,7 @@ final readonly class PdoDashboardRepository implements
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
-            throw new DashboardNotFoundException(
-                "Dashboard not found: " . $dashboardId->toString(),
-            );
+            throw DashboardNotFoundException::forId($dashboardId);
         }
 
         return $this->mapper->mapToEntity($row);

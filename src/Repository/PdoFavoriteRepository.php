@@ -50,14 +50,11 @@ final readonly class PdoFavoriteRepository implements
             "l",
         );
         $statement = $this->pdo->prepare(
-            "SELECT " .
-                $favoriteFields .
-                ", " .
-                $linkFields .
-                ' FROM favorites f
+            "SELECT {$favoriteFields}, {$linkFields}
+             FROM favorites f
              INNER JOIN links l ON f.link_id = l.link_id
              WHERE f.dashboard_id = :dashboard_id
-             ORDER BY f.sort_order ASC',
+             ORDER BY f.sort_order ASC",
         );
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
@@ -107,8 +104,8 @@ final readonly class PdoFavoriteRepository implements
         try {
             $now = new DateTimeImmutable();
             $statement = $this->pdo->prepare(
-                'INSERT INTO favorites (dashboard_id, link_id, sort_order, created_at)
-                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)',
+                "INSERT INTO favorites (dashboard_id, link_id, sort_order, created_at)
+                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)",
             );
             $statement->execute([
                 ":dashboard_id" => $dashboardId->getBytes(),
@@ -132,9 +129,7 @@ final readonly class PdoFavoriteRepository implements
                 str_contains($e->getMessage(), "foreign key constraint fails")
             ) {
                 if (str_contains($e->getMessage(), "dashboard_id")) {
-                    throw new DashboardNotFoundException(
-                        "Dashboard not found: " . $dashboardId->toString(),
-                    );
+                    throw DashboardNotFoundException::forId($dashboardId);
                 } else {
                     throw LinkNotFoundException::forId($linkId);
                 }
