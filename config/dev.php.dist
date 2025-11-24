@@ -1,37 +1,102 @@
-<?php
+<?php declare(strict_types=1);
 
+// Load autoloader
+require_once __DIR__ . "/../vendor/autoload.php";
+
+use jschreuder\BookmarkBureau\Config\SqliteDatabaseConfig;
+use jschreuder\BookmarkBureau\Config\DefaultAuthConfig;
+use jschreuder\BookmarkBureau\Config\MonologLoggerConfig;
+use jschreuder\BookmarkBureau\Config\DefaultRateLimitConfig;
+use jschreuder\BookmarkBureau\Config\FileUserStorageConfig;
+
+/**
+ * Development environment configuration
+ *
+ * This file demonstrates how to configure BookmarkBureau for development.
+ * It returns a callable that creates a configured ServiceContainer with typed config objects.
+ *
+ * Users can override this by creating their own environment config file that:
+ * 1. Instantiates the config classes they need (DatabaseConfig, AuthConfig, etc.)
+ * 2. Returns a callable that creates and returns the ServiceContainer
+ *
+ * Example for production with MySQL:
+ *
+ *   $dbConfig = new MysqlDatabaseConfig(
+ *       host: $_ENV["DB_HOST"],
+ *       dbname: $_ENV["DB_NAME"],
+ *       user: $_ENV["DB_USER"],
+ *       pass: $_ENV["DB_PASS"],
+ *   );
+ *   $loggerConfig = new MonologLoggerConfig(
+ *       name: "bookmark-bureau",
+ *       logPath: "/var/log/bookmark-bureau.log",
+ *   );
+ *   // ... create other configs ...
+ *   return [
+ *       "databaseConfig" => $databaseConfig,
+ *       "rateLimitDatabaseConfig" => $rateLimitDatabaseConfig,
+ *       "authConfig" => $authConfig,
+ *       "loggerConfig" => $loggerConfig,
+ *       "rateLimitConfig" => $rateLimitConfig,
+ *       "userStorageConfig" => $userStorageConfig,
+ *       "siteUrl" => "http://localhost:8080/api.php",
+ *   ];
+ */
+
+$logDir = __DIR__ . "/../var/logs";
+$logFile =
+    "{$logDir}/" .
+    (php_sapi_name() === "cli" ? "cli" : "web") .
+    "-" .
+    date("Ymd") .
+    ".log";
+
+// Ensure log directory exists
+if (!is_dir($logDir)) {
+    mkdir($logDir, 0755, true);
+}
+
+// Create config objects for this environment
+$databaseConfig = new SqliteDatabaseConfig(
+    dsn: "sqlite:" . __DIR__ . "/../var/bb.db",
+);
+
+$rateLimitDatabaseConfig = new SqliteDatabaseConfig(
+    dsn: "sqlite:" . __DIR__ . "/../var/ratelimit.db",
+);
+
+$authConfig = new DefaultAuthConfig(
+    jwtSecret: "dev-secret-key-change-in-production",
+    applicationName: "bookmark-bureau",
+    sessionTtl: 1800, // 30 minutes
+    rememberMeTtl: 2592000, // 30 days
+);
+
+$loggerConfig = new MonologLoggerConfig(
+    name: "bookmark-bureau",
+    logPath: $logFile,
+    enableRequestLogging: true,
+);
+
+$rateLimitConfig = new DefaultRateLimitConfig(
+    database: $rateLimitDatabaseConfig,
+    usernameThreshold: 10,
+    ipThreshold: 100,
+    windowMinutes: 10,
+    trustProxyHeaders: false,
+);
+
+$userStorageConfig = new FileUserStorageConfig(
+    filePath: __DIR__ . "/../var/users.json",
+);
+
+// Create and return an array of config objects
 return [
-    "site.url" => "http://localhost:8080/api.php",
-
-    "logger.name" => "middle-skeleton",
-    "logger.path" =>
-        __DIR__ .
-        "/../var/logs/" .
-        (php_sapi_name() === "cli" ? "cli" : "web") .
-        "-" .
-        date("Ymd") .
-        ".log",
-    "logger.enable_request_logging" => true, // Enable request/response logging in development
-
-    "db.dsn" => "sqlite:./var/bb.db",
-    "db.dbname" => null,
-    "db.user" => null,
-    "db.pass" => null,
-
-    "ratelimit.db.dsn" => "sqlite:./var/ratelimit.db",
-    "ratelimit.db.dbname" => null,
-    "ratelimit.db.user" => null,
-    "ratelimit.db.pass" => null,
-    "ratelimit.username_threshold" => 10, // Max failed attempts per username in window
-    "ratelimit.ip_threshold" => 100, // Max failed attempts per IP in window
-    "ratelimit.window_minutes" => 10, // Time window for rate limiting
-    "ratelimit.trust_proxy_headers" => false, // Trust X-Forwarded-For when behind load balancer
-
-    "users.storage.type" => "file",
-    "users.storage.path" => __DIR__ . "/../var/users.json",
-
-    "auth.jwt_secret" => "dev-secret-key-change-in-production",
-    "auth.application_name" => "bookmark-bureau",
-    "auth.session_ttl" => 1800, // 30 minutes
-    "auth.remember_me_ttl" => 2592000, // 30 days
+    "databaseConfig" => $databaseConfig,
+    "rateLimitDatabaseConfig" => $rateLimitDatabaseConfig,
+    "authConfig" => $authConfig,
+    "loggerConfig" => $loggerConfig,
+    "rateLimitConfig" => $rateLimitConfig,
+    "userStorageConfig" => $userStorageConfig,
+    "siteUrl" => "http://localhost:8080/api.php",
 ];
