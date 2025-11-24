@@ -28,6 +28,7 @@ final readonly class CategoryLinkDeleteAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
+    /** @param array{id: string, link_id: string} $data */
     #[\Override]
     public function execute(array $data): array
     {

@@ -29,6 +29,7 @@ final readonly class LinkDeleteAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
+    /** @param array{id: string} $data */
     #[\Override]
     public function execute(array $data): array
     {

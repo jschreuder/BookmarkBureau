@@ -34,6 +34,7 @@ final readonly class TagReadAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
+    /** @param array{tag_name: string} $data */
     #[\Override]
     public function execute(array $data): array
     {

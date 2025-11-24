@@ -37,6 +37,7 @@ final readonly class FavoriteCreateAction implements ActionInterface
         $this->inputSpec->validate($data, $fields);
     }
 
+    /** @param array{dashboard_id: string, link_id: string} $data */
     #[\Override]
     public function execute(array $data): array
     {

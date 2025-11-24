@@ -33,6 +33,7 @@ final readonly class CategoryUpdateAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
+    /** @param array{id: string, title: string, color: ?string} $data */
     #[\Override]
     public function execute(array $data): array
     {

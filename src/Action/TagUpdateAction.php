@@ -34,6 +34,7 @@ final readonly class TagUpdateAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
+    /** @param array{tag_name: string, color: ?string} $data */
     #[\Override]
     public function execute(array $data): array
     {

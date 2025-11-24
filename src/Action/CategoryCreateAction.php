@@ -37,6 +37,7 @@ final readonly class CategoryCreateAction implements ActionInterface
         $this->inputSpec->validate($data, $fields);
     }
 
+    /** @param array{dashboard_id: string, title: string, color: ?string, sort_order: int} $data */
     #[\Override]
     public function execute(array $data): array
     {

@@ -34,6 +34,7 @@ final readonly class FavoriteReorderAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
+    /** @param array{dashboard_id: string, links: array<int, array{link_id: string, sort_order: int}>} $data */
     #[\Override]
     public function execute(array $data): array
     {

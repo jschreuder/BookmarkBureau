@@ -36,6 +36,7 @@ final readonly class LinkCreateAction implements ActionInterface
         $this->inputSpec->validate($data, $fields);
     }
 
+    /** @param array{url: string, title: string, description: string, icon: ?string} $data */
     #[\Override]
     public function execute(array $data): array
     {
