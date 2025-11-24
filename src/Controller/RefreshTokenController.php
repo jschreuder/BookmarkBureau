@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Controller;
 
+use jschreuder\BookmarkBureau\Entity\Value\TokenClaims;
 use jschreuder\BookmarkBureau\Entity\Value\TokenResponse;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\OutputSpec\TokenOutputSpec;
@@ -12,6 +13,7 @@ use jschreuder\Middle\Controller\ControllerInterface;
 use jschreuder\Middle\Exception\AuthenticationException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Ramsey\Uuid\UuidInterface;
 
 final readonly class RefreshTokenController implements ControllerInterface
 {
@@ -29,7 +31,10 @@ final readonly class RefreshTokenController implements ControllerInterface
         $userId = $request->getAttribute("authenticatedUserId");
         $tokenClaims = $request->getAttribute("tokenClaims");
 
-        if ($userId === null || $tokenClaims === null) {
+        if (
+            !$userId instanceof UuidInterface ||
+            !$tokenClaims instanceof TokenClaims
+        ) {
             throw new AuthenticationException("Authentication required");
         }
 

@@ -7,7 +7,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\TokenResponse;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
-use jschreuder\BookmarkBureau\InputSpec\LoginInputSpec;
+use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\OutputSpec\TokenOutputSpec;
 use jschreuder\BookmarkBureau\Response\ResponseTransformerInterface;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
@@ -27,7 +27,7 @@ final readonly class LoginController implements
     RequestValidatorInterface
 {
     public function __construct(
-        private LoginInputSpec $inputSpec,
+        private InputSpecInterface $inputSpec,
         private UserServiceInterface $userService,
         private JwtServiceInterface $jwtService,
         private TotpVerifierInterface $totpVerifier,
@@ -56,6 +56,7 @@ final readonly class LoginController implements
     #[\Override]
     public function execute(ServerRequestInterface $request): ResponseInterface
     {
+        /** @var array{email: string, password: string, remember_me: bool, totp_code: ?string} $data */
         $data = (array) $request->getParsedBody();
         $email = new Email($data["email"]);
 
@@ -77,7 +78,7 @@ final readonly class LoginController implements
 
             // Verify TOTP if enabled on user account
             if ($user->requiresTotp()) {
-                $totpCode = $data["totp_code"] ?? "";
+                $totpCode = $data["totp_code"];
                 if (empty($totpCode)) {
                     $this->rateLimitService->recordFailure(
                         $email->value,
@@ -100,7 +101,7 @@ final readonly class LoginController implements
             $this->rateLimitService->clearUsername($email->value);
 
             // Generate appropriate token based on rememberMe flag
-            $rememberMe = $data["remember_me"] ?? false;
+            $rememberMe = $data["remember_me"];
             $tokenType = $rememberMe
                 ? TokenType::REMEMBER_ME_TOKEN
                 : TokenType::SESSION_TOKEN;
