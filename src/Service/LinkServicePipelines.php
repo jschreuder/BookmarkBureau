@@ -2,11 +2,24 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
+use jschreuder\BookmarkBureau\Composite\LinkCollection;
+use jschreuder\BookmarkBureau\Composite\TagNameCollection;
+use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\OperationPipeline\NoPipeline;
 use jschreuder\BookmarkBureau\OperationPipeline\PipelineInterface;
+use Ramsey\Uuid\UuidInterface;
 
 final readonly class LinkServicePipelines
 {
+    /**
+     * @param PipelineInterface<UuidInterface, Link>|null $getLink
+     * @param PipelineInterface<Link, Link>|null $createLink
+     * @param PipelineInterface<Link, Link>|null $updateLink
+     * @param PipelineInterface<Link, null>|null $deleteLink
+     * @param PipelineInterface<null, LinkCollection>|null $searchLinks
+     * @param PipelineInterface<TagNameCollection, LinkCollection>|null $findLinksByTag
+     * @param PipelineInterface<null, LinkCollection>|null $listLinks
+     */
     public function __construct(
         private PipelineInterface $default = new NoPipeline(),
         private ?PipelineInterface $getLink = null,
@@ -18,36 +31,43 @@ final readonly class LinkServicePipelines
         private ?PipelineInterface $listLinks = null,
     ) {}
 
+    /** @return PipelineInterface<UuidInterface, Link> */
     public function getLink(): PipelineInterface
     {
         return $this->getLink ?? $this->default;
     }
 
+    /** @return PipelineInterface<Link, Link> */
     public function createLink(): PipelineInterface
     {
         return $this->createLink ?? $this->default;
     }
 
+    /** @return PipelineInterface<Link, Link> */
     public function updateLink(): PipelineInterface
     {
         return $this->updateLink ?? $this->default;
     }
 
+    /** @return PipelineInterface<Link, null> */
     public function deleteLink(): PipelineInterface
     {
         return $this->deleteLink ?? $this->default;
     }
 
+    /** @return PipelineInterface<null, LinkCollection> */
     public function searchLinks(): PipelineInterface
     {
         return $this->searchLinks ?? $this->default;
     }
 
+    /** @return PipelineInterface<TagNameCollection, LinkCollection> */
     public function findLinksByTag(): PipelineInterface
     {
         return $this->findLinksByTag ?? $this->default;
     }
 
+    /** @return PipelineInterface<null, LinkCollection> */
     public function listLinks(): PipelineInterface
     {
         return $this->listLinks ?? $this->default;

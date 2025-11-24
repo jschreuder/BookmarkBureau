@@ -110,8 +110,9 @@ final class CategoryService implements CategoryServiceInterface
         $deleteCategory = $this->categoryRepository->findById($categoryId);
         $this->pipelines
             ->deleteCategory()
-            ->run(function (Category $category): void {
+            ->run(function (Category $category): null {
                 $this->categoryRepository->delete($category);
+                return null;
             }, $deleteCategory);
     }
 
@@ -138,10 +139,11 @@ final class CategoryService implements CategoryServiceInterface
 
         $this->pipelines
             ->reorderCategories()
-            ->run(function (CategoryCollection $reorderedCategories): void {
+            ->run(function (CategoryCollection $reorderedCategories): null {
                 foreach ($reorderedCategories as $category) {
                     $this->categoryRepository->save($category);
                 }
+                return null;
             }, new CategoryCollection(...$updatedCategories));
     }
 
@@ -199,11 +201,12 @@ final class CategoryService implements CategoryServiceInterface
 
         $this->pipelines
             ->removeLinkFromCategory()
-            ->run(function (CategoryLinkParams $categoryLink): void {
+            ->run(function (CategoryLinkParams $categoryLink): null {
                 $this->categoryRepository->removeLink(
                     $categoryLink->category->categoryId,
                     $categoryLink->link->linkId,
                 );
+                return null;
             }, $categoryLinkParams);
     }
 
@@ -214,8 +217,9 @@ final class CategoryService implements CategoryServiceInterface
     ): void {
         $this->pipelines
             ->reorderLinksInCategory()
-            ->run(function (LinkCollection $links) use ($categoryId): void {
+            ->run(function (LinkCollection $links) use ($categoryId): null {
                 $this->categoryRepository->reorderLinks($categoryId, $links);
+                return null;
             }, $links);
     }
 }

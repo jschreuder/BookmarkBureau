@@ -82,11 +82,12 @@ final class FavoriteService implements FavoriteServiceInterface
 
         $this->pipelines
             ->removeFavorite()
-            ->run(function (FavoriteParams $favoriteParams): void {
+            ->run(function (FavoriteParams $favoriteParams): null {
                 $this->favoriteRepository->removeFavorite(
                     $favoriteParams->dashboard->dashboardId,
                     $favoriteParams->link->linkId,
                 );
+                return null;
             }, $removeFavorite);
     }
 
@@ -112,11 +113,12 @@ final class FavoriteService implements FavoriteServiceInterface
             ->reorderFavorites()
             ->run(function (FavoriteCollection $favorites) use (
                 $dashboardId,
-            ): void {
+            ): null {
                 $this->favoriteRepository->reorderFavorites(
                     $dashboardId,
                     $favorites,
                 );
+                return null;
             }, $favorites);
     }
 }

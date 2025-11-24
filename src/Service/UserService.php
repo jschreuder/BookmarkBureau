@@ -21,35 +21,6 @@ final readonly class UserService implements UserServiceInterface
         private UserServicePipelines $pipelines,
     ) {}
 
-    #[\Override]
-    public function createUser(Email $email, string $plainPassword): User
-    {
-        // Check if email already exists
-        if ($this->userRepository->existsByEmail($email)) {
-            throw DuplicateEmailException::forEmail($email);
-        }
-
-        // Hash the password
-        $passwordHash = $this->passwordHasher->hash($plainPassword);
-
-        // Create new user without TOTP
-        $now = new DateTimeImmutable();
-        $newUser = new User(
-            userId: Uuid::uuid4(),
-            email: $email,
-            passwordHash: $passwordHash,
-            totpSecret: null,
-            createdAt: $now,
-            updatedAt: $now,
-        );
-
-        return $this->pipelines->createUser()->run(function (User $user): User {
-            // Persist to repository
-            $this->userRepository->save($user);
-            return $user;
-        }, $newUser);
-    }
-
     /**
      * @throws UserNotFoundException when user doesn't exist
      */
@@ -88,16 +59,33 @@ final readonly class UserService implements UserServiceInterface
             ->run(fn(): UserCollection => $this->userRepository->findAll());
     }
 
-    /**
-     * @throws UserNotFoundException when user doesn't exist
-     */
     #[\Override]
-    public function deleteUser(UuidInterface $userId): void
+    public function createUser(Email $email, string $plainPassword): User
     {
-        $deleteUser = $this->userRepository->findById($userId);
-        $this->pipelines->deleteUser()->run(function (User $user): void {
-            $this->userRepository->delete($user);
-        }, $deleteUser);
+        // Check if email already exists
+        if ($this->userRepository->existsByEmail($email)) {
+            throw DuplicateEmailException::forEmail($email);
+        }
+
+        // Hash the password
+        $passwordHash = $this->passwordHasher->hash($plainPassword);
+
+        // Create new user without TOTP
+        $now = new DateTimeImmutable();
+        $newUser = new User(
+            userId: Uuid::uuid4(),
+            email: $email,
+            passwordHash: $passwordHash,
+            totpSecret: null,
+            createdAt: $now,
+            updatedAt: $now,
+        );
+
+        return $this->pipelines->createUser()->run(function (User $user): User {
+            // Persist to repository
+            $this->userRepository->save($user);
+            return $user;
+        }, $newUser);
     }
 
     /**
@@ -114,9 +102,10 @@ final readonly class UserService implements UserServiceInterface
             $this->passwordHasher->hash($plainPassword),
         );
 
-        $this->pipelines->changePassword()->run(function (User $user): void {
+        $this->pipelines->changePassword()->run(function (User $user): null {
             // Persist changes
             $this->userRepository->save($user);
+            return null;
         }, $updatedUser);
     }
 
@@ -156,8 +145,9 @@ final readonly class UserService implements UserServiceInterface
         $updatedUser = $this->userRepository->findById($userId);
         $updatedUser->disableTotp();
 
-        $this->pipelines->disableTotp()->run(function (User $user): void {
+        $this->pipelines->disableTotp()->run(function (User $user): null {
             $this->userRepository->save($user);
+            return null;
         }, $updatedUser);
     }
 
@@ -179,5 +169,18 @@ final readonly class UserService implements UserServiceInterface
         }
 
         return new TotpSecret($secret);
+    }
+
+    /**
+     * @throws UserNotFoundException when user doesn't exist
+     */
+    #[\Override]
+    public function deleteUser(UuidInterface $userId): void
+    {
+        $deleteUser = $this->userRepository->findById($userId);
+        $this->pipelines->deleteUser()->run(function (User $user): null {
+            $this->userRepository->delete($user);
+            return null;
+        }, $deleteUser);
     }
 }

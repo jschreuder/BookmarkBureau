@@ -16,6 +16,10 @@ use Closure;
  *
  * $pipeline = new Pipeline(new Middleware1(), new Middleware2());
  * $result = $pipeline->run(fn($user) => register_user($user), $newUser);
+ *
+ * @template TInput of object|null
+ * @template TOutput of object|null
+ * @implements PipelineInterface<TInput, TOutput>
  */
 final readonly class Pipeline implements PipelineInterface
 {
@@ -27,14 +31,23 @@ final readonly class Pipeline implements PipelineInterface
         $this->middlewares = $middlewares;
     }
 
+    /**
+     * @phpstan-return self<TInput, TOutput>
+     */
     public function withMiddleware(
         PipelineMiddlewareInterface $middleware,
     ): Pipeline {
         $newMiddlewares = $this->middlewares;
         array_push($newMiddlewares, $middleware);
+        // @phpstan-ignore return.type (covariance limitation with generic self-returns)
         return new self(...$newMiddlewares);
     }
 
+    /**
+     * @param Closure(TInput): TOutput $operation
+     * @param TInput $data
+     * @phpstan-return TOutput
+     */
     #[\Override]
     public function run(Closure $operation, ?object $data = null): ?object
     {
@@ -42,6 +55,7 @@ final readonly class Pipeline implements PipelineInterface
             return $operation($data);
         }
 
+        /** @var OperationHandler<TInput, TOutput> $handler */
         $handler = new OperationHandler($this->middlewares);
         return $handler->handle($operation, $data);
     }

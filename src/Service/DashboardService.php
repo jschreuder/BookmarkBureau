@@ -164,8 +164,9 @@ final class DashboardService implements DashboardServiceInterface
         $deleteDashboard = $this->dashboardRepository->findById($dashboardId);
         $this->pipelines
             ->deleteDashboard()
-            ->run(function (Dashboard $dashboard): void {
+            ->run(function (Dashboard $dashboard): null {
                 $this->dashboardRepository->delete($dashboard);
+                return null;
             }, $deleteDashboard);
     }
 }

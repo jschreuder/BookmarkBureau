@@ -2,11 +2,20 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
+use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
+use jschreuder\BookmarkBureau\Composite\FavoriteParams;
+use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\OperationPipeline\NoPipeline;
 use jschreuder\BookmarkBureau\OperationPipeline\PipelineInterface;
 
 final readonly class FavoriteServicePipelines
 {
+    /**
+     * @param PipelineInterface $default
+     * @param PipelineInterface<FavoriteParams, Favorite>|null $addFavorite
+     * @param PipelineInterface<FavoriteParams, null>|null $removeFavorite
+     * @param PipelineInterface<FavoriteCollection, null>|null $reorderFavorites
+     */
     public function __construct(
         private PipelineInterface $default = new NoPipeline(),
         private ?PipelineInterface $addFavorite = null,
@@ -14,16 +23,19 @@ final readonly class FavoriteServicePipelines
         private ?PipelineInterface $reorderFavorites = null,
     ) {}
 
+    /** @return PipelineInterface<FavoriteParams, Favorite> */
     public function addFavorite(): PipelineInterface
     {
         return $this->addFavorite ?? $this->default;
     }
 
+    /** @return PipelineInterface<FavoriteParams, null> */
     public function removeFavorite(): PipelineInterface
     {
         return $this->removeFavorite ?? $this->default;
     }
 
+    /** @return PipelineInterface<FavoriteCollection, null> */
     public function reorderFavorites(): PipelineInterface
     {
         return $this->reorderFavorites ?? $this->default;

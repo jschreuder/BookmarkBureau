@@ -3,6 +3,13 @@
 use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
 
 describe("JwtToken", function () {
+    test("throws exception for empty token", function () {
+        expect(fn() => new JwtToken(""))->toThrow(
+            InvalidArgumentException::class,
+            "JWT token cannot be empty",
+        );
+    });
+
     test("__toString returns the token string", function () {
         $tokenString =
             "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1dXlkIn0.signature";

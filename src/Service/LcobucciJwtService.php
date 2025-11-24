@@ -5,6 +5,7 @@ namespace jschreuder\BookmarkBureau\Service;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
+use InvalidArgumentException;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Token\InvalidTokenStructure;
 use Lcobucci\JWT\Token\Plain;
@@ -32,7 +33,13 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
         private int $rememberMeTtl,
         private ClockInterface $clock,
         private JwtJtiRepositoryInterface $jwtJtiRepository,
-    ) {}
+    ) {
+        if (empty($this->applicationName)) {
+            throw new InvalidArgumentException(
+                "Application name cannot be empty",
+            );
+        }
+    }
 
     #[\Override]
     public function generate(User $user, TokenType $tokenType): JwtToken

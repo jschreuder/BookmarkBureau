@@ -85,8 +85,9 @@ final class TagService implements TagServiceInterface
     public function deleteTag(string $tagName): void
     {
         $deleteTag = $this->tagRepository->findByName($tagName);
-        $this->pipelines->deleteTag()->run(function (Tag $tag): void {
+        $this->pipelines->deleteTag()->run(function (Tag $tag): null {
             $this->tagRepository->delete($tag);
+            return null;
         }, $deleteTag);
     }
 
@@ -105,7 +106,7 @@ final class TagService implements TagServiceInterface
 
         $this->pipelines
             ->assignTagToLink()
-            ->run(function (LinkWithTagName $linkWithTag): void {
+            ->run(function (LinkWithTagName $linkWithTag): null {
                 // Check if tag exists
                 try {
                     $this->tagRepository->findByName(
@@ -129,6 +130,7 @@ final class TagService implements TagServiceInterface
                         $linkWithTag->tagName->value,
                     );
                 }
+                return null;
             }, $newLinkWithTag);
     }
 
@@ -144,11 +146,12 @@ final class TagService implements TagServiceInterface
 
         $this->pipelines
             ->removeTagFromLink()
-            ->run(function (LinkWithTagName $linkWithTag): void {
+            ->run(function (LinkWithTagName $linkWithTag): null {
                 $this->tagRepository->removeFromLinkId(
                     $linkWithTag->link->linkId,
                     $linkWithTag->tagName->value,
                 );
+                return null;
             }, $deleteLinkWithTag);
     }
 

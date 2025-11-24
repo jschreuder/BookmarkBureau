@@ -93,8 +93,9 @@ final class LinkService implements LinkServiceInterface
     public function deleteLink(UuidInterface $linkId): void
     {
         $deleteLink = $this->linkRepository->findById($linkId);
-        $this->pipelines->deleteLink()->run(function (Link $link): void {
+        $this->pipelines->deleteLink()->run(function (Link $link): null {
             $this->linkRepository->delete($link);
+            return null;
         }, $deleteLink);
     }
 
