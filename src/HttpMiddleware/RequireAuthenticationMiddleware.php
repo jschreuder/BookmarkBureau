@@ -7,6 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use UnexpectedValueException;
 
 final readonly class RequireAuthenticationMiddleware implements
     MiddlewareInterface
@@ -22,6 +23,11 @@ final readonly class RequireAuthenticationMiddleware implements
         RequestHandlerInterface $handler,
     ): ResponseInterface {
         $routeName = $request->getAttribute("route");
+        if (!\is_string($routeName) && $routeName !== null) {
+            throw new UnexpectedValueException(
+                "Routename in request must be a string or null.",
+            );
+        }
 
         // If route is public, allow through without authentication
         if (
