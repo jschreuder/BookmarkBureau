@@ -69,7 +69,11 @@ final readonly class PdoLoginRateLimitRepository implements
         // Calculate window cutoff internally
         $since = \date(
             SqlFormat::TIMESTAMP,
-            \strtotime("-{$this->windowMinutes} minutes", strtotime($now)),
+            \strtotime(
+                "-{$this->windowMinutes} minutes",
+                \strtotime($now) ?: null,
+            ) ?:
+            null,
         );
 
         $stmt = $this->connection->prepare("
@@ -118,7 +122,11 @@ final readonly class PdoLoginRateLimitRepository implements
         // Calculate cutoff internally
         $cutoff = \date(
             SqlFormat::TIMESTAMP,
-            \strtotime("-{$this->windowMinutes} minutes", strtotime($now)),
+            \strtotime(
+                "-{$this->windowMinutes} minutes",
+                \strtotime($now) ?: null,
+            ) ?:
+            null,
         );
 
         $stmt = $this->connection->prepare("
