@@ -11,3 +11,6 @@ parameters:
         -
             identifier: missingType.generics
             path: src/ServiceContainer/DatabaseTrait.php
+        -
+            identifier: missingType.generics
+            path: src/Config/DatabaseConfigInterface.php

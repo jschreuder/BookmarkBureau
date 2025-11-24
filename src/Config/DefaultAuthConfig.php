@@ -28,14 +28,17 @@ final readonly class DefaultAuthConfig implements AuthConfigInterface
         public int $totpWindow = 1,
     ) {
         $this->validateJwtSecret();
+        $this->validateWindow();
     }
 
     #[\Override]
     public function getJwtConfiguration(): Configuration
     {
+        /** @var non-empty-string $secret */
+        $secret = $this->jwtSecret;
         return Configuration::forSymmetricSigner(
             new Sha256(),
-            InMemory::plainText($this->jwtSecret),
+            InMemory::plainText($secret),
         )->withValidationConstraints();
     }
 
@@ -51,7 +54,9 @@ final readonly class DefaultAuthConfig implements AuthConfigInterface
     #[\Override]
     public function getTotpVerifier(): TotpVerifierInterface
     {
-        return new OtphpTotpVerifier($this->getClock(), window: $this->totpWindow);
+        /** @var int<1, max> $window */
+        $window = $this->totpWindow;
+        return new OtphpTotpVerifier($this->getClock(), window: $window);
     }
 
     #[\Override]
@@ -81,6 +86,15 @@ final readonly class DefaultAuthConfig implements AuthConfigInterface
                 "JWT secret must be at least 32 bytes (256 bits) for HS256. Current length: " .
                     \strlen($this->jwtSecret) .
                     " bytes.",
+            );
+        }
+    }
+
+    private function validateWindow(): void
+    {
+        if ($this->totpWindow < 1) {
+            throw new IncompleteConfigException(
+                "TOTP window must be at least 1. Current value: {$this->totpWindow}.",
             );
         }
     }
