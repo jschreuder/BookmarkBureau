@@ -43,11 +43,15 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
         return $filtered;
     }
 
+    /**
+     * @param array<int, mixed> $links The links array to filter.
+     * @return array<int, array<string, mixed>> The filtered links array.
+     */
     private function filterLinks(array $links): array
     {
         $filtered = [];
         foreach ($links as $link) {
-            if (!is_array($link)) {
+            if (!\is_array($link)) {
                 continue;
             }
             $filtered[] = [
@@ -93,7 +97,7 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
 
         // Validate each link entry
         $links = $data["links"] ?? [];
-        if (!is_array($links) || empty($links)) {
+        if (!\is_array($links) || empty($links)) {
             throw new ValidationFailedException([
                 "links" => "Links array must not be empty",
             ]);

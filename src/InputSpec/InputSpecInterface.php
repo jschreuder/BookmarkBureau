@@ -17,12 +17,20 @@ use jschreuder\Middle\Exception\ValidationFailedException;
  */
 interface InputSpecInterface
 {
-    /** @return string[] */
+    /** @return array<string> */
     public function getAvailableFields(): array;
 
-    /** @return array the raw data after filtering */
+    /**
+     * @param array<string, mixed> $rawData
+     * @param array<string>|null $fields
+     * @return array<string, mixed>
+     */
     public function filter(array $rawData, ?array $fields = null): array;
 
-    /** @throws ValidationFailedException */
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string>|null $fields
+     * @throws ValidationFailedException
+     */
     public function validate(array $data, ?array $fields = null): void;
 }
