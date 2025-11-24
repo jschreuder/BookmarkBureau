@@ -13,14 +13,14 @@ use Ramsey\Uuid\UuidInterface;
 final readonly class UserServicePipelines
 {
     /**
-     * @param PipelineInterface<UuidInterface, User> $getUser
-     * @param PipelineInterface<Email, User> $getUserByEmail
-     * @param PipelineInterface<null, UserCollection> $listAllUsers
-     * @param PipelineInterface<User, User> $createUser
-     * @param PipelineInterface<User, null> $changePassword
-     * @param PipelineInterface<User, null> $enableTotp
-     * @param PipelineInterface<User, null> $disableTotp
-     * @param PipelineInterface<User, null> $deleteUser
+     * @param PipelineInterface<UuidInterface, User>|null $getUser
+     * @param PipelineInterface<Email, User>|null $getUserByEmail
+     * @param PipelineInterface<null, UserCollection>|null $listAllUsers
+     * @param PipelineInterface<User, User>|null $createUser
+     * @param PipelineInterface<User, null>|null $changePassword
+     * @param PipelineInterface<User, null>|null $enableTotp
+     * @param PipelineInterface<User, null>|null $disableTotp
+     * @param PipelineInterface<User, null>|null $deleteUser
      */
     public function __construct(
         private PipelineInterface $default = new NoPipeline(),

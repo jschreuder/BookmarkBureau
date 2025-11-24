@@ -11,7 +11,6 @@ use jschreuder\BookmarkBureau\OperationPipeline\PipelineInterface;
 final readonly class FavoriteServicePipelines
 {
     /**
-     * @param PipelineInterface $default
      * @param PipelineInterface<FavoriteParams, Favorite>|null $addFavorite
      * @param PipelineInterface<FavoriteParams, null>|null $removeFavorite
      * @param PipelineInterface<FavoriteCollection, null>|null $reorderFavorites

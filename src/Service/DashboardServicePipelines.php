@@ -12,7 +12,6 @@ use Ramsey\Uuid\UuidInterface;
 final readonly class DashboardServicePipelines
 {
     /**
-     * @param PipelineInterface $default
      * @param PipelineInterface<UuidInterface, Dashboard>|null $getDashboard
      * @param PipelineInterface<UuidInterface, DashboardWithCategoriesAndFavorites>|null $getFullDashboard
      * @param PipelineInterface<null, DashboardCollection>|null $listAllDashboards

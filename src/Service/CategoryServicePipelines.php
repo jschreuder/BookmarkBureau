@@ -14,7 +14,6 @@ use Ramsey\Uuid\UuidInterface;
 final readonly class CategoryServicePipelines
 {
     /**
-     * @param PipelineInterface $default
      * @param PipelineInterface<UuidInterface, Category>|null $getCategory
      * @param PipelineInterface<Category, Category>|null $createCategory
      * @param PipelineInterface<Category, Category>|null $updateCategory
