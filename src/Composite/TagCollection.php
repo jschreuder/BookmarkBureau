@@ -7,8 +7,12 @@ use IteratorAggregate;
 use jschreuder\BookmarkBureau\Composite\CollectionTrait;
 use jschreuder\BookmarkBureau\Entity\Tag;
 
+/**
+ * @implements IteratorAggregate<int, Tag>
+ */
 final readonly class TagCollection implements IteratorAggregate, Countable
 {
+    /** @use CollectionTrait<Tag> */
     use CollectionTrait;
 
     public function __construct(Tag ...$tags)

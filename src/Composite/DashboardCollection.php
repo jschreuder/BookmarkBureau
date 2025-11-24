@@ -7,8 +7,12 @@ use IteratorAggregate;
 use jschreuder\BookmarkBureau\Composite\CollectionTrait;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 
+/**
+ * @implements IteratorAggregate<int, Dashboard>
+ */
 final readonly class DashboardCollection implements IteratorAggregate, Countable
 {
+    /** @use CollectionTrait<Dashboard> */
     use CollectionTrait;
 
     public function __construct(Dashboard ...$dashboards)

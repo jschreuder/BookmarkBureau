@@ -10,9 +10,13 @@ use Traversable;
  * Implementing classes must:
  * 1. Store entities in a private array property named $collection
  * 2. Implement a constructor that accepts variadic entities and assigns them to $this->collection
+ * 3. Add @implements IteratorAggregate<int, EntityType> annotation
  *
  * Example implementation:
  * ```
+ *  /**
+ *   * @implements IteratorAggregate<int, Link>
+ *   *\/
  *  final class LinkCollection implements IteratorAggregate, Countable
  *  {
  *      use CollectionTrait;
@@ -24,9 +28,12 @@ use Traversable;
  *      }
  *  }
  * ```
+ *
+ * @template T
  */
 trait CollectionTrait
 {
+    /** @var array<int, T> */
     private readonly array $collection;
 
     public function getIterator(): Traversable
@@ -46,6 +53,9 @@ trait CollectionTrait
         return empty($this->collection);
     }
 
+    /**
+     * @return array<int, T>
+     */
     public function toArray(): array
     {
         return $this->collection;
