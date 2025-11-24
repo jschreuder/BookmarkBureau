@@ -78,8 +78,10 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
     public function verify(JwtToken $token): TokenClaims
     {
         try {
+            /** @var non-empty-string $tokenString */
+            $tokenString = (string) $token;
             /** @var Plain $parsedToken */
-            $parsedToken = $this->jwtConfig->parser()->parse((string) $token);
+            $parsedToken = $this->jwtConfig->parser()->parse($tokenString);
             $tokenType = TokenType::from($parsedToken->claims()->get("type"));
 
             $this->validateTokenConstraints($parsedToken, $tokenType);

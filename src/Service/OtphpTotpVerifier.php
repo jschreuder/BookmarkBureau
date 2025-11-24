@@ -8,22 +8,37 @@ use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 
 final readonly class OtphpTotpVerifier implements TotpVerifierInterface
 {
+    /** @phpstan-param int<0, max> $window */
     public function __construct(
         private ClockInterface $clock,
         private int $window = 1,
-    ) {}
+    ) {
+        if ($window <= 0) {
+            throw new \InvalidArgumentException(
+                "Window must be greater than zero",
+            );
+        }
+    }
 
     #[\Override]
     public function verify(string $code, TotpSecret $secret): bool
     {
+        if (empty($code)) {
+            return false;
+        }
+
         try {
-            $totp = TOTP::create((string) $secret, clock: $this->clock);
+            /** @var non-empty-string secretString */
+            $secretString = (string) $secret;
+            $totp = TOTP::create($secretString, clock: $this->clock);
+            $timestamp = $this->clock->now()->getTimestamp();
+
             return $totp->verify(
                 $code,
-                $this->clock->now()->getTimestamp(),
+                $timestamp > 0 ? $timestamp : null,
                 $this->window,
             );
-        } catch (\Exception) {
+        } catch (\Throwable) {
             return false;
         }
     }
