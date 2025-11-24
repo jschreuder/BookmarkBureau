@@ -12,7 +12,7 @@ use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use RuntimeException;
+use UnexpectedValueException;
 
 final readonly class UserService implements UserServiceInterface
 {
@@ -134,7 +134,9 @@ final readonly class UserService implements UserServiceInterface
             ->run(function (User $user): TotpSecret {
                 $secret = $user->totpSecret;
                 if ($secret === null) {
-                    throw new RuntimeException("TOTP secret is not set");
+                    throw new UnexpectedValueException(
+                        "TOTP secret is not set",
+                    );
                 }
                 $this->userRepository->save($user);
                 return $secret;
