@@ -23,29 +23,40 @@ final readonly class Filter
 
     public function string(bool $allowNull = true): self
     {
-        $value =
-            !$allowNull || $this->value !== null ? (string) $this->value : null;
+        if ($allowNull && $this->value === null) {
+            return new self(null);
+        }
+        /** @phpstan-ignore cast.string */
+        $value = (string) $this->value;
         return new self($value);
     }
 
     public function int(bool $allowNull = true): self
     {
-        $value =
-            !$allowNull || $this->value !== null ? (int) $this->value : null;
+        if ($allowNull && $this->value === null) {
+            return new self(null);
+        }
+        /** @phpstan-ignore cast.int */
+        $value = (int) $this->value;
         return new self($value);
     }
 
     public function float(bool $allowNull = true): self
     {
-        $value =
-            !$allowNull || $this->value !== null ? (float) $this->value : null;
+        if ($allowNull && $this->value === null) {
+            return new self(null);
+        }
+        /** @phpstan-ignore cast.double */
+        $value = (float) $this->value;
         return new self($value);
     }
 
     public function bool(bool $allowNull = true): self
     {
-        $value =
-            !$allowNull || $this->value !== null ? (bool) $this->value : null;
+        if ($allowNull && $this->value === null) {
+            return new self(null);
+        }
+        $value = (bool) $this->value;
         return new self($value);
     }
 
