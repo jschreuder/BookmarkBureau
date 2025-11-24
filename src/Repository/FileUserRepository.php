@@ -144,6 +144,7 @@ final class FileUserRepository implements UserRepositoryInterface
         $this->isLoaded = true;
 
         $data = $this->loadJsonData();
+        /** @var array{user_id: string, email: string, password_hash: string, totp_secret: string|null, created_at: string, updated_at: string} $userArray */
         foreach ($data as $userArray) {
             // JSON stores UUIDs as strings, mapper expects bytes - convert for mapper compatibility
             $userArray["user_id"] = Uuid::fromString(
@@ -156,7 +157,7 @@ final class FileUserRepository implements UserRepositoryInterface
 
     /**
      * Load users from JSON file into memory
-     * @return array<int, array<string, mixed>>
+     * @return array<int, array{user_id: string, email: string, password_hash: string, totp_secret: string|null, created_at: string, updated_at: string}>
      */
     private function loadJsonData(): array
     {
@@ -169,8 +170,9 @@ final class FileUserRepository implements UserRepositoryInterface
             return [];
         }
 
+        /** @var array<int, array{user_id: string, email: string, password_hash: string, totp_secret: string|null, created_at: string, updated_at: string}> $data */
         $data = json_decode($content, true);
-        return \is_array($data) ? $data : [];
+        return $data;
     }
 
     /**
