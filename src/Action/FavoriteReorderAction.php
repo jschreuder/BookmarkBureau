@@ -61,9 +61,11 @@ final readonly class FavoriteReorderAction implements ActionInterface
         );
 
         // Transform each favorite to array
-        return array_map(
-            fn($favorite) => $this->outputSpec->transform($favorite),
-            $reorderedFavorites,
-        );
+        return [
+            "favorites" => array_map(
+                fn($favorite) => $this->outputSpec->transform($favorite),
+                $reorderedFavorites,
+            ),
+        ];
     }
 }

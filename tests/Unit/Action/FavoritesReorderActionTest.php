@@ -8,7 +8,7 @@ use jschreuder\BookmarkBureau\Service\FavoriteServiceInterface;
 use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Uuid;
 
-describe("ReorderFavoritesAction", function () {
+describe("FavoritesReorderAction", function () {
     describe("filter method", function () {
         test("filters dashboard_id and links", function () {
             $favoriteService = Mockery::mock(FavoriteServiceInterface::class);
@@ -163,13 +163,13 @@ describe("ReorderFavoritesAction", function () {
                 ],
             ]);
 
-            expect($result)->toHaveCount(2);
-            expect($result[0])->toHaveKey("dashboard_id");
-            expect($result[0])->toHaveKey("link_id");
-            expect($result[0])->toHaveKey("sort_order");
-            expect($result[1])->toHaveKey("dashboard_id");
-            expect($result[1])->toHaveKey("link_id");
-            expect($result[1])->toHaveKey("sort_order");
+            expect($result["favorites"])->toHaveCount(2);
+            expect($result["favorites"][0])->toHaveKey("dashboard_id");
+            expect($result["favorites"][0])->toHaveKey("link_id");
+            expect($result["favorites"][0])->toHaveKey("sort_order");
+            expect($result["favorites"][1])->toHaveKey("dashboard_id");
+            expect($result["favorites"][1])->toHaveKey("link_id");
+            expect($result["favorites"][1])->toHaveKey("sort_order");
         });
 
         test("returns empty array when collection is empty", function () {
@@ -198,7 +198,7 @@ describe("ReorderFavoritesAction", function () {
                 "links" => [["link_id" => $linkId, "sort_order" => 1]],
             ]);
 
-            expect($result)->toBe([]);
+            expect($result)->toBe(["favorites" => []]);
         });
 
         test("transforms each favorite with correct sort_order", function () {
@@ -235,8 +235,8 @@ describe("ReorderFavoritesAction", function () {
                 ],
             ]);
 
-            expect($result[0]["sort_order"])->toBe(5);
-            expect($result[1]["sort_order"])->toBe(10);
+            expect($result["favorites"][0]["sort_order"])->toBe(5);
+            expect($result["favorites"][1]["sort_order"])->toBe(10);
         });
     });
 
@@ -278,9 +278,9 @@ describe("ReorderFavoritesAction", function () {
             try {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
-                expect($result)->toHaveCount(2);
-                expect($result[0])->toHaveKey("sort_order");
-                expect($result[1])->toHaveKey("sort_order");
+                expect($result["favorites"])->toHaveCount(2);
+                expect($result["favorites"][0])->toHaveKey("sort_order");
+                expect($result["favorites"][1])->toHaveKey("sort_order");
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
