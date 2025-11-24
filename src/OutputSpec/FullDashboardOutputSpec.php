@@ -13,9 +13,12 @@ use jschreuder\BookmarkBureau\Composite\DashboardWithCategoriesAndFavorites;
  *
  * This is an example of OutputSpec composition pattern, where a complex object is transformed
  * by delegating to simpler, single-responsibility OutputSpecs.
+ *
+ * @implements OutputSpecInterface<DashboardWithCategoriesAndFavorites>
  */
 final readonly class FullDashboardOutputSpec implements OutputSpecInterface
 {
+    /** @use OutputSpecTrait<DashboardWithCategoriesAndFavorites> */
     use OutputSpecTrait;
 
     public function __construct(
@@ -30,9 +33,7 @@ final readonly class FullDashboardOutputSpec implements OutputSpecInterface
         return $data instanceof DashboardWithCategoriesAndFavorites;
     }
 
-    /**
-     * @param DashboardWithCategoriesAndFavorites $dashboardView
-     */
+    /** @param DashboardWithCategoriesAndFavorites $dashboardView */
     #[\Override]
     private function doTransform(object $dashboardView): array
     {

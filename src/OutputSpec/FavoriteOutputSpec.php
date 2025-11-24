@@ -5,8 +5,12 @@ namespace jschreuder\BookmarkBureau\OutputSpec;
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 
+/**
+ * @implements OutputSpecInterface<Favorite>
+ */
 final readonly class FavoriteOutputSpec implements OutputSpecInterface
 {
+    /** @use OutputSpecTrait<Favorite> */
     use OutputSpecTrait;
 
     #[\Override]
@@ -15,9 +19,7 @@ final readonly class FavoriteOutputSpec implements OutputSpecInterface
         return $data instanceof Favorite;
     }
 
-    /**
-     * @param Favorite $favorite
-     */
+    /** @param Favorite $favorite */
     #[\Override]
     private function doTransform(object $favorite): array
     {

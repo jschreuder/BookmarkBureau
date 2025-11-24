@@ -5,8 +5,12 @@ namespace jschreuder\BookmarkBureau\OutputSpec;
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
 
+/**
+ * @implements OutputSpecInterface<CategoryLink>
+ */
 final readonly class CategoryLinkOutputSpec implements OutputSpecInterface
 {
+    /** @use OutputSpecTrait<CategoryLink> */
     use OutputSpecTrait;
 
     #[\Override]

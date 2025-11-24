@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Action;
 
+use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
@@ -13,6 +14,7 @@ use Ramsey\Uuid\Uuid;
  */
 final readonly class LinkReadAction implements ActionInterface
 {
+    /** @param  OutputSpecInterface<Link> $outputSpec */
     public function __construct(
         private LinkServiceInterface $linkService,
         private InputSpecInterface $inputSpec,

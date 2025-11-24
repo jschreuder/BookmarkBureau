@@ -15,6 +15,8 @@ namespace jschreuder\BookmarkBureau\OutputSpec;
  * boundary specification rather than just their technical function.
  *
  * They may also be used to enrich given data if necessary.
+ *
+ * @template T of object
  */
 interface OutputSpecInterface
 {
@@ -30,7 +32,8 @@ interface OutputSpecInterface
      * and transforms them into plain arrays that can be serialized to JSON, XML,
      * or other formats.
      *
-     * @return array Serializable array representation
+     * @param T $data Domain object to transform into array representation
+     * @return array<string, mixed> Serializable array representation
      * @throws \InvalidArgumentException When data is of unsupported type
      */
     public function transform(object $data): array;

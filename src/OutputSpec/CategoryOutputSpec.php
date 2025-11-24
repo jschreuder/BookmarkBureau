@@ -5,8 +5,12 @@ namespace jschreuder\BookmarkBureau\OutputSpec;
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\Entity\Category;
 
+/**
+ * @implements OutputSpecInterface<Category>
+ */
 final readonly class CategoryOutputSpec implements OutputSpecInterface
 {
+    /** @use OutputSpecTrait<Category> */
     use OutputSpecTrait;
 
     #[\Override]
@@ -15,9 +19,7 @@ final readonly class CategoryOutputSpec implements OutputSpecInterface
         return $data instanceof Category;
     }
 
-    /**
-     * @param  Category $category
-     */
+    /** @param  Category $category */
     #[\Override]
     private function doTransform(object $category): array
     {

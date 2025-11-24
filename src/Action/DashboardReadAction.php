@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Action;
 
+use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
@@ -13,6 +14,7 @@ use Ramsey\Uuid\Uuid;
  */
 final readonly class DashboardReadAction implements ActionInterface
 {
+    /** @param  OutputSpecInterface<Dashboard> $outputSpec */
     public function __construct(
         private DashboardServiceInterface $dashboardService,
         private InputSpecInterface $inputSpec,

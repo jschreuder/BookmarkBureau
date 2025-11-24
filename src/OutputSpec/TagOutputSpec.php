@@ -4,8 +4,12 @@ namespace jschreuder\BookmarkBureau\OutputSpec;
 
 use jschreuder\BookmarkBureau\Entity\Tag;
 
+/**
+ * @implements OutputSpecInterface<Tag>
+ */
 final readonly class TagOutputSpec implements OutputSpecInterface
 {
+    /** @use OutputSpecTrait<Tag> */
     use OutputSpecTrait;
 
     #[\Override]
@@ -14,9 +18,7 @@ final readonly class TagOutputSpec implements OutputSpecInterface
         return $data instanceof Tag;
     }
 
-    /**
-     * @param  Tag $tag
-     */
+    /** @param  Tag $tag */
     #[\Override]
     private function doTransform(object $tag): array
     {

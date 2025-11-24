@@ -9,11 +9,20 @@ use InvalidArgumentException;
  * exception if it's not supported, and delegates the transform activities to
  * a new abstract private doTransform() method. Thus preventing the same
  * if-statement in every OutputSpec
+ *
+ * @template T of object
  */
 trait OutputSpecTrait
 {
     abstract public function supports(object $data): bool;
 
+    /**
+     * Transforms the given domain object into an array representation.
+     *
+     * @param T $data Domain object to transform into array representation
+     * @return array<string, mixed> Serializable array representation
+     * @throws InvalidArgumentException When data is of unsupported type
+     */
     public function transform(object $data): array
     {
         if (!$this->supports($data)) {
@@ -27,5 +36,9 @@ trait OutputSpecTrait
         return $this->doTransform($data);
     }
 
+    /**
+     * @param T $data Domain object to transform into array representation
+     * @return array<string, mixed> Serializable array representation
+     */
     abstract private function doTransform(object $data): array;
 }

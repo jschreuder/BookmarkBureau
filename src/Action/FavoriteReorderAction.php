@@ -3,6 +3,7 @@
 namespace jschreuder\BookmarkBureau\Action;
 
 use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
+use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\FavoriteServiceInterface;
@@ -14,6 +15,7 @@ use Ramsey\Uuid\Uuid;
  */
 final readonly class FavoriteReorderAction implements ActionInterface
 {
+    /** @param  OutputSpecInterface<Favorite> $outputSpec */
     public function __construct(
         private FavoriteServiceInterface $favoriteService,
         private InputSpecInterface $inputSpec,

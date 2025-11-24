@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Action;
 
+use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
@@ -13,6 +14,7 @@ use Ramsey\Uuid\Uuid;
  */
 final readonly class CategoryUpdateAction implements ActionInterface
 {
+    /** @param  OutputSpecInterface<Category> $outputSpec */
     public function __construct(
         private CategoryServiceInterface $categoryService,
         private InputSpecInterface $inputSpec,

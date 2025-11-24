@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Action;
 
+use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 
@@ -12,6 +13,7 @@ use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
  */
 final readonly class DashboardListAction implements ActionInterface
 {
+    /** @param  OutputSpecInterface<Dashboard> $outputSpec */
     public function __construct(
         private DashboardServiceInterface $dashboardService,
         private OutputSpecInterface $outputSpec,

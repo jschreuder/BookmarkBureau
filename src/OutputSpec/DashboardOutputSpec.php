@@ -5,8 +5,12 @@ namespace jschreuder\BookmarkBureau\OutputSpec;
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 
+/**
+ * @implements OutputSpecInterface<Dashboard>
+ */
 final readonly class DashboardOutputSpec implements OutputSpecInterface
 {
+    /** @use OutputSpecTrait<Dashboard> */
     use OutputSpecTrait;
 
     #[\Override]
@@ -15,9 +19,7 @@ final readonly class DashboardOutputSpec implements OutputSpecInterface
         return $data instanceof Dashboard;
     }
 
-    /**
-     * @param  Dashboard $dashboard
-     */
+    /** @param  Dashboard $dashboard */
     #[\Override]
     private function doTransform(object $dashboard): array
     {

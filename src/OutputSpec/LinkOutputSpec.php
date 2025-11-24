@@ -5,8 +5,12 @@ namespace jschreuder\BookmarkBureau\OutputSpec;
 use DateTimeInterface;
 use jschreuder\BookmarkBureau\Entity\Link;
 
+/**
+ * @implements OutputSpecInterface<Link>
+ */
 final readonly class LinkOutputSpec implements OutputSpecInterface
 {
+    /** @use OutputSpecTrait<Link> */
     use OutputSpecTrait;
 
     public function __construct(
@@ -19,9 +23,7 @@ final readonly class LinkOutputSpec implements OutputSpecInterface
         return $data instanceof Link;
     }
 
-    /**
-     * @param  Link $link
-     */
+    /** @param  Link $link */
     #[\Override]
     private function doTransform(object $link): array
     {

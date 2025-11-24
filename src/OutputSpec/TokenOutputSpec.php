@@ -4,8 +4,12 @@ namespace jschreuder\BookmarkBureau\OutputSpec;
 
 use jschreuder\BookmarkBureau\Entity\Value\TokenResponse;
 
+/**
+ * @implements OutputSpecInterface<TokenResponse>
+ */
 final readonly class TokenOutputSpec implements OutputSpecInterface
 {
+    /** @use OutputSpecTrait<TokenResponse> */
     use OutputSpecTrait;
 
     #[\Override]
@@ -14,6 +18,7 @@ final readonly class TokenOutputSpec implements OutputSpecInterface
         return $data instanceof TokenResponse;
     }
 
+    /** @param  TokenResponse $tokenResponse */
     #[\Override]
     private function doTransform(object $tokenResponse): array
     {

@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Action;
 
+use jschreuder\BookmarkBureau\Entity\Tag;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
@@ -14,6 +15,7 @@ use jschreuder\BookmarkBureau\Service\TagServiceInterface;
  */
 final readonly class TagReadAction implements ActionInterface
 {
+    /** @param  OutputSpecInterface<Tag> $outputSpec */
     public function __construct(
         private TagServiceInterface $tagService,
         private InputSpecInterface $inputSpec,
