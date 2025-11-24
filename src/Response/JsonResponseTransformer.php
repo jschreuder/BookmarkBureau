@@ -19,7 +19,7 @@ final readonly class JsonResponseTransformer implements
     /**
      * Transform array into JSON response
      *
-     * @param array $data Array to serialize as JSON
+     * @param array<string, mixed> $data Array to serialize as JSON
      * @param int $statusCode HTTP status code
      * @param array<string, string> $headers Additional headers
      * @return ResponseInterface JSON response with Content-Type: application/json

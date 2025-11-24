@@ -38,7 +38,7 @@ interface ResponseTransformerInterface
      * - Apply any additional headers
      * - Handle serialization errors appropriately
      *
-     * @param array $data The data to transform into a response body
+     * @param array<string, mixed> $data The data to transform into a response body
      * @param int $statusCode HTTP status code (default: 200)
      * @param array<string, string> $headers Additional headers to include
      * @return ResponseInterface PSR-7 response object
