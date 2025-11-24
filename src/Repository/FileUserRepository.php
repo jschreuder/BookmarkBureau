@@ -145,11 +145,19 @@ final class FileUserRepository implements UserRepositoryInterface
 
         $data = $this->loadJsonData();
         foreach ($data as $userArray) {
-            $user = $this->mapArrayToUser($userArray);
+            // JSON stores UUIDs as strings, mapper expects bytes - convert for mapper compatibility
+            $userArray["user_id"] = Uuid::fromString(
+                $userArray["user_id"],
+            )->getBytes();
+            $user = $this->mapper->mapToEntity($userArray);
             $this->users[$user->userId->toString()] = $user;
         }
     }
 
+    /**
+     * Load users from JSON file into memory
+     * @return array<int, array<string, mixed>>
+     */
     private function loadJsonData(): array
     {
         if (!file_exists($this->filePath)) {
@@ -172,7 +180,9 @@ final class FileUserRepository implements UserRepositoryInterface
     {
         $data = [];
         foreach ($this->users as $user) {
-            $data[] = $this->mapUserToArray($user);
+            $row = $this->mapper->mapToRow($user);
+            $row["user_id"] = Uuid::fromBytes($row["user_id"])->toString();
+            $data[] = $row;
         }
 
         $directory = dirname($this->filePath);
@@ -192,41 +202,5 @@ final class FileUserRepository implements UserRepositoryInterface
                 "Failed to write users to file: {$this->filePath}",
             );
         }
-    }
-
-    /**
-     * Map a User entity to an array for JSON serialization
-     * Uses mapper to transform UUIDs to string format for JSON storage
-     */
-    private function mapUserToArray(User $user): array
-    {
-        $row = $this->mapper->mapToRow($user);
-        // Convert binary UUID back to string for JSON storage
-        return [
-            "user_id" => $user->userId->toString(),
-            "email" => $row["email"],
-            "password_hash" => $row["password_hash"],
-            "totp_secret" => $row["totp_secret"],
-            "created_at" => $row["created_at"],
-            "updated_at" => $row["updated_at"],
-        ];
-    }
-
-    /**
-     * Map an array from JSON to a User entity
-     * Converts string UUID to bytes format expected by mapper
-     */
-    private function mapArrayToUser(array $data): User
-    {
-        // Convert string UUID to bytes for mapper compatibility
-        $mappedData = [
-            "user_id" => Uuid::fromString($data["user_id"])->getBytes(),
-            "email" => $data["email"],
-            "password_hash" => $data["password_hash"],
-            "totp_secret" => $data["totp_secret"],
-            "created_at" => $data["created_at"],
-            "updated_at" => $data["updated_at"],
-        ];
-        return $this->mapper->mapToEntity($mappedData);
     }
 }
