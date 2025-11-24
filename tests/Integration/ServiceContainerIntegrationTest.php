@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use jschreuder\BookmarkBureau\Config\DefaultAuthConfig;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
@@ -15,7 +16,7 @@ use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\JwtJtiRepositoryInterface;
-use jschreuder\BookmarkBureau\ServiceContainer;
+use jschreuder\BookmarkBureau\ServiceContainer\DefaultServiceContainer;
 use jschreuder\BookmarkBureau\Exception\IncompleteConfigException;
 use jschreuder\Middle\Router\RouterInterface;
 use jschreuder\Middle\ApplicationStack;
@@ -32,7 +33,9 @@ describe("ServiceContainer Integration", function () {
             "container instantiates successfully with test config",
             function () {
                 $container = TestContainerHelper::createContainerInstance();
-                expect($container)->toBeInstanceOf(ServiceContainer::class);
+                expect($container)->toBeInstanceOf(
+                    DefaultServiceContainer::class,
+                );
             },
         );
     });
@@ -126,10 +129,9 @@ describe("ServiceContainer Integration", function () {
         test(
             "provides UserRepository with configurable storage type",
             function () {
-                $config = TestContainerHelper::createTestConfig();
-                $config["users.storage.type"] = "file";
-                $compiledClass = TestContainerHelper::getCompiledContainerClass();
-                $container = $compiledClass->newInstance($config);
+                // The storage type is determined by the UserStorageConfig implementation
+                // FileUserStorageConfig already configured in TestContainerHelper
+                $container = TestContainerHelper::createContainerInstance();
                 $repository = $container->getUserRepository();
 
                 expect($repository)->toBeInstanceOf(
@@ -208,26 +210,30 @@ describe("ServiceContainer Integration", function () {
         test(
             "throws IncompleteConfigException when JWT secret is not configured",
             function () {
-                $config = TestContainerHelper::createTestConfig();
-                $config["auth.jwt_secret"] = "";
-                $compiledClass = TestContainerHelper::getCompiledContainerClass();
-                $container = $compiledClass->newInstance($config);
-
-                expect(fn() => $container->getJwtService())->toThrow(
-                    IncompleteConfigException::class,
-                );
+                // Exception is thrown when creating DefaultAuthConfig with empty JWT secret
+                expect(
+                    fn() => new DefaultAuthConfig(
+                        jwtSecret: "",
+                        applicationName: "bookmark-bureau",
+                        sessionTtl: 86400,
+                        rememberMeTtl: 1209600,
+                    ),
+                )->toThrow(IncompleteConfigException::class);
             },
         );
 
         test(
             "throws IncompleteConfigException when JWT secret is too short",
             function () {
-                $config = TestContainerHelper::createTestConfig();
-                $config["auth.jwt_secret"] = "too-short"; // Only 9 bytes, needs 32
-                $compiledClass = TestContainerHelper::getCompiledContainerClass();
-                $container = $compiledClass->newInstance($config);
-
-                expect(fn() => $container->getJwtService())->toThrow(
+                // Exception is thrown when creating DefaultAuthConfig with short JWT secret
+                expect(
+                    fn() => new DefaultAuthConfig(
+                        jwtSecret: "too-short", // Only 9 bytes, needs 32
+                        applicationName: "bookmark-bureau",
+                        sessionTtl: 86400,
+                        rememberMeTtl: 1209600,
+                    ),
+                )->toThrow(
                     IncompleteConfigException::class,
                     "JWT secret must be at least 32 bytes",
                 );

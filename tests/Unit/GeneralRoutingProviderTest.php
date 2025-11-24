@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
 
 use jschreuder\BookmarkBureau\GeneralRoutingProvider;
-use jschreuder\BookmarkBureau\ServiceContainer;
+use jschreuder\BookmarkBureau\ServiceContainer\DefaultServiceContainer;
+use jschreuder\BookmarkBureau\Config\RateLimitConfigInterface;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
@@ -17,7 +18,7 @@ use jschreuder\Middle\Controller\ControllerInterface;
 describe("GeneralRoutingProvider", function () {
     function createMockContainer()
     {
-        $container = Mockery::mock(ServiceContainer::class);
+        $container = Mockery::mock(DefaultServiceContainer::class);
         $container
             ->shouldReceive("getLinkService")
             ->andReturn(Mockery::mock(LinkServiceInterface::class));
@@ -45,10 +46,15 @@ describe("GeneralRoutingProvider", function () {
         $container
             ->shouldReceive("getRateLimitService")
             ->andReturn(Mockery::mock(RateLimitServiceInterface::class));
-        $container
-            ->shouldReceive("config")
-            ->with("ratelimit.trust_proxy_headers")
+
+        $rateLimitConfig = Mockery::mock(RateLimitConfigInterface::class);
+        $rateLimitConfig
+            ->shouldReceive("trustProxyHeadersBool")
             ->andReturn(false);
+        $container
+            ->shouldReceive("getRateLimitConfig")
+            ->andReturn($rateLimitConfig);
+
         return $container;
     }
 
@@ -480,7 +486,7 @@ describe("GeneralRoutingProvider", function () {
                     ->shouldReceive("get", "post", "put", "delete")
                     ->andReturnNull();
 
-                $container = Mockery::mock(ServiceContainer::class);
+                $container = Mockery::mock(DefaultServiceContainer::class);
                 $container->shouldReceive("getLinkService")->never();
                 $container->shouldReceive("getCategoryService")->never();
                 $container->shouldReceive("getDashboardService")->never();
@@ -510,7 +516,7 @@ describe("GeneralRoutingProvider", function () {
             $router->shouldReceive("post", "put", "delete")->andReturn($router);
 
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $container = Mockery::mock(ServiceContainer::class);
+            $container = Mockery::mock(DefaultServiceContainer::class);
             $container
                 ->shouldReceive("getLinkService")
                 ->andReturn($linkService);

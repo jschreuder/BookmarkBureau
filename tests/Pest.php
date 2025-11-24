@@ -55,7 +55,12 @@ use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
-use jschreuder\BookmarkBureau\ServiceContainer;
+use jschreuder\BookmarkBureau\ServiceContainer\DefaultServiceContainer;
+use jschreuder\BookmarkBureau\Config\SqliteDatabaseConfig;
+use jschreuder\BookmarkBureau\Config\DefaultAuthConfig;
+use jschreuder\BookmarkBureau\Config\MonologLoggerConfig;
+use jschreuder\BookmarkBureau\Config\DefaultRateLimitConfig;
+use jschreuder\BookmarkBureau\Config\FileUserStorageConfig;
 use jschreuder\MiddleDi\DiCompiler;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -212,7 +217,7 @@ class TestContainerHelper
         static $compiledClass = null;
 
         if ($compiledClass === null) {
-            $compiler = new DiCompiler(ServiceContainer::class);
+            $compiler = new DiCompiler(DefaultServiceContainer::class);
             $compiledClass = $compiler->compile();
         }
 
@@ -220,43 +225,59 @@ class TestContainerHelper
     }
 
     /**
-     * Create a test configuration for the container.
+     * Create test configuration objects for the container.
      * Uses in-memory SQLite database for testing.
      */
     public static function createTestConfig(): array
     {
+        $databaseConfig = new SqliteDatabaseConfig(dsn: "sqlite::memory:");
+
+        $rateLimitDatabaseConfig = new SqliteDatabaseConfig(
+            dsn: "sqlite:" . sys_get_temp_dir() . "/test_ratelimit.db",
+        );
+
+        $authConfig = new DefaultAuthConfig(
+            jwtSecret: "test-secret-key-32-bytes-long!!!",
+            applicationName: "bookmark-bureau",
+            sessionTtl: 86400,
+            rememberMeTtl: 1209600,
+        );
+
+        $loggerConfig = new MonologLoggerConfig(
+            name: "test-logger",
+            logPath: "php://memory",
+            enableRequestLogging: false,
+        );
+
+        $rateLimitConfig = new DefaultRateLimitConfig(
+            database: $rateLimitDatabaseConfig,
+            usernameThreshold: 10,
+            ipThreshold: 100,
+            windowMinutes: 10,
+            trustProxyHeaders: false,
+        );
+
+        $userStorageConfig = new FileUserStorageConfig(
+            filePath: sys_get_temp_dir() . "/test_users.json",
+        );
+
         return [
-            "site.url" => "http://test-localhost",
-            "logger.name" => "test-logger",
-            "logger.path" => "php://memory",
-            "db.dsn" => "sqlite:",
-            "db.dbname" => ":memory:",
-            "db.user" => "",
-            "db.pass" => "",
-            "ratelimit.db.dsn" =>
-                "sqlite:" . sys_get_temp_dir() . "/test_ratelimit.db",
-            "ratelimit.db.dbname" => "",
-            "ratelimit.db.user" => "",
-            "ratelimit.db.pass" => "",
-            "ratelimit.username_threshold" => 10,
-            "ratelimit.ip_threshold" => 100,
-            "ratelimit.window_minutes" => 10,
-            "ratelimit.trust_proxy_headers" => false,
-            "users.storage.type" => "pdo",
-            "users.storage.path" => sys_get_temp_dir() . "/test_users.json",
-            "auth.jwt_secret" => "test-secret-key-32-bytes-long!!!", // Exactly 32 bytes
-            "auth.application_name" => "bookmark-bureau",
-            "auth.session_ttl" => 86400,
-            "auth.remember_me_ttl" => 1209600,
+            "databaseConfig" => $databaseConfig,
+            "rateLimitDatabaseConfig" => $rateLimitDatabaseConfig,
+            "authConfig" => $authConfig,
+            "loggerConfig" => $loggerConfig,
+            "rateLimitConfig" => $rateLimitConfig,
+            "userStorageConfig" => $userStorageConfig,
+            "siteUrl" => "http://test-localhost",
         ];
     }
 
     /**
      * Create a new container instance with test configuration.
      */
-    public static function createContainerInstance(): ServiceContainer
+    public static function createContainerInstance(): DefaultServiceContainer
     {
         $compiledClass = self::getCompiledContainerClass();
-        return $compiledClass->newInstance(self::createTestConfig());
+        return $compiledClass->newInstance(...self::createTestConfig());
     }
 }
