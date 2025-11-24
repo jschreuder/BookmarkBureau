@@ -137,9 +137,7 @@ final class FileJwtJtiRepository implements JwtJtiRepositoryInterface
             // Write back the filtered lines
             if (empty($lines)) {
                 // If no lines remain, remove the file
-                if (file_exists($this->filePath)) {
-                    unlink($this->filePath);
-                }
+                unlink($this->filePath);
             } else {
                 // Write the remaining lines
                 if (
