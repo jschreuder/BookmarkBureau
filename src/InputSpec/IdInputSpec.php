@@ -22,6 +22,7 @@ final class IdInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
+    /** @return array{id: string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -40,9 +41,11 @@ final class IdInputSpec implements InputSpecInterface
             };
         }
 
+        /** @var array{id: string} */
         return $filtered;
     }
 
+    /** @param array{id: string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {

@@ -24,6 +24,7 @@ final class CategoryInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
+    /** @return array{id: string, dashboard_id: string, title: string, color: ?string, sort_order: int} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -57,9 +58,11 @@ final class CategoryInputSpec implements InputSpecInterface
             };
         }
 
+        /** @var array{id: string, dashboard_id: string, title: string, color: ?string, sort_order: int} */
         return $filtered;
     }
 
+    /** @param array{id: string, dashboard_id: string, title: string, color: ?string, sort_order: int} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {

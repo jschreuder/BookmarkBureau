@@ -18,6 +18,7 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
+    /** @return array{dashboard_id: string, links: array<int, array{link_id: string, sort_order: int}>} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -29,23 +30,26 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
                     ->string(allowNull: false)
                     ->trim()
                     ->done(),
-                "links" => $this->filterLinks(
-                    Filter::start($rawData, "links", [])
-                        ->do(fn($val) => is_array($val) ? $val : [])
-                        ->done(),
-                ),
+                "links" => (function () use ($rawData): array {
+                    $links = Filter::start($rawData, "links", [])
+                        ->do(fn($val) => \is_array($val) ? $val : [])
+                        ->done();
+                    /** @var array<int, mixed> $links */
+                    return $this->filterLinks($links);
+                })(),
                 default => throw new InvalidArgumentException(
                     "Unknown field: {$field}",
                 ),
             };
         }
 
+        /** @var array{dashboard_id: string, links: array<int, array{link_id: string, sort_order: int}>} */
         return $filtered;
     }
 
     /**
-     * @param array<int, mixed> $links The links array to filter.
-     * @return array<int, array<string, mixed>> The filtered links array.
+     * @param array<int, mixed> $links
+     * @return array<int, array{link_id: string, sort_order: int}>
      */
     private function filterLinks(array $links): array
     {
@@ -54,6 +58,7 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
             if (!\is_array($link)) {
                 continue;
             }
+            /** @var array<string, mixed> $link */
             $filtered[] = [
                 "link_id" => Filter::start($link, "link_id", "")
                     ->string(allowNull: false)
@@ -65,9 +70,11 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
             ];
         }
 
+        /** @var array<int, array{link_id: string, sort_order: int}> */
         return $filtered;
     }
 
+    /** @param array{dashboard_id: string, links: array<int, array{link_id: string, sort_order: int}>} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
@@ -96,8 +103,8 @@ final class ReorderFavoritesInputSpec implements InputSpecInterface
         }
 
         // Validate each link entry
-        $links = $data["links"] ?? [];
-        if (!\is_array($links) || empty($links)) {
+        $links = $data["links"];
+        if (empty($links)) {
             throw new ValidationFailedException([
                 "links" => "Links array must not be empty",
             ]);

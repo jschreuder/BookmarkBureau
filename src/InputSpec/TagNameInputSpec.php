@@ -22,6 +22,7 @@ final class TagNameInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
+    /** @return array{tag_name: string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -40,9 +41,11 @@ final class TagNameInputSpec implements InputSpecInterface
             };
         }
 
+        /** @var array{tag_name: string} */
         return $filtered;
     }
 
+    /** @param array{tag_name: string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {

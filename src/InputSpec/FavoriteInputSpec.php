@@ -18,6 +18,7 @@ final class FavoriteInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
+    /** @return array{dashboard_id: string, link_id: string, sort_order: ?int} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -42,9 +43,11 @@ final class FavoriteInputSpec implements InputSpecInterface
             };
         }
 
+        /** @var array{dashboard_id: string, link_id: string, sort_order: ?int} */
         return $filtered;
     }
 
+    /** @param array{dashboard_id: string, link_id: string, sort_order: ?int} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {

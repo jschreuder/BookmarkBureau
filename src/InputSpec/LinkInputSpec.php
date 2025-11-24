@@ -18,6 +18,7 @@ final class LinkInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
+    /** @return array{id: string, url: string, title: string, description: string, icon: ?string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -53,9 +54,11 @@ final class LinkInputSpec implements InputSpecInterface
             };
         }
 
+        /** @var array{id: string, url: string, title: string, description: string, icon: ?string} */
         return $filtered;
     }
 
+    /** @param array{id: string, url: string, title: string, description: string, icon: ?string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {

@@ -18,6 +18,7 @@ final class CategoryLinkInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
+    /** @return array{id: string, link_id: string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -39,9 +40,11 @@ final class CategoryLinkInputSpec implements InputSpecInterface
             };
         }
 
+        /** @var array{id: string, link_id: string} */
         return $filtered;
     }
 
+    /** @param array{id: string, link_id: string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
@@ -50,7 +53,10 @@ final class CategoryLinkInputSpec implements InputSpecInterface
         foreach ($fields as $field) {
             match ($field) {
                 "id" => $validator->key("id", Validator::notEmpty()->uuid()),
-                "link_id" => $validator->key("link_id", Validator::notEmpty()->uuid()),
+                "link_id" => $validator->key(
+                    "link_id",
+                    Validator::notEmpty()->uuid(),
+                ),
                 default => throw new InvalidArgumentException(
                     "Unknown field: {$field}",
                 ),

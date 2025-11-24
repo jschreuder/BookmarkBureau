@@ -23,6 +23,7 @@ final class LoginInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
+    /** @return array{email: string, password: string, remember_me: bool, totp_code: ?string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -52,9 +53,11 @@ final class LoginInputSpec implements InputSpecInterface
             };
         }
 
+        /** @var array{email: string, password: string, remember_me: bool, totp_code: ?string} */
         return $filtered;
     }
 
+    /** @param array{email: string, password: string, remember_me: bool, totp_code: ?string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {

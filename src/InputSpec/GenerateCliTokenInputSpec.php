@@ -18,6 +18,7 @@ final class GenerateCliTokenInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
+    /** @return array{email: string, password: string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -40,9 +41,11 @@ final class GenerateCliTokenInputSpec implements InputSpecInterface
             };
         }
 
+        /** @var array{email: string, password: string} */
         return $filtered;
     }
 
+    /** @param array{email: string, password: string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
