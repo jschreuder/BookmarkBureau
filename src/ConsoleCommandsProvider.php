@@ -11,6 +11,7 @@ use jschreuder\BookmarkBureau\Command\User\GenerateCliTokenCommand;
 use jschreuder\BookmarkBureau\Command\User\RevokeCliTokenCommand;
 use jschreuder\BookmarkBureau\Command\Security\CreateRateLimitDatabaseCommand;
 use jschreuder\BookmarkBureau\Command\Security\RateLimitCleanupCommand;
+use jschreuder\BookmarkBureau\InputSpec\GenerateCliTokenInputSpec;
 use Symfony\Component\Console\Application;
 
 final readonly class ConsoleCommandsProvider
@@ -34,6 +35,7 @@ final readonly class ConsoleCommandsProvider
             new GenerateCliTokenCommand(
                 $this->container->getUserService(),
                 $this->container->getJwtService(),
+                new GenerateCliTokenInputSpec(),
             ),
         );
         $application->add(
