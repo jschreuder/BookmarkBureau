@@ -17,6 +17,6 @@ final readonly class TagNameCollection implements IteratorAggregate, Countable
 
     public function __construct(TagName ...$tagNames)
     {
-        $this->collection = $tagNames;
+        $this->collection = array_values($tagNames);
     }
 }

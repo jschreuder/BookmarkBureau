@@ -19,6 +19,6 @@ final readonly class CategoryLinkCollection implements
 
     public function __construct(CategoryLink ...$categoryLinks)
     {
-        $this->collection = $categoryLinks;
+        $this->collection = array_values($categoryLinks);
     }
 }

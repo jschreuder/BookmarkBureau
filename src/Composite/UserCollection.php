@@ -16,6 +16,6 @@ final readonly class UserCollection implements IteratorAggregate, Countable
 
     public function __construct(User ...$users)
     {
-        $this->collection = $users;
+        $this->collection = array_values($users);
     }
 }

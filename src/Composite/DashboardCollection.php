@@ -17,6 +17,6 @@ final readonly class DashboardCollection implements IteratorAggregate, Countable
 
     public function __construct(Dashboard ...$dashboards)
     {
-        $this->collection = $dashboards;
+        $this->collection = array_values($dashboards);
     }
 }

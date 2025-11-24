@@ -17,6 +17,6 @@ final readonly class CategoryCollection implements IteratorAggregate, Countable
 
     public function __construct(Category ...$categories)
     {
-        $this->collection = $categories;
+        $this->collection = array_values($categories);
     }
 }

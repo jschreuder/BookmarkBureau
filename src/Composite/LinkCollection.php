@@ -17,6 +17,6 @@ final readonly class LinkCollection implements IteratorAggregate, Countable
 
     public function __construct(Link ...$links)
     {
-        $this->collection = $links;
+        $this->collection = array_values($links);
     }
 }
