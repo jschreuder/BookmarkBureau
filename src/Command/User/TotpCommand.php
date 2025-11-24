@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Command\User;
 
+use InvalidArgumentException;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
@@ -38,8 +39,15 @@ final class TotpCommand extends Command
         InputInterface $input,
         OutputInterface $output,
     ): int {
-        $action = strtolower($input->getArgument("action"));
-        $emailString = $input->getArgument("email");
+        $action = $input->getArgument("action") ?? "";
+        $emailString = $input->getArgument("email") ?? "";
+        if (!\is_string($action) || !\is_string($emailString)) {
+            throw new InvalidArgumentException(
+                "E-mail and Action must be a string",
+            );
+        }
+
+        $action = strtolower($action);
 
         if (!$this->isValidAction($action)) {
             $output->writeln(

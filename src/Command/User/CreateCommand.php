@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Command\User;
 
+use InvalidArgumentException;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Exception\DuplicateEmailException;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
@@ -48,12 +49,21 @@ final class CreateCommand extends Command
         InputInterface $input,
         OutputInterface $output,
     ): int {
-        $email = $input->getArgument("email");
-        $passwordArg = $input->getArgument("password");
-        $enableTotp = $input->getOption("enable-totp");
+        $email = $input->getArgument("email") ?? "";
+        $passwordArg = $input->getArgument("password") ?? "";
+        $enableTotp = $input->getOption("enable-totp") ?? "";
+        if (
+            !\is_string($email) ||
+            !\is_string($passwordArg) ||
+            !\is_bool($enableTotp)
+        ) {
+            throw new InvalidArgumentException(
+                "E-mail and password must be a string, enable-totp must be bool",
+            );
+        }
 
         $password = $this->resolvePassword($input, $output, $passwordArg);
-        if ($password === null) {
+        if ($password === "") {
             return Command::FAILURE;
         }
 
@@ -74,7 +84,7 @@ final class CreateCommand extends Command
             $output->writeln(
                 "<error>User with email '{$email}' already exists</error>",
             );
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $output->writeln("<error>Error: {$e->getMessage()}</error>");
         }
 

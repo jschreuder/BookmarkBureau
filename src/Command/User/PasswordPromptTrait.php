@@ -11,9 +11,9 @@ trait PasswordPromptTrait
     private function resolvePassword(
         InputInterface $input,
         OutputInterface $output,
-        ?string $passwordArg,
-    ): ?string {
-        if ($passwordArg) {
+        string $passwordArg,
+    ): string {
+        if (!empty($passwordArg)) {
             return $passwordArg;
         }
 
@@ -24,9 +24,9 @@ trait PasswordPromptTrait
         $question->setHiddenFallback(false);
         $password = $helper->ask($input, $output, $question);
 
-        if (!$password) {
+        if (!$password || !\is_string($password)) {
             $output->writeln("<error>Password cannot be empty</error>");
-            return null;
+            return "";
         }
 
         return $password;

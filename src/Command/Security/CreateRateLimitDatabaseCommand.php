@@ -36,6 +36,11 @@ final class CreateRateLimitDatabaseCommand extends Command
 
             // Check if we're using SQLite or MySQL
             $driver = $this->rateLimitDb->getAttribute(PDO::ATTR_DRIVER_NAME);
+            if (!\is_string($driver)) {
+                throw new InvalidArgumentException(
+                    "Driver name must be a string",
+                );
+            }
 
             try {
                 match ($driver) {

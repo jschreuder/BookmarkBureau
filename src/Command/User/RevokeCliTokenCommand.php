@@ -36,7 +36,10 @@ final class RevokeCliTokenCommand extends Command
         InputInterface $input,
         OutputInterface $output,
     ): int {
-        $jtiString = $input->getArgument("jti");
+        $jtiString = $input->getArgument("jti") ?? "";
+        if (!\is_string($jtiString)) {
+            throw new InvalidArgumentException("JTI must be a string");
+        }
 
         try {
             $jti = Uuid::fromString($jtiString);

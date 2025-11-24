@@ -48,12 +48,17 @@ final class GenerateCliTokenCommand extends Command
         InputInterface $input,
         OutputInterface $output,
     ): int {
-        $email = $input->getArgument("email");
-        $passwordArg = $input->getArgument("password");
+        $email = $input->getArgument("email") ?? "";
+        $passwordArg = $input->getArgument("password") ?? "";
+        if (!\is_string($email) || !\is_string($passwordArg)) {
+            throw new InvalidArgumentException(
+                "E-mail and password must be a string",
+            );
+        }
 
         try {
             $password = $this->resolvePassword($input, $output, $passwordArg);
-            if ($password === null) {
+            if ($password === "") {
                 throw new InvalidArgumentException(
                     "Cannot continue without a valid password",
                 );
@@ -64,6 +69,7 @@ final class GenerateCliTokenCommand extends Command
                 "password" => $password,
             ];
 
+            /** @var array{email: string, password: string} $filtered */
             $filtered = $this->inputSpec->filter($rawData);
             $this->inputSpec->validate($filtered);
 

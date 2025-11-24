@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Command\User;
 
+use InvalidArgumentException;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
@@ -39,15 +40,20 @@ final class ChangePasswordCommand extends Command
         InputInterface $input,
         OutputInterface $output,
     ): int {
-        $emailString = $input->getArgument("email");
-        $passwordArg = $input->getArgument("password");
+        $emailString = $input->getArgument("email") ?? "";
+        $passwordArg = $input->getArgument("password") ?? "";
+        if (!\is_string($emailString) || !\is_string($passwordArg)) {
+            throw new InvalidArgumentException(
+                "E-mail and password must be a string",
+            );
+        }
 
         try {
             $email = new Email($emailString);
             $user = $this->userService->getUserByEmail($email);
             $password = $this->resolvePassword($input, $output, $passwordArg);
 
-            if ($password === null) {
+            if ($password === "") {
                 return Command::FAILURE;
             }
 

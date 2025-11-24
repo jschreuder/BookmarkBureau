@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Command\User;
 
+use InvalidArgumentException;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Service\UserServiceInterface;
@@ -34,7 +35,10 @@ final class DeleteCommand extends Command
         InputInterface $input,
         OutputInterface $output,
     ): int {
-        $emailString = $input->getArgument("email");
+        $emailString = $input->getArgument("email") ?? "";
+        if (!\is_string($emailString)) {
+            throw new InvalidArgumentException("E-mail must be a string");
+        }
 
         try {
             $email = new Email($emailString);
@@ -55,7 +59,7 @@ final class DeleteCommand extends Command
             $output->writeln(
                 "<error>User with email '{$emailString}' not found</error>",
             );
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $output->writeln("<error>Error: {$e->getMessage()}</error>");
         }
 
@@ -74,6 +78,7 @@ final class DeleteCommand extends Command
             false,
         );
 
-        return $helper->ask($input, $output, $question);
+        $response = $helper->ask($input, $output, $question);
+        return \is_bool($response) ? $response : false;
     }
 }
