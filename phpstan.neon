@@ -14,3 +14,9 @@ parameters:
         -
             identifier: missingType.generics
             path: src/Config/DatabaseConfigInterface.php
+        -
+            identifier: missingType.generics
+            path: src/Config/MysqlDatabaseConfig.php
+        -
+            identifier: missingType.generics
+            path: src/Config/SqliteDatabaseConfig.php

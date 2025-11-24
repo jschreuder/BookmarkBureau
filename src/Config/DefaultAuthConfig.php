@@ -54,7 +54,7 @@ final readonly class DefaultAuthConfig implements AuthConfigInterface
     #[\Override]
     public function getTotpVerifier(): TotpVerifierInterface
     {
-        /** @var int<1, max> $window */
+        /** @var positive-int $window */
         $window = $this->totpWindow;
         return new OtphpTotpVerifier($this->getClock(), window: $window);
     }

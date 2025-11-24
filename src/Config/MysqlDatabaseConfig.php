@@ -13,8 +13,8 @@ use PDO;
  */
 final class MysqlDatabaseConfig implements DatabaseConfigInterface
 {
-    private ?PDO $dbInstance = null;
-    private ?PipelineInterface $defaultPipeline = null;
+    private PDO $dbInstance;
+    private PipelineInterface $defaultPipeline;
 
     public function __construct(
         public string $host,
@@ -34,7 +34,7 @@ final class MysqlDatabaseConfig implements DatabaseConfigInterface
     #[\Override]
     public function getConnection(): PDO
     {
-        if ($this->dbInstance === null) {
+        if (!isset($this->dbInstance)) {
             $dsn = "mysql:host={$this->host};port={$this->port};dbname={$this->dbname};charset={$this->charset}";
 
             $options = [
@@ -55,7 +55,7 @@ final class MysqlDatabaseConfig implements DatabaseConfigInterface
     #[\Override]
     public function getDefaultPipeline(): PipelineInterface
     {
-        if ($this->defaultPipeline === null) {
+        if (!isset($this->defaultPipeline)) {
             $this->defaultPipeline = new Pipeline(
                 new PdoTransactionMiddleware($this->getConnection()),
             );

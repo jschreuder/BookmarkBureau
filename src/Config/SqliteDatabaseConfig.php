@@ -13,8 +13,8 @@ use PDO;
  */
 final class SqliteDatabaseConfig implements DatabaseConfigInterface
 {
-    private ?PDO $dbInstance = null;
-    private ?PipelineInterface $defaultPipeline = null;
+    private PDO $dbInstance;
+    private PipelineInterface $defaultPipeline;
 
     public function __construct(private readonly string $dsn) {}
 
@@ -27,7 +27,7 @@ final class SqliteDatabaseConfig implements DatabaseConfigInterface
     #[\Override]
     public function getConnection(): PDO
     {
-        if ($this->dbInstance === null) {
+        if (!isset($this->dbInstance)) {
             $this->dbInstance = new PDO($this->dsn, null, null, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]);
@@ -38,7 +38,7 @@ final class SqliteDatabaseConfig implements DatabaseConfigInterface
     #[\Override]
     public function getDefaultPipeline(): PipelineInterface
     {
-        if ($this->defaultPipeline === null) {
+        if (!isset($this->defaultPipeline)) {
             $this->defaultPipeline = new Pipeline(
                 new PdoTransactionMiddleware($this->getConnection()),
             );
