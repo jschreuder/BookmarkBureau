@@ -6,6 +6,7 @@ final class Filter
 {
     private function __construct(private mixed $value) {}
 
+    /** @param array<string, mixed> $data */
     public static function start(
         array $data,
         string $key,

@@ -24,7 +24,8 @@ final readonly class SqlBuilder
      * Useful for constructing SELECT clauses or for use within JOIN queries
      * where fields need to be table-qualified.
      *
-     * @param EntityMapperInterface $mapper The entity mapper to extract fields from
+     * @template T of object
+     * @param EntityMapperInterface<T> $mapper The entity mapper to extract fields from
      * @param string|null $tableAlias Optional table alias (e.g., "l" for "links l")
      *                                 If provided, fields will be qualified (e.g., "l.field_name")
      * @return string Comma-separated field list
