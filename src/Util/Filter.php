@@ -2,7 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Util;
 
-final class Filter
+final readonly class Filter
 {
     private function __construct(private mixed $value) {}
 
@@ -17,78 +17,76 @@ final class Filter
 
     public function do(callable $function): self
     {
-        $this->value = $function($this->value);
-        return $this;
+        $value = $function($this->value);
+        return new self($value);
     }
 
     public function string(bool $allowNull = true): self
     {
-        $this->value =
+        $value =
             !$allowNull || $this->value !== null ? (string) $this->value : null;
-        return $this;
+        return new self($value);
     }
 
     public function int(bool $allowNull = true): self
     {
-        $this->value =
+        $value =
             !$allowNull || $this->value !== null ? (int) $this->value : null;
-        return $this;
+        return new self($value);
     }
 
     public function float(bool $allowNull = true): self
     {
-        $this->value =
+        $value =
             !$allowNull || $this->value !== null ? (float) $this->value : null;
-        return $this;
+        return new self($value);
     }
 
     public function bool(bool $allowNull = true): self
     {
-        $this->value =
+        $value =
             !$allowNull || $this->value !== null ? (bool) $this->value : null;
-        return $this;
+        return new self($value);
     }
 
     public function uppercase(): self
     {
-        $this->value = \is_string($this->value)
+        $value = \is_string($this->value)
             ? strtoupper($this->value)
             : $this->value;
-        return $this;
+        return new self($value);
     }
 
     public function lowercase(): self
     {
-        $this->value = \is_string($this->value)
+        $value = \is_string($this->value)
             ? strtolower($this->value)
             : $this->value;
-        return $this;
+        return new self($value);
     }
 
     public function trim(): self
     {
-        $this->value = \is_string($this->value)
-            ? trim($this->value)
-            : $this->value;
-        return $this;
+        $value = \is_string($this->value) ? trim($this->value) : $this->value;
+        return new self($value);
     }
 
     public function striptags(): self
     {
-        $this->value = \is_string($this->value)
+        $value = \is_string($this->value)
             ? strip_tags($this->value)
             : $this->value;
-        return $this;
+        return new self($value);
     }
 
     public function htmlspecialchars(
         int $flags = ENT_QUOTES | ENT_HTML5,
         string $encoding = "UTF-8",
     ): self {
-        $this->value = \is_string($this->value)
+        $value = \is_string($this->value)
             ? htmlspecialchars($this->value, $flags, $encoding)
             : $this->value;
-        return $this;
+        return new self($value);
     }
 
     public function done(): mixed
