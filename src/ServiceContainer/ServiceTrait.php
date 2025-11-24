@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\ServiceContainer;
 
+use jschreuder\BookmarkBureau\Config\UserStorageConfigInterface;
 use jschreuder\BookmarkBureau\OperationPipeline\NoPipeline;
 use jschreuder\BookmarkBureau\OperationPipeline\PipelineInterface;
 use jschreuder\BookmarkBureau\Service\CategoryService;
@@ -25,6 +26,7 @@ use jschreuder\BookmarkBureau\Service\UserServicePipelines;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
+use jschreuder\BookmarkBureau\Repository\FileUserRepository;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
@@ -32,8 +34,7 @@ use jschreuder\BookmarkBureau\Service\PasswordHasherInterface;
 
 trait ServiceTrait
 {
-    // Abstract for methods from ConfigTrait, DatabaseTrait, RepositoryTrait
-    abstract protected function config(string $key): mixed;
+    // Abstract for methods from DatabaseTrait, RepositoryTrait, AuthenticationTrait
     abstract public function getDefaultDbPipeline(): PipelineInterface;
     abstract public function getLinkRepository(): LinkRepositoryInterface;
     abstract public function getTagRepository(): TagRepositoryInterface;
@@ -42,6 +43,7 @@ trait ServiceTrait
     abstract public function getFavoriteRepository(): FavoriteRepositoryInterface;
     abstract public function getUserRepository(): UserRepositoryInterface;
     abstract public function getPasswordHasher(): PasswordHasherInterface;
+    abstract public function getUserStorageConfig(): UserStorageConfigInterface;
 
     public function getLinkService(): LinkServiceInterface
     {
@@ -132,14 +134,11 @@ trait ServiceTrait
 
     public function getUserServicePipelines(): UserServicePipelines
     {
-        $storageType = $this->config("users.storage.type");
-
         // Use NoPipeline for file-based storage, default DB pipeline for PDO storage
-        $defaultPipeline = match ($storageType) {
-            "file" => new NoPipeline(),
-            "pdo" => $this->getDefaultDbPipeline(),
-            default => new NoPipeline(),
-        };
+        $defaultPipeline =
+            $this->getUserRepository() instanceof FileUserRepository
+                ? new NoPipeline()
+                : $this->getDefaultDbPipeline();
 
         return new UserServicePipelines(default: $defaultPipeline);
     }

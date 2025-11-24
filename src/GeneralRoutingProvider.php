@@ -49,6 +49,7 @@ use jschreuder\BookmarkBureau\OutputSpec\LinkOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
 use jschreuder\BookmarkBureau\OutputSpec\TokenOutputSpec;
 use jschreuder\BookmarkBureau\Response\JsonResponseTransformer;
+use jschreuder\BookmarkBureau\ServiceContainer\DefaultServiceContainer;
 use jschreuder\BookmarkBureau\Util\ResourceRouteBuilder;
 use jschreuder\Middle\Router\RouterInterface;
 use jschreuder\Middle\Router\RoutingProviderInterface;
@@ -59,12 +60,7 @@ use Psr\Http\Message\ResponseInterface;
 
 final readonly class GeneralRoutingProvider implements RoutingProviderInterface
 {
-    private ServiceContainer $container;
-
-    public function __construct(ServiceContainer $container)
-    {
-        $this->container = $container;
-    }
+    public function __construct(private DefaultServiceContainer $container) {}
 
     #[\Override]
     public function registerRoutes(RouterInterface $router): void
@@ -94,7 +90,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                 new TokenOutputSpec(),
                 new JsonResponseTransformer(),
                 $this->container->getRateLimitService(),
-                $this->container->config("ratelimit.trust_proxy_headers"),
+                $this->container->getRateLimitConfig()->trustProxyHeadersBool(),
             ),
         );
 

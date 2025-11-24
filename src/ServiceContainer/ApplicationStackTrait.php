@@ -3,6 +3,7 @@
 namespace jschreuder\BookmarkBureau\ServiceContainer;
 
 use Closure;
+use jschreuder\BookmarkBureau\Config\LoggerConfigInterface;
 use jschreuder\Middle\ApplicationStack;
 use jschreuder\Middle\Controller\ControllerInterface;
 use jschreuder\Middle\Controller\ControllerRunner;
@@ -23,11 +24,11 @@ use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Monolog;
 
 trait ApplicationStackTrait
 {
-    abstract protected function config(string $key): mixed;
+    abstract public function getLoggerConfig(): LoggerConfigInterface;
+    abstract public function siteUrlString(): string;
     abstract public function getJwtService(): JwtServiceInterface;
 
     public function getApp(): ApplicationStack
@@ -38,10 +39,9 @@ trait ApplicationStackTrait
             new RequestFilterMiddleware(),
             new JsonRequestParserMiddleware(),
             new RequireAuthenticationMiddleware([
-                "home", // GET / - API info endpoint
-                "auth.login", // POST /auth/login - User login
-                "dashboard-view", // GET /{id} - Public dashboard view
-                // All other routes require authentication
+                "home",
+                "auth.login",
+                "dashboard-view",
             ]),
             new JwtAuthenticationMiddleware($this->getJwtService()),
             new RoutingMiddleware(
@@ -57,19 +57,12 @@ trait ApplicationStackTrait
 
     public function getLogger(): LoggerInterface
     {
-        $logger = new Monolog\Logger($this->config("logger.name"));
-        $logger->pushHandler(
-            new Monolog\Handler\StreamHandler(
-                $this->config("logger.path"),
-                Monolog\Level::Notice,
-            )->setFormatter(new Monolog\Formatter\LineFormatter()),
-        );
-        return $logger;
+        return $this->getLoggerConfig()->createLogger();
     }
 
     public function getAppRouter(): RouterInterface
     {
-        return new SymfonyRouter($this->config("site.url"));
+        return new SymfonyRouter($this->siteUrlString());
     }
 
     public function getUrlGenerator(): UrlGeneratorInterface

@@ -12,11 +12,12 @@ use jschreuder\BookmarkBureau\Command\User\RevokeCliTokenCommand;
 use jschreuder\BookmarkBureau\Command\Security\CreateRateLimitDatabaseCommand;
 use jschreuder\BookmarkBureau\Command\Security\RateLimitCleanupCommand;
 use jschreuder\BookmarkBureau\InputSpec\GenerateCliTokenInputSpec;
+use jschreuder\BookmarkBureau\ServiceContainer\DefaultServiceContainer;
 use Symfony\Component\Console\Application;
 
 final readonly class ConsoleCommandsProvider
 {
-    public function __construct(private ServiceContainer $container) {}
+    public function __construct(private DefaultServiceContainer $container) {}
 
     public function registerCommands(Application $application): void
     {

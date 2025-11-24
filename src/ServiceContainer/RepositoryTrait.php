@@ -2,11 +2,10 @@
 
 namespace jschreuder\BookmarkBureau\ServiceContainer;
 
-use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
+use jschreuder\BookmarkBureau\Config\UserStorageConfigInterface;
 use jschreuder\BookmarkBureau\Repository\CategoryRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
-use jschreuder\BookmarkBureau\Repository\FileUserRepository;
 use jschreuder\BookmarkBureau\Repository\JwtJtiRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\PdoCategoryRepository;
@@ -15,7 +14,6 @@ use jschreuder\BookmarkBureau\Repository\PdoFavoriteRepository;
 use jschreuder\BookmarkBureau\Repository\PdoJwtJtiRepository;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
 use jschreuder\BookmarkBureau\Repository\PdoTagRepository;
-use jschreuder\BookmarkBureau\Repository\PdoUserRepository;
 use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\UserRepositoryInterface;
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
@@ -23,14 +21,13 @@ use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\CategoryEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\FavoriteEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
-use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use PDO;
 
 trait RepositoryTrait
 {
-    // Abstract for methods from ConfigTrait, DatabaseTrait
-    abstract protected function config(string $key): mixed;
+    // Abstract for methods from DatabaseTrait and config/ServiceContainer
     abstract public function getDb(): PDO;
+    abstract public function getUserStorageConfig(): UserStorageConfigInterface;
 
     public function getLinkRepository(): LinkRepositoryInterface
     {
@@ -79,21 +76,7 @@ trait RepositoryTrait
 
     public function getUserRepository(): UserRepositoryInterface
     {
-        $storageType = $this->config("users.storage.type");
-
-        return match ($storageType) {
-            "file" => new FileUserRepository(
-                $this->config("users.storage.path"),
-                new UserEntityMapper(),
-            ),
-            "pdo" => new PdoUserRepository(
-                $this->getDb(),
-                new UserEntityMapper(),
-            ),
-            default => throw new RepositoryStorageException(
-                "Unknown user storage type: {$storageType}",
-            ),
-        };
+        return $this->getUserStorageConfig()->createUserRepository();
     }
 
     public function getJwtJtiRepository(): JwtJtiRepositoryInterface

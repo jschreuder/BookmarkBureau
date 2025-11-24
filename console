@@ -2,7 +2,7 @@
 <?php
 declare(strict_types=1);
 
-/** @var  jschreuder\BookmarkBureau\ServiceContainer $container */
+/** @var  jschreuder\BookmarkBureau\Config\ServiceContainer $container */
 $container = require __DIR__ . "/config/app_init.php";
 
 $application = new \Symfony\Component\Console\Application();

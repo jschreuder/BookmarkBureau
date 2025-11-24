@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
 
-use jschreuder\MiddleDi\DiCompiler;
-
 // Load autoloader & 3rd party libraries
 require_once __DIR__ . "/../vendor/autoload.php";
+
+use jschreuder\BookmarkBureau\ServiceContainer\DefaultServiceContainer;
+use jschreuder\MiddleDi\DiCompiler;
 
 // Disable error messages in output
 ini_set("display_errors", "no");
@@ -12,15 +13,14 @@ ini_set("display_errors", "no");
 date_default_timezone_set("UTC");
 mb_internal_encoding("UTF-8");
 
-// Setup DiC with Environment config
+// Load environment-specific config
 $environment = require __DIR__ . "/env.php";
 $config = require __DIR__ . "/" . $environment . ".php";
-$config["environment"] = $environment;
 
-/** @var  jschreuder\BookmarkBureau\ServiceContainer $container */
-$container = new DiCompiler(jschreuder\BookmarkBureau\ServiceContainer::class)
+/** @var  DefaultServiceContainer $container service container with typed config objects */
+$container = new DiCompiler(DefaultServiceContainer::class)
     ->compile()
-    ->newInstance($config);
+    ->newInstance(...$config);
 
 // Have Monolog log all PHP errors
 Monolog\ErrorHandler::register($container->getLogger());

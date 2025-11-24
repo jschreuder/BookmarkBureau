@@ -12,7 +12,7 @@
   ],
   "require": {
     "jschreuder/middle": "4.0.0-beta1",
-    "jschreuder/middle-di": "1.0.1",
+    "jschreuder/middle-di": "1.1.0",
     "laminas/laminas-diactoros": "^3.8",
     "laminas/laminas-httphandlerrunner": "^2.13",
     "monolog/monolog": "^3.9",
@@ -33,6 +33,11 @@
   "autoload": {
     "psr-4": {
       "jschreuder\\BookmarkBureau\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "jschreuder\\BookmarkBureau\\Tests\\": "tests/"
     }
   },
   "config": {
