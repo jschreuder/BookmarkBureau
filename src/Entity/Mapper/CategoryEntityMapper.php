@@ -11,11 +11,14 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
 /**
- * @implements EntityMapperInterface<Category>
+ * @phpstan-type CategoryEntityData array{category_id: string, dashboard: Dashboard, title: string, color: string|null, sort_order: string, created_at: string, updated_at: string}
+ * @phpstan-type CategoryRowData array{category_id: string, dashboard_id: string, title: string, color: string|null, sort_order: string, created_at: string, updated_at: string}
+ *
+ * @implements EntityMapperInterface<Category, CategoryEntityData, CategoryRowData>
  */
 final readonly class CategoryEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<Category, array{category_id: string, dashboard: Dashboard, title: string, color: string|null, sort_order: string, created_at: string, updated_at: string}> */
+    /** @use EntityMapperTrait<Category, CategoryEntityData, CategoryRowData> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -40,7 +43,6 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
         return $entity instanceof Category;
     }
 
-    /** @param array{category_id: string, dashboard: Dashboard, title: string, color: ?string, sort_order: string, created_at: string, updated_at: string } $data */
     #[\Override]
     private function doMapToEntity(array $data): Category
     {
@@ -57,7 +59,6 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
         );
     }
 
-    /** @param Category $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {
@@ -66,7 +67,7 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
             "dashboard_id" => $entity->dashboard->dashboardId->getBytes(),
             "title" => (string) $entity->title,
             "color" => $entity->color?->value,
-            "sort_order" => $entity->sortOrder,
+            "sort_order" => (string) $entity->sortOrder,
             "created_at" => $entity->createdAt->format(SqlFormat::TIMESTAMP),
             "updated_at" => $entity->updatedAt->format(SqlFormat::TIMESTAMP),
         ];

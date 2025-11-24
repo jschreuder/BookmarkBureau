@@ -9,11 +9,14 @@ use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
 /**
- * @implements EntityMapperInterface<CategoryLink>
+ * @phpstan-type CategoryLinkEntityData array{category: Category, link: Link, sort_order: string, created_at: string}
+ * @phpstan-type CategoryLinkRowData array{category_id: string, link_id: string, sort_order: string, created_at: string}
+ *
+ * @implements EntityMapperInterface<CategoryLink, CategoryLinkEntityData, CategoryLinkRowData>
  */
 final readonly class CategoryLinkEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<CategoryLink, array{category: Category, link: Link, sort_order: string, created_at: string}> */
+    /** @use EntityMapperTrait<CategoryLink, CategoryLinkEntityData, CategoryLinkRowData> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -37,7 +40,6 @@ final readonly class CategoryLinkEntityMapper implements EntityMapperInterface
         return $entity instanceof CategoryLink;
     }
 
-    /** @param array{category: Category, link: Link, sort_order: string, created_at: string} $data */
     #[\Override]
     private function doMapToEntity(array $data): CategoryLink
     {
@@ -49,14 +51,13 @@ final readonly class CategoryLinkEntityMapper implements EntityMapperInterface
         );
     }
 
-    /** @param CategoryLink $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {
         return [
             "category_id" => $entity->category->categoryId->getBytes(),
             "link_id" => $entity->link->linkId->getBytes(),
-            "sort_order" => $entity->sortOrder,
+            "sort_order" => (string) $entity->sortOrder,
             "created_at" => $entity->createdAt->format(SqlFormat::TIMESTAMP),
         ];
     }

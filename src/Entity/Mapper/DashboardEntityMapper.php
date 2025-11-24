@@ -10,11 +10,14 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
 /**
- * @implements EntityMapperInterface<Dashboard>
+ * @phpstan-type DashboardEntityData array{dashboard_id: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string}
+ * @phpstan-type DashboardRowData array{dashboard_id: string, title: string, description: string, icon: ?string, created_at: string, updated_at: string}
+ *
+ * @implements EntityMapperInterface<Dashboard, DashboardEntityData, DashboardRowData>
  */
 final readonly class DashboardEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<Dashboard, array{dashboard_id: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string}> */
+    /** @use EntityMapperTrait<Dashboard, DashboardEntityData, DashboardRowData> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -38,7 +41,6 @@ final readonly class DashboardEntityMapper implements EntityMapperInterface
         return $entity instanceof Dashboard;
     }
 
-    /** @param array{dashboard_id: string, title: string, description: string, icon: ?string, created_at: string, updated_at: string} $data */
     #[\Override]
     private function doMapToEntity(array $data): Dashboard
     {
@@ -52,7 +54,6 @@ final readonly class DashboardEntityMapper implements EntityMapperInterface
         );
     }
 
-    /** @param Dashboard $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {

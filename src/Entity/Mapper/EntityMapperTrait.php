@@ -16,8 +16,9 @@ use InvalidArgumentException;
  * doMapToRow(), allowing the trait to handle validation while delegating
  * the actual transformation logic.
  *
- * @template T of object
- * @template TData of array<string, mixed>
+ * @template TEntity of object
+ * @template TIn of array<string, mixed>
+ * @template TOut of array<string, mixed>
  */
 trait EntityMapperTrait
 {
@@ -26,8 +27,8 @@ trait EntityMapperTrait
     abstract public function getFields(): array;
 
     /**
-     * @param TData $data
-     * @return T
+     * @param TIn $data
+     * @return TEntity
      */
     public function mapToEntity(array $data): object
     {
@@ -46,12 +47,15 @@ trait EntityMapperTrait
     }
 
     /**
-     * @param TData $data
-     * @return T
+     * @param TIn $data
+     * @return TEntity
      */
     abstract private function doMapToEntity(array $data): object;
 
-    /** @param T $entity */
+    /**
+     * @param TEntity $entity
+     * @return TOut
+     */
     public function mapToRow(object $entity): array
     {
         if (!$this->supports($entity)) {
@@ -66,8 +70,8 @@ trait EntityMapperTrait
     }
 
     /**
-     * @param T $entity
-     * @return array<string, mixed>
+     * @param TEntity $entity
+     * @return TOut
      */
     abstract private function doMapToRow(object $entity): array;
 }

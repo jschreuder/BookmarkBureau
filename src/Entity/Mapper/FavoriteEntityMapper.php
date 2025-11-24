@@ -9,11 +9,14 @@ use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
 /**
- * @implements EntityMapperInterface<Favorite>
+ * @phpstan-type FavoriteEntityData array{dashboard: Dashboard, link: Link, sort_order: string, created_at: string}
+ * @phpstan-type FavoriteRowData array{dashboard_id: string, link_id: string, sort_order: string, created_at: string}
+ *
+ * @implements EntityMapperInterface<Favorite, FavoriteEntityData, FavoriteRowData>
  */
 final readonly class FavoriteEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<Favorite, array{dashboard: Dashboard, link: Link, sort_order: string, created_at: string}> */
+    /** @use EntityMapperTrait<Favorite, FavoriteEntityData, FavoriteRowData> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -35,7 +38,6 @@ final readonly class FavoriteEntityMapper implements EntityMapperInterface
         return $entity instanceof Favorite;
     }
 
-    /** @param array{dashboard: Dashboard, link: Link, sort_order: string, created_at: string} $data */
     #[\Override]
     private function doMapToEntity(array $data): Favorite
     {
@@ -47,14 +49,13 @@ final readonly class FavoriteEntityMapper implements EntityMapperInterface
         );
     }
 
-    /** @param Favorite $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {
         return [
             "dashboard_id" => $entity->dashboard->dashboardId->getBytes(),
             "link_id" => $entity->link->linkId->getBytes(),
-            "sort_order" => $entity->sortOrder,
+            "sort_order" => (string) $entity->sortOrder,
             "created_at" => $entity->createdAt->format(SqlFormat::TIMESTAMP),
         ];
     }

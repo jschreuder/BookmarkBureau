@@ -11,11 +11,14 @@ use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
 /**
- * @implements EntityMapperInterface<User>
+ * @phpstan-type UserEntityData array{user_id: string, email: string, password_hash: string, totp_secret: string|null, created_at: string, updated_at: string}
+ * @phpstan-type UserRowData array{user_id: string, email: string, password_hash: string, totp_secret: ?string, created_at: string, updated_at: string}
+ *
+ * @implements EntityMapperInterface<User, UserEntityData, UserRowData>
  */
 final readonly class UserEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<User, array{user_id: string, email: string, password_hash: string, totp_secret: string|null, created_at: string, updated_at: string}> */
+    /** @use EntityMapperTrait<User, UserEntityData, UserRowData> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -39,7 +42,6 @@ final readonly class UserEntityMapper implements EntityMapperInterface
         return $entity instanceof User;
     }
 
-    /** @param array{user_id: string, email: string, password_hash: string, totp_secret: ?string, created_at: string, updated_at: string} $data */
     #[\Override]
     private function doMapToEntity(array $data): User
     {
@@ -55,7 +57,6 @@ final readonly class UserEntityMapper implements EntityMapperInterface
         );
     }
 
-    /** @param User $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {

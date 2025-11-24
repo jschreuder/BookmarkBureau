@@ -12,11 +12,14 @@ use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
 /**
- * @implements EntityMapperInterface<Link>
+ * @phpstan-type LinkEntityData array{link_id: string, url: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string, tags: TagCollection|null}
+ * @phpstan-type LinkRowData array{link_id: string, url: string, title: string, description: string, icon: ?string, created_at: string, updated_at: string}
+ *
+ * @implements EntityMapperInterface<Link, LinkEntityData, LinkRowData>
  */
 final readonly class LinkEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<Link, array{link_id: string, url: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string, tags: TagCollection|null}> */
+    /** @use EntityMapperTrait<Link, LinkEntityData, LinkRowData> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -41,7 +44,6 @@ final readonly class LinkEntityMapper implements EntityMapperInterface
         return $entity instanceof Link;
     }
 
-    /** @param array{link_id: string, url: string, title: string, description: string, icon: ?string, created_at: string, updated_at: string, tags: ?TagCollection} $data */
     #[\Override]
     private function doMapToEntity(array $data): Link
     {
@@ -59,7 +61,6 @@ final readonly class LinkEntityMapper implements EntityMapperInterface
         );
     }
 
-    /** @param Link $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {

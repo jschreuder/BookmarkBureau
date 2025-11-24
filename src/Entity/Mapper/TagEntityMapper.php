@@ -7,11 +7,14 @@ use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 
 /**
- * @implements EntityMapperInterface<Tag>
+ * @phpstan-type TagEntityData array{tag_name: string, color: string|null}
+ * @phpstan-type TagRowData array{tag_name: string, color: ?string}
+ *
+ * @implements EntityMapperInterface<Tag, TagEntityData, TagRowData>
  */
 final readonly class TagEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<Tag, array{tag_name: string, color: string|null}> */
+    /** @use EntityMapperTrait<Tag, TagEntityData, TagRowData> */
     use EntityMapperTrait;
 
     private const array FIELDS = ["tag_name", "color"];
@@ -28,7 +31,6 @@ final readonly class TagEntityMapper implements EntityMapperInterface
         return $entity instanceof Tag;
     }
 
-    /** @param array{tag_name: string, color: ?string} $data */
     #[\Override]
     private function doMapToEntity(array $data): Tag
     {
@@ -40,7 +42,6 @@ final readonly class TagEntityMapper implements EntityMapperInterface
         );
     }
 
-    /** @param Tag $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {

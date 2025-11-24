@@ -18,7 +18,9 @@ use InvalidArgumentException;
  * specific entity type, providing a single point of responsibility for
  * transformation in both directions.
  *
- * @template T of object
+ * @template TEntity of object
+ * @template TIn of array<string, mixed>
+ * @template TOut of array<string, mixed>
  */
 interface EntityMapperInterface
 {
@@ -50,8 +52,8 @@ interface EntityMapperInterface
      * entity instance. The array should contain all fields necessary to
      * construct a valid entity.
      *
-     * @param array<string, mixed> $data
-     * @return T
+     * @param TIn $data
+     * @return TEntity
      * @throws InvalidArgumentException When required fields are missing or invalid
      * @throws DomainException When entity construction fails due to business rule violations
      */
@@ -65,9 +67,9 @@ interface EntityMapperInterface
      * (API response). The resulting array uses field names that correspond to
      * database columns or API payload keys.
      *
-     * @param T $entity
-     * @return array<string, mixed>
-     * @throws \InvalidArgumentException When entity is of unsupported type
+     * @param TEntity $entity
+     * @return TOut
+     * @throws InvalidArgumentException When entity is of unsupported type
      */
     public function mapToRow(object $entity): array;
 }
