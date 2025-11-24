@@ -56,7 +56,7 @@ final class IpAddress
             // inet_pton/inet_ntop normalizes IPv6 format
             $packed = @inet_pton($ip);
             if ($packed !== false) {
-                return inet_ntop($packed);
+                return inet_ntop($packed) ?: $ip;
             }
         }
 
