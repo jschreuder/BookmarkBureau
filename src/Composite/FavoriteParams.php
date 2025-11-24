@@ -13,6 +13,6 @@ final readonly class FavoriteParams
     public function __construct(
         public Dashboard $dashboard,
         public Link $link,
-        public ?int $sortOrder = null,
+        public int $sortOrder = -1,
     ) {}
 }

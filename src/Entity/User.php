@@ -77,6 +77,7 @@ final class User implements EntityEqualityInterface
         $this->totpSecret = null;
     }
 
+    /** @phpstan-assert-if-true !null $this->totpSecret */
     public function requiresTotp(): bool
     {
         return $this->totpSecret !== null;

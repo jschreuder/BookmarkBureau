@@ -13,6 +13,6 @@ final readonly class CategoryLinkParams
     public function __construct(
         public Category $category,
         public Link $link,
-        public ?int $sortOrder = null,
+        public int $sortOrder = -1,
     ) {}
 }
