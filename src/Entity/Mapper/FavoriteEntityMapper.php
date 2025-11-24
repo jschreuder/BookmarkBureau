@@ -6,8 +6,12 @@ use DateTimeImmutable;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
+/**
+ * @implements EntityMapperInterface<Favorite>
+ */
 final readonly class FavoriteEntityMapper implements EntityMapperInterface
 {
+    /** @use EntityMapperTrait<Favorite> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -40,10 +44,10 @@ final readonly class FavoriteEntityMapper implements EntityMapperInterface
         );
     }
 
+    /** @param Favorite $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {
-        /** @var Favorite $entity */
         return [
             "dashboard_id" => $entity->dashboard->dashboardId->getBytes(),
             "link_id" => $entity->link->linkId->getBytes(),

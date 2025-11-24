@@ -11,8 +11,12 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
+/**
+ * @implements EntityMapperInterface<Link>
+ */
 final readonly class LinkEntityMapper implements EntityMapperInterface
 {
+    /** @use EntityMapperTrait<Link> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -54,10 +58,10 @@ final readonly class LinkEntityMapper implements EntityMapperInterface
         );
     }
 
+    /** @param Link $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {
-        /** @var Link $entity */
         return [
             "link_id" => $entity->linkId->getBytes(),
             "url" => (string) $entity->url,

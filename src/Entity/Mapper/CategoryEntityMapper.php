@@ -9,8 +9,12 @@ use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
+/**
+ * @implements EntityMapperInterface<Category>
+ */
 final readonly class CategoryEntityMapper implements EntityMapperInterface
 {
+    /** @use EntityMapperTrait<Category> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -51,10 +55,10 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
         );
     }
 
+    /** @param Category $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {
-        /** @var Category $entity */
         return [
             "category_id" => $entity->categoryId->getBytes(),
             "dashboard_id" => $entity->dashboard->dashboardId->getBytes(),

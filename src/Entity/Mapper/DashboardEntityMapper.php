@@ -9,8 +9,12 @@ use jschreuder\BookmarkBureau\Entity\Value\Icon;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
+/**
+ * @implements EntityMapperInterface<Dashboard>
+ */
 final readonly class DashboardEntityMapper implements EntityMapperInterface
 {
+    /** @use EntityMapperTrait<Dashboard> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -47,10 +51,10 @@ final readonly class DashboardEntityMapper implements EntityMapperInterface
         );
     }
 
+    /** @param Dashboard $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {
-        /** @var Dashboard $entity */
         return [
             "dashboard_id" => $entity->dashboardId->getBytes(),
             "title" => (string) $entity->title,

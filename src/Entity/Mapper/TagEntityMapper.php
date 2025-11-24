@@ -6,8 +6,12 @@ use jschreuder\BookmarkBureau\Entity\Tag;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 
+/**
+ * @implements EntityMapperInterface<Tag>
+ */
 final readonly class TagEntityMapper implements EntityMapperInterface
 {
+    /** @use EntityMapperTrait<Tag> */
     use EntityMapperTrait;
 
     private const array FIELDS = ["tag_name", "color"];
@@ -35,10 +39,10 @@ final readonly class TagEntityMapper implements EntityMapperInterface
         );
     }
 
+    /** @param Tag $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {
-        /** @var Tag $entity */
         return [
             "tag_name" => (string) $entity->tagName,
             "color" => $entity->color?->value,

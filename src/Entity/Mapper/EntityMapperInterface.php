@@ -2,6 +2,9 @@
 
 namespace jschreuder\BookmarkBureau\Entity\Mapper;
 
+use DomainException;
+use InvalidArgumentException;
+
 /**
  * Specification for bidirectional transformation between domain entities and data rows
  *
@@ -14,6 +17,8 @@ namespace jschreuder\BookmarkBureau\Entity\Mapper;
  * (entities with business logic). They encapsulate the mapping logic for a
  * specific entity type, providing a single point of responsibility for
  * transformation in both directions.
+ *
+ * @template T of object
  */
 interface EntityMapperInterface
 {
@@ -45,8 +50,10 @@ interface EntityMapperInterface
      * entity instance. The array should contain all fields necessary to
      * construct a valid entity.
      *
-     * @throws \InvalidArgumentException When required fields are missing or invalid
-     * @throws \DomainException When entity construction fails due to business rule violations
+     * @param array<string, mixed> $data
+     * @return T
+     * @throws InvalidArgumentException When required fields are missing or invalid
+     * @throws DomainException When entity construction fails due to business rule violations
      */
     public function mapToEntity(array $data): object;
 
@@ -58,6 +65,8 @@ interface EntityMapperInterface
      * (API response). The resulting array uses field names that correspond to
      * database columns or API payload keys.
      *
+     * @param T $entity
+     * @return array<string, mixed>
      * @throws \InvalidArgumentException When entity is of unsupported type
      */
     public function mapToRow(object $entity): array;

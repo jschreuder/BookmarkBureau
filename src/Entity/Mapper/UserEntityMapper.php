@@ -10,8 +10,12 @@ use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
+/**
+ * @implements EntityMapperInterface<User>
+ */
 final readonly class UserEntityMapper implements EntityMapperInterface
 {
+    /** @use EntityMapperTrait<User> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -50,10 +54,10 @@ final readonly class UserEntityMapper implements EntityMapperInterface
         );
     }
 
+    /** @param User $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {
-        /** @var User $entity */
         return [
             "user_id" => $entity->userId->getBytes(),
             "email" => (string) $entity->email,

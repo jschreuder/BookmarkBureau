@@ -6,8 +6,12 @@ use DateTimeImmutable;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
+/**
+ * @implements EntityMapperInterface<CategoryLink>
+ */
 final readonly class CategoryLinkEntityMapper implements EntityMapperInterface
 {
+    /** @use EntityMapperTrait<CategoryLink> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -42,10 +46,10 @@ final readonly class CategoryLinkEntityMapper implements EntityMapperInterface
         );
     }
 
+    /** @param CategoryLink $entity */
     #[\Override]
     private function doMapToRow(object $entity): array
     {
-        /** @var CategoryLink $entity */
         return [
             "category_id" => $entity->category->categoryId->getBytes(),
             "link_id" => $entity->link->linkId->getBytes(),

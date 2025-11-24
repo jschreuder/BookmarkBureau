@@ -15,6 +15,8 @@ use InvalidArgumentException;
  * Implementing classes must define abstract methods doMapToEntity() and
  * doMapToRow(), allowing the trait to handle validation while delegating
  * the actual transformation logic.
+ *
+ * @template T of object
  */
 trait EntityMapperTrait
 {
@@ -22,6 +24,7 @@ trait EntityMapperTrait
 
     abstract public function getFields(): array;
 
+    /** @return T */
     public function mapToEntity(array $data): object
     {
         $fields = $this->getFields();
@@ -38,8 +41,13 @@ trait EntityMapperTrait
         return $this->doMapToEntity($data);
     }
 
+    /**
+     * @param array<string, mixed> $data
+     * @return T
+     */
     abstract private function doMapToEntity(array $data): object;
 
+    /** @param T $entity */
     public function mapToRow(object $entity): array
     {
         if (!$this->supports($entity)) {
@@ -53,5 +61,9 @@ trait EntityMapperTrait
         return $this->doMapToRow($entity);
     }
 
+    /**
+     * @param T $entity
+     * @return array<string, mixed>
+     */
     abstract private function doMapToRow(object $entity): array;
 }
