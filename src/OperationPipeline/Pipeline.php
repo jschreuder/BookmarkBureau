@@ -19,6 +19,7 @@ use Closure;
  */
 final readonly class Pipeline implements PipelineInterface
 {
+    /** @var array<PipelineMiddlewareInterface> */
     private array $middlewares;
 
     public function __construct(PipelineMiddlewareInterface ...$middlewares)

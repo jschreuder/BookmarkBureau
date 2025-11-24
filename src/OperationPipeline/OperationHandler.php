@@ -9,6 +9,10 @@ final class OperationHandler
 {
     private bool $called = false;
 
+    /**
+     * @param array<PipelineMiddlewareInterface> $middlewares
+     * @param int $currentIndex
+     */
     public function __construct(
         private readonly array $middlewares,
         private readonly int $currentIndex = 0,
