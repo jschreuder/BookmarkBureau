@@ -3,7 +3,9 @@
 namespace jschreuder\BookmarkBureau\Entity\Mapper;
 
 use DateTimeImmutable;
+use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Favorite;
+use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
 /**
@@ -11,7 +13,7 @@ use jschreuder\BookmarkBureau\Util\SqlFormat;
  */
 final readonly class FavoriteEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<Favorite> */
+    /** @use EntityMapperTrait<Favorite, array{dashboard: Dashboard, link: Link, sort_order: string, created_at: string}> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -33,6 +35,7 @@ final readonly class FavoriteEntityMapper implements EntityMapperInterface
         return $entity instanceof Favorite;
     }
 
+    /** @param array{dashboard: Dashboard, link: Link, sort_order: string, created_at: string} $data */
     #[\Override]
     private function doMapToEntity(array $data): Favorite
     {

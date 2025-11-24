@@ -11,7 +11,7 @@ use jschreuder\BookmarkBureau\Entity\Value\TagName;
  */
 final readonly class TagEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<Tag> */
+    /** @use EntityMapperTrait<Tag, array{tag_name: string, color: string|null}> */
     use EntityMapperTrait;
 
     private const array FIELDS = ["tag_name", "color"];
@@ -28,6 +28,7 @@ final readonly class TagEntityMapper implements EntityMapperInterface
         return $entity instanceof Tag;
     }
 
+    /** @param array{tag_name: string, color: ?string} $data */
     #[\Override]
     private function doMapToEntity(array $data): Tag
     {

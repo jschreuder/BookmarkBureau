@@ -15,7 +15,7 @@ use jschreuder\BookmarkBureau\Util\SqlFormat;
  */
 final readonly class UserEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<User> */
+    /** @use EntityMapperTrait<User, array{user_id: string, email: string, password_hash: string, totp_secret: string|null, created_at: string, updated_at: string}> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -39,6 +39,7 @@ final readonly class UserEntityMapper implements EntityMapperInterface
         return $entity instanceof User;
     }
 
+    /** @param array{user_id: string, email: string, password_hash: string, totp_secret: ?string, created_at: string, updated_at: string} $data */
     #[\Override]
     private function doMapToEntity(array $data): User
     {

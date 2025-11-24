@@ -3,7 +3,9 @@
 namespace jschreuder\BookmarkBureau\Entity\Mapper;
 
 use DateTimeImmutable;
+use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
+use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
 /**
@@ -11,7 +13,7 @@ use jschreuder\BookmarkBureau\Util\SqlFormat;
  */
 final readonly class CategoryLinkEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<CategoryLink> */
+    /** @use EntityMapperTrait<CategoryLink, array{category: Category, link: Link, sort_order: string, created_at: string}> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -35,6 +37,7 @@ final readonly class CategoryLinkEntityMapper implements EntityMapperInterface
         return $entity instanceof CategoryLink;
     }
 
+    /** @param array{category: Category, link: Link, sort_order: string, created_at: string} $data */
     #[\Override]
     private function doMapToEntity(array $data): CategoryLink
     {

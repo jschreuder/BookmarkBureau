@@ -14,7 +14,7 @@ use jschreuder\BookmarkBureau\Util\SqlFormat;
  */
 final readonly class DashboardEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<Dashboard> */
+    /** @use EntityMapperTrait<Dashboard, array{dashboard_id: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string}> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -38,6 +38,7 @@ final readonly class DashboardEntityMapper implements EntityMapperInterface
         return $entity instanceof Dashboard;
     }
 
+    /** @param array{dashboard_id: string, title: string, description: string, icon: ?string, created_at: string, updated_at: string} $data */
     #[\Override]
     private function doMapToEntity(array $data): Dashboard
     {

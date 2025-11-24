@@ -16,7 +16,7 @@ use jschreuder\BookmarkBureau\Util\SqlFormat;
  */
 final readonly class LinkEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<Link> */
+    /** @use EntityMapperTrait<Link, array{link_id: string, url: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string, tags: TagCollection|null}> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -41,6 +41,7 @@ final readonly class LinkEntityMapper implements EntityMapperInterface
         return $entity instanceof Link;
     }
 
+    /** @param array{link_id: string, url: string, title: string, description: string, icon: ?string, created_at: string, updated_at: string, tags: ?TagCollection} $data */
     #[\Override]
     private function doMapToEntity(array $data): Link
     {

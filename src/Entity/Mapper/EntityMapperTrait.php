@@ -17,6 +17,7 @@ use InvalidArgumentException;
  * the actual transformation logic.
  *
  * @template T of object
+ * @template TData of array<string, mixed>
  */
 trait EntityMapperTrait
 {
@@ -24,7 +25,10 @@ trait EntityMapperTrait
 
     abstract public function getFields(): array;
 
-    /** @return T */
+    /**
+     * @param TData $data
+     * @return T
+     */
     public function mapToEntity(array $data): object
     {
         $fields = $this->getFields();
@@ -42,7 +46,7 @@ trait EntityMapperTrait
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param TData $data
      * @return T
      */
     abstract private function doMapToEntity(array $data): object;

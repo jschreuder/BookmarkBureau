@@ -5,6 +5,7 @@ namespace jschreuder\BookmarkBureau\Entity\Mapper;
 use DateTimeImmutable;
 use Ramsey\Uuid\Uuid;
 use jschreuder\BookmarkBureau\Entity\Category;
+use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
@@ -14,7 +15,7 @@ use jschreuder\BookmarkBureau\Util\SqlFormat;
  */
 final readonly class CategoryEntityMapper implements EntityMapperInterface
 {
-    /** @use EntityMapperTrait<Category> */
+    /** @use EntityMapperTrait<Category, array{category_id: string, dashboard: Dashboard, title: string, color: string|null, sort_order: string, created_at: string, updated_at: string}> */
     use EntityMapperTrait;
 
     private const array FIELDS = [
@@ -39,6 +40,7 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
         return $entity instanceof Category;
     }
 
+    /** @param array{category_id: string, dashboard: Dashboard, title: string, color: ?string, sort_order: string, created_at: string, updated_at: string } $data */
     #[\Override]
     private function doMapToEntity(array $data): Category
     {
