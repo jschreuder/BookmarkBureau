@@ -162,48 +162,41 @@ final readonly class PdoCategoryRepository implements
     }
 
     /**
-     * Save a new category or update existing one
+     * Save a new category
      * @throws DashboardNotFoundException when dashboard doesn't exist (FK violation on insert)
      */
     #[\Override]
-    public function save(Category $category): void
+    public function insert(Category $category): void
+    {
+        try {
+            $row = $this->categoryMapper->mapToRow($category);
+            $query = SqlBuilder::buildInsert("categories", $row);
+            $this->pdo->prepare($query["sql"])->execute($query["params"]);
+        } catch (\PDOException $e) {
+            if (
+                str_contains(
+                    $e->getMessage(),
+                    "FOREIGN KEY constraint failed",
+                ) ||
+                str_contains($e->getMessage(), "foreign key constraint fails")
+            ) {
+                throw DashboardNotFoundException::forId(
+                    $category->dashboard->dashboardId,
+                );
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Update existing category
+     */
+    #[\Override]
+    public function update(Category $category): void
     {
         $row = $this->categoryMapper->mapToRow($category);
-        $categoryIdBytes = $row["category_id"];
-
-        // Check if category exists
-        $check = $this->pdo->prepare(
-            "SELECT 1 FROM categories WHERE category_id = :category_id LIMIT 1",
-        );
-        $check->execute([":category_id" => $categoryIdBytes]);
-
-        if ($check->fetch() === false) {
-            // Insert new category
-            try {
-                $build = SqlBuilder::buildInsert("categories", $row);
-                $this->pdo->prepare($build["sql"])->execute($build["params"]);
-            } catch (\PDOException $e) {
-                if (
-                    str_contains(
-                        $e->getMessage(),
-                        "FOREIGN KEY constraint failed",
-                    ) ||
-                    str_contains(
-                        $e->getMessage(),
-                        "foreign key constraint fails",
-                    )
-                ) {
-                    throw DashboardNotFoundException::forId(
-                        $category->dashboard->dashboardId,
-                    );
-                }
-                throw $e;
-            }
-        } else {
-            // Update existing category
-            $build = SqlBuilder::buildUpdate("categories", $row, "category_id");
-            $this->pdo->prepare($build["sql"])->execute($build["params"]);
-        }
+        $query = SqlBuilder::buildUpdate("categories", $row, "category_id");
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**

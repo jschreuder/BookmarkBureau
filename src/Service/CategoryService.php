@@ -75,7 +75,7 @@ final class CategoryService implements CategoryServiceInterface
         return $this->pipelines
             ->createCategory()
             ->run(function (Category $newCategory): Category {
-                $this->categoryRepository->save($newCategory);
+                $this->categoryRepository->insert($newCategory);
                 return $newCategory;
             }, $category);
     }
@@ -96,7 +96,7 @@ final class CategoryService implements CategoryServiceInterface
         return $this->pipelines
             ->updateCategory()
             ->run(function (Category $updatedCategory): Category {
-                $this->categoryRepository->save($updatedCategory);
+                $this->categoryRepository->update($updatedCategory);
                 return $updatedCategory;
             }, $category);
     }
@@ -141,7 +141,7 @@ final class CategoryService implements CategoryServiceInterface
             ->reorderCategories()
             ->run(function (CategoryCollection $reorderedCategories): null {
                 foreach ($reorderedCategories as $category) {
-                    $this->categoryRepository->save($category);
+                    $this->categoryRepository->update($category);
                 }
                 return null;
             }, new CategoryCollection(...$updatedCategories));

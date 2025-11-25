@@ -93,7 +93,7 @@ describe("CategoryService", function () {
                 ->shouldReceive("getMaxSortOrderForDashboardId")
                 ->with($dashboardId)
                 ->andReturn(2);
-            $categoryRepository->shouldReceive("save")->once();
+            $categoryRepository->shouldReceive("insert")->once();
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
@@ -138,7 +138,7 @@ describe("CategoryService", function () {
                 ->shouldReceive("getMaxSortOrderForDashboardId")
                 ->with($dashboardId)
                 ->andReturn(-1);
-            $categoryRepository->shouldReceive("save")->once();
+            $categoryRepository->shouldReceive("insert")->once();
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
@@ -250,7 +250,7 @@ describe("CategoryService", function () {
                 ->shouldReceive("findById")
                 ->with($categoryId)
                 ->andReturn($category);
-            $categoryRepository->shouldReceive("save")->once();
+            $categoryRepository->shouldReceive("update")->once();
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
@@ -289,7 +289,7 @@ describe("CategoryService", function () {
                 ->shouldReceive("findById")
                 ->with($categoryId)
                 ->andReturn($category);
-            $categoryRepository->shouldReceive("save")->once();
+            $categoryRepository->shouldReceive("update")->once();
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
@@ -437,7 +437,7 @@ describe("CategoryService", function () {
                 ->shouldReceive("findByDashboardId")
                 ->with($dashboardId)
                 ->andReturn($categories);
-            $categoryRepository->shouldReceive("save")->times(3);
+            $categoryRepository->shouldReceive("update")->times(3);
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
@@ -478,7 +478,7 @@ describe("CategoryService", function () {
                 ->shouldReceive("findByDashboardId")
                 ->with($dashboardId)
                 ->andReturn($categories);
-            $categoryRepository->shouldReceive("save")->once();
+            $categoryRepository->shouldReceive("update")->once();
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
@@ -806,8 +806,9 @@ describe("CategoryService", function () {
                 $categoryRepository
                     ->shouldReceive("getMaxSortOrderForDashboardId")
                     ->andReturn(-1);
-                // 1 create + 1 update + 1 reorder = 3 save calls
-                $categoryRepository->shouldReceive("save")->times(3);
+                $categoryRepository->shouldReceive("insert")->times(1);
+                // 1 update + 1 reorder = 2 update calls
+                $categoryRepository->shouldReceive("update")->times(2);
                 $categoryRepository
                     ->shouldReceive("findById")
                     ->andReturn($category);
@@ -904,8 +905,10 @@ describe("CategoryService", function () {
                 ->with($dashboardId)
                 ->andReturn(1, 2);
 
-            // 2 save calls: one for create1, one for create2, two for reorder = 4 total
-            $categoryRepository->shouldReceive("save")->times(4);
+            // 2 insert calls: one for create1, one for create2
+            $categoryRepository->shouldReceive("insert")->times(2);
+            // 2 update calls: two for reorder
+            $categoryRepository->shouldReceive("update")->times(2);
 
             // For reorder, return the categories
             $categories = new CategoryCollection($category1, $category2);

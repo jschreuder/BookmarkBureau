@@ -103,7 +103,7 @@ describe("CategoryLinkEntityMapper", function () {
                 $category->categoryId->getBytes(),
             );
             expect($row["link_id"])->toBe($link->linkId->getBytes());
-            expect($row["sort_order"])->toBe(4);
+            expect($row["sort_order"])->toBe("4");
         });
 
         test("formats timestamps correctly", function () {
@@ -173,30 +173,25 @@ describe("CategoryLinkEntityMapper", function () {
             expect($restoredCategoryLink->sortOrder)->toBe(99);
         });
 
-        test(
-            "preserves created_at timestamp through round-trip",
-            function () {
-                $mapper = new CategoryLinkEntityMapper();
-                $category = TestEntityFactory::createCategory();
-                $link = TestEntityFactory::createLink();
-                $createdAt = new DateTimeImmutable("2024-02-15 14:30:00");
-                $originalCategoryLink = TestEntityFactory::createCategoryLink(
-                    category: $category,
-                    link: $link,
-                    createdAt: $createdAt,
-                );
+        test("preserves created_at timestamp through round-trip", function () {
+            $mapper = new CategoryLinkEntityMapper();
+            $category = TestEntityFactory::createCategory();
+            $link = TestEntityFactory::createLink();
+            $createdAt = new DateTimeImmutable("2024-02-15 14:30:00");
+            $originalCategoryLink = TestEntityFactory::createCategoryLink(
+                category: $category,
+                link: $link,
+                createdAt: $createdAt,
+            );
 
-                $row = $mapper->mapToRow($originalCategoryLink);
-                $row["category"] = $category;
-                $row["link"] = $link;
-                $restoredCategoryLink = $mapper->mapToEntity($row);
+            $row = $mapper->mapToRow($originalCategoryLink);
+            $row["category"] = $category;
+            $row["link"] = $link;
+            $restoredCategoryLink = $mapper->mapToEntity($row);
 
-                expect(
-                    $restoredCategoryLink->createdAt->format(
-                        "Y-m-d H:i:s",
-                    ),
-                )->toBe("2024-02-15 14:30:00");
-            },
-        );
+            expect(
+                $restoredCategoryLink->createdAt->format("Y-m-d H:i:s"),
+            )->toBe("2024-02-15 14:30:00");
+        });
     });
 });

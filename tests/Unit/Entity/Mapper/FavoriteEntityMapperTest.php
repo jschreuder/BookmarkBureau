@@ -101,7 +101,7 @@ describe("FavoriteEntityMapper", function () {
                 $dashboard->dashboardId->getBytes(),
             );
             expect($row["link_id"])->toBe($link->linkId->getBytes());
-            expect($row["sort_order"])->toBe(5);
+            expect($row["sort_order"])->toBe("5");
         });
 
         test(

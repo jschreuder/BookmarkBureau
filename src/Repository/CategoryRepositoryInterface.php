@@ -53,10 +53,15 @@ interface CategoryRepositoryInterface
     ): int;
 
     /**
-     * Save a new category or update existing one
+     * Save a new category
      * @throws DashboardNotFoundException when dashboard doesn't exist (FK violation on insert)
      */
-    public function save(Category $category): void;
+    public function insert(Category $category): void;
+
+    /**
+     * Update existing category
+     */
+    public function update(Category $category): void;
 
     /**
      * Delete a category (cascades to category_links)

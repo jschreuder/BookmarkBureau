@@ -1,7 +1,6 @@
 <?php
 
 use jschreuder\BookmarkBureau\Entity\Mapper\CategoryEntityMapper;
-use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\Value\HexColor;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
@@ -144,7 +143,7 @@ describe("CategoryEntityMapper", function () {
             );
             expect($row["title"])->toBe("Important");
             expect($row["color"])->toBe("#FF0000");
-            expect($row["sort_order"])->toBe(2);
+            expect($row["sort_order"])->toBe("2");
         });
 
         test("maps Category entity with null color to row array", function () {
