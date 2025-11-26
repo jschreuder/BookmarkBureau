@@ -127,7 +127,7 @@ final class DashboardService implements DashboardServiceInterface
         return $this->pipelines
             ->createDashboard()
             ->run(function (Dashboard $dashboard): Dashboard {
-                $this->dashboardRepository->save($dashboard);
+                $this->dashboardRepository->insert($dashboard);
                 return $dashboard;
             }, $newDashboard);
     }
@@ -150,7 +150,7 @@ final class DashboardService implements DashboardServiceInterface
         return $this->pipelines
             ->updateDashboard()
             ->run(function (Dashboard $dashboard): Dashboard {
-                $this->dashboardRepository->save($dashboard);
+                $this->dashboardRepository->update($dashboard);
                 return $dashboard;
             }, $updatedDashboard);
     }

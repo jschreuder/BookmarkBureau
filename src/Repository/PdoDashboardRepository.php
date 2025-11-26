@@ -67,33 +67,25 @@ final readonly class PdoDashboardRepository implements
     }
 
     /**
-     * Save a new dashboard or update existing one
+     * Save a new dashboard
      */
     #[\Override]
-    public function save(Dashboard $dashboard): void
+    public function insert(Dashboard $dashboard): void
     {
         $row = $this->mapper->mapToRow($dashboard);
-        $dashboardIdBytes = $row["dashboard_id"];
+        $build = SqlBuilder::buildInsert("dashboards", $row);
+        $this->pdo->prepare($build["sql"])->execute($build["params"]);
+    }
 
-        // Check if dashboard exists
-        $check = $this->pdo->prepare(
-            "SELECT 1 FROM dashboards WHERE dashboard_id = :dashboard_id LIMIT 1",
-        );
-        $check->execute([":dashboard_id" => $dashboardIdBytes]);
-
-        if ($check->fetch() === false) {
-            // Insert new dashboard
-            $build = SqlBuilder::buildInsert("dashboards", $row);
-            $this->pdo->prepare($build["sql"])->execute($build["params"]);
-        } else {
-            // Update existing dashboard
-            $build = SqlBuilder::buildUpdate(
-                "dashboards",
-                $row,
-                "dashboard_id",
-            );
-            $this->pdo->prepare($build["sql"])->execute($build["params"]);
-        }
+    /**
+     * Update existing dashboard
+     */
+    #[\Override]
+    public function update(Dashboard $dashboard): void
+    {
+        $row = $this->mapper->mapToRow($dashboard);
+        $build = SqlBuilder::buildUpdate("dashboards", $row, "dashboard_id");
+        $this->pdo->prepare($build["sql"])->execute($build["params"]);
     }
 
     /**

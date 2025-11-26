@@ -374,7 +374,7 @@ describe("DashboardService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $dashboardRepository->shouldReceive("save")->once();
+            $dashboardRepository->shouldReceive("insert")->once();
 
             $categoryRepository = Mockery::mock(
                 CategoryRepositoryInterface::class,
@@ -408,7 +408,7 @@ describe("DashboardService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $dashboardRepository->shouldReceive("save")->once();
+            $dashboardRepository->shouldReceive("insert")->once();
 
             $categoryRepository = Mockery::mock(
                 CategoryRepositoryInterface::class,
@@ -473,7 +473,7 @@ describe("DashboardService", function () {
                 ->shouldReceive("findById")
                 ->with($dashboardId)
                 ->andReturn($dashboard);
-            $dashboardRepository->shouldReceive("save")->once();
+            $dashboardRepository->shouldReceive("update")->once();
 
             $categoryRepository = Mockery::mock(
                 CategoryRepositoryInterface::class,
@@ -517,7 +517,7 @@ describe("DashboardService", function () {
                 ->shouldReceive("findById")
                 ->with($dashboardId)
                 ->andReturn($dashboard);
-            $dashboardRepository->shouldReceive("save")->once();
+            $dashboardRepository->shouldReceive("update")->once();
 
             $categoryRepository = Mockery::mock(
                 CategoryRepositoryInterface::class,
@@ -673,7 +673,8 @@ describe("DashboardService", function () {
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
             );
-            $dashboardRepository->shouldReceive("save")->twice();
+            $dashboardRepository->shouldReceive("insert")->once();
+            $dashboardRepository->shouldReceive("update")->once();
             $dashboardRepository
                 ->shouldReceive("findAll")
                 ->andReturn($collection);

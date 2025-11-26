@@ -252,7 +252,7 @@ describe("PdoDashboardRepository", function () {
         );
     });
 
-    describe("save", function () {
+    describe("insert", function () {
         test("inserts a new dashboard", function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository(
@@ -261,30 +261,11 @@ describe("PdoDashboardRepository", function () {
             );
             $dashboard = TestEntityFactory::createDashboard();
 
-            $repo->save($dashboard);
+            $repo->insert($dashboard);
 
             $found = $repo->findById($dashboard->dashboardId);
             expect((string) $found->title)->toBe((string) $dashboard->title);
             expect($found->description)->toBe($dashboard->description);
-        });
-
-        test("updates an existing dashboard", function () {
-            $pdo = createDashboardDatabase();
-            $repo = new PdoDashboardRepository(
-                $pdo,
-                new DashboardEntityMapper(),
-            );
-            $dashboard = TestEntityFactory::createDashboard();
-
-            $repo->save($dashboard);
-
-            $dashboard->title = new Title("Updated Title");
-            $dashboard->description = "Updated Description";
-            $repo->save($dashboard);
-
-            $found = $repo->findById($dashboard->dashboardId);
-            expect((string) $found->title)->toBe("Updated Title");
-            expect($found->description)->toBe("Updated Description");
         });
 
         test("preserves timestamps on insert", function () {
@@ -300,7 +281,7 @@ describe("PdoDashboardRepository", function () {
                 updatedAt: $updatedAt,
             );
 
-            $repo->save($dashboard);
+            $repo->insert($dashboard);
 
             $found = $repo->findById($dashboard->dashboardId);
             expect($found->createdAt->format("Y-m-d H:i:s"))->toBe(
@@ -311,7 +292,7 @@ describe("PdoDashboardRepository", function () {
             );
         });
 
-        test("saves dashboards with null icon", function () {
+        test("inserts dashboards with null icon", function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository(
                 $pdo,
@@ -319,7 +300,7 @@ describe("PdoDashboardRepository", function () {
             );
             $dashboardId = Uuid::uuid4();
 
-            // Create dashboard and manually set icon to null before saving
+            // Create dashboard and manually set icon to null before inserting
             $dashboard = new Dashboard(
                 dashboardId: $dashboardId,
                 title: new Title("Test Dashboard"),
@@ -329,13 +310,13 @@ describe("PdoDashboardRepository", function () {
                 updatedAt: new DateTimeImmutable("2024-01-01 12:00:00"),
             );
 
-            $repo->save($dashboard);
+            $repo->insert($dashboard);
 
             $found = $repo->findById($dashboard->dashboardId);
             expect($found->icon)->toBeNull();
         });
 
-        test("saves dashboards with icon", function () {
+        test("inserts dashboards with icon", function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository(
                 $pdo,
@@ -344,14 +325,35 @@ describe("PdoDashboardRepository", function () {
             $icon = new Icon("custom-icon");
             $dashboard = TestEntityFactory::createDashboard(icon: $icon);
 
-            $repo->save($dashboard);
+            $repo->insert($dashboard);
 
             $found = $repo->findById($dashboard->dashboardId);
             expect($found->icon)->not->toBeNull();
             expect((string) $found->icon)->toBe("custom-icon");
         });
+    });
 
-        test("updates icon field when saving existing dashboard", function () {
+    describe("update", function () {
+        test("updates an existing dashboard", function () {
+            $pdo = createDashboardDatabase();
+            $repo = new PdoDashboardRepository(
+                $pdo,
+                new DashboardEntityMapper(),
+            );
+            $dashboard = TestEntityFactory::createDashboard();
+
+            $repo->insert($dashboard);
+
+            $dashboard->title = new Title("Updated Title");
+            $dashboard->description = "Updated Description";
+            $repo->update($dashboard);
+
+            $found = $repo->findById($dashboard->dashboardId);
+            expect((string) $found->title)->toBe("Updated Title");
+            expect($found->description)->toBe("Updated Description");
+        });
+
+        test("updates icon field", function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository(
                 $pdo,
@@ -359,11 +361,11 @@ describe("PdoDashboardRepository", function () {
             );
             $dashboard = TestEntityFactory::createDashboard(icon: null);
 
-            $repo->save($dashboard);
+            $repo->insert($dashboard);
 
             $newIcon = new Icon("updated-icon");
             $dashboard->icon = $newIcon;
-            $repo->save($dashboard);
+            $repo->update($dashboard);
 
             $found = $repo->findById($dashboard->dashboardId);
             expect((string) $found->icon)->toBe("updated-icon");
@@ -378,14 +380,44 @@ describe("PdoDashboardRepository", function () {
             $icon = new Icon("initial-icon");
             $dashboard = TestEntityFactory::createDashboard(icon: $icon);
 
-            $repo->save($dashboard);
+            $repo->insert($dashboard);
 
             $dashboard->icon = null;
-            $repo->save($dashboard);
+            $repo->update($dashboard);
 
             $found = $repo->findById($dashboard->dashboardId);
             expect($found->icon)->toBeNull();
         });
+
+        test(
+            "preserves createdAt and updates updatedAt timestamp",
+            function () {
+                $pdo = createDashboardDatabase();
+                $repo = new PdoDashboardRepository(
+                    $pdo,
+                    new DashboardEntityMapper(),
+                );
+                $createdAt = new DateTimeImmutable("2024-01-01 10:00:00");
+                $updatedAt = new DateTimeImmutable("2024-01-01 12:00:00");
+                $dashboard = TestEntityFactory::createDashboard(
+                    createdAt: $createdAt,
+                    updatedAt: $updatedAt,
+                );
+
+                $repo->insert($dashboard);
+
+                // Changing a property triggers markAsUpdated() which updates the timestamp
+                $dashboard->title = new Title("Updated Title");
+                $repo->update($dashboard);
+
+                $found = $repo->findById($dashboard->dashboardId);
+                expect($found->createdAt->format("Y-m-d H:i:s"))->toBe(
+                    "2024-01-01 10:00:00",
+                );
+                // The updatedAt timestamp should have been automatically updated
+                expect($found->updatedAt)->not->toBe($updatedAt);
+            },
+        );
     });
 
     describe("delete", function () {
@@ -397,7 +429,7 @@ describe("PdoDashboardRepository", function () {
             );
             $dashboard = TestEntityFactory::createDashboard();
 
-            $repo->save($dashboard);
+            $repo->insert($dashboard);
             $repo->delete($dashboard);
 
             expect(fn() => $repo->findById($dashboard->dashboardId))->toThrow(
@@ -414,7 +446,7 @@ describe("PdoDashboardRepository", function () {
             $dashboard = TestEntityFactory::createDashboard();
             $categoryId = Uuid::uuid4();
 
-            $repo->save($dashboard);
+            $repo->insert($dashboard);
 
             $pdo->prepare(
                 "INSERT INTO categories (category_id, dashboard_id, title) VALUES (?, ?, ?)",
@@ -451,7 +483,7 @@ describe("PdoDashboardRepository", function () {
             $dashboard = TestEntityFactory::createDashboard();
             $linkId = Uuid::uuid4();
 
-            $repo->save($dashboard);
+            $repo->insert($dashboard);
 
             // Insert a link first
             $pdo->prepare(
@@ -501,7 +533,7 @@ describe("PdoDashboardRepository", function () {
                 $categoryId = Uuid::uuid4();
                 $linkId = Uuid::uuid4();
 
-                $repo->save($dashboard);
+                $repo->insert($dashboard);
 
                 // Create category
                 $pdo->prepare(
@@ -582,10 +614,10 @@ describe("PdoDashboardRepository", function () {
             $dashboard1 = TestEntityFactory::createDashboard();
             $dashboard2 = TestEntityFactory::createDashboard();
 
-            $repo->save($dashboard1);
+            $repo->insert($dashboard1);
             expect($repo->count())->toBe(1);
 
-            $repo->save($dashboard2);
+            $repo->insert($dashboard2);
             expect($repo->count())->toBe(2);
 
             $repo->delete($dashboard1);

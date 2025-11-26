@@ -20,9 +20,14 @@ interface DashboardRepositoryInterface
     public function findAll(): DashboardCollection;
 
     /**
-     * Save a new dashboard or update existing one
+     * Save a new dashboard
      */
-    public function save(Dashboard $dashboard): void;
+    public function insert(Dashboard $dashboard): void;
+
+    /**
+     * Update existing dashboard
+     */
+    public function update(Dashboard $dashboard): void;
 
     /**
      * Delete a dashboard (cascades to categories, favorites)
