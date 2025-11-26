@@ -79,10 +79,10 @@ trait EntityMapperTrait
     /**
      * Replace a field name in an array of fields
      *
-     * @param array<int, string> $fields
+     * @param array<string> $fields
      * @param string $currentField
      * @param string $newFieldName
-     * @return array<int, string>
+     * @return array<string>
      * @throws OutOfBoundsException if the current field is not found
      */
     private function replaceField(
