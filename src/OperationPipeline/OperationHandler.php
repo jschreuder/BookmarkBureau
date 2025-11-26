@@ -45,10 +45,13 @@ final class OperationHandler
         $nextHandler = new self($this->middlewares, $this->currentIndex + 1);
 
         /** @var TOutput $result */
-        $result = $middleware->process(
-            $data,
-            fn($d) => $nextHandler->handle($operation, $d),
-        );
+        $result = $middleware->process($data, function (?object $d) use (
+            $operation,
+            $nextHandler,
+        ): object|null {
+            /** @var TInput $d */
+            return $nextHandler->handle($operation, $d);
+        });
         return $result;
     }
 }
