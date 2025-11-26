@@ -6,6 +6,9 @@ parameters:
         # The $default pipeline parameter is intentionally generic - it can handle any input/output types.
         # PHPStan's invariant generics don't support this pattern, so we ignore these specific errors.
         -
+            identifier: trait.unused
+            path: src/OperationPipeline/PipelineMiddlewareTrait.php
+        -
             identifier: missingType.generics
             path: src/Service/*ServicePipelines.php
         -

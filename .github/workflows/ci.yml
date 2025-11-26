@@ -20,6 +20,9 @@ jobs:
       - name: Install PHP dependencies
         run: composer install --prefer-dist --no-progress
 
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse
+
       - name: Run backend tests with coverage
         run: vendor/bin/pest --coverage --coverage-clover=coverage.xml
 
