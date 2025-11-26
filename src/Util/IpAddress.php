@@ -17,9 +17,11 @@ final class IpAddress
 
         // Check for proxy headers (X-Forwarded-For) if configured
         if ($trustProxyHeaders) {
-            $forwardedFor = \is_string($serverParams["HTTP_X_FORWARDED_FOR"])
-                ? $serverParams["HTTP_X_FORWARDED_FOR"]
-                : null;
+            $forwardedFor =
+                isset($serverParams["HTTP_X_FORWARDED_FOR"]) &&
+                \is_string($serverParams["HTTP_X_FORWARDED_FOR"])
+                    ? $serverParams["HTTP_X_FORWARDED_FOR"]
+                    : null;
             if ($forwardedFor) {
                 // X-Forwarded-For can contain multiple IPs: "client, proxy1, proxy2"
                 // Use the first (leftmost) IP as the original client
@@ -32,9 +34,11 @@ final class IpAddress
         }
 
         // Fall back to REMOTE_ADDR with normalization
-        $remoteAddr = \is_string($serverParams["REMOTE_ADDR"])
-            ? $serverParams["REMOTE_ADDR"]
-            : "0.0.0.0";
+        $remoteAddr =
+            isset($serverParams["REMOTE_ADDR"]) &&
+            \is_string($serverParams["REMOTE_ADDR"])
+                ? $serverParams["REMOTE_ADDR"]
+                : "0.0.0.0";
         return self::normalize($remoteAddr);
     }
 
