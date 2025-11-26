@@ -40,6 +40,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
         );
         $statement->execute([":link_id" => $linkId->getBytes()]);
 
+        /** @var array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         if (empty($rows)) {
             throw LinkNotFoundException::forId($linkId);
@@ -62,6 +63,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
         );
         $statement->execute([$limit, $offset]);
 
+        /** @var array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         $links = $this->buildLinkFromRows($rows);
 
@@ -88,6 +90,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
         );
         $statement->execute([$searchTerm, $searchTerm, $limit]);
 
+        /** @var array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         $links = $this->buildLinkFromRows($rows);
 
@@ -131,6 +134,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             ),
         );
 
+        /** @var array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         $links = $this->buildLinkFromRows($rows);
 
