@@ -3,6 +3,7 @@
 **A bookmark management system demonstrating clean architecture with [Middle Framework](https://github.com/jschreuder/Middle)**
 
 [![Build](https://github.com/jschreuder/BookmarkBureau/actions/workflows/ci.yml/badge.svg)](https://github.com/jschreuder/BookmarkBureau/actions)
+[![PHPStan](https://img.shields.io/badge/PHPStan-level%2010-brightgreen.svg?style=flat)](phpstan.neon)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=jschreuder_BookmarkBureau&metric=security_rating)](https://sonarcloud.io/dashboard?id=jschreuder_BookmarkBureau)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=jschreuder_BookmarkBureau&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=jschreuder_BookmarkBureau)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=jschreuder_BookmarkBureau&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=jschreuder_BookmarkBureau)
