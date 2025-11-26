@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Service;
 
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
 use InvalidArgumentException;
 use Lcobucci\JWT\Configuration;
@@ -82,11 +83,17 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
             $tokenString = (string) $token;
             /** @var Plain $parsedToken */
             $parsedToken = $this->jwtConfig->parser()->parse($tokenString);
-            $tokenType = TokenType::from($parsedToken->claims()->get("type"));
+            $tokenTypeString = $parsedToken->claims()->get("type");
+            $tokenType = TokenType::from(
+                \is_string($tokenTypeString) ? $tokenTypeString : "",
+            );
 
             $this->validateTokenConstraints($parsedToken, $tokenType);
 
-            $userId = Uuid::fromString($parsedToken->claims()->get("sub"));
+            $userIdString = $parsedToken->claims()->get("sub");
+            $userId = Uuid::fromString(
+                \is_string($userIdString) ? $userIdString : "",
+            );
             $issuedAt = $this->extractIssuedAt($parsedToken);
             [$expiresAt, $jti] = $this->extractTypeSpecificClaims(
                 $parsedToken,
@@ -139,9 +146,16 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
 
     private function extractIssuedAt(Plain $token): DateTime
     {
+        $iat = $token->claims()->get("iat");
+        if (!$iat instanceof DateTimeInterface) {
+            throw new InvalidTokenException(
+                "Invalid token issued-at timestamp",
+            );
+        }
+
         $issuedAt = DateTime::createFromFormat(
             "U",
-            (string) $token->claims()->get("iat")->getTimestamp(),
+            (string) $iat->getTimestamp(),
             new DateTimeZone("UTC"),
         );
 
@@ -171,13 +185,13 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
     private function extractAndValidateCliJti(Plain $token): UuidInterface
     {
         $jtiClaim = $token->claims()->get("jti");
-        if ($jtiClaim === null) {
+        if ($jtiClaim === null || !\is_string($jtiClaim)) {
             throw new InvalidTokenException(
                 "CLI token missing required JTI claim",
             );
         }
 
-        $jti = Uuid::fromString((string) $jtiClaim);
+        $jti = Uuid::fromString($jtiClaim);
 
         if (!$this->jwtJtiRepository->hasJti($jti)) {
             throw new InvalidTokenException(
@@ -191,7 +205,7 @@ final readonly class LcobucciJwtService implements JwtServiceInterface
     private function extractExpiresAt(Plain $token): ?DateTime
     {
         $expClaim = $token->claims()->get("exp");
-        if ($expClaim === null) {
+        if ($expClaim === null || !$expClaim instanceof DateTimeInterface) {
             return null;
         }
 
