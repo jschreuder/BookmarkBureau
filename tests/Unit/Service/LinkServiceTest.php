@@ -4,13 +4,9 @@ use jschreuder\BookmarkBureau\Composite\LinkCollection;
 use jschreuder\BookmarkBureau\Composite\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
-use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
-use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
-use jschreuder\BookmarkBureau\Repository\FavoriteRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
-use jschreuder\BookmarkBureau\Repository\TagRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\LinkService;
 use jschreuder\BookmarkBureau\Service\LinkServicePipelines;
 use Ramsey\Uuid\Uuid;
@@ -61,7 +57,7 @@ describe("LinkService", function () {
     describe("createLink method", function () {
         test("creates a new link with all parameters", function () {
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("save")->once();
+            $linkRepository->shouldReceive("insert")->once();
 
             $pipelines = new LinkServicePipelines();
 
@@ -83,7 +79,7 @@ describe("LinkService", function () {
 
         test("creates a new link without icon", function () {
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("save")->once();
+            $linkRepository->shouldReceive("insert")->once();
 
             $pipelines = new LinkServicePipelines();
 
@@ -102,7 +98,7 @@ describe("LinkService", function () {
 
         test("creates a new link with empty description", function () {
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("save")->once();
+            $linkRepository->shouldReceive("insert")->once();
 
             $pipelines = new LinkServicePipelines();
 
@@ -136,7 +132,7 @@ describe("LinkService", function () {
                 ->shouldReceive("findById")
                 ->with($linkId)
                 ->andReturn($link);
-            $linkRepository->shouldReceive("save")->once();
+            $linkRepository->shouldReceive("update")->once();
 
             $pipelines = new LinkServicePipelines();
 
@@ -168,7 +164,7 @@ describe("LinkService", function () {
                 ->shouldReceive("findById")
                 ->with($linkId)
                 ->andReturn($link);
-            $linkRepository->shouldReceive("save")->once();
+            $linkRepository->shouldReceive("update")->once();
 
             $pipelines = new LinkServicePipelines();
 
@@ -441,7 +437,8 @@ describe("LinkService", function () {
                 );
 
                 $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-                $linkRepository->shouldReceive("save")->twice();
+                $linkRepository->shouldReceive("insert")->once();
+                $linkRepository->shouldReceive("update")->once();
                 $linkRepository
                     ->shouldReceive("findById")
                     ->with($linkId)
@@ -486,7 +483,7 @@ describe("LinkService", function () {
             $searchResults = new LinkCollection($link1, $link2);
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("save")->twice();
+            $linkRepository->shouldReceive("insert")->twice();
             $linkRepository
                 ->shouldReceive("search")
                 ->with("example", 100)

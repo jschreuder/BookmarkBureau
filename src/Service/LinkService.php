@@ -58,7 +58,7 @@ final class LinkService implements LinkServiceInterface
         );
 
         return $this->pipelines->createLink()->run(function (Link $link): Link {
-            $this->linkRepository->save($link);
+            $this->linkRepository->insert($link);
             return $link;
         }, $newLink);
     }
@@ -81,7 +81,7 @@ final class LinkService implements LinkServiceInterface
         $updatedLink->icon = $icon !== null ? new Icon($icon) : null;
 
         return $this->pipelines->updateLink()->run(function (Link $link): Link {
-            $this->linkRepository->save($link);
+            $this->linkRepository->update($link);
             return $link;
         }, $updatedLink);
     }
@@ -118,14 +118,7 @@ final class LinkService implements LinkServiceInterface
         $searchTagNames = new TagNameCollection(new TagName($tagName));
         return $this->pipelines
             ->findLinksByTag()
-            ->run(
-                fn(
-                    TagNameCollection $tagNames,
-                ): LinkCollection => $this->linkRepository->findByTags(
-                    $tagNames,
-                ),
-                $searchTagNames,
-            );
+            ->run($this->linkRepository->findByTags(...), $searchTagNames);
     }
 
     #[\Override]

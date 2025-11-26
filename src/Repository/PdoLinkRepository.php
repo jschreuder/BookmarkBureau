@@ -177,29 +177,25 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     }
 
     /**
-     * Save a new link or update existing one
+     * Save a new link
      */
     #[\Override]
-    public function save(Link $link): void
+    public function insert(Link $link): void
     {
         $row = $this->mapper->mapToRow($link);
-        $linkIdBytes = $row["link_id"];
+        $build = SqlBuilder::buildInsert("links", $row);
+        $this->pdo->prepare($build["sql"])->execute($build["params"]);
+    }
 
-        // Check if link exists
-        $check = $this->pdo->prepare(
-            "SELECT 1 FROM links WHERE link_id = :link_id LIMIT 1",
-        );
-        $check->execute([":link_id" => $linkIdBytes]);
-
-        if ($check->fetch() === false) {
-            // Insert new link
-            $build = SqlBuilder::buildInsert("links", $row);
-            $this->pdo->prepare($build["sql"])->execute($build["params"]);
-        } else {
-            // Update existing link
-            $build = SqlBuilder::buildUpdate("links", $row, "link_id");
-            $this->pdo->prepare($build["sql"])->execute($build["params"]);
-        }
+    /**
+     * Update existing link
+     */
+    #[\Override]
+    public function update(Link $link): void
+    {
+        $row = $this->mapper->mapToRow($link);
+        $build = SqlBuilder::buildUpdate("links", $row, "link_id");
+        $this->pdo->prepare($build["sql"])->execute($build["params"]);
     }
 
     /**

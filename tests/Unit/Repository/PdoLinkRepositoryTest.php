@@ -250,7 +250,7 @@ describe("PdoLinkRepository", function () {
             );
             $link = TestEntityFactory::createLink();
 
-            $repo->save($link);
+            $repo->insert($link);
 
             $found = $repo->findById($link->linkId);
             expect((string) $found->url)->toBe((string) $link->url);
@@ -266,11 +266,11 @@ describe("PdoLinkRepository", function () {
             );
             $link = TestEntityFactory::createLink();
 
-            $repo->save($link);
+            $repo->insert($link);
 
             $link->url = new Url("https://updated.com");
             $link->title = new Title("Updated Title");
-            $repo->save($link);
+            $repo->update($link);
 
             $found = $repo->findById($link->linkId);
             expect((string) $found->url)->toBe("https://updated.com");
@@ -291,7 +291,7 @@ describe("PdoLinkRepository", function () {
                 updatedAt: $updatedAt,
             );
 
-            $repo->save($link);
+            $repo->insert($link);
 
             $found = $repo->findById($link->linkId);
             expect($found->createdAt->format("Y-m-d H:i:s"))->toBe(
@@ -311,7 +311,7 @@ describe("PdoLinkRepository", function () {
             );
             $link = TestEntityFactory::createLink(icon: null);
 
-            $repo->save($link);
+            $repo->insert($link);
 
             $found = $repo->findById($link->linkId);
             expect($found->icon)->toBeNull();
@@ -328,7 +328,7 @@ describe("PdoLinkRepository", function () {
             );
             $link = TestEntityFactory::createLink();
 
-            $repo->save($link);
+            $repo->insert($link);
             $repo->delete($link);
 
             expect(fn() => $repo->findById($link->linkId))->toThrow(
@@ -345,7 +345,7 @@ describe("PdoLinkRepository", function () {
             );
             $link = TestEntityFactory::createLink();
 
-            $repo->save($link);
+            $repo->insert($link);
             $pdo->prepare("INSERT INTO tags (tag_name) VALUES (?)")->execute([
                 "test-tag",
             ]);

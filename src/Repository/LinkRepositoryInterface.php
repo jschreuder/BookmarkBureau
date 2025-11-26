@@ -35,9 +35,14 @@ interface LinkRepositoryInterface
     public function findByCategoryId(UuidInterface $categoryId): LinkCollection;
 
     /**
-     * Save a new link or update existing one
+     * Save a new link
      */
-    public function save(Link $link): void;
+    public function insert(Link $link): void;
+
+    /**
+     * Update existing link
+     */
+    public function update(Link $link): void;
 
     /**
      * Delete a link (cascades to link_tags, category_links, favorites)
