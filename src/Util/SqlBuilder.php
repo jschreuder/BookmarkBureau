@@ -3,6 +3,7 @@
 namespace jschreuder\BookmarkBureau\Util;
 
 use jschreuder\BookmarkBureau\Entity\Mapper\EntityMapperInterface;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 
 /**
  * Helper for building dynamic SQL statements from field lists.
@@ -30,21 +31,43 @@ final readonly class SqlBuilder
      * @param EntityMapperInterface<TEntity, TIn, TOut> $mapper The entity mapper to extract fields from
      * @param string|null $tableAlias Optional table alias (e.g., "l" for "links l")
      *                                 If provided, fields will be qualified (e.g., "l.field_name")
+     * @param array<string, string> $fieldAliases Optional mapping of field names to SQL aliases
+     *                               (e.g., ["created_at" => "createdAt"] produces "table.created_at AS createdAt")
      * @return string Comma-separated field list
+     * @throws RepositoryStorageException If a field alias references a non-existent field
      */
     public static function selectFieldsFromMapper(
         EntityMapperInterface $mapper,
         ?string $tableAlias = null,
+        array $fieldAliases = [],
     ): string {
         $fields = $mapper->getFields();
 
-        if ($tableAlias === null || $tableAlias === "") {
-            return implode(", ", $fields);
+        // Validate that all field aliases reference existing fields
+        $nonExistentFields = array_diff_key($fieldAliases, array_flip($fields));
+        if (!empty($nonExistentFields)) {
+            $fieldName = array_key_first($nonExistentFields);
+            throw new RepositoryStorageException(
+                "Field alias references non-existent field \"{$fieldName}\"",
+            );
         }
 
         return implode(
             ", ",
-            array_map(fn(string $field) => "{$tableAlias}.{$field}", $fields),
+            array_map(function (string $field) use (
+                $tableAlias,
+                $fieldAliases,
+            ): string {
+                $fieldExpr =
+                    $tableAlias !== null && $tableAlias !== ""
+                        ? "{$tableAlias}.{$field}"
+                        : $field;
+
+                return $fieldExpr .
+                    (isset($fieldAliases[$field])
+                        ? " AS {$fieldAliases[$field]}"
+                        : "");
+            }, $fields),
         );
     }
 
