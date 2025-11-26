@@ -35,9 +35,10 @@ final readonly class ActionController implements
             $request->getMethod() === "GET"
                 ? $request->getQueryParams()
                 : $request->getParsedBody();
-        if (!is_array($rawData)) {
+        if (!\is_array($rawData)) {
             $rawData = [];
         }
+        /** @var array<string, mixed> $rawData */
 
         // Often the ID is part of the path, in which case routing should have added it to attributes
         $id = $request->getAttribute("id");
@@ -52,6 +53,7 @@ final readonly class ActionController implements
     #[\Override]
     public function validateRequest(ServerRequestInterface $request): void
     {
+        /** @var array<string, mixed> $data */
         $data = (array) $request->getParsedBody();
         $this->action->validate($data);
     }
@@ -59,6 +61,7 @@ final readonly class ActionController implements
     #[\Override]
     public function execute(ServerRequestInterface $request): ResponseInterface
     {
+        /** @var array<string, mixed> $data */
         $data = (array) $request->getParsedBody();
         $result = $this->action->execute($data);
 

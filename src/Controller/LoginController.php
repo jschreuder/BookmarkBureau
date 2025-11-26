@@ -41,6 +41,7 @@ final readonly class LoginController implements
     public function filterRequest(
         ServerRequestInterface $request,
     ): ServerRequestInterface {
+        /** @var array<string, mixed> $rawData */
         $rawData = (array) $request->getParsedBody();
         $filtered = $this->inputSpec->filter($rawData);
         return $request->withParsedBody($filtered);
@@ -49,6 +50,7 @@ final readonly class LoginController implements
     #[\Override]
     public function validateRequest(ServerRequestInterface $request): void
     {
+        /** @var array<string, mixed> $data */
         $data = (array) $request->getParsedBody();
         $this->inputSpec->validate($data);
     }

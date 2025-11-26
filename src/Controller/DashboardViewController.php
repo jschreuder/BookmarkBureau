@@ -63,6 +63,7 @@ final readonly class DashboardViewController implements
     #[\Override]
     public function execute(ServerRequestInterface $request): ResponseInterface
     {
+        /** @var array{id: string} $data */
         $data = (array) $request->getParsedBody();
         $dashboardId = Uuid::fromString($data["id"]);
 
