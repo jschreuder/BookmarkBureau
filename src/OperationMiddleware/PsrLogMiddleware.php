@@ -14,6 +14,7 @@ final readonly class PsrLogMiddleware implements PipelineMiddlewareInterface
         private string $logLevel = LogLevel::DEBUG,
     ) {}
 
+    /** @param callable(object|null): (object|null) $next */
     #[\Override]
     public function process(?object $data, callable $next): ?object
     {
