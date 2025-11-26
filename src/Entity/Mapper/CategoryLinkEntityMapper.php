@@ -35,6 +35,12 @@ final readonly class CategoryLinkEntityMapper implements EntityMapperInterface
     }
 
     #[\Override]
+    public function getDbFields(): array
+    {
+        return $this->getFields();
+    }
+
+    #[\Override]
     public function supports(object $entity): bool
     {
         return $entity instanceof CategoryLink;

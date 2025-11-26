@@ -3,6 +3,7 @@
 namespace jschreuder\BookmarkBureau\Entity\Mapper;
 
 use InvalidArgumentException;
+use OutOfBoundsException;
 
 /**
  * This trait implements common validation logic for EntityMappers to prevent
@@ -74,4 +75,28 @@ trait EntityMapperTrait
      * @return TOut
      */
     abstract private function doMapToRow(object $entity): array;
+
+    /**
+     * Replace a field name in an array of fields
+     *
+     * @param array<int, string> $fields
+     * @param string $currentField
+     * @param string $newFieldName
+     * @return array<int, string>
+     * @throws OutOfBoundsException if the current field is not found
+     */
+    private function replaceField(
+        array $fields,
+        string $currentField,
+        string $newFieldName,
+    ): array {
+        $key = array_search($currentField, $fields, true);
+        if ($key === false) {
+            throw new OutOfBoundsException(
+                "Field '{$currentField}' not found in fields array",
+            );
+        }
+        $fields[$key] = $newFieldName;
+        return $fields;
+    }
 }

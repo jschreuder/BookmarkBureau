@@ -21,6 +21,27 @@ describe("CategoryLinkEntityMapper", function () {
         });
     });
 
+    describe("getDbFields", function () {
+        test(
+            "returns same fields as getFields since already has _id fields",
+            function () {
+                $mapper = new CategoryLinkEntityMapper();
+                $fields = $mapper->getFields();
+                $dbFields = $mapper->getDbFields();
+
+                expect($dbFields)->toBe($fields);
+                expect($dbFields)->toBe([
+                    "category_id",
+                    "link_id",
+                    "sort_order",
+                    "created_at",
+                    "category",
+                    "link",
+                ]);
+            },
+        );
+    });
+
     describe("supports", function () {
         test("returns true for CategoryLink entities", function () {
             $mapper = new CategoryLinkEntityMapper();

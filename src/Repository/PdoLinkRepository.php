@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Composite\LinkCollection;
@@ -155,6 +156,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
         );
         $statement->execute([":category_id" => $categoryId->getBytes()]);
 
+        /** @var array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         if (empty($rows)) {
             // Verify the category exists
@@ -222,7 +224,11 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
         $statement = $this->pdo->prepare("SELECT COUNT(*) as count FROM links");
         $statement->execute();
 
+        /** @var array{count: int}|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RepositoryStorageException("Failed to count links");
+        }
         return (int) $result["count"];
     }
 
@@ -233,7 +239,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
      * 2. Collecting tags for each link into a TagCollection
      * 3. Mapping to Link entities with their tags
      *
-     * @param array<int, array<string, mixed>> $rows
+     * @param array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows
      * @return array<int, Link>
      */
     private function buildLinkFromRows(array $rows): array
@@ -271,7 +277,10 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
                 $tagName = $tagRow["tag_name"];
 
                 if (!\array_key_exists($tagName, $tagObjects)) {
-                    $tagObject = $this->tagMapper->mapToEntity($tagRow);
+                    $tagObject = $this->tagMapper->mapToEntity([
+                        "tag_name" => $tagName,
+                        "color" => $tagRow["color"],
+                    ]);
                     $tagObjects[$tagName] = $tagObject;
                 } else {
                     $tagObject = $tagObjects[$tagName];
@@ -282,6 +291,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
 
             // Map Link entity with its tags
             $linkRow["tags"] = new TagCollection(...$tags);
+            unset($linkRow["tag_name"], $linkRow["color"]);
             $link = $this->mapper->mapToEntity($linkRow);
             $links[] = $link;
         }

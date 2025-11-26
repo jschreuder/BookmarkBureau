@@ -10,6 +10,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\PdoCategoryRepository;
@@ -1087,6 +1088,35 @@ describe("PdoCategoryRepository", function () {
                 $repo->getMaxSortOrderForDashboardId($dashboard->dashboardId),
             )->toBe(-1);
         });
+
+        test("throws RepositoryStorageException when fetch fails", function () {
+            $mockPdo = Mockery::mock(PDO::class);
+            $mockStmt = Mockery::mock(PDOStatement::class);
+
+            $dashboardId = Uuid::uuid4();
+
+            $mockStmt->shouldReceive("execute")->andReturn(true);
+            $mockStmt->shouldReceive("fetch")->andReturn(false);
+
+            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
+
+            $mockDashboardRepo = Mockery::mock(
+                DashboardRepositoryInterface::class,
+            );
+            $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
+
+            $repo = new PdoCategoryRepository(
+                $mockPdo,
+                $mockDashboardRepo,
+                $mockLinkRepo,
+                new CategoryEntityMapper(),
+                new LinkEntityMapper(),
+            );
+
+            expect(
+                fn() => $repo->getMaxSortOrderForDashboardId($dashboardId),
+            )->toThrow(RepositoryStorageException::class);
+        });
     });
 
     describe("getMaxSortOrderForCategoryId", function () {
@@ -1153,6 +1183,35 @@ describe("PdoCategoryRepository", function () {
                 $repo->getMaxSortOrderForCategoryId($category->categoryId),
             )->toBe(-1);
         });
+
+        test("throws RepositoryStorageException when fetch fails", function () {
+            $mockPdo = Mockery::mock(PDO::class);
+            $mockStmt = Mockery::mock(PDOStatement::class);
+
+            $categoryId = Uuid::uuid4();
+
+            $mockStmt->shouldReceive("execute")->andReturn(true);
+            $mockStmt->shouldReceive("fetch")->andReturn(false);
+
+            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
+
+            $mockDashboardRepo = Mockery::mock(
+                DashboardRepositoryInterface::class,
+            );
+            $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
+
+            $repo = new PdoCategoryRepository(
+                $mockPdo,
+                $mockDashboardRepo,
+                $mockLinkRepo,
+                new CategoryEntityMapper(),
+                new LinkEntityMapper(),
+            );
+
+            expect(
+                fn() => $repo->getMaxSortOrderForCategoryId($categoryId),
+            )->toThrow(RepositoryStorageException::class);
+        });
     });
 
     describe("count", function () {
@@ -1185,6 +1244,33 @@ describe("PdoCategoryRepository", function () {
             );
 
             expect($repo->count())->toBe(0);
+        });
+
+        test("throws RepositoryStorageException when fetch fails", function () {
+            $mockPdo = Mockery::mock(PDO::class);
+            $mockStmt = Mockery::mock(PDOStatement::class);
+
+            $mockStmt->shouldReceive("execute")->andReturn(true);
+            $mockStmt->shouldReceive("fetch")->andReturn(false);
+
+            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
+
+            $mockDashboardRepo = Mockery::mock(
+                DashboardRepositoryInterface::class,
+            );
+            $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
+
+            $repo = new PdoCategoryRepository(
+                $mockPdo,
+                $mockDashboardRepo,
+                $mockLinkRepo,
+                new CategoryEntityMapper(),
+                new LinkEntityMapper(),
+            );
+
+            expect(fn() => $repo->count())->toThrow(
+                RepositoryStorageException::class,
+            );
         });
     });
 
@@ -1226,6 +1312,35 @@ describe("PdoCategoryRepository", function () {
             $repo->insert($category);
 
             expect($repo->countLinksInCategory($category->categoryId))->toBe(0);
+        });
+
+        test("throws RepositoryStorageException when fetch fails", function () {
+            $mockPdo = Mockery::mock(PDO::class);
+            $mockStmt = Mockery::mock(\PDOStatement::class);
+
+            $categoryId = Uuid::uuid4();
+
+            $mockStmt->shouldReceive("execute")->andReturn(true);
+            $mockStmt->shouldReceive("fetch")->andReturn(false);
+
+            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
+
+            $mockDashboardRepo = Mockery::mock(
+                DashboardRepositoryInterface::class,
+            );
+            $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
+
+            $repo = new PdoCategoryRepository(
+                $mockPdo,
+                $mockDashboardRepo,
+                $mockLinkRepo,
+                new CategoryEntityMapper(),
+                new LinkEntityMapper(),
+            );
+
+            expect(fn() => $repo->countLinksInCategory($categoryId))->toThrow(
+                RepositoryStorageException::class,
+            );
         });
     });
 

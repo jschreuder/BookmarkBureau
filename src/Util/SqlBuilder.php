@@ -41,7 +41,7 @@ final readonly class SqlBuilder
         ?string $tableAlias = null,
         array $fieldAliases = [],
     ): string {
-        $fields = $mapper->getFields();
+        $fields = $mapper->getDbFields();
 
         // Validate that all field aliases reference existing fields
         $nonExistentFields = array_diff_key($fieldAliases, array_flip($fields));

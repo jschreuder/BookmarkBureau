@@ -11,11 +11,22 @@ describe("TagEntityMapper", function () {
             $mapper = new TagEntityMapper();
             $fields = $mapper->getFields();
 
-            expect($fields)->toBe([
-                "tag_name",
-                "color",
-            ]);
+            expect($fields)->toBe(["tag_name", "color"]);
         });
+    });
+
+    describe("getDbFields", function () {
+        test(
+            "returns same fields as getFields since no entity references",
+            function () {
+                $mapper = new TagEntityMapper();
+                $fields = $mapper->getFields();
+                $dbFields = $mapper->getDbFields();
+
+                expect($dbFields)->toBe($fields);
+                expect($dbFields)->toBe(["tag_name", "color"]);
+            },
+        );
     });
 
     describe("supports", function () {

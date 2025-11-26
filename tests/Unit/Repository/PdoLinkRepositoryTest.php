@@ -9,6 +9,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Repository\PdoLinkRepository;
 use Ramsey\Uuid\Uuid;
 
@@ -396,6 +397,26 @@ describe("PdoLinkRepository", function () {
             );
 
             expect($repo->count())->toBe(0);
+        });
+
+        test("throws RepositoryStorageException when fetch fails", function () {
+            $mockPdo = Mockery::mock(PDO::class);
+            $mockStmt = Mockery::mock(PDOStatement::class);
+
+            $mockStmt->shouldReceive("execute")->andReturn(true);
+            $mockStmt->shouldReceive("fetch")->andReturn(false);
+
+            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
+
+            $repo = new PdoLinkRepository(
+                $mockPdo,
+                new LinkEntityMapper(),
+                new TagEntityMapper(),
+            );
+
+            expect(fn() => $repo->count())->toThrow(
+                RepositoryStorageException::class,
+            );
         });
     });
 

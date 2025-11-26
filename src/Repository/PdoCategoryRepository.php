@@ -15,6 +15,7 @@ use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
 use Ramsey\Uuid\Uuid;
@@ -38,12 +39,13 @@ final readonly class PdoCategoryRepository implements
     {
         $sql = SqlBuilder::buildSelect(
             "categories",
-            $this->categoryMapper->getFields(),
+            $this->categoryMapper->getDbFields(),
             "category_id = :category_id LIMIT 1",
         );
         $statement = $this->pdo->prepare($sql);
         $statement->execute([":category_id" => $categoryId->getBytes()]);
 
+        /** @var array{category_id: string, dashboard_id: string, title: string, color: string|null, sort_order: string, created_at: string, updated_at: string}|false $row */
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
             throw CategoryNotFoundException::forId($categoryId);
@@ -69,7 +71,7 @@ final readonly class PdoCategoryRepository implements
 
         $sql = SqlBuilder::buildSelect(
             "categories",
-            $this->categoryMapper->getFields(),
+            $this->categoryMapper->getDbFields(),
             "dashboard_id = :dashboard_id",
             "sort_order ASC",
         );
@@ -78,6 +80,8 @@ final readonly class PdoCategoryRepository implements
 
         $categories = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /** @var array{category_id: string, dashboard_id: string, title: string, color: string|null, sort_order: string, created_at: string, updated_at: string} $row */
+            unset($row["dashboard_id"]);
             $row["dashboard"] = $dashboard;
             $categories[] = $this->categoryMapper->mapToEntity($row);
         }
@@ -112,7 +116,17 @@ final readonly class PdoCategoryRepository implements
 
         $categoryLinks = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $link = $this->linkMapper->mapToEntity($row);
+            /** @var array{category_id: string, link_id: string, sort_order: string, category_link_created_at: string, url: string, title: string, icon: string|null, description: string, created_at: string, updated_at: string} $row */
+            $link = $this->linkMapper->mapToEntity([
+                "link_id" => $row["link_id"],
+                "url" => $row["url"],
+                "title" => $row["title"],
+                "description" => $row["description"],
+                "icon" => $row["icon"],
+                "created_at" => $row["created_at"],
+                "updated_at" => $row["updated_at"],
+                "tags" => null,
+            ]);
             $categoryLinks[] = new CategoryLink(
                 category: $category,
                 link: $link,
@@ -139,7 +153,13 @@ final readonly class PdoCategoryRepository implements
         );
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
+        /** @var array{max_sort: int|null}|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RepositoryStorageException(
+                "Failed to get category max sort order for dashboard",
+            );
+        }
         $maxSort = (int) $result["max_sort"];
         return $maxSort === 0 && $result["max_sort"] === null ? -1 : $maxSort;
     }
@@ -156,7 +176,13 @@ final readonly class PdoCategoryRepository implements
         );
         $statement->execute([":category_id" => $categoryId->getBytes()]);
 
+        /** @var array{max_sort: int|null}|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RepositoryStorageException(
+                "Failed to get link max sort order for category",
+            );
+        }
         $maxSort = (int) $result["max_sort"];
         return $maxSort === 0 && $result["max_sort"] === null ? -1 : $maxSort;
     }
@@ -370,7 +396,11 @@ final readonly class PdoCategoryRepository implements
         );
         $statement->execute();
 
+        /** @var array{count: int}|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RepositoryStorageException("Failed to count categories");
+        }
         return (int) $result["count"];
     }
 
@@ -385,7 +415,13 @@ final readonly class PdoCategoryRepository implements
         );
         $statement->execute([":category_id" => $categoryId->getBytes()]);
 
+        /** @var array{count: int}|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RepositoryStorageException(
+                "Failed to count links in category",
+            );
+        }
         return (int) $result["count"];
     }
 }

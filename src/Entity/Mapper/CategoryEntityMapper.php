@@ -23,7 +23,7 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
 
     private const array FIELDS = [
         "category_id",
-        "dashboard_id",
+        "dashboard",
         "title",
         "color",
         "sort_order",
@@ -35,6 +35,16 @@ final readonly class CategoryEntityMapper implements EntityMapperInterface
     public function getFields(): array
     {
         return self::FIELDS;
+    }
+
+    #[\Override]
+    public function getDbFields(): array
+    {
+        return $this->replaceField(
+            $this->getFields(),
+            "dashboard",
+            "dashboard_id",
+        );
     }
 
     #[\Override]

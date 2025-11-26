@@ -1,5 +1,6 @@
 <?php
 
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Repository\PdoLoginRateLimitRepository;
 
 describe("PdoLoginRateLimitRepository", function () {
@@ -382,6 +383,26 @@ describe("PdoLoginRateLimitRepository", function () {
             );
 
             expect($counts["user_count"])->toBe(2);
+        });
+
+        test("throws RepositoryStorageException when fetch fails", function () {
+            $mockPdo = Mockery::mock(PDO::class);
+            $mockStmt = Mockery::mock(PDOStatement::class);
+
+            $mockStmt->shouldReceive("execute")->andReturn(true);
+            $mockStmt->shouldReceive("fetch")->andReturn(false);
+
+            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
+
+            $repo = new PdoLoginRateLimitRepository($mockPdo);
+
+            expect(
+                fn() => $repo->countAttempts(
+                    "user@example.com",
+                    "192.168.1.1",
+                    "2024-01-01 12:00:00",
+                ),
+            )->toThrow(RepositoryStorageException::class);
         });
     });
 

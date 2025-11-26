@@ -26,6 +26,12 @@ final readonly class TagEntityMapper implements EntityMapperInterface
     }
 
     #[\Override]
+    public function getDbFields(): array
+    {
+        return $this->getFields();
+    }
+
+    #[\Override]
     public function supports(object $entity): bool
     {
         return $entity instanceof Tag;

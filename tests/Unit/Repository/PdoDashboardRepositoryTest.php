@@ -3,6 +3,7 @@
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\Icon;
@@ -589,6 +590,25 @@ describe("PdoDashboardRepository", function () {
 
             $repo->delete($dashboard1);
             expect($repo->count())->toBe(1);
+        });
+
+        test("throws RepositoryStorageException when fetch fails", function () {
+            $mockPdo = Mockery::mock(PDO::class);
+            $mockStmt = Mockery::mock(PDOStatement::class);
+
+            $mockStmt->shouldReceive("execute")->andReturn(true);
+            $mockStmt->shouldReceive("fetch")->andReturn(false);
+
+            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
+
+            $repo = new PdoDashboardRepository(
+                $mockPdo,
+                new DashboardEntityMapper(),
+            );
+
+            expect(fn() => $repo->count())->toThrow(
+                RepositoryStorageException::class,
+            );
         });
     });
 });

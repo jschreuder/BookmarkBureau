@@ -34,6 +34,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         $statement = $this->pdo->prepare($sql);
         $statement->execute([":tag_name" => $tagName]);
 
+        /** @var array{tag_name: string, color: string|null}|false $row */
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
             throw TagNotFoundException::forName(new TagName($tagName));
@@ -59,6 +60,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
 
         $tags = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /** @var array{tag_name: string, color: string|null} $row */
             $tags[] = $this->mapper->mapToEntity($row);
         }
 
@@ -94,6 +96,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
 
         $tags = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /** @var array{tag_name: string, color: string|null} $row */
             $tags[] = $this->mapper->mapToEntity($row);
         }
 
@@ -120,6 +123,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
 
         $tags = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /** @var array{tag_name: string, color: string|null} $row */
             $tags[] = $this->mapper->mapToEntity($row);
         }
 

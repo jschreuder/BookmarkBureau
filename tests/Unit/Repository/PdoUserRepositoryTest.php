@@ -5,6 +5,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\HashedPassword;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Repository\PdoUserRepository;
 use Ramsey\Uuid\Uuid;
 
@@ -388,6 +389,22 @@ describe("PdoUserRepository", function () {
 
             $repo->delete($user);
             expect($repo->count())->toBe(0);
+        });
+
+        test("throws RepositoryStorageException when fetch fails", function () {
+            $mockPdo = Mockery::mock(PDO::class);
+            $mockStmt = Mockery::mock(PDOStatement::class);
+
+            $mockStmt->shouldReceive("execute")->andReturn(true);
+            $mockStmt->shouldReceive("fetch")->andReturn(false);
+
+            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
+
+            $repo = new PdoUserRepository($mockPdo, new UserEntityMapper());
+
+            expect(fn() => $repo->count())->toThrow(
+                RepositoryStorageException::class,
+            );
         });
     });
 });

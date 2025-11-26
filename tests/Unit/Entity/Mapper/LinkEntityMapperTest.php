@@ -27,6 +27,28 @@ describe("LinkEntityMapper", function () {
         });
     });
 
+    describe("getDbFields", function () {
+        test(
+            "returns same fields as getFields since no entity references",
+            function () {
+                $mapper = new LinkEntityMapper();
+                $fields = $mapper->getFields();
+                $dbFields = $mapper->getDbFields();
+
+                expect($dbFields)->toBe($fields);
+                expect($dbFields)->toBe([
+                    "link_id",
+                    "url",
+                    "title",
+                    "description",
+                    "icon",
+                    "created_at",
+                    "updated_at",
+                ]);
+            },
+        );
+    });
+
     describe("supports", function () {
         test("returns true for Link entities", function () {
             $mapper = new LinkEntityMapper();

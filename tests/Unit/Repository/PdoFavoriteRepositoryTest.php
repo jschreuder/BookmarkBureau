@@ -8,6 +8,7 @@ use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Repository\PdoDashboardRepository;
@@ -291,6 +292,36 @@ describe("PdoFavoriteRepository", function () {
             );
 
             expect($maxSort)->toBe(-1);
+        });
+
+        test("throws RepositoryStorageException when fetch fails", function () {
+            $mockPdo = Mockery::mock(PDO::class);
+            $mockStmt = Mockery::mock(PDOStatement::class);
+
+            $dashboardId = Uuid::uuid4();
+
+            $mockStmt->shouldReceive("execute")->andReturn(true);
+            $mockStmt->shouldReceive("fetch")->andReturn(false);
+
+            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
+
+            $mockDashboardRepo = Mockery::mock(
+                DashboardRepositoryInterface::class,
+            );
+            $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
+
+            $repo = new PdoFavoriteRepository(
+                $mockPdo,
+                $mockDashboardRepo,
+                $mockLinkRepo,
+                new FavoriteEntityMapper(),
+                new DashboardEntityMapper(),
+                new LinkEntityMapper(),
+            );
+
+            expect(
+                fn() => $repo->getMaxSortOrderForDashboardId($dashboardId),
+            )->toThrow(RepositoryStorageException::class);
         });
     });
 
@@ -758,6 +789,36 @@ describe("PdoFavoriteRepository", function () {
 
             expect($repo->countForDashboardId($dashboard->dashboardId))->toBe(
                 0,
+            );
+        });
+
+        test("throws RepositoryStorageException when fetch fails", function () {
+            $mockPdo = Mockery::mock(PDO::class);
+            $mockStmt = Mockery::mock(PDOStatement::class);
+
+            $dashboardId = Uuid::uuid4();
+
+            $mockStmt->shouldReceive("execute")->andReturn(true);
+            $mockStmt->shouldReceive("fetch")->andReturn(false);
+
+            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
+
+            $mockDashboardRepo = Mockery::mock(
+                DashboardRepositoryInterface::class,
+            );
+            $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
+
+            $repo = new PdoFavoriteRepository(
+                $mockPdo,
+                $mockDashboardRepo,
+                $mockLinkRepo,
+                new FavoriteEntityMapper(),
+                new DashboardEntityMapper(),
+                new LinkEntityMapper(),
+            );
+
+            expect(fn() => $repo->countForDashboardId($dashboardId))->toThrow(
+                RepositoryStorageException::class,
             );
         });
     });

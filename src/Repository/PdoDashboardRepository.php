@@ -8,6 +8,7 @@ use jschreuder\BookmarkBureau\Composite\DashboardCollection;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
 
 final readonly class PdoDashboardRepository implements
@@ -32,6 +33,7 @@ final readonly class PdoDashboardRepository implements
         $statement = $this->pdo->prepare($sql);
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
+        /** @var array{dashboard_id: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string}|false $row */
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
             throw DashboardNotFoundException::forId($dashboardId);
@@ -57,6 +59,7 @@ final readonly class PdoDashboardRepository implements
 
         $dashboards = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /** @var array{dashboard_id: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string} $row */
             $dashboards[] = $this->mapper->mapToEntity($row);
         }
 
@@ -119,7 +122,11 @@ final readonly class PdoDashboardRepository implements
         );
         $statement->execute();
 
+        /** @var array{count: string}|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RepositoryStorageException("Failed to count dashboards");
+        }
         return (int) $result["count"];
     }
 }

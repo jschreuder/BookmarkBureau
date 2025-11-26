@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 use PDO;
 
@@ -28,7 +29,8 @@ final readonly class PdoLoginRateLimitRepository implements
             LIMIT 1
         ");
         $stmt->execute([$username, $ip, $now]);
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        /** @var array{username: string, ip: string, expires_at: string}|false $result */
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result === false) {
             return [
@@ -84,11 +86,17 @@ final readonly class PdoLoginRateLimitRepository implements
             WHERE timestamp > ?
         ");
         $stmt->execute([$username, $ip, $since]);
+        /** @var array{user_count: string, ip_count: string}|false $result */
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RepositoryStorageException(
+                "Failed to fetch login rate limit data",
+            );
+        }
 
         return [
-            "user_count" => (int) ($result["user_count"] ?? 0),
-            "ip_count" => (int) ($result["ip_count"] ?? 0),
+            "user_count" => (int) $result["user_count"],
+            "ip_count" => (int) $result["ip_count"],
         ];
     }
 

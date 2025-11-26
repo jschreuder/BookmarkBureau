@@ -8,6 +8,7 @@ use jschreuder\BookmarkBureau\Composite\UserCollection;
 use jschreuder\BookmarkBureau\Entity\User;
 use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
 
@@ -31,8 +32,9 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         );
         $statement = $this->pdo->prepare($sql);
         $statement->execute([":user_id" => $userId->getBytes()]);
-        $row = $statement->fetch(PDO::FETCH_ASSOC);
 
+        /** @var array{user_id: string, email: string, password_hash: string, totp_secret: string|null, created_at: string, updated_at: string}|false $row */
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
             throw UserNotFoundException::forId($userId);
         }
@@ -53,8 +55,9 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         );
         $statement = $this->pdo->prepare($sql);
         $statement->execute([":email" => (string) $email]);
-        $row = $statement->fetch(PDO::FETCH_ASSOC);
 
+        /** @var array{user_id: string, email: string, password_hash: string, totp_secret: string|null, created_at: string, updated_at: string}|false $row */
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
             throw UserNotFoundException::forEmail($email);
         }
@@ -77,7 +80,9 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         $statement = $this->pdo->prepare($sql);
         $statement->execute();
         $users = [];
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /** @var array{user_id: string, email: string, password_hash: string, totp_secret: string|null, created_at: string, updated_at: string} $row */
             $users[] = $this->mapper->mapToEntity($row);
         }
         return new UserCollection(...$users);
@@ -142,7 +147,12 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     {
         $statement = $this->pdo->prepare("SELECT COUNT(*) as count FROM users");
         $statement->execute();
+
+        /** @var array{count: int}|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RepositoryStorageException("Failed to count users");
+        }
         return (int) $result["count"];
     }
 }

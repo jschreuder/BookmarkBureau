@@ -36,6 +36,17 @@ interface EntityMapperInterface
     public function getFields(): array;
 
     /**
+     * Get all database field names that this mapper handles
+     *
+     * This can differ from the field names returned by getFields() if the
+     * mapper expects some fields to be turned into objects before, especially
+     * other entities that are referenced by this entity.
+     *
+     * @return array<string> List of database field names supported by this mapper
+     */
+    public function getDbFields(): array;
+
+    /**
      * Determines if this mapper supports transforming the given data
      *
      * This method checks whether the provided entity is of a type that this

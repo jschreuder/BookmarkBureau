@@ -11,12 +11,46 @@ describe("FavoriteEntityMapper", function () {
             $fields = $mapper->getFields();
 
             expect($fields)->toBe([
-                "dashboard_id",
-                "link_id",
+                "dashboard",
+                "link",
                 "sort_order",
                 "created_at",
             ]);
         });
+    });
+
+    describe("getDbFields", function () {
+        test(
+            "returns database field names with dashboard_id and link_id",
+            function () {
+                $mapper = new FavoriteEntityMapper();
+                $dbFields = $mapper->getDbFields();
+
+                expect($dbFields)->toBe([
+                    "dashboard_id",
+                    "link_id",
+                    "sort_order",
+                    "created_at",
+                ]);
+            },
+        );
+
+        test(
+            "getDbFields differs from getFields in entity reference fields",
+            function () {
+                $mapper = new FavoriteEntityMapper();
+                $fields = $mapper->getFields();
+                $dbFields = $mapper->getDbFields();
+
+                expect($dbFields)->not->toBe($fields);
+                expect(in_array("dashboard", $dbFields, true))->toBeFalse();
+                expect(in_array("link", $dbFields, true))->toBeFalse();
+                expect(in_array("dashboard_id", $dbFields, true))->toBeTrue();
+                expect(in_array("link_id", $dbFields, true))->toBeTrue();
+                expect(in_array("dashboard", $fields, true))->toBeTrue();
+                expect(in_array("link", $fields, true))->toBeTrue();
+            },
+        );
     });
 
     describe("supports", function () {

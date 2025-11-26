@@ -20,8 +20,8 @@ final readonly class FavoriteEntityMapper implements EntityMapperInterface
     use EntityMapperTrait;
 
     private const array FIELDS = [
-        "dashboard_id",
-        "link_id",
+        "dashboard",
+        "link",
         "sort_order",
         "created_at",
     ];
@@ -30,6 +30,20 @@ final readonly class FavoriteEntityMapper implements EntityMapperInterface
     public function getFields(): array
     {
         return self::FIELDS;
+    }
+
+    #[\Override]
+    public function getDbFields(): array
+    {
+        return $this->replaceField(
+            $this->replaceField(
+                $this->getFields(),
+                "dashboard",
+                "dashboard_id",
+            ),
+            "link",
+            "link_id",
+        );
     }
 
     #[\Override]

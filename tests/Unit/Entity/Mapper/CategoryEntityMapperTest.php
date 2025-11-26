@@ -15,7 +15,7 @@ describe("CategoryEntityMapper", function () {
 
             expect($fields)->toBe([
                 "category_id",
-                "dashboard_id",
+                "dashboard",
                 "title",
                 "color",
                 "sort_order",
@@ -23,6 +23,41 @@ describe("CategoryEntityMapper", function () {
                 "updated_at",
             ]);
         });
+    });
+
+    describe("getDbFields", function () {
+        test(
+            "returns database field names with dashboard_id instead of dashboard",
+            function () {
+                $mapper = new CategoryEntityMapper();
+                $dbFields = $mapper->getDbFields();
+
+                expect($dbFields)->toBe([
+                    "category_id",
+                    "dashboard_id",
+                    "title",
+                    "color",
+                    "sort_order",
+                    "created_at",
+                    "updated_at",
+                ]);
+            },
+        );
+
+        test(
+            "getDbFields differs from getFields only in dashboard field",
+            function () {
+                $mapper = new CategoryEntityMapper();
+                $fields = $mapper->getFields();
+                $dbFields = $mapper->getDbFields();
+
+                expect($dbFields)->not->toBe($fields);
+                expect(in_array("dashboard", $dbFields, true))->toBeFalse();
+                expect(in_array("dashboard_id", $dbFields, true))->toBeTrue();
+                expect(in_array("dashboard", $fields, true))->toBeTrue();
+                expect(in_array("dashboard_id", $fields, true))->toBeFalse();
+            },
+        );
     });
 
     describe("supports", function () {

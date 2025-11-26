@@ -14,9 +14,9 @@ use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
+use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
-use Ramsey\Uuid\Uuid;
 
 final readonly class PdoFavoriteRepository implements
     FavoriteRepositoryInterface
@@ -44,10 +44,12 @@ final readonly class PdoFavoriteRepository implements
         $favoriteFields = SqlBuilder::selectFieldsFromMapper(
             $this->favoriteMapper,
             "f",
+            ["created_at" => "favorite_created_at"],
         );
         $linkFields = SqlBuilder::selectFieldsFromMapper(
             $this->linkMapper,
             "l",
+            ["created_at" => "link_created_at"],
         );
         $statement = $this->pdo->prepare(
             "SELECT {$favoriteFields}, {$linkFields}
@@ -60,9 +62,24 @@ final readonly class PdoFavoriteRepository implements
 
         $favorites = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $row["dashboard"] = $dashboard;
-            $row["link"] = $this->linkMapper->mapToEntity($row);
-            $favorites[] = $this->favoriteMapper->mapToEntity($row);
+            /** @var array{dashboard_id: string, link_id: string, sort_order: string, favorite_created_at:string, url: string, title: string, description: string, icon: string|null, link_created_at: string, updated_at: string} $row */
+            unset($row["dashboard_id"]);
+            $link = $this->linkMapper->mapToEntity([
+                "link_id" => $row["link_id"],
+                "url" => $row["url"],
+                "title" => $row["title"],
+                "description" => $row["description"],
+                "icon" => $row["icon"],
+                "created_at" => $row["link_created_at"],
+                "updated_at" => $row["updated_at"],
+                "tags" => null,
+            ]);
+            $favorites[] = $this->favoriteMapper->mapToEntity([
+                "dashboard" => $dashboard,
+                "link" => $link,
+                "sort_order" => $row["sort_order"],
+                "created_at" => $row["favorite_created_at"],
+            ]);
         }
 
         return new FavoriteCollection(...$favorites);
@@ -81,7 +98,14 @@ final readonly class PdoFavoriteRepository implements
         );
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
+        /** @var array{max_sort: int|null}|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RepositoryStorageException(
+                "Failed to get max sort order for favorites",
+            );
+        }
+
         $maxSort = (int) $result["max_sort"];
         return $maxSort === 0 && $result["max_sort"] === null ? -1 : $maxSort;
     }
@@ -247,7 +271,11 @@ final readonly class PdoFavoriteRepository implements
         );
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
+        /** @var array{count: int}|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RepositoryStorageException("Failed to count users");
+        }
         return (int) $result["count"];
     }
 
@@ -276,6 +304,7 @@ final readonly class PdoFavoriteRepository implements
 
         $dashboards = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /** @var array{dashboard_id: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string} $row */
             $dashboards[] = $this->dashboardMapper->mapToEntity($row);
         }
 
