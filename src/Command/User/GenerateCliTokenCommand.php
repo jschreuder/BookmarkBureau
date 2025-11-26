@@ -104,6 +104,9 @@ final class GenerateCliTokenCommand extends Command
         } catch (ValidationFailedException $e) {
             $output->writeln("<error>Validation failed:</error>");
             foreach ($e->getValidationErrors() as $message) {
+                $message = \is_string($message)
+                    ? $message
+                    : "[unknown message]";
                 $output->writeln("<error>  - {$message}</error>");
             }
         } catch (InvalidArgumentException $e) {
