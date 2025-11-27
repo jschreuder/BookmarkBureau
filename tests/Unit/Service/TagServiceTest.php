@@ -156,7 +156,7 @@ describe("TagService", function () {
     describe("createTag method", function () {
         test("creates a new tag with name and color", function () {
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository->shouldReceive("save")->once();
+            $tagRepository->shouldReceive("insert")->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
 
@@ -175,7 +175,7 @@ describe("TagService", function () {
 
         test("creates a new tag without color", function () {
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository->shouldReceive("save")->once();
+            $tagRepository->shouldReceive("insert")->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
 
@@ -195,7 +195,7 @@ describe("TagService", function () {
             function () {
                 $tagRepository = Mockery::mock(TagRepositoryInterface::class);
                 $tagRepository
-                    ->shouldReceive("save")
+                    ->shouldReceive("insert")
                     ->once()
                     ->andThrow(DuplicateTagException::class);
 
@@ -242,7 +242,7 @@ describe("TagService", function () {
                 ->with("my-tag")
                 ->once()
                 ->andReturn($tag);
-            $tagRepository->shouldReceive("save")->once();
+            $tagRepository->shouldReceive("update")->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
 
@@ -269,7 +269,7 @@ describe("TagService", function () {
                 ->with("my-tag")
                 ->once()
                 ->andReturn($tag);
-            $tagRepository->shouldReceive("save")->once();
+            $tagRepository->shouldReceive("update")->once();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
 
@@ -409,7 +409,7 @@ describe("TagService", function () {
                 ->with("new-tag")
                 ->once()
                 ->andThrow(TagNotFoundException::class);
-            $tagRepository->shouldReceive("save")->once();
+            $tagRepository->shouldReceive("update")->once();
             $tagRepository
                 ->shouldReceive("isAssignedToLinkId")
                 ->with($linkId, "new-tag")
@@ -617,7 +617,7 @@ describe("TagService", function () {
 
                 $tagRepository = Mockery::mock(TagRepositoryInterface::class);
                 // For create tag
-                $tagRepository->shouldReceive("save")->once();
+                $tagRepository->shouldReceive("insert")->once();
                 // For getTagsForLink
                 $tagRepository
                     ->shouldReceive("findTagsForLinkId")
@@ -675,7 +675,7 @@ describe("TagService", function () {
             $searchResult = new TagCollection($tag1);
 
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository->shouldReceive("save")->times(2);
+            $tagRepository->shouldReceive("insert")->times(2);
             $tagRepository
                 ->shouldReceive("findAll")
                 ->andReturn($tagsCollection);

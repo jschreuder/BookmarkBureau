@@ -27,7 +27,7 @@ final class TagService implements TagServiceInterface
     {
         return $this->pipelines
             ->listAllTags()
-            ->run(fn(): TagCollection => $this->tagRepository->findAll());
+            ->run($this->tagRepository->findAll(...));
     }
 
     /**
@@ -58,7 +58,7 @@ final class TagService implements TagServiceInterface
         );
 
         return $this->pipelines->createTag()->run(function (Tag $tag): Tag {
-            $this->tagRepository->save($tag);
+            $this->tagRepository->insert($tag);
             return $tag;
         }, $newTag);
     }
@@ -73,7 +73,7 @@ final class TagService implements TagServiceInterface
         $updatedTag->color = $color !== null ? new HexColor($color) : null;
 
         return $this->pipelines->updateTag()->run(function (Tag $tag): Tag {
-            $this->tagRepository->save($tag);
+            $this->tagRepository->update($tag);
             return $tag;
         }, $updatedTag);
     }
@@ -115,7 +115,7 @@ final class TagService implements TagServiceInterface
                 } catch (TagNotFoundException) {
                     // Tag doesn't exist, create it
                     $tag = new Tag($linkWithTag->tagName, null);
-                    $this->tagRepository->save($tag);
+                    $this->tagRepository->update($tag);
                 }
 
                 // Assign tag to link (only if not already assigned)

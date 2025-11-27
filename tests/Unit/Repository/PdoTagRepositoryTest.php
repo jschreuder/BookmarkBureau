@@ -323,7 +323,7 @@ describe("PdoTagRepository", function () {
         });
     });
 
-    describe("save", function () {
+    describe("insert", function () {
         test("inserts a new tag", function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo, new TagEntityMapper());
@@ -331,7 +331,7 @@ describe("PdoTagRepository", function () {
                 tagName: new TagName("new-tag"),
             );
 
-            $repo->save($tag);
+            $repo->insert($tag);
 
             $found = $repo->findByName("new-tag");
             expect($found->tagName->value)->toBe("new-tag");
@@ -346,47 +346,10 @@ describe("PdoTagRepository", function () {
                 color: $color,
             );
 
-            $repo->save($tag);
+            $repo->insert($tag);
 
             $found = $repo->findByName("red-tag");
             expect((string) $found->color)->toBe("#FF0000");
-        });
-
-        test("updates an existing tag color", function () {
-            $pdo = createTagDatabase();
-            $repo = new PdoTagRepository($pdo, new TagEntityMapper());
-
-            $tag = TestEntityFactory::createTag(
-                tagName: new TagName("mutable-tag"),
-                color: new HexColor("#FF0000"),
-            );
-            $repo->save($tag);
-
-            // Update with new color
-            $updatedTag = new Tag(
-                tagName: new TagName("mutable-tag"),
-                color: new HexColor("#00FF00"),
-            );
-            $repo->save($updatedTag);
-
-            $found = $repo->findByName("mutable-tag");
-            expect((string) $found->color)->toBe("#00FF00");
-        });
-
-        test("silently updates an existing tag when saved again", function () {
-            $pdo = createTagDatabase();
-            $repo = new PdoTagRepository($pdo, new TagEntityMapper());
-
-            $tag = TestEntityFactory::createTag(
-                tagName: new TagName("duplicate"),
-            );
-            $repo->save($tag);
-
-            // Save again - should not throw, but update instead
-            $repo->save($tag);
-
-            $found = $repo->findByName("duplicate");
-            expect($found->tagName->value)->toBe("duplicate");
         });
 
         test("inserts tag with null color", function () {
@@ -397,60 +360,25 @@ describe("PdoTagRepository", function () {
                 color: null,
             );
 
-            $repo->save($tag);
+            $repo->insert($tag);
 
             $found = $repo->findByName("no-color");
             expect($found->color)->toBeNull();
         });
 
         test(
-            "throws DuplicateTagException when tag insert violates unique constraint",
+            "throws DuplicateTagException when tag already exists",
             function () {
-                // Use reflection to call save with a mocked PDO that simulates a race condition
-                // where the check passes but the insert fails with a duplicate constraint error
-                $mockPdo = Mockery::mock(PDO::class);
-                $checkStmt = Mockery::mock(\PDOStatement::class);
-                $insertStmt = Mockery::mock(\PDOStatement::class);
-
-                // First prepare (check statement) - tag doesn't exist
-                $checkStmt->shouldReceive("execute")->andReturn(true);
-                $checkStmt->shouldReceive("fetch")->andReturn(false); // tag not found
-
-                // Second prepare (insert statement) - throws duplicate error
-                $insertException = new \PDOException(
-                    "UNIQUE constraint failed: tags.tag_name",
-                );
-                $insertStmt
-                    ->shouldReceive("execute")
-                    ->andThrow($insertException);
-
-                // Mock PDO to return our mocked statements in order
-                $mockPdo
-                    ->shouldReceive("prepare")
-                    ->once()
-                    ->with(
-                        "SELECT 1 FROM tags WHERE tag_name = :tag_name LIMIT 1",
-                    )
-                    ->andReturn($checkStmt);
-
-                $mockPdo
-                    ->shouldReceive("prepare")
-                    ->once()
-                    ->withArgs(function ($sql) {
-                        return str_contains($sql, "INSERT INTO tags") &&
-                            str_contains($sql, "VALUES");
-                    })
-                    ->andReturn($insertStmt);
-
-                $repoWithMock = new PdoTagRepository(
-                    $mockPdo,
-                    new TagEntityMapper(),
-                );
+                $pdo = createTagDatabase();
+                $repo = new PdoTagRepository($pdo, new TagEntityMapper());
                 $tag = TestEntityFactory::createTag(
-                    tagName: new TagName("race-condition"),
+                    tagName: new TagName("duplicate"),
                 );
 
-                expect(fn() => $repoWithMock->save($tag))->toThrow(
+                $repo->insert($tag);
+
+                // Try to insert the same tag again
+                expect(fn() => $repo->insert($tag))->toThrow(
                     DuplicateTagException::class,
                 );
             },
@@ -460,27 +388,13 @@ describe("PdoTagRepository", function () {
             "re-throws PDOException when not a duplicate constraint error",
             function () {
                 $mockPdo = Mockery::mock(PDO::class);
-                $checkStmt = Mockery::mock(\PDOStatement::class);
                 $insertStmt = Mockery::mock(\PDOStatement::class);
 
-                // First prepare (check statement) - tag doesn't exist
-                $checkStmt->shouldReceive("execute")->andReturn(true);
-                $checkStmt->shouldReceive("fetch")->andReturn(false); // tag not found
-
-                // Second prepare (insert statement) - throws unexpected error
+                // Insert statement throws unexpected error
                 $insertException = new \PDOException("Disk I/O error");
                 $insertStmt
                     ->shouldReceive("execute")
                     ->andThrow($insertException);
-
-                // Mock PDO to return our mocked statements in order
-                $mockPdo
-                    ->shouldReceive("prepare")
-                    ->once()
-                    ->with(
-                        "SELECT 1 FROM tags WHERE tag_name = :tag_name LIMIT 1",
-                    )
-                    ->andReturn($checkStmt);
 
                 $mockPdo
                     ->shouldReceive("prepare")
@@ -499,11 +413,70 @@ describe("PdoTagRepository", function () {
                     tagName: new TagName("error-case"),
                 );
 
-                expect(fn() => $repoWithMock->save($tag))->toThrow(
+                expect(fn() => $repoWithMock->insert($tag))->toThrow(
                     \PDOException::class,
                 );
             },
         );
+    });
+
+    describe("update", function () {
+        test("updates an existing tag color", function () {
+            $pdo = createTagDatabase();
+            $repo = new PdoTagRepository($pdo, new TagEntityMapper());
+
+            $tag = TestEntityFactory::createTag(
+                tagName: new TagName("mutable-tag"),
+                color: new HexColor("#FF0000"),
+            );
+            $repo->insert($tag);
+
+            // Update with new color
+            $updatedTag = new Tag(
+                tagName: new TagName("mutable-tag"),
+                color: new HexColor("#00FF00"),
+            );
+            $repo->update($updatedTag);
+
+            $found = $repo->findByName("mutable-tag");
+            expect((string) $found->color)->toBe("#00FF00");
+        });
+
+        test("updates tag color to null", function () {
+            $pdo = createTagDatabase();
+            $repo = new PdoTagRepository($pdo, new TagEntityMapper());
+
+            $tag = TestEntityFactory::createTag(
+                tagName: new TagName("colored-tag"),
+                color: new HexColor("#FF0000"),
+            );
+            $repo->insert($tag);
+
+            // Update to remove color
+            $updatedTag = new Tag(
+                tagName: new TagName("colored-tag"),
+                color: null,
+            );
+            $repo->update($updatedTag);
+
+            $found = $repo->findByName("colored-tag");
+            expect($found->color)->toBeNull();
+        });
+
+        test("silently succeeds when updating non-existent tag", function () {
+            $pdo = createTagDatabase();
+            $repo = new PdoTagRepository($pdo, new TagEntityMapper());
+
+            $tag = TestEntityFactory::createTag(
+                tagName: new TagName("nonexistent"),
+                color: new HexColor("#FF0000"),
+            );
+
+            // Should not throw, just silently do nothing
+            $repo->update($tag);
+
+            expect(true)->toBeTrue();
+        });
     });
 
     describe("delete", function () {
@@ -514,7 +487,7 @@ describe("PdoTagRepository", function () {
                 tagName: new TagName("deletable"),
             );
 
-            $repo->save($tag);
+            $repo->insert($tag);
             $repo->delete($tag);
 
             expect(fn() => $repo->findByName("deletable"))->toThrow(
@@ -532,7 +505,7 @@ describe("PdoTagRepository", function () {
             $tag = TestEntityFactory::createTag(
                 tagName: new TagName("cascadeable"),
             );
-            $repo->save($tag);
+            $repo->insert($tag);
             $repo->assignToLinkId($linkId, "cascadeable");
 
             // Verify tag was assigned
@@ -565,7 +538,7 @@ describe("PdoTagRepository", function () {
             $tag = TestEntityFactory::createTag(
                 tagName: new TagName("assignable"),
             );
-            $repo->save($tag);
+            $repo->insert($tag);
 
             $repo->assignToLinkId($linkId, "assignable");
 
@@ -598,7 +571,7 @@ describe("PdoTagRepository", function () {
                 $tag = TestEntityFactory::createTag(
                     tagName: new TagName("orphan"),
                 );
-                $repo->save($tag);
+                $repo->insert($tag);
 
                 $nonExistentLinkId = Uuid::uuid4();
 
@@ -617,7 +590,7 @@ describe("PdoTagRepository", function () {
             $tag = TestEntityFactory::createTag(
                 tagName: new TagName("idempotent"),
             );
-            $repo->save($tag);
+            $repo->insert($tag);
 
             $repo->assignToLinkId($linkId, "idempotent");
             $repo->assignToLinkId($linkId, "idempotent");
@@ -638,7 +611,7 @@ describe("PdoTagRepository", function () {
             $tag = TestEntityFactory::createTag(
                 tagName: new TagName("removable"),
             );
-            $repo->save($tag);
+            $repo->insert($tag);
             $repo->assignToLinkId($linkId, "removable");
 
             $repo->removeFromLinkId($linkId, "removable");
@@ -657,7 +630,7 @@ describe("PdoTagRepository", function () {
             $tag = TestEntityFactory::createTag(
                 tagName: new TagName("unassigned"),
             );
-            $repo->save($tag);
+            $repo->insert($tag);
 
             // Should not throw
             $repo->removeFromLinkId($linkId, "unassigned");
@@ -783,7 +756,7 @@ describe("PdoTagRepository", function () {
             $tag = TestEntityFactory::createTag(
                 tagName: new TagName("assigned"),
             );
-            $repo->save($tag);
+            $repo->insert($tag);
             $repo->assignToLinkId($linkId, "assigned");
 
             expect($repo->isAssignedToLinkId($linkId, "assigned"))->toBeTrue();
@@ -798,7 +771,7 @@ describe("PdoTagRepository", function () {
             $tag = TestEntityFactory::createTag(
                 tagName: new TagName("unassigned"),
             );
-            $repo->save($tag);
+            $repo->insert($tag);
 
             expect(
                 $repo->isAssignedToLinkId($linkId, "unassigned"),
@@ -810,7 +783,7 @@ describe("PdoTagRepository", function () {
             $repo = new PdoTagRepository($pdo, new TagEntityMapper());
 
             $tag = TestEntityFactory::createTag(tagName: new TagName("ghost"));
-            $repo->save($tag);
+            $repo->insert($tag);
 
             $nonExistentLinkId = Uuid::uuid4();
 

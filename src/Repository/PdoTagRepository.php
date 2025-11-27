@@ -131,42 +131,38 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     }
 
     /**
-     * Save a new tag or update existing one
+     * Save a new tag
      * @throws DuplicateTagException when tag name already exists (on insert)
      */
     #[\Override]
-    public function save(Tag $tag): void
+    public function insert(Tag $tag): void
     {
         $row = $this->mapper->mapToRow($tag);
-        $tagNameValue = $row["tag_name"];
-
-        // Check if tag exists
-        $check = $this->pdo->prepare(
-            "SELECT 1 FROM tags WHERE tag_name = :tag_name LIMIT 1",
-        );
-        $check->execute([":tag_name" => $tagNameValue]);
-
-        if ($check->fetch() === false) {
-            // Insert new tag
-            try {
-                $build = SqlBuilder::buildInsert("tags", $row);
-                $this->pdo->prepare($build["sql"])->execute($build["params"]);
-            } catch (\PDOException $e) {
-                if (
-                    str_contains($e->getMessage(), "Duplicate entry") ||
-                    str_contains($e->getMessage(), "UNIQUE constraint failed")
-                ) {
-                    throw DuplicateTagException::forName(
-                        new TagName($tagNameValue),
-                    );
-                }
-                throw $e;
-            }
-        } else {
-            // Update existing tag
-            $build = SqlBuilder::buildUpdate("tags", $row, "tag_name");
+        try {
+            $build = SqlBuilder::buildInsert("tags", $row);
             $this->pdo->prepare($build["sql"])->execute($build["params"]);
+        } catch (\PDOException $e) {
+            if (
+                str_contains($e->getMessage(), "Duplicate entry") ||
+                str_contains($e->getMessage(), "UNIQUE constraint failed")
+            ) {
+                throw DuplicateTagException::forName(
+                    new TagName($tag->tagName->value),
+                );
+            }
+            throw $e;
         }
+    }
+
+    /**
+     * Update existing tag
+     */
+    #[\Override]
+    public function update(Tag $tag): void
+    {
+        $row = $this->mapper->mapToRow($tag);
+        $build = SqlBuilder::buildUpdate("tags", $row, "tag_name");
+        $this->pdo->prepare($build["sql"])->execute($build["params"]);
     }
 
     /**

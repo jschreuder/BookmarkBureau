@@ -33,10 +33,15 @@ interface TagRepositoryInterface
     public function searchByName(string $query, int $limit = 20): TagCollection;
 
     /**
-     * Save a new tag or update existing one
+     * Save a new tag
      * @throws DuplicateTagException when tag name already exists (on insert)
      */
-    public function save(Tag $tag): void;
+    public function insert(Tag $tag): void;
+
+    /**
+     * Update existing tag
+     */
+    public function update(Tag $tag): void;
 
     /**
      * Delete a tag (cascades to link_tags)
