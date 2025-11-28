@@ -17,6 +17,7 @@ use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
+use jschreuder\BookmarkBureau\Util\SqlExceptionHandler;
 
 final readonly class PdoFavoriteRepository implements
     FavoriteRepositoryInterface
@@ -142,14 +143,9 @@ final readonly class PdoFavoriteRepository implements
                 createdAt: $now,
             );
         } catch (\PDOException $e) {
-            if (
-                str_contains(
-                    $e->getMessage(),
-                    "FOREIGN KEY constraint failed",
-                ) ||
-                str_contains($e->getMessage(), "foreign key constraint fails")
-            ) {
-                if (str_contains($e->getMessage(), "dashboard_id")) {
+            if (SqlExceptionHandler::isForeignKeyViolation($e)) {
+                $field = SqlExceptionHandler::getForeignKeyField($e);
+                if ($field === "dashboard_id") {
                     throw DashboardNotFoundException::forId($dashboardId);
                 } else {
                     throw LinkNotFoundException::forId($linkId);

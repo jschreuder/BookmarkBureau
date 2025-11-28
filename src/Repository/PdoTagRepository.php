@@ -12,6 +12,7 @@ use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DuplicateTagException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
+use jschreuder\BookmarkBureau\Util\SqlExceptionHandler;
 
 final readonly class PdoTagRepository implements TagRepositoryInterface
 {
@@ -142,10 +143,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             $build = SqlBuilder::buildInsert("tags", $row);
             $this->pdo->prepare($build["sql"])->execute($build["params"]);
         } catch (\PDOException $e) {
-            if (
-                str_contains($e->getMessage(), "Duplicate entry") ||
-                str_contains($e->getMessage(), "UNIQUE constraint failed")
-            ) {
+            if (SqlExceptionHandler::isDuplicateEntry($e)) {
                 throw DuplicateTagException::forName(
                     new TagName($tag->tagName->value),
                 );
@@ -221,10 +219,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             ]);
         } catch (\PDOException $e) {
             // Ignore duplicate entry errors (tag already assigned to link)
-            if (
-                !str_contains($e->getMessage(), "Duplicate entry") &&
-                !str_contains($e->getMessage(), "UNIQUE constraint failed")
-            ) {
+            if (!SqlExceptionHandler::isDuplicateEntry($e)) {
                 throw $e;
             }
         }
@@ -247,14 +242,9 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
             ]);
             $this->pdo->prepare($query["sql"])->execute($query["params"]);
         } catch (\PDOException $e) {
-            if (
-                str_contains(
-                    $e->getMessage(),
-                    "FOREIGN KEY constraint failed",
-                ) ||
-                str_contains($e->getMessage(), "foreign key constraint fails")
-            ) {
-                if (str_contains($e->getMessage(), "link_id")) {
+            if (SqlExceptionHandler::isForeignKeyViolation($e)) {
+                $field = SqlExceptionHandler::getForeignKeyField($e);
+                if ($field === "link_id") {
                     throw LinkNotFoundException::forId($linkId);
                 } else {
                     throw TagNotFoundException::forName(new TagName($tagName));

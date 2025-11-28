@@ -18,6 +18,7 @@ use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
+use jschreuder\BookmarkBureau\Util\SqlExceptionHandler;
 use Ramsey\Uuid\Uuid;
 
 final readonly class PdoCategoryRepository implements
@@ -195,13 +196,7 @@ final readonly class PdoCategoryRepository implements
             $query = SqlBuilder::buildInsert("categories", $row);
             $this->pdo->prepare($query["sql"])->execute($query["params"]);
         } catch (\PDOException $e) {
-            if (
-                str_contains(
-                    $e->getMessage(),
-                    "FOREIGN KEY constraint failed",
-                ) ||
-                str_contains($e->getMessage(), "foreign key constraint fails")
-            ) {
+            if (SqlExceptionHandler::isForeignKeyViolation($e)) {
                 throw DashboardNotFoundException::forId(
                     $category->dashboard->dashboardId,
                 );
@@ -275,14 +270,9 @@ final readonly class PdoCategoryRepository implements
                 createdAt: $now,
             );
         } catch (\PDOException $e) {
-            if (
-                str_contains(
-                    $e->getMessage(),
-                    "FOREIGN KEY constraint failed",
-                ) ||
-                str_contains($e->getMessage(), "foreign key constraint fails")
-            ) {
-                if (str_contains($e->getMessage(), "category_id")) {
+            if (SqlExceptionHandler::isForeignKeyViolation($e)) {
+                $field = SqlExceptionHandler::getForeignKeyField($e);
+                if ($field === "category_id") {
                     throw CategoryNotFoundException::forId($categoryId);
                 } else {
                     throw LinkNotFoundException::forId($linkId);
