@@ -19,6 +19,9 @@ parameters:
             path: src/Config/DatabaseConfigInterface.php
         -
             identifier: missingType.generics
+            path: src/Config/PostgresDatabaseConfig.php
+        -
+            identifier: missingType.generics
             path: src/Config/MysqlDatabaseConfig.php
         -
             identifier: missingType.generics
