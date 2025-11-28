@@ -209,14 +209,11 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         }
 
         try {
-            $statement = $this->pdo->prepare(
-                'INSERT INTO link_tags (link_id, tag_name)
-                 VALUES (:link_id, :tag_name)',
-            );
-            $statement->execute([
-                ":link_id" => $linkId->getBytes(),
-                ":tag_name" => $tagName,
+            $query = SqlBuilder::buildInsert("link_tags", [
+                "link_id" => $linkId->getBytes(),
+                "tag_name" => $tagName,
             ]);
+            $this->pdo->prepare($query["sql"])->execute($query["params"]);
         } catch (\PDOException $e) {
             // Ignore duplicate entry errors (tag already assigned to link)
             if (!SqlExceptionHandler::isDuplicateEntry($e)) {

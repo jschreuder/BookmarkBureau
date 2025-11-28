@@ -331,6 +331,39 @@ describe("SqlBuilder", function () {
             expect($result["sql"])->toContain("name = :name");
             expect($result["params"][":uuid"])->toBe("abc-123");
         });
+
+        test("handles composite primary keys", function () {
+            $row = [
+                "dashboard_id" => "abc",
+                "link_id" => "def",
+                "sort_order" => 5,
+            ];
+            $result = SqlBuilder::buildUpdate("favorites", $row, [
+                "dashboard_id",
+                "link_id",
+            ]);
+
+            expect($result["sql"])->toBe(
+                "UPDATE favorites SET sort_order = :sort_order WHERE dashboard_id = :dashboard_id AND link_id = :link_id",
+            );
+            expect($result["params"])->toBe([
+                ":dashboard_id" => "abc",
+                ":link_id" => "def",
+                ":sort_order" => 5,
+            ]);
+        });
+
+        test("excludes all composite key fields from SET clause", function () {
+            $row = ["key1" => 1, "key2" => 2, "value" => "test"];
+            $result = SqlBuilder::buildUpdate("table", $row, ["key1", "key2"]);
+
+            expect($result["sql"])->not->toContain("key1 = :key1,");
+            expect($result["sql"])->not->toContain("key2 = :key2,");
+            expect($result["sql"])->toContain("value = :value");
+            expect($result["sql"])->toContain(
+                "WHERE key1 = :key1 AND key2 = :key2",
+            );
+        });
     });
 
     describe("buildDelete", function () {

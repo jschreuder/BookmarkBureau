@@ -432,7 +432,7 @@ describe("PdoFavoriteRepository", function () {
                     ->once()
                     ->with(
                         'INSERT INTO favorites (dashboard_id, link_id, sort_order, created_at)
-                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)',
+                VALUES (:dashboard_id, :link_id, :sort_order, :created_at)',
                     )
                     ->andReturn($insertStmt);
 
@@ -487,7 +487,7 @@ describe("PdoFavoriteRepository", function () {
                     ->once()
                     ->with(
                         'INSERT INTO favorites (dashboard_id, link_id, sort_order, created_at)
-                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)',
+                VALUES (:dashboard_id, :link_id, :sort_order, :created_at)',
                     )
                     ->andReturn($insertStmt);
 
@@ -542,7 +542,7 @@ describe("PdoFavoriteRepository", function () {
                     ->once()
                     ->with(
                         'INSERT INTO favorites (dashboard_id, link_id, sort_order, created_at)
-                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)',
+                VALUES (:dashboard_id, :link_id, :sort_order, :created_at)',
                     )
                     ->andReturn($insertStmt);
 

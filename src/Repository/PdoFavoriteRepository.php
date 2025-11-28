@@ -125,16 +125,13 @@ final readonly class PdoFavoriteRepository implements
 
         try {
             $now = new DateTimeImmutable();
-            $statement = $this->pdo->prepare(
-                "INSERT INTO favorites (dashboard_id, link_id, sort_order, created_at)
-                 VALUES (:dashboard_id, :link_id, :sort_order, :created_at)",
-            );
-            $statement->execute([
-                ":dashboard_id" => $dashboardId->getBytes(),
-                ":link_id" => $linkId->getBytes(),
-                ":sort_order" => $sortOrder,
-                ":created_at" => $now->format(SqlFormat::TIMESTAMP),
+            $query = SqlBuilder::buildInsert("favorites", [
+                "dashboard_id" => $dashboardId->getBytes(),
+                "link_id" => $linkId->getBytes(),
+                "sort_order" => $sortOrder,
+                "created_at" => $now->format(SqlFormat::TIMESTAMP),
             ]);
+            $this->pdo->prepare($query["sql"])->execute($query["params"]);
 
             return new Favorite(
                 dashboard: $dashboard,
@@ -216,15 +213,16 @@ final readonly class PdoFavoriteRepository implements
             );
         }
 
-        $statement = $this->pdo->prepare(
-            'UPDATE favorites SET sort_order = :sort_order
-             WHERE dashboard_id = :dashboard_id AND link_id = :link_id',
+        $query = SqlBuilder::buildUpdate(
+            "favorites",
+            [
+                "dashboard_id" => $dashboardId->getBytes(),
+                "link_id" => $linkId->getBytes(),
+                "sort_order" => $sortOrder,
+            ],
+            ["dashboard_id", "link_id"],
         );
-        $statement->execute([
-            ":dashboard_id" => $dashboardId->getBytes(),
-            ":link_id" => $linkId->getBytes(),
-            ":sort_order" => $sortOrder,
-        ]);
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**

@@ -252,16 +252,13 @@ final readonly class PdoCategoryRepository implements
 
         try {
             $now = new DateTimeImmutable();
-            $statement = $this->pdo->prepare(
-                'INSERT INTO category_links (category_id, link_id, sort_order, created_at)
-                 VALUES (:category_id, :link_id, :sort_order, :created_at)',
-            );
-            $statement->execute([
-                ":category_id" => $categoryId->getBytes(),
-                ":link_id" => $linkId->getBytes(),
-                ":sort_order" => $sortOrder,
-                ":created_at" => $now->format(SqlFormat::TIMESTAMP),
+            $query = SqlBuilder::buildInsert("category_links", [
+                "category_id" => $categoryId->getBytes(),
+                "link_id" => $linkId->getBytes(),
+                "sort_order" => $sortOrder,
+                "created_at" => $now->format(SqlFormat::TIMESTAMP),
             ]);
+            $this->pdo->prepare($query["sql"])->execute($query["params"]);
 
             return new CategoryLink(
                 category: $category,
@@ -342,15 +339,16 @@ final readonly class PdoCategoryRepository implements
         $this->findById($categoryId);
         $this->linkRepository->findById($linkId);
 
-        $statement = $this->pdo->prepare(
-            'UPDATE category_links SET sort_order = :sort_order
-             WHERE category_id = :category_id AND link_id = :link_id',
+        $query = SqlBuilder::buildUpdate(
+            "category_links",
+            [
+                "category_id" => $categoryId->getBytes(),
+                "link_id" => $linkId->getBytes(),
+                "sort_order" => $sortOrder,
+            ],
+            ["category_id", "link_id"],
         );
-        $statement->execute([
-            ":category_id" => $categoryId->getBytes(),
-            ":link_id" => $linkId->getBytes(),
-            ":sort_order" => $sortOrder,
-        ]);
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**

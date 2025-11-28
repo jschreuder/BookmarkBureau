@@ -143,22 +143,26 @@ final readonly class SqlBuilder
     /**
      * Build an UPDATE statement and its parameters from a row array.
      *
-     * Excludes the specified primary key field from the SET clause.
+     * Excludes the specified primary key field(s) from the SET clause.
      *
      * @param string $table The table name
      * @param array<string, mixed> $row The row data with field names as keys
-     * @param string $primaryKeyField The primary key field name (excluded from SET)
+     * @param string|array<string> $primaryKeyFields Primary key field name(s) (excluded from SET)
      * @return array{sql: string, params: array<string, mixed>}
      */
     public static function buildUpdate(
         string $table,
         array $row,
-        string $primaryKeyField,
+        string|array $primaryKeyFields,
     ): array {
         $fields = array_keys($row);
+        $keyFields = \is_array($primaryKeyFields)
+            ? $primaryKeyFields
+            : [$primaryKeyFields];
+
         $updateFields = array_filter(
             $fields,
-            fn($field) => $field !== $primaryKeyField,
+            fn($field) => !\in_array($field, $keyFields, true),
         );
 
         $setClauses = array_map(
@@ -166,10 +170,16 @@ final readonly class SqlBuilder
             $updateFields,
         );
 
+        $whereClauses = array_map(
+            fn($field) => "{$field} = :{$field}",
+            $keyFields,
+        );
+
         $sql =
             "UPDATE {$table} SET " .
             implode(", ", $setClauses) .
-            " WHERE {$primaryKeyField} = :{$primaryKeyField}";
+            " WHERE " .
+            implode(" AND ", $whereClauses);
 
         $params = [];
         foreach ($fields as $field) {
