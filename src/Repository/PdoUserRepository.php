@@ -27,7 +27,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     {
         $sql = SqlBuilder::buildSelect(
             "users",
-            $this->mapper->getFields(),
+            $this->mapper->getDbFields(),
             "user_id = :user_id LIMIT 1",
         );
         $statement = $this->pdo->prepare($sql);
@@ -50,7 +50,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     {
         $sql = SqlBuilder::buildSelect(
             "users",
-            $this->mapper->getFields(),
+            $this->mapper->getDbFields(),
             "email = :email LIMIT 1",
         );
         $statement = $this->pdo->prepare($sql);
@@ -73,7 +73,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     {
         $sql = SqlBuilder::buildSelect(
             "users",
-            $this->mapper->getFields(),
+            $this->mapper->getDbFields(),
             null,
             "email ASC",
         );

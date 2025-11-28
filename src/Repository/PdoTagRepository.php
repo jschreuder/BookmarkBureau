@@ -28,7 +28,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     {
         $sql = SqlBuilder::buildSelect(
             "tags",
-            $this->mapper->getFields(),
+            $this->mapper->getDbFields(),
             "tag_name = :tag_name LIMIT 1",
         );
         $statement = $this->pdo->prepare($sql);
@@ -51,7 +51,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     {
         $sql = SqlBuilder::buildSelect(
             "tags",
-            $this->mapper->getFields(),
+            $this->mapper->getDbFields(),
             null,
             "tag_name ASC",
         );
@@ -113,7 +113,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
 
         $sql = SqlBuilder::buildSelect(
             "tags",
-            $this->mapper->getFields(),
+            $this->mapper->getDbFields(),
             "tag_name LIKE ?",
             "tag_name ASC",
             $limit,

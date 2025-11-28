@@ -27,7 +27,7 @@ final readonly class PdoDashboardRepository implements
     {
         $sql = SqlBuilder::buildSelect(
             "dashboards",
-            $this->mapper->getFields(),
+            $this->mapper->getDbFields(),
             "dashboard_id = :dashboard_id LIMIT 1",
         );
         $statement = $this->pdo->prepare($sql);
@@ -50,7 +50,7 @@ final readonly class PdoDashboardRepository implements
     {
         $sql = SqlBuilder::buildSelect(
             "dashboards",
-            $this->mapper->getFields(),
+            $this->mapper->getDbFields(),
             null,
             "title ASC",
         );
