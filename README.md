@@ -130,13 +130,20 @@ PUT    /dashboard/{id}/favorites       Reorder favorites
 
 **Service Layer**
 - Business logic coordination
-- Transaction management via UnitOfWork pattern
+- Flexible extension via OperationPipeline for cross-cutting concerns (transactions, logging, auditing)
 - Clean interfaces for testing
 
 **Repository Layer**
-- PDO-based implementations, but inferface-first and thus easily replacable
-- Cross-database compatible (MySQL/SQLite)
+- PDO-based implementations, but interface-first and thus easily replaceable
+- File-based alternatives for specific use cases (UserRepository, JwtJtiRepository)
+- Entity mappers handle database in/out translation
+- Cross-database compatible (MySQL/SQLite/PostgreSQL)
 - Optimized queries, N+1 prevention
+
+**Configuration & DI**
+- Pure PHP configuration interfaces and implementations (no YAML/XML)
+- Trait-based service container composition for modularity
+- Compile-time type safety throughout
 
 #### Domain Model Architecture
 
@@ -224,19 +231,25 @@ curl http://localhost:8080/link/{id}
 ```
 /src
   /Action              CRUD operations following three-phase pattern
+  /Command             CLI commands for application management
   /Composite           Immutable data structures composing entities/values
+  /Config              Configuration interfaces and implementations
   /Controller          HTTP controllers (generic ActionController)
   /Entity              Domain entities with value objects
+    /Mapper            Entity-to-database mapping layer
   /Exception           Custom exception hierarchy
+  /HttpMiddleware      PSR-15 HTTP middleware components
   /InputSpec           Request filtering and validation
+  /OperationMiddleware Transaction/logging middleware for service operations
+  /OperationPipeline   Pipeline system for cross-cutting concerns
   /OutputSpec          Response serialization
-  /Repository          Data access layer (interfaces + PDO)
+  /Repository          Data access layer (interfaces + PDO/file-based)
+  /Response            Response transformers (JSON, etc.)
   /Service             Business logic coordination
-  /Service/UnitOfWork  Transaction management
-  /Util                Shared utilities
+  /ServiceContainer    DI container trait-based composition
+  /Util                Shared utilities (SqlBuilder, Filter, etc.)
 
-  GeneralRoutingProvider.php  Route registration
-  ServiceContainer.php        DI container definition
+  *RoutingProvider.php Route registration by domain area
 
 /migrations            Database migrations
 /web                   Application entry point
