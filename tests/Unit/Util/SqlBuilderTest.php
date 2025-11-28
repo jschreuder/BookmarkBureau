@@ -345,6 +345,13 @@ describe("SqlBuilder", function () {
             expect($result["params"])->toBe([":user_id" => "test123"]);
         });
 
+        test("throws exception when WHERE array is empty", function () {
+            expect(fn() => SqlBuilder::buildDelete("users", []))->toThrow(
+                RepositoryStorageException::class,
+                "DELETE statement requires at least one WHERE condition",
+            );
+        });
+
         test(
             "builds DELETE with multiple fields for junction tables",
             function () {

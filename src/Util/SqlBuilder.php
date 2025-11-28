@@ -188,9 +188,16 @@ final readonly class SqlBuilder
      * @param string $table The table name
      * @param array<string, mixed> $where Associative array of field => value for WHERE clause
      * @return array{sql: string, params: array<string, mixed>}
+     * @throws RepositoryStorageException If $where array is empty
      */
     public static function buildDelete(string $table, array $where): array
     {
+        if (empty($where)) {
+            throw new RepositoryStorageException(
+                "DELETE statement requires at least one WHERE condition to prevent accidental table truncation",
+            );
+        }
+
         $whereClauses = array_map(
             fn($field) => "{$field} = :{$field}",
             array_keys($where),
