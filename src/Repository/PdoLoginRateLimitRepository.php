@@ -23,12 +23,16 @@ final readonly class PdoLoginRateLimitRepository implements
         $stmt = $this->connection->prepare("
             SELECT username, ip, expires_at
             FROM login_blocks
-            WHERE (username = ? OR ip = ?)
-              AND expires_at > ?
+            WHERE (username = :username OR ip = :ip)
+              AND expires_at > :now
             ORDER BY expires_at DESC
             LIMIT 1
         ");
-        $stmt->execute([$username, $ip, $now]);
+        $stmt->execute([
+            ":username" => $username,
+            ":ip" => $ip,
+            ":now" => $now,
+        ]);
         /** @var array{username: string, ip: string, expires_at: string}|false $result */
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -57,9 +61,13 @@ final readonly class PdoLoginRateLimitRepository implements
     ): void {
         $stmt = $this->connection->prepare("
             INSERT INTO failed_login_attempts (timestamp, ip, username)
-            VALUES (?, ?, ?)
+            VALUES (:timestamp, :ip, :username)
         ");
-        $stmt->execute([$timestamp, $ip, $username]);
+        $stmt->execute([
+            ":timestamp" => $timestamp,
+            ":ip" => $ip,
+            ":username" => $username,
+        ]);
     }
 
     #[\Override]
@@ -80,12 +88,16 @@ final readonly class PdoLoginRateLimitRepository implements
 
         $stmt = $this->connection->prepare("
             SELECT
-                SUM(CASE WHEN username = ? THEN 1 ELSE 0 END) as user_count,
-                SUM(CASE WHEN ip = ? THEN 1 ELSE 0 END) as ip_count
+                SUM(CASE WHEN username = :username THEN 1 ELSE 0 END) as user_count,
+                SUM(CASE WHEN ip = :ip THEN 1 ELSE 0 END) as ip_count
             FROM failed_login_attempts
-            WHERE timestamp > ?
+            WHERE timestamp > :since
         ");
-        $stmt->execute([$username, $ip, $since]);
+        $stmt->execute([
+            ":username" => $username,
+            ":ip" => $ip,
+            ":since" => $since,
+        ]);
         /** @var array{user_count: string, ip_count: string}|false $result */
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
@@ -109,9 +121,14 @@ final readonly class PdoLoginRateLimitRepository implements
         $now = new \DateTimeImmutable()->format(SqlFormat::TIMESTAMP);
         $stmt = $this->connection->prepare("
             INSERT INTO login_blocks (username, ip, blocked_at, expires_at)
-            VALUES (?, ?, ?, ?)
+            VALUES (:username, :ip, :blocked_at, :expires_at)
         ");
-        $stmt->execute([$username, $ip, $now, $expiresAt]);
+        $stmt->execute([
+            ":username" => $username,
+            ":ip" => $ip,
+            ":blocked_at" => $now,
+            ":expires_at" => $expiresAt,
+        ]);
     }
 
     #[\Override]
@@ -120,9 +137,9 @@ final readonly class PdoLoginRateLimitRepository implements
         $stmt = $this->connection->prepare("
             UPDATE failed_login_attempts
             SET username = NULL
-            WHERE username = ?
+            WHERE username = :username
         ");
-        $stmt->execute([$username]);
+        $stmt->execute([":username" => $username]);
     }
 
     #[\Override]
@@ -140,16 +157,16 @@ final readonly class PdoLoginRateLimitRepository implements
 
         $stmt = $this->connection->prepare("
             DELETE FROM failed_login_attempts
-            WHERE timestamp < ?
+            WHERE timestamp < :cutoff
         ");
-        $stmt->execute([$cutoff]);
+        $stmt->execute([":cutoff" => $cutoff]);
         $deleted = $stmt->rowCount();
 
         $stmt = $this->connection->prepare("
             DELETE FROM login_blocks
-            WHERE expires_at < ?
+            WHERE expires_at < :now
         ");
-        $stmt->execute([$now]);
+        $stmt->execute([":now" => $now]);
 
         return $deleted + $stmt->rowCount();
     }
