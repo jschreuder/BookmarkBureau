@@ -30,9 +30,14 @@ interface UserRepositoryInterface
     public function findAll(): UserCollection;
 
     /**
-     * Save a new user or update an existing one
+     * Save a new user
      */
-    public function save(User $user): void;
+    public function insert(User $user): void;
+
+    /**
+     * Update existing user
+     */
+    public function update(User $user): void;
 
     /**
      * Delete a user

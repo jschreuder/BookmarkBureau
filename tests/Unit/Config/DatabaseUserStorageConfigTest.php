@@ -42,6 +42,7 @@ describe("DatabaseUserStorageConfig", function () {
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
                 SQL
+                ,
             );
 
             $config = new DatabaseUserStorageConfig($dbConfig);
@@ -49,7 +50,7 @@ describe("DatabaseUserStorageConfig", function () {
 
             // Create and save a test user
             $user = TestEntityFactory::createUser();
-            $repository->save($user);
+            $repository->insert($user);
 
             // Retrieve the user
             $retrieved = $repository->findById($user->userId);
@@ -59,19 +60,22 @@ describe("DatabaseUserStorageConfig", function () {
             expect((string) $retrieved->email)->toBe((string) $user->email);
         });
 
-        test("multiple calls to createUserRepository return different instances", function () {
-            $dbConfig = new SqliteDatabaseConfig("sqlite::memory:");
-            $config = new DatabaseUserStorageConfig($dbConfig);
+        test(
+            "multiple calls to createUserRepository return different instances",
+            function () {
+                $dbConfig = new SqliteDatabaseConfig("sqlite::memory:");
+                $config = new DatabaseUserStorageConfig($dbConfig);
 
-            $repository1 = $config->createUserRepository();
-            $repository2 = $config->createUserRepository();
+                $repository1 = $config->createUserRepository();
+                $repository2 = $config->createUserRepository();
 
-            // Different instances
-            expect($repository1)->not->toBe($repository2);
-            // But same type
-            expect($repository1)->toBeInstanceOf(PdoUserRepository::class);
-            expect($repository2)->toBeInstanceOf(PdoUserRepository::class);
-        });
+                // Different instances
+                expect($repository1)->not->toBe($repository2);
+                // But same type
+                expect($repository1)->toBeInstanceOf(PdoUserRepository::class);
+                expect($repository2)->toBeInstanceOf(PdoUserRepository::class);
+            },
+        );
 
         test("repository can find user by email", function () {
             $dbConfig = new SqliteDatabaseConfig("sqlite::memory:");
@@ -89,6 +93,7 @@ describe("DatabaseUserStorageConfig", function () {
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
                 SQL
+                ,
             );
 
             $config = new DatabaseUserStorageConfig($dbConfig);
@@ -96,7 +101,7 @@ describe("DatabaseUserStorageConfig", function () {
 
             // Create and save a test user
             $user = TestEntityFactory::createUser();
-            $repository->save($user);
+            $repository->insert($user);
 
             // Find by email
             $retrieved = $repository->findByEmail($user->email);
@@ -134,8 +139,9 @@ describe("DatabaseUserStorageConfig", function () {
             expect($config1)->toBeInstanceOf(DatabaseUserStorageConfig::class);
 
             // Both configs should work
-            expect($config1->createUserRepository())
-                ->toBeInstanceOf(UserRepositoryInterface::class);
+            expect($config1->createUserRepository())->toBeInstanceOf(
+                UserRepositoryInterface::class,
+            );
         });
     });
 });

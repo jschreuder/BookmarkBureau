@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\GeneralRoutingProvider;
 use jschreuder\Middle\Router\RoutingProviderCollection;
@@ -29,14 +30,22 @@ function createJwtContainerInstance()
         ,
     );
 
+    // Clean up file-based user storage for clean test state
+    $userStoragePath = sys_get_temp_dir() . "/test_users.json";
+    if (file_exists($userStoragePath)) {
+        unlink($userStoragePath);
+    }
+
     // Initialize the rate limiting tables for file-based SQLite
     $rateLimitDbPath = sys_get_temp_dir() . "/test_ratelimit.db";
+
+    // Remove existing database file to ensure clean test state
+    if (file_exists($rateLimitDbPath)) {
+        unlink($rateLimitDbPath);
+    }
+
     $rateLimitPdo = new PDO("sqlite:" . $rateLimitDbPath);
     $rateLimitPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // Drop and recreate tables for clean test state
-    $rateLimitPdo->exec("DROP TABLE IF EXISTS failed_login_attempts");
-    $rateLimitPdo->exec("DROP TABLE IF EXISTS login_blocks");
     $rateLimitPdo->exec(
         <<<SQL
             CREATE TABLE failed_login_attempts (
@@ -74,8 +83,10 @@ describe("JWT Authentication Full Stack Integration", function () {
             // Create a test user first
             $userRepository = $container->getUserRepository();
 
-            $testUser = TestEntityFactory::createUser();
-            $userRepository->save($testUser);
+            $testUser = TestEntityFactory::createUser(
+                email: new Email("test1@user.com"),
+            );
+            $userRepository->insert($testUser);
 
             // Simulate HTTP POST /auth/login
             $request = ServerRequestFactory::fromGlobals();
@@ -120,8 +131,10 @@ describe("JWT Authentication Full Stack Integration", function () {
             $jwtService = $container->getJwtService();
 
             // Create and save test user
-            $testUser = TestEntityFactory::createUser();
-            $userRepository->save($testUser);
+            $testUser = TestEntityFactory::createUser(
+                email: new Email("test2@user.com"),
+            );
+            $userRepository->insert($testUser);
 
             // Generate a valid token
             $token = $jwtService->generate($testUser, TokenType::SESSION_TOKEN);
@@ -191,8 +204,10 @@ describe("JWT Authentication Full Stack Integration", function () {
             $jwtService = $container->getJwtService();
 
             // Create and save test user
-            $testUser = TestEntityFactory::createUser();
-            $userRepository->save($testUser);
+            $testUser = TestEntityFactory::createUser(
+                email: new Email("test3@user.com"),
+            );
+            $userRepository->insert($testUser);
 
             // Generate remember-me token
             $token = $jwtService->generate(
@@ -348,8 +363,10 @@ describe("JWT Authentication Full Stack Integration", function () {
                 );
 
                 // Create and save test user
-                $testUser = TestEntityFactory::createUser();
-                $userRepository->save($testUser);
+                $testUser = TestEntityFactory::createUser(
+                    email: new Email("test4@user.com"),
+                );
+                $userRepository->insert($testUser);
 
                 // Generate a valid token
                 $token = $jwtService->generate(

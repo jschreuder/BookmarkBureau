@@ -46,10 +46,7 @@ final readonly class UserService implements UserServiceInterface
     {
         return $this->pipelines
             ->getUserByEmail()
-            ->run(
-                fn(Email $e) => $this->userRepository->findByEmail($e),
-                $email,
-            );
+            ->run($this->userRepository->findByEmail(...), $email);
     }
 
     #[\Override]
@@ -57,7 +54,7 @@ final readonly class UserService implements UserServiceInterface
     {
         return $this->pipelines
             ->listAllUsers()
-            ->run(fn(): UserCollection => $this->userRepository->findAll());
+            ->run($this->userRepository->findAll(...));
     }
 
     #[\Override]
@@ -84,7 +81,7 @@ final readonly class UserService implements UserServiceInterface
 
         return $this->pipelines->createUser()->run(function (User $user): User {
             // Persist to repository
-            $this->userRepository->save($user);
+            $this->userRepository->insert($user);
             return $user;
         }, $newUser);
     }
@@ -105,7 +102,7 @@ final readonly class UserService implements UserServiceInterface
 
         $this->pipelines->changePassword()->run(function (User $user): null {
             // Persist changes
-            $this->userRepository->save($user);
+            $this->userRepository->update($user);
             return null;
         }, $updatedUser);
     }
@@ -138,7 +135,7 @@ final readonly class UserService implements UserServiceInterface
                         "TOTP secret is not set",
                     );
                 }
-                $this->userRepository->save($user);
+                $this->userRepository->update($user);
                 return $secret;
             }, $updatedUser);
     }
@@ -153,7 +150,7 @@ final readonly class UserService implements UserServiceInterface
         $updatedUser->disableTotp();
 
         $this->pipelines->disableTotp()->run(function (User $user): null {
-            $this->userRepository->save($user);
+            $this->userRepository->update($user);
             return null;
         }, $updatedUser);
     }

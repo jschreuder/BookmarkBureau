@@ -29,7 +29,7 @@ describe("UserService", function () {
                     ->shouldReceive("existsByEmail")
                     ->with($email)
                     ->andReturn(false);
-                $userRepository->shouldReceive("save")->once();
+                $userRepository->shouldReceive("insert")->once();
 
                 $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
                 $passwordHasher
@@ -90,7 +90,7 @@ describe("UserService", function () {
                 ->shouldReceive("existsByEmail")
                 ->with($email)
                 ->andReturn(false);
-            $userRepository->shouldReceive("save")->once();
+            $userRepository->shouldReceive("insert")->once();
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
             $passwordHasher
@@ -325,7 +325,7 @@ describe("UserService", function () {
                 ->shouldReceive("findById")
                 ->with($userId)
                 ->andReturn($user);
-            $userRepository->shouldReceive("save")->with($user)->once();
+            $userRepository->shouldReceive("update")->with($user)->once();
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
             $passwordHasher
@@ -442,7 +442,7 @@ describe("UserService", function () {
                 ->shouldReceive("findById")
                 ->with($userId)
                 ->andReturn($user);
-            $userRepository->shouldReceive("save")->with($user)->once();
+            $userRepository->shouldReceive("update")->with($user)->once();
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
 
@@ -471,7 +471,7 @@ describe("UserService", function () {
                 ->shouldReceive("findById")
                 ->with($userId)
                 ->andReturn($user);
-            $userRepository->shouldReceive("save")->once();
+            $userRepository->shouldReceive("update")->once();
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
 
@@ -529,7 +529,7 @@ describe("UserService", function () {
                 ->shouldReceive("findById")
                 ->with($userId)
                 ->andReturn($user);
-            $userRepository->shouldReceive("save")->with($user)->once();
+            $userRepository->shouldReceive("update")->with($user)->once();
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
 

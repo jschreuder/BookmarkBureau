@@ -29,7 +29,8 @@ describe("FileUserStorageConfig", function () {
 
     describe("user repository creation", function () {
         test("creates FileUserRepository instance", function () {
-            $filePath = sys_get_temp_dir() . "/test_users_" . uniqid() . ".json";
+            $filePath =
+                sys_get_temp_dir() . "/test_users_" . uniqid() . ".json";
             $config = new FileUserStorageConfig(filePath: $filePath);
 
             $repository = $config->createUserRepository();
@@ -43,7 +44,8 @@ describe("FileUserStorageConfig", function () {
         });
 
         test("repository can be used to save and retrieve users", function () {
-            $filePath = sys_get_temp_dir() . "/test_users_" . uniqid() . ".json";
+            $filePath =
+                sys_get_temp_dir() . "/test_users_" . uniqid() . ".json";
             $config = new FileUserStorageConfig(filePath: $filePath);
 
             $repository = $config->createUserRepository();
@@ -52,7 +54,7 @@ describe("FileUserStorageConfig", function () {
             $user = TestEntityFactory::createUser();
 
             // Save the user
-            $repository->save($user);
+            $repository->insert($user);
 
             // Retrieve the user
             $retrieved = $repository->findById($user->userId);
@@ -66,35 +68,38 @@ describe("FileUserStorageConfig", function () {
             }
         });
 
-        test("multiple calls to createUserRepository return different instances", function () {
-            $filePath = sys_get_temp_dir() . "/test_users_" . uniqid() . ".json";
-            $config = new FileUserStorageConfig(filePath: $filePath);
+        test(
+            "multiple calls to createUserRepository return different instances",
+            function () {
+                $filePath =
+                    sys_get_temp_dir() . "/test_users_" . uniqid() . ".json";
+                $config = new FileUserStorageConfig(filePath: $filePath);
 
-            $repository1 = $config->createUserRepository();
-            $repository2 = $config->createUserRepository();
+                $repository1 = $config->createUserRepository();
+                $repository2 = $config->createUserRepository();
 
-            // Different instances
-            expect($repository1)->not->toBe($repository2);
-            // But same type
-            expect($repository1)->toBeInstanceOf(FileUserRepository::class);
-            expect($repository2)->toBeInstanceOf(FileUserRepository::class);
+                // Different instances
+                expect($repository1)->not->toBe($repository2);
+                // But same type
+                expect($repository1)->toBeInstanceOf(FileUserRepository::class);
+                expect($repository2)->toBeInstanceOf(FileUserRepository::class);
 
-            // Cleanup
-            if (file_exists($filePath)) {
-                unlink($filePath);
-            }
-        });
+                // Cleanup
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            },
+        );
     });
 
     describe("readonly property", function () {
         test("config is readonly", function () {
-            $config = new FileUserStorageConfig(
-                filePath: "/tmp/users.json",
-            );
+            $config = new FileUserStorageConfig(filePath: "/tmp/users.json");
 
             // Attempting to modify readonly properties should fail
-            expect(fn() => $config->filePath = "/tmp/other.json")
-                ->toThrow(Error::class);
+            expect(fn() => ($config->filePath = "/tmp/other.json"))->toThrow(
+                Error::class,
+            );
         });
     });
 

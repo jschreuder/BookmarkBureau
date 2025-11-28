@@ -208,19 +208,61 @@ describe("PdoUserRepository", function () {
         });
     });
 
-    describe("save", function () {
+    describe("insert", function () {
         test("inserts a new user", function () {
             $pdo = createUserDatabase();
             $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
-            $repo->save($user);
+            $repo->insert($user);
 
             $found = $repo->findById($user->userId);
             expect($found->userId->toString())->toBe($user->userId->toString());
             expect((string) $found->email)->toBe((string) $user->email);
         });
 
+        test("inserts user with TOTP secret", function () {
+            $pdo = createUserDatabase();
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
+            $totpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
+            $user = TestEntityFactory::createUser(totpSecret: $totpSecret);
+
+            $repo->insert($user);
+
+            $found = $repo->findById($user->userId);
+            expect($found->totpSecret)->not->toBeNull();
+            expect($found->totpSecret->value)->toBe($totpSecret->value);
+        });
+
+        test("inserts user without TOTP secret (null)", function () {
+            $pdo = createUserDatabase();
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
+            $user = TestEntityFactory::createUser(totpSecret: null);
+
+            $repo->insert($user);
+
+            $found = $repo->findById($user->userId);
+            expect($found->totpSecret)->toBeNull();
+        });
+
+        test("preserves timestamps on insert", function () {
+            $pdo = createUserDatabase();
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
+            $user = TestEntityFactory::createUser();
+
+            $repo->insert($user);
+
+            $found = $repo->findById($user->userId);
+            expect($found->createdAt->format("Y-m-d H:i:s"))->toBe(
+                $user->createdAt->format("Y-m-d H:i:s"),
+            );
+            expect($found->updatedAt->format("Y-m-d H:i:s"))->toBe(
+                $user->updatedAt->format("Y-m-d H:i:s"),
+            );
+        });
+    });
+
+    describe("update", function () {
         test("updates an existing user", function () {
             $pdo = createUserDatabase();
             $repo = new PdoUserRepository($pdo, new UserEntityMapper());
@@ -242,50 +284,65 @@ describe("PdoUserRepository", function () {
                 createdAt: $user->createdAt,
                 updatedAt: $user->updatedAt,
             );
-            $repo->save($updatedUser);
+            $repo->update($updatedUser);
 
             $found = $repo->findById($userId);
             expect((string) $found->email)->toBe((string) $newEmail);
         });
 
-        test("saves user with TOTP secret", function () {
+        test("updates user TOTP secret", function () {
             $pdo = createUserDatabase();
             $repo = new PdoUserRepository($pdo, new UserEntityMapper());
-            $totpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
-            $user = TestEntityFactory::createUser(totpSecret: $totpSecret);
+            $userId = Uuid::uuid4();
+            $user = TestEntityFactory::createUser(
+                id: $userId,
+                totpSecret: null,
+            );
 
-            $repo->save($user);
+            insertTestUser($pdo, $user);
 
-            $found = $repo->findById($user->userId);
+            // Update to add TOTP secret
+            $newTotpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
+            $updatedUser = TestEntityFactory::createUser(
+                id: $userId,
+                email: $user->email,
+                passwordHash: $user->passwordHash,
+                totpSecret: $newTotpSecret,
+                createdAt: $user->createdAt,
+                updatedAt: $user->updatedAt,
+            );
+            $repo->update($updatedUser);
+
+            $found = $repo->findById($userId);
             expect($found->totpSecret)->not->toBeNull();
-            expect($found->totpSecret->value)->toBe($totpSecret->value);
+            expect($found->totpSecret->value)->toBe($newTotpSecret->value);
         });
 
-        test("saves user without TOTP secret (null)", function () {
+        test("removes TOTP secret on update", function () {
             $pdo = createUserDatabase();
             $repo = new PdoUserRepository($pdo, new UserEntityMapper());
-            $user = TestEntityFactory::createUser(totpSecret: null);
+            $userId = Uuid::uuid4();
+            $totpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
+            $user = TestEntityFactory::createUser(
+                id: $userId,
+                totpSecret: $totpSecret,
+            );
 
-            $repo->save($user);
+            insertTestUser($pdo, $user);
 
-            $found = $repo->findById($user->userId);
+            // Update to remove TOTP secret
+            $updatedUser = TestEntityFactory::createUser(
+                id: $userId,
+                email: $user->email,
+                passwordHash: $user->passwordHash,
+                totpSecret: null,
+                createdAt: $user->createdAt,
+                updatedAt: $user->updatedAt,
+            );
+            $repo->update($updatedUser);
+
+            $found = $repo->findById($userId);
             expect($found->totpSecret)->toBeNull();
-        });
-
-        test("preserves timestamps on insert", function () {
-            $pdo = createUserDatabase();
-            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
-            $user = TestEntityFactory::createUser();
-
-            $repo->save($user);
-
-            $found = $repo->findById($user->userId);
-            expect($found->createdAt->format("Y-m-d H:i:s"))->toBe(
-                $user->createdAt->format("Y-m-d H:i:s"),
-            );
-            expect($found->updatedAt->format("Y-m-d H:i:s"))->toBe(
-                $user->updatedAt->format("Y-m-d H:i:s"),
-            );
         });
     });
 

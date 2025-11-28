@@ -89,29 +89,25 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Save a new user or update an existing one
+     * Save a new user
      */
     #[\Override]
-    public function save(User $user): void
+    public function insert(User $user): void
     {
         $row = $this->mapper->mapToRow($user);
-        $userIdBytes = $row["user_id"];
+        $build = SqlBuilder::buildInsert("users", $row);
+        $this->pdo->prepare($build["sql"])->execute($build["params"]);
+    }
 
-        // Check if user exists
-        $check = $this->pdo->prepare(
-            "SELECT 1 FROM users WHERE user_id = :user_id LIMIT 1",
-        );
-        $check->execute([":user_id" => $userIdBytes]);
-
-        if ($check->fetch() === false) {
-            // Insert new user
-            $build = SqlBuilder::buildInsert("users", $row);
-            $this->pdo->prepare($build["sql"])->execute($build["params"]);
-        } else {
-            // Update existing user
-            $build = SqlBuilder::buildUpdate("users", $row, "user_id");
-            $this->pdo->prepare($build["sql"])->execute($build["params"]);
-        }
+    /**
+     * Update existing user
+     */
+    #[\Override]
+    public function update(User $user): void
+    {
+        $row = $this->mapper->mapToRow($user);
+        $build = SqlBuilder::buildUpdate("users", $row, "user_id");
+        $this->pdo->prepare($build["sql"])->execute($build["params"]);
     }
 
     /**

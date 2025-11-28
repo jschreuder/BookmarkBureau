@@ -3,6 +3,7 @@
 use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
+use jschreuder\BookmarkBureau\Exception\DuplicateUserException;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use jschreuder\BookmarkBureau\Repository\FileUserRepository;
 use Ramsey\Uuid\Uuid;
@@ -26,7 +27,7 @@ describe("FileUserRepository", function () {
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
-            $repo->save($user);
+            $repo->insert($user);
             $found = $repo->findById($user->userId);
 
             expect($found->userId->toString())->toBe($user->userId->toString());
@@ -77,7 +78,7 @@ describe("FileUserRepository", function () {
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $userWithoutTotp = TestEntityFactory::createUser();
 
-            $repo->save($userWithoutTotp);
+            $repo->insert($userWithoutTotp);
             $found = $repo->findById($userWithoutTotp->userId);
 
             expect($found->totpSecret)->toBeNull();
@@ -94,7 +95,7 @@ describe("FileUserRepository", function () {
                 totpSecret: $totpSecret,
             );
 
-            $repo->save($userWithTotp);
+            $repo->insert($userWithTotp);
             $found = $repo->findById($userWithTotp->userId);
 
             expect($found->totpSecret)->not->toBeNull();
@@ -109,7 +110,7 @@ describe("FileUserRepository", function () {
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
-            $repo->save($user);
+            $repo->insert($user);
             $found = $repo->findById($user->userId);
 
             expect($found->createdAt->format("Y-m-d H:i:s"))->toBe(
@@ -130,7 +131,7 @@ describe("FileUserRepository", function () {
             $email = new Email("test@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
-            $repo->save($user);
+            $repo->insert($user);
             $found = $repo->findByEmail($email);
 
             expect($found->userId->toString())->toBe($user->userId->toString());
@@ -163,7 +164,7 @@ describe("FileUserRepository", function () {
             $email = new Email("stored@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
-            $repo->save($user);
+            $repo->insert($user);
 
             // Create new repo instance to load from file
             $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
@@ -202,9 +203,9 @@ describe("FileUserRepository", function () {
                 email: new Email("bob@example.com"),
             );
 
-            $repo->save($user1);
-            $repo->save($user2);
-            $repo->save($user3);
+            $repo->insert($user1);
+            $repo->insert($user2);
+            $repo->insert($user3);
 
             $result = $repo->findAll();
 
@@ -228,8 +229,8 @@ describe("FileUserRepository", function () {
                 email: new Email("second@example.com"),
             );
 
-            $repo->save($user1);
-            $repo->save($user2);
+            $repo->insert($user1);
+            $repo->insert($user2);
 
             // Create new repo instance to load from file
             $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
@@ -241,46 +242,17 @@ describe("FileUserRepository", function () {
         });
     });
 
-    describe("save", function () {
+    describe("insert", function () {
         test("inserts a new user", function () {
             $filePath = getTestFilePath();
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
-            $repo->save($user);
+            $repo->insert($user);
 
             $found = $repo->findById($user->userId);
             expect($found->userId->toString())->toBe($user->userId->toString());
             expect((string) $found->email)->toBe((string) $user->email);
-
-            cleanupTestFile($filePath);
-        });
-
-        test("updates an existing user", function () {
-            $filePath = getTestFilePath();
-            $repo = new FileUserRepository($filePath, new UserEntityMapper());
-            $userId = Uuid::uuid4();
-            $user = TestEntityFactory::createUser(
-                id: $userId,
-                email: new Email("original@example.com"),
-            );
-
-            $repo->save($user);
-
-            // Create updated user with same ID but different email
-            $newEmail = new Email("updated@example.com");
-            $updatedUser = TestEntityFactory::createUser(
-                id: $userId,
-                email: $newEmail,
-                passwordHash: $user->passwordHash,
-                totpSecret: $user->totpSecret,
-                createdAt: $user->createdAt,
-                updatedAt: $user->updatedAt,
-            );
-            $repo->save($updatedUser);
-
-            $found = $repo->findById($userId);
-            expect((string) $found->email)->toBe((string) $newEmail);
 
             cleanupTestFile($filePath);
         });
@@ -291,7 +263,7 @@ describe("FileUserRepository", function () {
             $totpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
             $user = TestEntityFactory::createUser(totpSecret: $totpSecret);
 
-            $repo->save($user);
+            $repo->insert($user);
 
             $found = $repo->findById($user->userId);
             expect($found->totpSecret)->not->toBeNull();
@@ -305,7 +277,7 @@ describe("FileUserRepository", function () {
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser(totpSecret: null);
 
-            $repo->save($user);
+            $repo->insert($user);
 
             $found = $repo->findById($user->userId);
             expect($found->totpSecret)->toBeNull();
@@ -320,7 +292,7 @@ describe("FileUserRepository", function () {
 
             expect(file_exists($filePath))->toBeFalse();
 
-            $repo->save($user);
+            $repo->insert($user);
 
             expect(file_exists($filePath))->toBeTrue();
 
@@ -335,7 +307,7 @@ describe("FileUserRepository", function () {
 
             expect(is_dir($tempDir))->toBeFalse();
 
-            $repo->save($user);
+            $repo->insert($user);
 
             expect(is_dir($tempDir))->toBeTrue();
             expect(file_exists($filePath))->toBeTrue();
@@ -351,7 +323,7 @@ describe("FileUserRepository", function () {
                 email: new Email("test@example.com"),
             );
 
-            $repo->save($user);
+            $repo->insert($user);
 
             // Verify file contains valid JSON
             $content = file_get_contents($filePath);
@@ -363,6 +335,257 @@ describe("FileUserRepository", function () {
 
             cleanupTestFile($filePath);
         });
+
+        test(
+            "throws DuplicateUserException when user already exists",
+            function () {
+                $filePath = getTestFilePath();
+                $repo = new FileUserRepository(
+                    $filePath,
+                    new UserEntityMapper(),
+                );
+                $email = new Email("duplicate@example.com");
+                $user1 = TestEntityFactory::createUser(email: $email);
+                $user2 = TestEntityFactory::createUser(email: $email);
+
+                $repo->insert($user1);
+
+                expect(fn() => $repo->insert($user2))->toThrow(
+                    DuplicateUserException::class,
+                );
+
+                cleanupTestFile($filePath);
+            },
+        );
+
+        test(
+            "throws DuplicateUserException when inserting user with same email from file",
+            function () {
+                $filePath = getTestFilePath();
+                $repo1 = new FileUserRepository(
+                    $filePath,
+                    new UserEntityMapper(),
+                );
+                $email = new Email("stored@example.com");
+                $user1 = TestEntityFactory::createUser(email: $email);
+
+                $repo1->insert($user1);
+
+                // Create new repo instance that loads from file
+                $repo2 = new FileUserRepository(
+                    $filePath,
+                    new UserEntityMapper(),
+                );
+                $user2 = TestEntityFactory::createUser(email: $email);
+
+                expect(fn() => $repo2->insert($user2))->toThrow(
+                    DuplicateUserException::class,
+                );
+
+                cleanupTestFile($filePath);
+            },
+        );
+    });
+
+    describe("update", function () {
+        test("updates user password", function () {
+            $filePath = getTestFilePath();
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
+            $email = new Email("test@example.com");
+            $user = TestEntityFactory::createUser(email: $email);
+
+            $repo->insert($user);
+
+            // Create updated user with same ID and email but different password
+            $updatedUser = TestEntityFactory::createUser(
+                id: $user->userId,
+                email: $email,
+                totpSecret: $user->totpSecret,
+                createdAt: $user->createdAt,
+                updatedAt: $user->updatedAt,
+            );
+            $repo->update($updatedUser);
+
+            $found = $repo->findByEmail($email);
+            expect($found->userId->toString())->toBe($user->userId->toString());
+
+            cleanupTestFile($filePath);
+        });
+
+        test("updates user email address", function () {
+            $filePath = getTestFilePath();
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
+            $originalEmail = new Email("original@example.com");
+            $user = TestEntityFactory::createUser(email: $originalEmail);
+
+            $repo->insert($user);
+
+            $newEmail = new Email("updated@example.com");
+            $updatedUser = TestEntityFactory::createUser(
+                id: $user->userId,
+                email: $newEmail,
+                passwordHash: $user->passwordHash,
+                totpSecret: $user->totpSecret,
+                createdAt: $user->createdAt,
+                updatedAt: $user->updatedAt,
+            );
+            $repo->update($updatedUser);
+
+            $found = $repo->findByEmail($newEmail);
+            expect($found->userId->toString())->toBe($user->userId->toString());
+            expect((string) $found->email)->toBe((string) $newEmail);
+
+            cleanupTestFile($filePath);
+        });
+
+        test("updates user TOTP secret", function () {
+            $filePath = getTestFilePath();
+            $repo = new FileUserRepository($filePath, new UserEntityMapper());
+            $email = new Email("test@example.com");
+            $user = TestEntityFactory::createUser(
+                email: $email,
+                totpSecret: null,
+            );
+
+            $repo->insert($user);
+
+            $newTotpSecret = new TotpSecret("JBSWY3DPEHPK3PXP");
+            $updatedUser = TestEntityFactory::createUser(
+                id: $user->userId,
+                email: $email,
+                totpSecret: $newTotpSecret,
+                passwordHash: $user->passwordHash,
+                createdAt: $user->createdAt,
+                updatedAt: $user->updatedAt,
+            );
+            $repo->update($updatedUser);
+
+            $found = $repo->findByEmail($email);
+            expect($found->totpSecret)->not->toBeNull();
+            expect($found->totpSecret->value)->toBe($newTotpSecret->value);
+
+            cleanupTestFile($filePath);
+        });
+
+        test("persists updates to file", function () {
+            $filePath = getTestFilePath();
+            $repo1 = new FileUserRepository($filePath, new UserEntityMapper());
+            $originalEmail = new Email("original@example.com");
+            $user = TestEntityFactory::createUser(email: $originalEmail);
+
+            $repo1->insert($user);
+
+            $newEmail = new Email("updated@example.com");
+            $updatedUser = TestEntityFactory::createUser(
+                id: $user->userId,
+                email: $newEmail,
+                passwordHash: $user->passwordHash,
+                totpSecret: $user->totpSecret,
+                createdAt: $user->createdAt,
+                updatedAt: $user->updatedAt,
+            );
+            $repo1->update($updatedUser);
+
+            // Create new repo instance to load from file
+            $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
+            $found = $repo2->findByEmail($newEmail);
+
+            expect((string) $found->email)->toBe((string) $newEmail);
+
+            cleanupTestFile($filePath);
+        });
+
+        test(
+            "throws UserNotFoundException when user does not exist",
+            function () {
+                $filePath = getTestFilePath();
+                $repo = new FileUserRepository(
+                    $filePath,
+                    new UserEntityMapper(),
+                );
+                $user = TestEntityFactory::createUser();
+
+                expect(fn() => $repo->update($user))->toThrow(
+                    UserNotFoundException::class,
+                );
+
+                cleanupTestFile($filePath);
+            },
+        );
+
+        test(
+            "throws UserNotFoundException when user was deleted from file",
+            function () {
+                $filePath = getTestFilePath();
+                $repo1 = new FileUserRepository(
+                    $filePath,
+                    new UserEntityMapper(),
+                );
+                $email = new Email("temporary@example.com");
+                $user = TestEntityFactory::createUser(email: $email);
+
+                $repo1->insert($user);
+
+                // Create new repo instance that loads from file
+                $repo2 = new FileUserRepository(
+                    $filePath,
+                    new UserEntityMapper(),
+                );
+
+                // Delete from first repo
+                $repo1->delete($user);
+
+                // Try to update from second repo - should fail since user was deleted
+                $updatedUser = TestEntityFactory::createUser(
+                    id: $user->userId,
+                    email: $email,
+                    passwordHash: $user->passwordHash,
+                    totpSecret: $user->totpSecret,
+                    createdAt: $user->createdAt,
+                    updatedAt: $user->updatedAt,
+                );
+
+                expect(fn() => $repo2->update($updatedUser))->toThrow(
+                    UserNotFoundException::class,
+                );
+
+                cleanupTestFile($filePath);
+            },
+        );
+
+        test(
+            "throws DuplicateUserException when updating to email that already exists",
+            function () {
+                $filePath = getTestFilePath();
+                $repo = new FileUserRepository(
+                    $filePath,
+                    new UserEntityMapper(),
+                );
+                $email1 = new Email("user1@example.com");
+                $email2 = new Email("user2@example.com");
+                $user1 = TestEntityFactory::createUser(email: $email1);
+                $user2 = TestEntityFactory::createUser(email: $email2);
+
+                $repo->insert($user1);
+                $repo->insert($user2);
+
+                // Try to update user1 to use user2's email
+                $updatedUser1 = TestEntityFactory::createUser(
+                    id: $user1->userId,
+                    email: $email2,
+                    passwordHash: $user1->passwordHash,
+                    totpSecret: $user1->totpSecret,
+                    createdAt: $user1->createdAt,
+                    updatedAt: $user1->updatedAt,
+                );
+
+                expect(fn() => $repo->update($updatedUser1))->toThrow(
+                    DuplicateUserException::class,
+                );
+
+                cleanupTestFile($filePath);
+            },
+        );
     });
 
     describe("delete", function () {
@@ -371,7 +594,7 @@ describe("FileUserRepository", function () {
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
-            $repo->save($user);
+            $repo->insert($user);
             $repo->delete($user);
 
             expect(fn() => $repo->findById($user->userId))->toThrow(
@@ -407,7 +630,7 @@ describe("FileUserRepository", function () {
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
-            $repo->save($user);
+            $repo->insert($user);
             $repo->delete($user);
 
             // Create new repo instance to load from file
@@ -428,7 +651,7 @@ describe("FileUserRepository", function () {
             $email = new Email("test@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
-            $repo->save($user);
+            $repo->insert($user);
 
             expect($repo->existsByEmail($email))->toBeTrue();
 
@@ -461,7 +684,7 @@ describe("FileUserRepository", function () {
             $email = new Email("stored@example.com");
             $user = TestEntityFactory::createUser(email: $email);
 
-            $repo->save($user);
+            $repo->insert($user);
 
             // Create new repo instance to load from file
             $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
@@ -486,13 +709,19 @@ describe("FileUserRepository", function () {
             $filePath = getTestFilePath();
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
 
-            $user1 = TestEntityFactory::createUser();
-            $user2 = TestEntityFactory::createUser();
-            $user3 = TestEntityFactory::createUser();
+            $user1 = TestEntityFactory::createUser(
+                email: new Email("user1@example.com"),
+            );
+            $user2 = TestEntityFactory::createUser(
+                email: new Email("user2@example.com"),
+            );
+            $user3 = TestEntityFactory::createUser(
+                email: new Email("user3@example.com"),
+            );
 
-            $repo->save($user1);
-            $repo->save($user2);
-            $repo->save($user3);
+            $repo->insert($user1);
+            $repo->insert($user2);
+            $repo->insert($user3);
 
             expect($repo->count())->toBe(3);
 
@@ -504,7 +733,7 @@ describe("FileUserRepository", function () {
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $user = TestEntityFactory::createUser();
 
-            $repo->save($user);
+            $repo->insert($user);
             expect($repo->count())->toBe(1);
 
             $repo->delete($user);
@@ -517,11 +746,15 @@ describe("FileUserRepository", function () {
             $filePath = getTestFilePath();
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
 
-            $user1 = TestEntityFactory::createUser();
-            $user2 = TestEntityFactory::createUser();
+            $user1 = TestEntityFactory::createUser(
+                email: new Email("user1@example.com"),
+            );
+            $user2 = TestEntityFactory::createUser(
+                email: new Email("user2@example.com"),
+            );
 
-            $repo->save($user1);
-            $repo->save($user2);
+            $repo->insert($user1);
+            $repo->insert($user2);
 
             // Create new repo instance to load from file
             $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
@@ -545,8 +778,8 @@ describe("FileUserRepository", function () {
                 email: new Email("user2@example.com"),
             );
 
-            $repo1->save($user1);
-            $repo1->save($user2);
+            $repo1->insert($user1);
+            $repo1->insert($user2);
 
             // Second instance: load and verify
             $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
@@ -571,7 +804,7 @@ describe("FileUserRepository", function () {
             $user1 = TestEntityFactory::createUser(
                 email: new Email("user1@example.com"),
             );
-            $repo1->save($user1);
+            $repo1->insert($user1);
 
             // Second instance loads from file
             $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
@@ -580,7 +813,7 @@ describe("FileUserRepository", function () {
             $user2 = TestEntityFactory::createUser(
                 email: new Email("user2@example.com"),
             );
-            $repo1->save($user2);
+            $repo1->insert($user2);
 
             // Second instance should see both users when calling methods
             // (Note: this tests that repo2 reloads the file)

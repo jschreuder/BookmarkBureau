@@ -6,6 +6,7 @@ use jschreuder\BookmarkBureau\Composite\UserCollection;
 use jschreuder\BookmarkBureau\Entity\User;
 use jschreuder\BookmarkBureau\Entity\Mapper\UserEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Value\Email;
+use jschreuder\BookmarkBureau\Exception\DuplicateUserException;
 use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Exception\UserNotFoundException;
 use Ramsey\Uuid\Uuid;
@@ -14,7 +15,7 @@ use Ramsey\Uuid\UuidInterface;
 final class FileUserRepository implements UserRepositoryInterface
 {
     /**
-     * @var array<string, User> In-memory cache of users indexed by user_id string
+     * @var array<string, User> In-memory cache of users indexed by emailaddress
      */
     private array $users = [];
 
@@ -32,13 +33,14 @@ final class FileUserRepository implements UserRepositoryInterface
     public function findById(UuidInterface $userId): User
     {
         $this->loadUsers();
-        $userIdString = $userId->toString();
 
-        if (!isset($this->users[$userIdString])) {
-            throw UserNotFoundException::forId($userId);
+        foreach ($this->users as $user) {
+            if ($user->userId->equals($userId)) {
+                return $user;
+            }
         }
 
-        return $this->users[$userIdString];
+        throw UserNotFoundException::forId($userId);
     }
 
     /**
@@ -49,13 +51,11 @@ final class FileUserRepository implements UserRepositoryInterface
     {
         $this->loadUsers();
 
-        foreach ($this->users as $user) {
-            if ($user->email->equals($email)) {
-                return $user;
-            }
+        if (!isset($this->users[$email->value])) {
+            throw UserNotFoundException::forEmail($email);
         }
 
-        throw UserNotFoundException::forEmail($email);
+        return $this->users[$email->value];
     }
 
     /**
@@ -83,11 +83,43 @@ final class FileUserRepository implements UserRepositoryInterface
      * Save a new user or update an existing one
      */
     #[\Override]
-    public function save(User $user): void
+    public function insert(User $user): void
     {
         $this->loadUsers();
-        $userIdString = $user->userId->toString();
-        $this->users[$userIdString] = $user;
+        if (isset($this->users[$user->email->value])) {
+            throw DuplicateUserException::forEmail($user->email);
+        }
+        $this->users[$user->email->value] = $user;
+        $this->persistUsers();
+    }
+
+    /**
+     * Update an existing user
+     */
+    #[\Override]
+    public function update(User $user): void
+    {
+        $this->loadUsers();
+        // Throws exception if user does not exist:
+        $existingUser = $this->findById($user->userId);
+
+        // Check if new email is already taken by another user
+        if (
+            isset($this->users[$user->email->value]) &&
+            !$existingUser->userId->equals(
+                $this->users[$user->email->value]->userId,
+            )
+        ) {
+            throw DuplicateUserException::forEmail($user->email);
+        }
+
+        // Remove old entry if user email has changed
+        if (!$existingUser->email->equals($user->email)) {
+            unset($this->users[$existingUser->email->value]);
+        }
+
+        // Remove old entry and insert updated user
+        $this->users[$user->email->value] = $user;
         $this->persistUsers();
     }
 
@@ -98,8 +130,7 @@ final class FileUserRepository implements UserRepositoryInterface
     public function delete(User $user): void
     {
         $this->loadUsers();
-        $userIdString = $user->userId->toString();
-        unset($this->users[$userIdString]);
+        unset($this->users[$user->email->value]);
         $this->persistUsers();
     }
 
@@ -151,7 +182,7 @@ final class FileUserRepository implements UserRepositoryInterface
                 $userArray["user_id"],
             )->getBytes();
             $user = $this->mapper->mapToEntity($userArray);
-            $this->users[$user->userId->toString()] = $user;
+            $this->users[$user->email->value] = $user;
         }
     }
 
