@@ -453,4 +453,73 @@ describe("SqlBuilder", function () {
             );
         });
     });
+
+    describe("buildMax", function () {
+        test("builds MAX without WHERE clause", function () {
+            $sql = SqlBuilder::buildMax("categories", "sort_order");
+
+            expect($sql)->toBe(
+                "SELECT MAX(sort_order) as max_value FROM categories",
+            );
+        });
+
+        test("builds MAX with WHERE clause", function () {
+            $sql = SqlBuilder::buildMax(
+                "categories",
+                "sort_order",
+                "dashboard_id = :dashboard_id",
+            );
+
+            expect($sql)->toBe(
+                "SELECT MAX(sort_order) as max_value FROM categories WHERE dashboard_id = :dashboard_id",
+            );
+        });
+
+        test("builds MAX with custom column alias", function () {
+            $sql = SqlBuilder::buildMax(
+                "favorites",
+                "sort_order",
+                "dashboard_id = :dashboard_id",
+                "max_sort",
+            );
+
+            expect($sql)->toBe(
+                "SELECT MAX(sort_order) as max_sort FROM favorites WHERE dashboard_id = :dashboard_id",
+            );
+        });
+    });
+
+    describe("extractMaxValue", function () {
+        test("returns actual value when MAX result is a number", function () {
+            $result = ["max_value" => 42];
+            expect(SqlBuilder::extractMaxValue($result))->toBe(42);
+        });
+
+        test("returns negative one when MAX result is NULL", function () {
+            $result = ["max_value" => null];
+            expect(SqlBuilder::extractMaxValue($result))->toBe(-1);
+        });
+
+        test("returns zero when MAX result is zero", function () {
+            $result = ["max_value" => 0];
+            expect(SqlBuilder::extractMaxValue($result))->toBe(0);
+        });
+
+        test("throws exception when query result is false", function () {
+            expect(fn() => SqlBuilder::extractMaxValue(false))->toThrow(
+                RepositoryStorageException::class,
+                "Failed to fetch MAX value",
+            );
+        });
+
+        test("handles custom column alias", function () {
+            $result = ["max_sort" => 10];
+            expect(SqlBuilder::extractMaxValue($result, "max_sort"))->toBe(10);
+        });
+
+        test("handles custom column alias with NULL", function () {
+            $result = ["max_sort" => null];
+            expect(SqlBuilder::extractMaxValue($result, "max_sort"))->toBe(-1);
+        });
+    });
 });

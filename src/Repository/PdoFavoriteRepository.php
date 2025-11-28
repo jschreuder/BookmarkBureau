@@ -93,21 +93,17 @@ final readonly class PdoFavoriteRepository implements
     public function getMaxSortOrderForDashboardId(
         UuidInterface $dashboardId,
     ): int {
-        $statement = $this->pdo->prepare(
-            "SELECT MAX(sort_order) as max_sort FROM favorites WHERE dashboard_id = :dashboard_id",
+        $sql = SqlBuilder::buildMax(
+            "favorites",
+            "sort_order",
+            "dashboard_id = :dashboard_id",
+            "max_sort",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
-        /** @var array{max_sort: int|null}|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
-        if ($result === false) {
-            throw new RepositoryStorageException(
-                "Failed to get max sort order for favorites",
-            );
-        }
-
-        $maxSort = (int) $result["max_sort"];
-        return $maxSort === 0 && $result["max_sort"] === null ? -1 : $maxSort;
+        return SqlBuilder::extractMaxValue($result, "max_sort");
     }
 
     /**

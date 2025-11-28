@@ -237,4 +237,53 @@ final readonly class SqlBuilder
 
         return $sql;
     }
+
+    /**
+     * Build a MAX query for a specific column with optional WHERE clause.
+     *
+     * @param string $table The table name
+     * @param string $column The column to find MAX value for
+     * @param string|null $where Optional WHERE clause (without WHERE keyword)
+     * @param string $columnAlias The alias for MAX result (default: "max_value")
+     * @return string The complete SELECT MAX() statement
+     */
+    public static function buildMax(
+        string $table,
+        string $column,
+        ?string $where = null,
+        string $columnAlias = "max_value",
+    ): string {
+        $sql = "SELECT MAX({$column}) as {$columnAlias} FROM {$table}";
+
+        if ($where !== null) {
+            $sql .= " WHERE {$where}";
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Extract MAX value from query result, returning -1 if NULL.
+     *
+     * Handles the common pattern where MAX(column) returns NULL when no rows exist,
+     * and repositories need to return -1 in that case.
+     *
+     * @param array<string, mixed>|false $result The PDO fetch result
+     * @param string $columnAlias The alias used in the query (default: "max_value")
+     * @return int The max value, or -1 if NULL
+     * @throws RepositoryStorageException If the query failed
+     */
+    public static function extractMaxValue(
+        array|false $result,
+        string $columnAlias = "max_value",
+    ): int {
+        if ($result === false) {
+            throw new RepositoryStorageException("Failed to fetch MAX value");
+        }
+
+        $maxValue = (int) $result[$columnAlias];
+        return $maxValue === 0 && $result[$columnAlias] === null
+            ? -1
+            : $maxValue;
+    }
 }
