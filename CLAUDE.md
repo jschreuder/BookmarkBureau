@@ -166,7 +166,7 @@ Example: `DashboardViewController` - implements `ControllerInterface` + filter/v
 - **Entity mutations with property hooks**: See `src/Entity/Link.php` - `set { markAsUpdated() }` pattern when entity has an updatedAt property
 - **Input filtering**: See `src/InputSpec/*` - uses `Util\Filter` fluent API for sanitization
 - **Route registration**: See `src/*RoutingProvider.php` - uses `Util\ResourceRouteBuilder` for RESTful routes
-- **Repository SQL**: Use `SqlBuilder` for INSERT/UPDATE/DELETE/COUNT/MAX queries (returns `['sql' => '...', 'params' => [...]]`), use `SqlExceptionHandler::isForeignKeyViolation()` and `isDuplicateEntry()` for error detection. Always use named parameters (`:field_name`), never positional (`?`)
+- **Repository SQL**: Use `SqlBuilder` for queries (INSERT/UPDATE/DELETE return `['sql' => '...', 'params' => [...]]`, SELECT/COUNT/MAX return SQL string only). Use `SqlExceptionHandler::isForeignKeyViolation()` and `isDuplicateEntry()` for error detection. Always use named parameters (`:field_name`), never positional (`?`)
 
 ## Documentation References
 
