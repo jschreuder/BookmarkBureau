@@ -23,6 +23,12 @@ final class TagService implements TagServiceInterface
     ) {}
 
     #[\Override]
+    public function getTag(string $tagName): Tag
+    {
+        return $this->tagRepository->findByName($tagName);
+    }
+
+    #[\Override]
     public function listAllTags(): TagCollection
     {
         return $this->pipelines
@@ -115,7 +121,7 @@ final class TagService implements TagServiceInterface
                 } catch (TagNotFoundException) {
                     // Tag doesn't exist, create it
                     $tag = new Tag($linkWithTag->tagName, null);
-                    $this->tagRepository->update($tag);
+                    $this->tagRepository->insert($tag);
                 }
 
                 // Assign tag to link (only if not already assigned)

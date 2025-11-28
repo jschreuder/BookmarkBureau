@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Service;
 
 use jschreuder\BookmarkBureau\Composite\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Tag;
+use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Exception\DuplicateTagException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
@@ -11,6 +12,13 @@ use Ramsey\Uuid\UuidInterface;
 
 interface TagServiceInterface
 {
+    /**
+     * Get a tag by their name
+     *
+     * @throws TagNotFoundException when tag doesn't exist
+     */
+    public function getTag(string $tagName): Tag;
+
     /**
      * Get all tags
      */

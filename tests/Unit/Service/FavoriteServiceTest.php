@@ -2,6 +2,7 @@
 
 use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
+use jschreuder\BookmarkBureau\Exception\DuplicateFavoriteException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
@@ -137,7 +138,7 @@ describe("FavoriteService", function () {
         });
 
         test(
-            "throws FavoriteNotFoundException when link is already favorited",
+            "throws DuplicateFavoriteException when link is already favorited",
             function () {
                 $dashboardId = Uuid::uuid4();
                 $linkId = Uuid::uuid4();
@@ -184,7 +185,7 @@ describe("FavoriteService", function () {
 
                 expect(
                     fn() => $service->addFavorite($dashboardId, $linkId),
-                )->toThrow(FavoriteNotFoundException::class);
+                )->toThrow(DuplicateFavoriteException::class);
             },
         );
 
@@ -591,7 +592,7 @@ describe("FavoriteService", function () {
                 // Try to add same favorite again - should throw FavoriteNotFoundException
                 expect(
                     fn() => $service->addFavorite($dashboardId, $linkId),
-                )->toThrow(FavoriteNotFoundException::class);
+                )->toThrow(DuplicateFavoriteException::class);
             },
         );
     });

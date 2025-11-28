@@ -68,12 +68,12 @@ describe("TagReadAction", function () {
             $tag = TestEntityFactory::createTag(
                 tagName: new TagName("important"),
             );
-            $collection = new TagCollection($tag);
 
             $tagService
-                ->shouldReceive("listAllTags")
+                ->shouldReceive("getTag")
+                ->with($tag->tagName->value)
                 ->once()
-                ->andReturn($collection);
+                ->andReturn($tag);
 
             $result = $action->execute(["tag_name" => "important"]);
 
@@ -89,12 +89,11 @@ describe("TagReadAction", function () {
                 new TagOutputSpec(),
             );
 
-            $collection = new TagCollection();
-
             $tagService
-                ->shouldReceive("listAllTags")
+                ->shouldReceive("getTag")
+                ->with("nonexistent")
                 ->once()
-                ->andReturn($collection);
+                ->andThrow(TagNotFoundException::class);
 
             expect(
                 fn() => $action->execute(["tag_name" => "nonexistent"]),
@@ -125,12 +124,12 @@ describe("TagReadAction", function () {
             $tag = TestEntityFactory::createTag(
                 tagName: new TagName("important"),
             );
-            $collection = new TagCollection($tag);
 
             $tagService
-                ->shouldReceive("listAllTags")
+                ->shouldReceive("getTag")
+                ->with($tag->tagName->value)
                 ->once()
-                ->andReturn($collection);
+                ->andReturn($tag);
 
             $result = $action->execute($filtered);
             expect($result)->toBeArray();

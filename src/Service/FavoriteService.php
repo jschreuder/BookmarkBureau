@@ -6,6 +6,7 @@ use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 use jschreuder\BookmarkBureau\Composite\FavoriteParams;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
+use jschreuder\BookmarkBureau\Exception\DuplicateFavoriteException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Repository\DashboardRepositoryInterface;
@@ -25,7 +26,7 @@ final class FavoriteService implements FavoriteServiceInterface
     /**
      * @throws DashboardNotFoundException when dashboard doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
-     * @throws FavoriteNotFoundException when link is already favorited
+     * @throws DuplicateFavoriteException when link is already favorited
      */
     #[\Override]
     public function addFavorite(
@@ -38,7 +39,7 @@ final class FavoriteService implements FavoriteServiceInterface
 
         // Check if already favorited
         if ($this->favoriteRepository->isFavorite($dashboardId, $linkId)) {
-            throw FavoriteNotFoundException::forDashboardAndLink(
+            throw DuplicateFavoriteException::forDashboardAndLink(
                 $dashboardId,
                 $linkId,
             );

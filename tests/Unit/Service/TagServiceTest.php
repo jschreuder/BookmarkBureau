@@ -409,7 +409,7 @@ describe("TagService", function () {
                 ->with("new-tag")
                 ->once()
                 ->andThrow(TagNotFoundException::class);
-            $tagRepository->shouldReceive("update")->once();
+            $tagRepository->shouldReceive("insert")->once();
             $tagRepository
                 ->shouldReceive("isAssignedToLinkId")
                 ->with($linkId, "new-tag")

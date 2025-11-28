@@ -38,17 +38,7 @@ final readonly class TagReadAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        // Note: TagService doesn't have a getTag method, but we can list all tags
-        // For now, returning the tag by searching with the exact tag name
-        // This might need adjustment based on how tag retrieval is intended to work
-        $tags = $this->tagService->listAllTags();
-        foreach ($tags as $tag) {
-            if ($tag->tagName->value === $data["tag_name"]) {
-                return $this->outputSpec->transform($tag);
-            }
-        }
-        // If tag not found, let the service throw TagNotFoundException
-        // We'll need to add a getTag method to TagService or handle this differently
-        throw TagNotFoundException::forName(new TagName($data["tag_name"]));
+        $tag = $this->tagService->getTag($data["tag_name"]);
+        return $this->outputSpec->transform($tag);
     }
 }
