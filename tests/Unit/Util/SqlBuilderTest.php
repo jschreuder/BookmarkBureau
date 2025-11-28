@@ -491,7 +491,7 @@ describe("SqlBuilder", function () {
 
     describe("extractMaxValue", function () {
         test("returns actual value when MAX result is a number", function () {
-            $result = ["max_value" => 42];
+            $result = ["max_value" => "42"];
             expect(SqlBuilder::extractMaxValue($result))->toBe(42);
         });
 
@@ -501,7 +501,7 @@ describe("SqlBuilder", function () {
         });
 
         test("returns zero when MAX result is zero", function () {
-            $result = ["max_value" => 0];
+            $result = ["max_value" => "0"];
             expect(SqlBuilder::extractMaxValue($result))->toBe(0);
         });
 
@@ -513,7 +513,7 @@ describe("SqlBuilder", function () {
         });
 
         test("handles custom column alias", function () {
-            $result = ["max_sort" => 10];
+            $result = ["max_sort" => "10"];
             expect(SqlBuilder::extractMaxValue($result, "max_sort"))->toBe(10);
         });
 

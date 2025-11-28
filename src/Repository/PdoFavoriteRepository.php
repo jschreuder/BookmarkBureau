@@ -102,6 +102,7 @@ final readonly class PdoFavoriteRepository implements
         $statement = $this->pdo->prepare($sql);
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
+        /** @var array<string, mixed>|false $result */
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         return SqlBuilder::extractMaxValue($result, "max_sort");
     }

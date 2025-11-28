@@ -268,22 +268,31 @@ final readonly class SqlBuilder
      * Handles the common pattern where MAX(column) returns NULL when no rows exist,
      * and repositories need to return -1 in that case.
      *
-     * @param array<string, mixed>|false $result The PDO fetch result
+     * @param mixed $result The PDO fetch result
      * @param string $columnAlias The alias used in the query (default: "max_value")
      * @return int The max value, or -1 if NULL
      * @throws RepositoryStorageException If the query failed
      */
     public static function extractMaxValue(
-        array|false $result,
+        mixed $result,
         string $columnAlias = "max_value",
     ): int {
-        if ($result === false) {
+        if ($result === false || !\is_array($result)) {
             throw new RepositoryStorageException("Failed to fetch MAX value");
         }
 
-        $maxValue = (int) $result[$columnAlias];
-        return $maxValue === 0 && $result[$columnAlias] === null
-            ? -1
-            : $maxValue;
+        if (!\array_key_exists($columnAlias, $result)) {
+            throw new RepositoryStorageException(
+                "Column alias \"{$columnAlias}\" not found in result",
+            );
+        }
+
+        $value = $result[$columnAlias];
+        // Handle bad output (mostly NULL)
+        if (!\is_int($value) && !\is_string($value)) {
+            return -1;
+        }
+
+        return (int) $value;
     }
 }
