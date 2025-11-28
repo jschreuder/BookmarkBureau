@@ -122,10 +122,10 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     #[\Override]
     public function delete(User $user): void
     {
-        $statement = $this->pdo->prepare(
-            "DELETE FROM users WHERE user_id = :user_id",
-        );
-        $statement->execute([":user_id" => $user->userId->getBytes()]);
+        $query = SqlBuilder::buildDelete("users", [
+            "user_id" => $user->userId->getBytes(),
+        ]);
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**

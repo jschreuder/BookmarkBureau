@@ -6,6 +6,7 @@ use DateTimeInterface;
 use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
+use jschreuder\BookmarkBureau\Util\SqlBuilder;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
 final readonly class PdoJwtJtiRepository implements JwtJtiRepositoryInterface
@@ -65,10 +66,10 @@ final readonly class PdoJwtJtiRepository implements JwtJtiRepositoryInterface
     public function deleteJti(UuidInterface $jti): void
     {
         try {
-            $statement = $this->pdo->prepare(
-                "DELETE FROM jwt_jti WHERE jti = :jti",
-            );
-            $statement->execute([":jti" => $jti->getBytes()]);
+            $query = SqlBuilder::buildDelete("jwt_jti", [
+                "jti" => $jti->getBytes(),
+            ]);
+            $this->pdo->prepare($query["sql"])->execute($query["params"]);
         } catch (\Throwable $e) {
             throw new RepositoryStorageException(
                 "Failed to delete JWT JTI: " . $e->getMessage(),

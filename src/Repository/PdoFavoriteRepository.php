@@ -179,13 +179,11 @@ final readonly class PdoFavoriteRepository implements
             );
         }
 
-        $statement = $this->pdo->prepare(
-            "DELETE FROM favorites WHERE dashboard_id = :dashboard_id AND link_id = :link_id",
-        );
-        $statement->execute([
-            ":dashboard_id" => $dashboardId->getBytes(),
-            ":link_id" => $linkId->getBytes(),
+        $query = SqlBuilder::buildDelete("favorites", [
+            "dashboard_id" => $dashboardId->getBytes(),
+            "link_id" => $linkId->getBytes(),
         ]);
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**

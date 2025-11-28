@@ -238,12 +238,10 @@ final readonly class PdoCategoryRepository implements
     public function delete(Category $category): void
     {
         // Delete cascades are handled by database constraints
-        $statement = $this->pdo->prepare(
-            "DELETE FROM categories WHERE category_id = :category_id",
-        );
-        $statement->execute([
-            ":category_id" => $category->categoryId->getBytes(),
+        $query = SqlBuilder::buildDelete("categories", [
+            "category_id" => $category->categoryId->getBytes(),
         ]);
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**
@@ -317,13 +315,11 @@ final readonly class PdoCategoryRepository implements
             throw LinkNotFoundException::forId($linkId);
         }
 
-        $statement = $this->pdo->prepare(
-            "DELETE FROM category_links WHERE category_id = :category_id AND link_id = :link_id",
-        );
-        $statement->execute([
-            ":category_id" => $categoryId->getBytes(),
-            ":link_id" => $linkId->getBytes(),
+        $query = SqlBuilder::buildDelete("category_links", [
+            "category_id" => $categoryId->getBytes(),
+            "link_id" => $linkId->getBytes(),
         ]);
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**

@@ -178,10 +178,10 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
     public function delete(Tag $tag): void
     {
         // Delete cascades are handled by database constraints
-        $statement = $this->pdo->prepare(
-            "DELETE FROM tags WHERE tag_name = :tag_name",
-        );
-        $statement->execute([":tag_name" => $tag->tagName->value]);
+        $query = SqlBuilder::buildDelete("tags", [
+            "tag_name" => $tag->tagName->value,
+        ]);
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**
@@ -241,13 +241,11 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         string $tagName,
     ): void {
         try {
-            $statement = $this->pdo->prepare(
-                "DELETE FROM link_tags WHERE link_id = :link_id AND tag_name = :tag_name",
-            );
-            $statement->execute([
-                ":link_id" => $linkId->getBytes(),
-                ":tag_name" => $tagName,
+            $query = SqlBuilder::buildDelete("link_tags", [
+                "link_id" => $linkId->getBytes(),
+                "tag_name" => $tagName,
             ]);
+            $this->pdo->prepare($query["sql"])->execute($query["params"]);
         } catch (\PDOException $e) {
             if (
                 str_contains(

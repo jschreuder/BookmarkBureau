@@ -101,12 +101,10 @@ final readonly class PdoDashboardRepository implements
     public function delete(Dashboard $dashboard): void
     {
         // Delete cascades are handled by database constraints
-        $statement = $this->pdo->prepare(
-            "DELETE FROM dashboards WHERE dashboard_id = :dashboard_id",
-        );
-        $statement->execute([
-            ":dashboard_id" => $dashboard->dashboardId->getBytes(),
+        $query = SqlBuilder::buildDelete("dashboards", [
+            "dashboard_id" => $dashboard->dashboardId->getBytes(),
         ]);
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**

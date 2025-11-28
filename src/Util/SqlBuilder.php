@@ -181,4 +181,31 @@ final readonly class SqlBuilder
             "params" => $params,
         ];
     }
+
+    /**
+     * Build a DELETE statement with WHERE clause from field-value pairs.
+     *
+     * @param string $table The table name
+     * @param array<string, mixed> $where Associative array of field => value for WHERE clause
+     * @return array{sql: string, params: array<string, mixed>}
+     */
+    public static function buildDelete(string $table, array $where): array
+    {
+        $whereClauses = array_map(
+            fn($field) => "{$field} = :{$field}",
+            array_keys($where),
+        );
+
+        $sql = "DELETE FROM {$table} WHERE " . implode(" AND ", $whereClauses);
+
+        $params = [];
+        foreach ($where as $field => $value) {
+            $params[":{$field}"] = $value;
+        }
+
+        return [
+            "sql" => $sql,
+            "params" => $params,
+        ];
+    }
 }

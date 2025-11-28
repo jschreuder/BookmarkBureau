@@ -215,10 +215,10 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     public function delete(Link $link): void
     {
         // Delete cascades are handled by database constraints
-        $statement = $this->pdo->prepare(
-            "DELETE FROM links WHERE link_id = :link_id",
-        );
-        $statement->execute([":link_id" => $link->linkId->getBytes()]);
+        $query = SqlBuilder::buildDelete("links", [
+            "link_id" => $link->linkId->getBytes(),
+        ]);
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**

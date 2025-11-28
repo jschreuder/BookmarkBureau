@@ -332,4 +332,81 @@ describe("SqlBuilder", function () {
             expect($result["params"][":uuid"])->toBe("abc-123");
         });
     });
+
+    describe("buildDelete", function () {
+        test("builds DELETE with single field", function () {
+            $result = SqlBuilder::buildDelete("users", [
+                "user_id" => "test123",
+            ]);
+
+            expect($result["sql"])->toBe(
+                "DELETE FROM users WHERE user_id = :user_id",
+            );
+            expect($result["params"])->toBe([":user_id" => "test123"]);
+        });
+
+        test(
+            "builds DELETE with multiple fields for junction tables",
+            function () {
+                $result = SqlBuilder::buildDelete("link_tags", [
+                    "link_id" => "abc",
+                    "tag_name" => "php",
+                ]);
+
+                expect($result["sql"])->toBe(
+                    "DELETE FROM link_tags WHERE link_id = :link_id AND tag_name = :tag_name",
+                );
+                expect($result["params"])->toBe([
+                    ":link_id" => "abc",
+                    ":tag_name" => "php",
+                ]);
+            },
+        );
+
+        test("handles null values in WHERE clause", function () {
+            $result = SqlBuilder::buildDelete("users", ["phone" => null]);
+
+            expect($result["params"][":phone"])->toBeNull();
+        });
+
+        test("handles binary data in WHERE clause", function () {
+            $binaryId = "binary-uuid-data";
+            $result = SqlBuilder::buildDelete("users", [
+                "user_id" => $binaryId,
+            ]);
+
+            expect($result["params"][":user_id"])->toBe($binaryId);
+        });
+
+        test("builds DELETE with three fields", function () {
+            $result = SqlBuilder::buildDelete("complex_table", [
+                "field1" => "value1",
+                "field2" => "value2",
+                "field3" => "value3",
+            ]);
+
+            expect($result["sql"])->toBe(
+                "DELETE FROM complex_table WHERE field1 = :field1 AND field2 = :field2 AND field3 = :field3",
+            );
+            expect($result["params"])->toBe([
+                ":field1" => "value1",
+                ":field2" => "value2",
+                ":field3" => "value3",
+            ]);
+        });
+
+        test("preserves field order in parameters", function () {
+            $result = SqlBuilder::buildDelete("users", [
+                "email" => "test@example.com",
+                "id" => 5,
+                "status" => "active",
+            ]);
+
+            expect(array_keys($result["params"]))->toBe([
+                ":email",
+                ":id",
+                ":status",
+            ]);
+        });
+    });
 });
