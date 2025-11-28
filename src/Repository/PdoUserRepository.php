@@ -147,7 +147,8 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     #[\Override]
     public function count(): int
     {
-        $statement = $this->pdo->prepare("SELECT COUNT(*) as count FROM users");
+        $sql = SqlBuilder::buildCount("users");
+        $statement = $this->pdo->prepare($sql);
         $statement->execute();
 
         /** @var array{count: int}|false $result */

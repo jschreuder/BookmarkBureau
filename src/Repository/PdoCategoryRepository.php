@@ -393,9 +393,8 @@ final readonly class PdoCategoryRepository implements
     #[\Override]
     public function count(): int
     {
-        $statement = $this->pdo->prepare(
-            "SELECT COUNT(*) as count FROM categories",
-        );
+        $sql = SqlBuilder::buildCount("categories");
+        $statement = $this->pdo->prepare($sql);
         $statement->execute();
 
         /** @var array{count: int}|false $result */
@@ -412,9 +411,11 @@ final readonly class PdoCategoryRepository implements
     #[\Override]
     public function countLinksInCategory(UuidInterface $categoryId): int
     {
-        $statement = $this->pdo->prepare(
-            "SELECT COUNT(*) as count FROM category_links WHERE category_id = :category_id",
+        $sql = SqlBuilder::buildCount(
+            "category_links",
+            "category_id = :category_id",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([":category_id" => $categoryId->getBytes()]);
 
         /** @var array{count: int}|false $result */

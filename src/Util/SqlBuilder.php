@@ -215,4 +215,26 @@ final readonly class SqlBuilder
             "params" => $params,
         ];
     }
+
+    /**
+     * Build a COUNT query with optional WHERE clause.
+     *
+     * @param string $table The table name
+     * @param string|null $where Optional WHERE clause (without WHERE keyword)
+     * @param string $columnAlias The alias for COUNT result (default: "count")
+     * @return string The complete SELECT COUNT(*) statement
+     */
+    public static function buildCount(
+        string $table,
+        ?string $where = null,
+        string $columnAlias = "count",
+    ): string {
+        $sql = "SELECT COUNT(*) as {$columnAlias} FROM {$table}";
+
+        if ($where !== null) {
+            $sql .= " WHERE {$where}";
+        }
+
+        return $sql;
+    }
 }

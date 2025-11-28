@@ -113,9 +113,8 @@ final readonly class PdoDashboardRepository implements
     #[\Override]
     public function count(): int
     {
-        $statement = $this->pdo->prepare(
-            "SELECT COUNT(*) as count FROM dashboards",
-        );
+        $sql = SqlBuilder::buildCount("dashboards");
+        $statement = $this->pdo->prepare($sql);
         $statement->execute();
 
         /** @var array{count: string}|false $result */

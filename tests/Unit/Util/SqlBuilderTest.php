@@ -416,4 +416,41 @@ describe("SqlBuilder", function () {
             ]);
         });
     });
+
+    describe("buildCount", function () {
+        test("builds COUNT without WHERE clause", function () {
+            $sql = SqlBuilder::buildCount("users");
+
+            expect($sql)->toBe("SELECT COUNT(*) as count FROM users");
+        });
+
+        test("builds COUNT with WHERE clause", function () {
+            $sql = SqlBuilder::buildCount(
+                "favorites",
+                "dashboard_id = :dashboard_id",
+            );
+
+            expect($sql)->toBe(
+                "SELECT COUNT(*) as count FROM favorites WHERE dashboard_id = :dashboard_id",
+            );
+        });
+
+        test("builds COUNT with custom column alias", function () {
+            $sql = SqlBuilder::buildCount("users", null, "total");
+
+            expect($sql)->toBe("SELECT COUNT(*) as total FROM users");
+        });
+
+        test("builds COUNT with WHERE and custom alias", function () {
+            $sql = SqlBuilder::buildCount(
+                "links",
+                "created_at > :date",
+                "total_links",
+            );
+
+            expect($sql)->toBe(
+                "SELECT COUNT(*) as total_links FROM links WHERE created_at > :date",
+            );
+        });
+    });
 });

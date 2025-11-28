@@ -230,7 +230,8 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     #[\Override]
     public function count(): int
     {
-        $statement = $this->pdo->prepare("SELECT COUNT(*) as count FROM links");
+        $sql = SqlBuilder::buildCount("links");
+        $statement = $this->pdo->prepare($sql);
         $statement->execute();
 
         /** @var array{count: int}|false $result */

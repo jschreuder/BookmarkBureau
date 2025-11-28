@@ -264,9 +264,11 @@ final readonly class PdoFavoriteRepository implements
     #[\Override]
     public function countForDashboardId(UuidInterface $dashboardId): int
     {
-        $statement = $this->pdo->prepare(
-            "SELECT COUNT(*) as count FROM favorites WHERE dashboard_id = :dashboard_id",
+        $sql = SqlBuilder::buildCount(
+            "favorites",
+            "dashboard_id = :dashboard_id",
         );
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
         /** @var array{count: int}|false $result */
