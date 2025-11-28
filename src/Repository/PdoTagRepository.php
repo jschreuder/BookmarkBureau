@@ -114,12 +114,12 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
         $sql = SqlBuilder::buildSelect(
             "tags",
             $this->mapper->getDbFields(),
-            "tag_name LIKE ?",
+            "tag_name LIKE :search_term",
             "tag_name ASC",
             $limit,
         );
         $statement = $this->pdo->prepare($sql);
-        $statement->execute([$searchTerm]);
+        $statement->execute([":search_term" => $searchTerm]);
 
         $tags = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {

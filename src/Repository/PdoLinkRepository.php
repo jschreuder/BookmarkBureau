@@ -59,9 +59,9 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
              LEFT JOIN link_tags lt ON l.link_id = lt.link_id
              LEFT JOIN tags t ON lt.tag_name = t.tag_name
              ORDER BY l.created_at DESC
-             LIMIT ? OFFSET ?",
+             LIMIT :limit OFFSET :offset",
         );
-        $statement->execute([$limit, $offset]);
+        $statement->execute([":limit" => $limit, ":offset" => $offset]);
 
         /** @var array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -84,11 +84,14 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             "SELECT {$fields}, {$tagFields} FROM links l
              LEFT JOIN link_tags lt ON l.link_id = lt.link_id
              LEFT JOIN tags t ON lt.tag_name = t.tag_name
-             WHERE l.title LIKE ? OR l.description LIKE ?
+             WHERE l.title LIKE :search_term OR l.description LIKE :search_term
              ORDER BY l.created_at DESC
-             LIMIT ?",
+             LIMIT :limit",
         );
-        $statement->execute([$searchTerm, $searchTerm, $limit]);
+        $statement->execute([
+            ":search_term" => $searchTerm,
+            ":limit" => $limit,
+        ]);
 
         /** @var array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
