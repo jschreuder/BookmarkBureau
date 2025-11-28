@@ -5,6 +5,7 @@ namespace jschreuder\BookmarkBureau\Service;
 use jschreuder\BookmarkBureau\Composite\LinkWithTagName;
 use jschreuder\BookmarkBureau\Composite\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Tag;
+use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\OperationPipeline\NoPipeline;
 use jschreuder\BookmarkBureau\OperationPipeline\PipelineInterface;
 use Ramsey\Uuid\UuidInterface;
@@ -12,6 +13,7 @@ use Ramsey\Uuid\UuidInterface;
 final readonly class TagServicePipelines
 {
     /**
+     * @param PipelineInterface<TagName, Tag>|null $getTag
      * @param PipelineInterface<null, TagCollection>|null $listAllTags
      * @param PipelineInterface<UuidInterface, TagCollection>|null $getTagsForLink
      * @param PipelineInterface<Tag, Tag>|null $createTag
@@ -23,6 +25,7 @@ final readonly class TagServicePipelines
      */
     public function __construct(
         private PipelineInterface $default = new NoPipeline(),
+        private ?PipelineInterface $getTag = null,
         private ?PipelineInterface $listAllTags = null,
         private ?PipelineInterface $getTagsForLink = null,
         private ?PipelineInterface $createTag = null,
@@ -32,6 +35,12 @@ final readonly class TagServicePipelines
         private ?PipelineInterface $removeTagFromLink = null,
         private ?PipelineInterface $searchTags = null,
     ) {}
+
+    /** @return PipelineInterface<TagName, Tag> */
+    public function getTag(): PipelineInterface
+    {
+        return $this->getTag ?? $this->default;
+    }
 
     /** @return PipelineInterface<null, TagCollection> */
     public function listAllTags(): PipelineInterface

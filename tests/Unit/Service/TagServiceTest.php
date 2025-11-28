@@ -14,6 +14,56 @@ use jschreuder\BookmarkBureau\Service\TagServicePipelines;
 use Ramsey\Uuid\Uuid;
 
 describe("TagService", function () {
+    describe("getTag method", function () {
+        test("returns a tag by name", function () {
+            $tag = TestEntityFactory::createTag(tagName: new TagName("my-tag"));
+
+            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
+            $tagRepository
+                ->shouldReceive("findByName")
+                ->with("my-tag")
+                ->once()
+                ->andReturn($tag);
+
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+
+            $service = new TagService(
+                $tagRepository,
+                $linkRepository,
+                new TagServicePipelines(),
+            );
+
+            $result = $service->getTag("my-tag");
+
+            expect($result)->toBeInstanceOf(Tag::class);
+            expect($result->tagName->value)->toBe("my-tag");
+        });
+
+        test(
+            "throws TagNotFoundException when tag does not exist",
+            function () {
+                $tagRepository = Mockery::mock(TagRepositoryInterface::class);
+                $tagRepository
+                    ->shouldReceive("findByName")
+                    ->with("nonexistent-tag")
+                    ->once()
+                    ->andThrow(TagNotFoundException::class);
+
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+
+                $service = new TagService(
+                    $tagRepository,
+                    $linkRepository,
+                    new TagServicePipelines(),
+                );
+
+                expect(fn() => $service->getTag("nonexistent-tag"))->toThrow(
+                    TagNotFoundException::class,
+                );
+            },
+        );
+    });
+
     describe("listAllTags method", function () {
         test("returns all tags from repository", function () {
             $tag1 = TestEntityFactory::createTag(tagName: new TagName("tag1"));

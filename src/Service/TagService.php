@@ -25,7 +25,14 @@ final class TagService implements TagServiceInterface
     #[\Override]
     public function getTag(string $tagName): Tag
     {
-        return $this->tagRepository->findByName($tagName);
+        return $this->pipelines
+            ->getTag()
+            ->run(
+                fn(TagName $tagName): Tag => $this->tagRepository->findByName(
+                    $tagName->value,
+                ),
+                new TagName($tagName),
+            );
     }
 
     #[\Override]
