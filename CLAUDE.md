@@ -136,7 +136,7 @@ final readonly class ImplementationClass implements SpecificInterface
 - Final classes by default (no inheritance)
 - Override attribute for interface methods
 - Traits for sharing code between implementations (e.g., `OutputSpecTrait`, `CollectionTrait`)
-- Utility classes in `src/Util/` for shared functionality (e.g., `Filter` for input sanitization, `SqlFormat` for constants)
+- Utility classes in `src/Util/` for shared functionality (e.g., `Filter` for input sanitization, `SqlBuilder` for SQL generation, `SqlExceptionHandler` for error detection)
 - Use double quotes `"` for strings and interpolation with brackets `"{$value}"` where possible
 - OperationPipeline pattern for service cross-cutting concerns (transactions, logging, auditing, caching)
 
@@ -166,6 +166,7 @@ Example: `DashboardViewController` - implements `ControllerInterface` + filter/v
 - **Entity mutations with property hooks**: See `src/Entity/Link.php` - `set { markAsUpdated() }` pattern when entity has an updatedAt property
 - **Input filtering**: See `src/InputSpec/*` - uses `Util\Filter` fluent API for sanitization
 - **Route registration**: See `src/*RoutingProvider.php` - uses `Util\ResourceRouteBuilder` for RESTful routes
+- **Repository SQL**: Use `SqlBuilder` for INSERT/UPDATE/DELETE/COUNT/MAX queries (returns `['sql' => '...', 'params' => [...]]`), use `SqlExceptionHandler::isForeignKeyViolation()` and `isDuplicateEntry()` for error detection. Always use named parameters (`:field_name`), never positional (`?`)
 
 ## Documentation References
 
