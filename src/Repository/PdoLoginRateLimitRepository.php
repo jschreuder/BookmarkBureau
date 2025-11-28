@@ -106,11 +106,12 @@ final readonly class PdoLoginRateLimitRepository implements
         ?string $ip,
         string $expiresAt,
     ): void {
+        $now = new \DateTimeImmutable()->format(SqlFormat::TIMESTAMP);
         $stmt = $this->connection->prepare("
             INSERT INTO login_blocks (username, ip, blocked_at, expires_at)
-            VALUES (?, ?, CURRENT_TIMESTAMP, ?)
+            VALUES (?, ?, ?, ?)
         ");
-        $stmt->execute([$username, $ip, $expiresAt]);
+        $stmt->execute([$username, $ip, $now, $expiresAt]);
     }
 
     #[\Override]
