@@ -373,6 +373,24 @@ describe("PdoCategoryRepository", function () {
             expect($found->sortOrder)->toBe(5);
         });
 
+        test(
+            "throws CategoryNotFoundException when updating non-existent category",
+            function () {
+                $pdo = createCategoryDatabase();
+                [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories(
+                    $pdo,
+                );
+                $dashboard = TestEntityFactory::createDashboard();
+                $category = TestEntityFactory::createCategory(
+                    dashboard: $dashboard,
+                );
+
+                expect(fn() => $repo->update($category))->toThrow(
+                    CategoryNotFoundException::class,
+                );
+            },
+        );
+
         test("preserves timestamps on insert", function () {
             $pdo = createCategoryDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories(

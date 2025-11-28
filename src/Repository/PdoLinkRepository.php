@@ -193,13 +193,19 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
 
     /**
      * Update existing link
+     * @throws LinkNotFoundException when link doesn't exist
      */
     #[\Override]
     public function update(Link $link): void
     {
         $row = $this->mapper->mapToRow($link);
         $build = SqlBuilder::buildUpdate("links", $row, "link_id");
-        $this->pdo->prepare($build["sql"])->execute($build["params"]);
+        $statement = $this->pdo->prepare($build["sql"]);
+        $statement->execute($build["params"]);
+
+        if ($statement->rowCount() === 0) {
+            throw LinkNotFoundException::forId($link->linkId);
+        }
     }
 
     /**

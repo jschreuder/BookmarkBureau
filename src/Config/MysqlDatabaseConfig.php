@@ -40,6 +40,13 @@ final class MysqlDatabaseConfig implements DatabaseConfigInterface
             $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$this->charset}",
+                // CRITICAL: Use FOUND_ROWS instead of AFFECTED_ROWS for rowCount()
+                // This makes rowCount() return the number of rows that MATCHED the WHERE clause
+                // rather than rows that were CHANGED. This is required for repository update()
+                // methods to properly detect non-existent entities (UPDATE returns 0 for both
+                // "no match" and "match but no change"), while still allowing updates with
+                // identical values to succeed without throwing exceptions.
+                PDO::MYSQL_ATTR_FOUND_ROWS => true,
             ];
 
             $this->dbInstance = new PDO(

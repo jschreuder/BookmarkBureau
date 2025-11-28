@@ -79,13 +79,19 @@ final readonly class PdoDashboardRepository implements
 
     /**
      * Update existing dashboard
+     * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     #[\Override]
     public function update(Dashboard $dashboard): void
     {
         $row = $this->mapper->mapToRow($dashboard);
         $build = SqlBuilder::buildUpdate("dashboards", $row, "dashboard_id");
-        $this->pdo->prepare($build["sql"])->execute($build["params"]);
+        $statement = $this->pdo->prepare($build["sql"]);
+        $statement->execute($build["params"]);
+
+        if ($statement->rowCount() === 0) {
+            throw DashboardNotFoundException::forId($dashboard->dashboardId);
+        }
     }
 
     /**

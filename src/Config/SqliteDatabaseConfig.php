@@ -28,9 +28,17 @@ final class SqliteDatabaseConfig implements DatabaseConfigInterface
     public function getConnection(): PDO
     {
         if (!isset($this->dbInstance)) {
-            $this->dbInstance = new PDO($this->dsn, null, null, [
+            $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            ]);
+                // NOTE: SQLite's rowCount() behavior for UPDATE statements
+                // SQLite always returns the number of rows that MATCHED the WHERE clause,
+                // not the number of rows that were CHANGED. This is SQLite's built-in
+                // behavior and cannot be configured. This is the desired behavior for
+                // repository update() methods to properly detect non-existent entities
+                // while allowing updates with identical values to succeed.
+            ];
+
+            $this->dbInstance = new PDO($this->dsn, null, null, $options);
         }
         return $this->dbInstance;
     }

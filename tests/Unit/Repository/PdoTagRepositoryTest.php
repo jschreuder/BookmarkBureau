@@ -463,20 +463,22 @@ describe("PdoTagRepository", function () {
             expect($found->color)->toBeNull();
         });
 
-        test("silently succeeds when updating non-existent tag", function () {
-            $pdo = createTagDatabase();
-            $repo = new PdoTagRepository($pdo, new TagEntityMapper());
+        test(
+            "throws TagNotFoundException when updating non-existent tag",
+            function () {
+                $pdo = createTagDatabase();
+                $repo = new PdoTagRepository($pdo, new TagEntityMapper());
 
-            $tag = TestEntityFactory::createTag(
-                tagName: new TagName("nonexistent"),
-                color: new HexColor("#FF0000"),
-            );
+                $tag = TestEntityFactory::createTag(
+                    tagName: new TagName("nonexistent"),
+                    color: new HexColor("#FF0000"),
+                );
 
-            // Should not throw, just silently do nothing
-            $repo->update($tag);
-
-            expect(true)->toBeTrue();
-        });
+                expect(fn() => $repo->update($tag))->toThrow(
+                    TagNotFoundException::class,
+                );
+            },
+        );
     });
 
     describe("delete", function () {

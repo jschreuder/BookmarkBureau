@@ -216,13 +216,19 @@ final readonly class PdoCategoryRepository implements
 
     /**
      * Update existing category
+     * @throws CategoryNotFoundException when category doesn't exist
      */
     #[\Override]
     public function update(Category $category): void
     {
         $row = $this->categoryMapper->mapToRow($category);
         $query = SqlBuilder::buildUpdate("categories", $row, "category_id");
-        $this->pdo->prepare($query["sql"])->execute($query["params"]);
+        $statement = $this->pdo->prepare($query["sql"]);
+        $statement->execute($query["params"]);
+
+        if ($statement->rowCount() === 0) {
+            throw CategoryNotFoundException::forId($category->categoryId);
+        }
     }
 
     /**

@@ -156,13 +156,19 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
 
     /**
      * Update existing tag
+     * @throws TagNotFoundException when tag doesn't exist
      */
     #[\Override]
     public function update(Tag $tag): void
     {
         $row = $this->mapper->mapToRow($tag);
         $build = SqlBuilder::buildUpdate("tags", $row, "tag_name");
-        $this->pdo->prepare($build["sql"])->execute($build["params"]);
+        $statement = $this->pdo->prepare($build["sql"]);
+        $statement->execute($build["params"]);
+
+        if ($statement->rowCount() === 0) {
+            throw TagNotFoundException::forName($tag->tagName);
+        }
     }
 
     /**

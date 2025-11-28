@@ -418,6 +418,23 @@ describe("PdoDashboardRepository", function () {
                 expect($found->updatedAt)->not->toBe($updatedAt);
             },
         );
+
+        test(
+            "throws DashboardNotFoundException when updating non-existent dashboard",
+            function () {
+                $pdo = createDashboardDatabase();
+                $repo = new PdoDashboardRepository(
+                    $pdo,
+                    new DashboardEntityMapper(),
+                );
+
+                $dashboard = TestEntityFactory::createDashboard();
+
+                expect(fn() => $repo->update($dashboard))->toThrow(
+                    DashboardNotFoundException::class,
+                );
+            },
+        );
     });
 
     describe("delete", function () {

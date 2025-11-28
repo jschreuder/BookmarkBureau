@@ -344,6 +344,50 @@ describe("PdoUserRepository", function () {
             $found = $repo->findById($userId);
             expect($found->totpSecret)->toBeNull();
         });
+
+        test(
+            "throws UserNotFoundException when updating non-existent user",
+            function () {
+                $pdo = createUserDatabase();
+                $repo = new PdoUserRepository($pdo, new UserEntityMapper());
+
+                $user = TestEntityFactory::createUser(
+                    email: new Email("nonexistent@example.com"),
+                );
+
+                expect(fn() => $repo->update($user))->toThrow(
+                    UserNotFoundException::class,
+                );
+            },
+        );
+
+        test("does not throw when updating with identical values", function () {
+            $pdo = createUserDatabase();
+            $repo = new PdoUserRepository($pdo, new UserEntityMapper());
+            $userId = Uuid::uuid4();
+            $user = TestEntityFactory::createUser(
+                id: $userId,
+                email: new Email("test@example.com"),
+            );
+
+            insertTestUser($pdo, $user);
+
+            // Update with exact same values
+            $sameUser = TestEntityFactory::createUser(
+                id: $userId,
+                email: $user->email,
+                passwordHash: $user->passwordHash,
+                totpSecret: $user->totpSecret,
+                createdAt: $user->createdAt,
+                updatedAt: $user->updatedAt,
+            );
+
+            // Should not throw even if no rows are changed
+            $repo->update($sameUser);
+
+            $found = $repo->findById($userId);
+            expect((string) $found->email)->toBe((string) $user->email);
+        });
     });
 
     describe("delete", function () {

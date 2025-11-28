@@ -277,6 +277,24 @@ describe("PdoLinkRepository", function () {
             expect((string) $found->title)->toBe("Updated Title");
         });
 
+        test(
+            "throws LinkNotFoundException when updating non-existent link",
+            function () {
+                $pdo = createLinkDatabase();
+                $repo = new PdoLinkRepository(
+                    $pdo,
+                    new LinkEntityMapper(),
+                    new TagEntityMapper(),
+                );
+
+                $link = TestEntityFactory::createLink();
+
+                expect(fn() => $repo->update($link))->toThrow(
+                    LinkNotFoundException::class,
+                );
+            },
+        );
+
         test("preserves timestamps on insert", function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository(

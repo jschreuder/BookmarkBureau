@@ -101,13 +101,19 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
 
     /**
      * Update existing user
+     * @throws UserNotFoundException when user doesn't exist
      */
     #[\Override]
     public function update(User $user): void
     {
         $row = $this->mapper->mapToRow($user);
         $build = SqlBuilder::buildUpdate("users", $row, "user_id");
-        $this->pdo->prepare($build["sql"])->execute($build["params"]);
+        $statement = $this->pdo->prepare($build["sql"]);
+        $statement->execute($build["params"]);
+
+        if ($statement->rowCount() === 0) {
+            throw UserNotFoundException::forId($user->userId);
+        }
     }
 
     /**
