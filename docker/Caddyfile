@@ -1,0 +1,28 @@
+{
+    # Disable automatic HTTPS (typically used behind reverse proxy on NAS)
+    auto_https off
+    # Disable admin API
+    admin off
+}
+
+:8080 {
+    # Document root is the web directory
+    root * /var/www/web
+
+    # Enable compression
+    encode gzip
+
+    # API endpoint - route to PHP-FPM
+    @api {
+        path /api.php*
+    }
+    reverse_proxy @api unix//run/php-fpm.sock {
+        transport fastcgi {
+            root /var/www/web
+        }
+    }
+
+    # Angular SPA - serve static files, fallback to index.html for client-side routing
+    try_files {path} /index.html
+    file_server
+}

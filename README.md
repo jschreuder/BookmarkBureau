@@ -186,13 +186,41 @@ This three-pillar approach creates a complete domain language: Entities represen
 
 ## Quick Start
 
-### Requirements
+### Docker (Recommended)
 
-- PHP 8.4+
-- Composer
-- MySQL 8.0+ or SQLite
+**Requirements**: Docker or Podman
 
-### Installation
+```bash
+# Using Docker
+docker run -d \
+  -p 8080:8080 \
+  -v bb-data:/var/www/var \
+  -e JWT_SECRET=$(openssl rand -hex 32) \
+  ghcr.io/jschreuder/bookmark-bureau:latest
+
+# Using Podman (rootless)
+podman run -d \
+  -p 8080:8080 \
+  -v bb-data:/var/www/var \
+  -e JWT_SECRET=$(openssl rand -hex 32) \
+  ghcr.io/jschreuder/bookmark-bureau:latest
+
+# Using docker-compose
+curl -O https://raw.githubusercontent.com/jschreuder/BookmarkBureau/master/docker-compose.yml
+# Edit JWT_SECRET in docker-compose.yml
+docker-compose up -d
+```
+
+**Environment Variables**:
+- `JWT_SECRET` (required) - Secret key for JWT tokens (use a secure random value)
+- `SITE_URL` (optional) - Base URL, default: `http://localhost:8080`
+- `SESSION_TTL` (optional) - Session timeout in seconds, default: `1800` (30 min)
+
+Access the application at `http://localhost:8080`
+
+### Local Development
+
+**Requirements**: PHP 8.4+, Composer, MySQL 8.0+ or SQLite
 
 ```bash
 git clone https://github.com/jschreuder/BookmarkBureau.git
@@ -203,7 +231,7 @@ cp config/dev.php.example config/dev.php
 vendor/bin/phinx migrate
 ```
 
-### Run Development Server
+**Run Development Server**:
 
 ```bash
 php -S localhost:8080 -t web

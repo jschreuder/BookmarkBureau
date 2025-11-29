@@ -1,0 +1,49 @@
+# Git
+.git
+.gitignore
+
+# Dependencies (will be installed in container)
+vendor/
+node_modules/
+frontend/node_modules/
+
+# Build artifacts
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+
+# Runtime/data files
+var/
+*.db
+*.log
+
+# Development files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Documentation
+docs/
+frontend/docs/
+*.md
+!README.md
+
+# Test files
+tests/
+frontend/src/**/*.spec.ts
+phpunit.xml
+pest.php
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Environment files
+.env
+.env.local
+# Include distribution files but exclude active config files
+config/*.php
+!config/app_init.php
+!config/*.php.dist

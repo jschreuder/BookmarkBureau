@@ -1,0 +1,118 @@
+<?php declare(strict_types=1);
+
+// Load autoloader
+require_once __DIR__ . "/../vendor/autoload.php";
+
+use jschreuder\BookmarkBureau\Config\SqliteDatabaseConfig;
+use jschreuder\BookmarkBureau\Config\DefaultAuthConfig;
+use jschreuder\BookmarkBureau\Config\MonologLoggerConfig;
+use jschreuder\BookmarkBureau\Config\DefaultRateLimitConfig;
+use jschreuder\BookmarkBureau\Config\FileUserStorageConfig;
+
+/**
+ * Production environment configuration
+ *
+ * This configuration reads from environment variables, making it suitable
+ * for containerized deployments (Docker/Podman).
+ *
+ * Required environment variables:
+ * - DB_PATH: Path to main SQLite database
+ * - RATELIMIT_DB_PATH: Path to rate limit SQLite database
+ * - JWT_SECRET: Secret key for JWT token signing (MUST be changed from default)
+ * - SITE_URL: Base URL of the application
+ *
+ * Optional environment variables:
+ * - APP_NAME: Application name (default: "bookmark-bureau")
+ * - SESSION_TTL: Session timeout in seconds (default: 1800 = 30 minutes)
+ * - REMEMBER_ME_TTL: Remember me timeout in seconds (default: 2592000 = 30 days)
+ * - LOG_PATH: Path to log file (default: /var/www/var/logs/web-{date}.log)
+ * - USERS_FILE: Path to users JSON file (default: /var/www/var/users.json)
+ * - RATELIMIT_USERNAME_THRESHOLD: Max login attempts per username (default: 10)
+ * - RATELIMIT_IP_THRESHOLD: Max login attempts per IP (default: 100)
+ * - RATELIMIT_WINDOW_MINUTES: Rate limit window in minutes (default: 10)
+ */
+
+// Validate required environment variables
+$requiredEnvVars = ["DB_PATH", "RATELIMIT_DB_PATH", "JWT_SECRET", "SITE_URL"];
+foreach ($requiredEnvVars as $envVar) {
+    if (empty($_ENV[$envVar])) {
+        throw new RuntimeException(
+            "Missing required environment variable: {$envVar}",
+        );
+    }
+}
+
+// Warn if using default JWT secret
+if ($_ENV["JWT_SECRET"] === "change-me-in-production") {
+    error_log(
+        "WARNING: Using default JWT_SECRET. Please set a secure random value!",
+    );
+}
+
+// Determine log file path
+$logPath =
+    $_ENV["LOG_PATH"] ??
+    "/var/www/var/logs/" .
+        (php_sapi_name() === "cli" ? "cli" : "web") .
+        "-" .
+        date("Ymd") .
+        ".log";
+
+// Ensure log directory exists
+$logDir = dirname($logPath);
+if (!is_dir($logDir)) {
+    mkdir($logDir, 0755, true);
+}
+
+// Create config objects from environment variables
+$databaseConfig = new SqliteDatabaseConfig(dsn: "sqlite:" . $_ENV["DB_PATH"]);
+
+$rateLimitDatabaseConfig = new SqliteDatabaseConfig(
+    dsn: "sqlite:" . $_ENV["RATELIMIT_DB_PATH"],
+);
+
+$authConfig = new DefaultAuthConfig(
+    jwtSecret: $_ENV["JWT_SECRET"],
+    applicationName: $_ENV["APP_NAME"] ?? "bookmark-bureau",
+    sessionTtl: isset($_ENV["SESSION_TTL"])
+        ? (int) $_ENV["SESSION_TTL"]
+        : 1800,
+    rememberMeTtl: isset($_ENV["REMEMBER_ME_TTL"])
+        ? (int) $_ENV["REMEMBER_ME_TTL"]
+        : 2592000,
+);
+
+$loggerConfig = new MonologLoggerConfig(
+    name: $_ENV["APP_NAME"] ?? "bookmark-bureau",
+    logPath: $logPath,
+    enableRequestLogging: true,
+);
+
+$rateLimitConfig = new DefaultRateLimitConfig(
+    database: $rateLimitDatabaseConfig,
+    usernameThreshold: isset($_ENV["RATELIMIT_USERNAME_THRESHOLD"])
+        ? (int) $_ENV["RATELIMIT_USERNAME_THRESHOLD"]
+        : 10,
+    ipThreshold: isset($_ENV["RATELIMIT_IP_THRESHOLD"])
+        ? (int) $_ENV["RATELIMIT_IP_THRESHOLD"]
+        : 100,
+    windowMinutes: isset($_ENV["RATELIMIT_WINDOW_MINUTES"])
+        ? (int) $_ENV["RATELIMIT_WINDOW_MINUTES"]
+        : 10,
+    trustProxyHeaders: false,
+);
+
+$userStorageConfig = new FileUserStorageConfig(
+    filePath: $_ENV["USERS_FILE"] ?? "/var/www/var/users.json",
+);
+
+// Return configuration array
+return [
+    "databaseConfig" => $databaseConfig,
+    "rateLimitDatabaseConfig" => $rateLimitDatabaseConfig,
+    "authConfig" => $authConfig,
+    "loggerConfig" => $loggerConfig,
+    "rateLimitConfig" => $rateLimitConfig,
+    "userStorageConfig" => $userStorageConfig,
+    "siteUrl" => $_ENV["SITE_URL"],
+];
