@@ -8,7 +8,6 @@
 /var/bb_database
 /var/users.json
 /vendor/
-composer.lock
 coverage.xml
 
 # Frontend build artifacts
