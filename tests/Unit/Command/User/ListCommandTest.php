@@ -14,7 +14,7 @@ describe("ListCommand", function () {
             $command = new ListCommand($userService);
 
             $userService
-                ->shouldReceive("listAllUsers")
+                ->shouldReceive("getAllUsers")
                 ->andReturn(new UserCollection());
 
             $tester = new CommandTester($command);
@@ -36,7 +36,7 @@ describe("ListCommand", function () {
             );
 
             $userService
-                ->shouldReceive("listAllUsers")
+                ->shouldReceive("getAllUsers")
                 ->andReturn(new UserCollection($user1, $user2));
 
             $tester = new CommandTester($command);
@@ -62,7 +62,7 @@ describe("ListCommand", function () {
             );
 
             $userService
-                ->shouldReceive("listAllUsers")
+                ->shouldReceive("getAllUsers")
                 ->andReturn(
                     new UserCollection($userWithTotp, $userWithoutTotp),
                 );

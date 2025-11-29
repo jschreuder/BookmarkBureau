@@ -37,7 +37,7 @@ interface FavoriteServiceInterface
      *
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
-    public function getFavoritesForDashboardId(
+    public function getFavoritesForDashboard(
         UuidInterface $dashboardId,
     ): FavoriteCollection;
 

@@ -41,7 +41,7 @@ final readonly class FavoriteReorderAction implements ActionInterface
         $dashboardId = Uuid::fromString($data["dashboard_id"]);
 
         // Get current favorites and create a map by link_id for quick lookup
-        $currentFavorites = $this->favoriteService->getFavoritesForDashboardId(
+        $currentFavorites = $this->favoriteService->getFavoritesForDashboard(
             $dashboardId,
         );
         $favoritesMap = [];

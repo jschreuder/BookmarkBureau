@@ -14,24 +14,24 @@ final readonly class TagServicePipelines
 {
     /**
      * @param PipelineInterface<TagName, Tag>|null $getTag
-     * @param PipelineInterface<null, TagCollection>|null $listAllTags
+     * @param PipelineInterface<null, TagCollection>|null $getAllTags
      * @param PipelineInterface<UuidInterface, TagCollection>|null $getTagsForLink
      * @param PipelineInterface<Tag, Tag>|null $createTag
      * @param PipelineInterface<Tag, Tag>|null $updateTag
      * @param PipelineInterface<Tag, null>|null $deleteTag
-     * @param PipelineInterface<LinkWithTagName, null>|null $assignTagToLink
+     * @param PipelineInterface<LinkWithTagName, null>|null $addTagToLink
      * @param PipelineInterface<LinkWithTagName, null>|null $removeTagFromLink
      * @param PipelineInterface<null, TagCollection>|null $searchTags
      */
     public function __construct(
         private PipelineInterface $default = new NoPipeline(),
         private ?PipelineInterface $getTag = null,
-        private ?PipelineInterface $listAllTags = null,
+        private ?PipelineInterface $getAllTags = null,
         private ?PipelineInterface $getTagsForLink = null,
         private ?PipelineInterface $createTag = null,
         private ?PipelineInterface $updateTag = null,
         private ?PipelineInterface $deleteTag = null,
-        private ?PipelineInterface $assignTagToLink = null,
+        private ?PipelineInterface $addTagToLink = null,
         private ?PipelineInterface $removeTagFromLink = null,
         private ?PipelineInterface $searchTags = null,
     ) {}
@@ -43,9 +43,9 @@ final readonly class TagServicePipelines
     }
 
     /** @return PipelineInterface<null, TagCollection> */
-    public function listAllTags(): PipelineInterface
+    public function getAllTags(): PipelineInterface
     {
-        return $this->listAllTags ?? $this->default;
+        return $this->getAllTags ?? $this->default;
     }
 
     /** @return PipelineInterface<UuidInterface, TagCollection> */
@@ -73,9 +73,9 @@ final readonly class TagServicePipelines
     }
 
     /** @return PipelineInterface<LinkWithTagName, null> */
-    public function assignTagToLink(): PipelineInterface
+    public function addTagToLink(): PipelineInterface
     {
-        return $this->assignTagToLink ?? $this->default;
+        return $this->addTagToLink ?? $this->default;
     }
 
     /** @return PipelineInterface<LinkWithTagName, null> */

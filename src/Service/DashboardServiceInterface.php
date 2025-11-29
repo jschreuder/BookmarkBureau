@@ -31,7 +31,7 @@ interface DashboardServiceInterface
     /**
      * List all dashboards (without detailed data)
      */
-    public function listAllDashboards(): DashboardCollection;
+    public function getAllDashboards(): DashboardCollection;
 
     /**
      * Create a new dashboard

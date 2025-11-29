@@ -210,7 +210,7 @@ describe("UserService", function () {
         );
     });
 
-    describe("listAllUsers method", function () {
+    describe("getAllUsers method", function () {
         test("returns empty collection when no users exist", function () {
             $userRepository = Mockery::mock(UserRepositoryInterface::class);
             $userRepository
@@ -225,7 +225,7 @@ describe("UserService", function () {
                 new UserServicePipelines(),
             );
 
-            $result = $service->listAllUsers();
+            $result = $service->getAllUsers();
 
             expect($result)->toBeInstanceOf(UserCollection::class);
             expect($result->count())->toBe(0);
@@ -250,7 +250,7 @@ describe("UserService", function () {
                 new UserServicePipelines(),
             );
 
-            $result = $service->listAllUsers();
+            $result = $service->getAllUsers();
 
             expect($result->count())->toBe(3);
             $users = $result->toArray();

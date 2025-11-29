@@ -57,13 +57,10 @@ interface LinkServiceInterface
     /**
      * Find links by tag
      */
-    public function findLinksByTag(string $tagName): LinkCollection;
+    public function getLinksByTag(string $tagName): LinkCollection;
 
     /**
      * List all links with pagination
      */
-    public function listLinks(
-        int $limit = 100,
-        int $offset = 0,
-    ): LinkCollection;
+    public function getLinks(int $limit = 100, int $offset = 0): LinkCollection;
 }

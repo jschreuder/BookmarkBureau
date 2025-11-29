@@ -139,7 +139,7 @@ All services implement corresponding interfaces and use `OperationPipeline` with
 #### DashboardService (DashboardServiceInterface)
 **Methods:**
 - `getFullDashboard(UuidInterface)` - Get dashboard with categories and favorites
-- `listAllDashboards()` - List all dashboards
+- `getAllDashboards()` - List all dashboards
 - `createDashboard(string title, string description, ?string icon)` - Create
 - `updateDashboard(UuidInterface, string, string, ?string)` - Update
 - `deleteDashboard(UuidInterface)` - Delete (cascades)
@@ -161,8 +161,8 @@ All services implement corresponding interfaces and use `OperationPipeline` with
 - `updateLink(UuidInterface, string, string, string, ?string)` - Update
 - `deleteLink(UuidInterface)` - Delete (cascades)
 - `searchLinks(string query, int limit)` - Full-text search
-- `findLinksByTag(string tagName)` - Filter by tag
-- `listLinks(int limit, int offset)` - Paginated list
+- `getLinksByTag(string tagName)` - Filter by tag
+- `getLinks(int limit, int offset)` - Paginated list
 
 #### FavoriteService (FavoriteServiceInterface)
 **Methods:**
@@ -172,12 +172,12 @@ All services implement corresponding interfaces and use `OperationPipeline` with
 
 #### TagService (TagServiceInterface)
 **Methods:**
-- `listAllTags()` - Get all tags
+- `getAllTags()` - Get all tags
 - `getTagsForLink(UuidInterface linkId)` - Get tags for link
 - `createTag(string tagName, ?string color)` - Create
 - `updateTag(string tagName, ?string color)` - Update
 - `deleteTag(string tagName)` - Delete (cascades)
-- `assignTagToLink(UuidInterface linkId, string tagName, ?string color)` - Assign
+- `addTagToLink(UuidInterface linkId, string tagName, ?string color)` - Assign
 - `removeTagFromLink(UuidInterface, string)` - Remove
 - `searchTags(string query, int limit)` - Search tags
 
@@ -188,7 +188,7 @@ All services implement corresponding interfaces and use `OperationPipeline` with
 - `createUser(string email, string password)` - Create user with hashed password
 - `getUser(UuidInterface)` - Get user by ID
 - `getUserByEmail(string)` - Get user by email
-- `listAllUsers()` - List all users
+- `getAllUsers()` - List all users
 - `deleteUser(UuidInterface)` - Delete user
 - `changePassword(UuidInterface, string newPassword)` - Change user password
 - `verifyPassword(UuidInterface, string password)` - Verify password hash
@@ -1253,8 +1253,8 @@ return $this->outputSpec->transform($dashboard); // Uses DashboardOutputSpec ✅
 **Status:** Service methods exist but no exposed endpoints
 **Available in Services but not exposed:**
 - LinkService.searchLinks() - full-text search
-- LinkService.findLinksByTag() - filter by tag
-- LinkService.listLinks() with pagination
+- LinkService.getLinksByTag() - filter by tag
+- LinkService.getLinks() with pagination
 - TagService.searchTags() - tag search
 - CategoryService.reorderCategories()
 - CategoryService.reorderLinksInCategory()

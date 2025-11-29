@@ -17,8 +17,8 @@ final readonly class LinkServicePipelines
      * @param PipelineInterface<Link, Link>|null $updateLink
      * @param PipelineInterface<Link, null>|null $deleteLink
      * @param PipelineInterface<null, LinkCollection>|null $searchLinks
-     * @param PipelineInterface<TagNameCollection, LinkCollection>|null $findLinksByTag
-     * @param PipelineInterface<null, LinkCollection>|null $listLinks
+     * @param PipelineInterface<TagNameCollection, LinkCollection>|null $getLinksByTag
+     * @param PipelineInterface<null, LinkCollection>|null $getLinks
      */
     public function __construct(
         private PipelineInterface $default = new NoPipeline(),
@@ -27,8 +27,8 @@ final readonly class LinkServicePipelines
         private ?PipelineInterface $updateLink = null,
         private ?PipelineInterface $deleteLink = null,
         private ?PipelineInterface $searchLinks = null,
-        private ?PipelineInterface $findLinksByTag = null,
-        private ?PipelineInterface $listLinks = null,
+        private ?PipelineInterface $getLinksByTag = null,
+        private ?PipelineInterface $getLinks = null,
     ) {}
 
     /** @return PipelineInterface<UuidInterface, Link> */
@@ -62,14 +62,14 @@ final readonly class LinkServicePipelines
     }
 
     /** @return PipelineInterface<TagNameCollection, LinkCollection> */
-    public function findLinksByTag(): PipelineInterface
+    public function getLinksByTag(): PipelineInterface
     {
-        return $this->findLinksByTag ?? $this->default;
+        return $this->getLinksByTag ?? $this->default;
     }
 
     /** @return PipelineInterface<null, LinkCollection> */
-    public function listLinks(): PipelineInterface
+    public function getLinks(): PipelineInterface
     {
-        return $this->listLinks ?? $this->default;
+        return $this->getLinks ?? $this->default;
     }
 }

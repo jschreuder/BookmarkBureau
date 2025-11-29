@@ -63,12 +63,12 @@ describe("DashboardListAction", function () {
     });
 
     describe("execute method", function () {
-        test("calls listAllDashboards on service", function () {
+        test("calls getAllDashboards on service", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
             $collection = new DashboardCollection();
 
             $dashboardService
-                ->shouldReceive("listAllDashboards")
+                ->shouldReceive("getAllDashboards")
                 ->once()
                 ->andReturn($collection);
 
@@ -89,7 +89,7 @@ describe("DashboardListAction", function () {
                 $collection = new DashboardCollection();
 
                 $dashboardService
-                    ->shouldReceive("listAllDashboards")
+                    ->shouldReceive("getAllDashboards")
                     ->andReturn($collection);
 
                 $outputSpec = new DashboardOutputSpec();
@@ -111,7 +111,7 @@ describe("DashboardListAction", function () {
             $collection = new DashboardCollection($dashboard);
 
             $dashboardService
-                ->shouldReceive("listAllDashboards")
+                ->shouldReceive("getAllDashboards")
                 ->andReturn($collection);
 
             $outputSpec = new DashboardOutputSpec();
@@ -146,7 +146,7 @@ describe("DashboardListAction", function () {
             );
 
             $dashboardService
-                ->shouldReceive("listAllDashboards")
+                ->shouldReceive("getAllDashboards")
                 ->andReturn($collection);
 
             $outputSpec = new DashboardOutputSpec();
@@ -170,7 +170,7 @@ describe("DashboardListAction", function () {
             $collection = new DashboardCollection($dashboard);
 
             $dashboardService
-                ->shouldReceive("listAllDashboards")
+                ->shouldReceive("getAllDashboards")
                 ->andReturn($collection);
 
             $outputSpec = new DashboardOutputSpec();
@@ -191,7 +191,7 @@ describe("DashboardListAction", function () {
             $collection = new DashboardCollection($dashboard);
 
             $dashboardService
-                ->shouldReceive("listAllDashboards")
+                ->shouldReceive("getAllDashboards")
                 ->andReturn($collection);
 
             $outputSpec = new DashboardOutputSpec();
@@ -215,7 +215,7 @@ describe("DashboardListAction", function () {
             $collection = new DashboardCollection($dashboard);
 
             $dashboardService
-                ->shouldReceive("listAllDashboards")
+                ->shouldReceive("getAllDashboards")
                 ->andReturn($collection);
 
             $outputSpec = new DashboardOutputSpec();
@@ -232,7 +232,7 @@ describe("DashboardListAction", function () {
             $collection = new DashboardCollection($dashboard);
 
             $dashboardService
-                ->shouldReceive("listAllDashboards")
+                ->shouldReceive("getAllDashboards")
                 ->andReturn($collection);
 
             $outputSpec = new DashboardOutputSpec();
@@ -260,7 +260,7 @@ describe("DashboardListAction", function () {
                 $collection = new DashboardCollection();
 
                 $dashboardService
-                    ->shouldReceive("listAllDashboards")
+                    ->shouldReceive("getAllDashboards")
                     ->andReturn($collection);
 
                 $outputSpec = new DashboardOutputSpec();
@@ -293,7 +293,7 @@ describe("DashboardListAction", function () {
                 $collection = new DashboardCollection($dashboard1, $dashboard2);
 
                 $dashboardService
-                    ->shouldReceive("listAllDashboards")
+                    ->shouldReceive("getAllDashboards")
                     ->andReturn($collection);
 
                 $outputSpec = new DashboardOutputSpec();
@@ -328,7 +328,7 @@ describe("DashboardListAction", function () {
                 $collection = new DashboardCollection($dashboard1, $dashboard2);
 
                 $dashboardService
-                    ->shouldReceive("listAllDashboards")
+                    ->shouldReceive("getAllDashboards")
                     ->andReturn($collection);
 
                 $outputSpec = new DashboardOutputSpec();

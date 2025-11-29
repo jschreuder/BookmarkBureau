@@ -38,7 +38,7 @@ interface UserServiceInterface
     /**
      * List all users
      */
-    public function listAllUsers(): UserCollection;
+    public function getAllUsers(): UserCollection;
 
     /**
      * Delete a user

@@ -309,7 +309,7 @@ describe("LinkService", function () {
         });
     });
 
-    describe("findLinksByTag method", function () {
+    describe("getLinksByTag method", function () {
         test("finds links by tag name", function () {
             $link1 = TestEntityFactory::createLink();
             $link2 = TestEntityFactory::createLink();
@@ -325,7 +325,7 @@ describe("LinkService", function () {
 
             $service = new LinkService($linkRepository, $pipelines);
 
-            $result = $service->findLinksByTag("test-tag");
+            $result = $service->getLinksByTag("test-tag");
 
             expect($result)->toEqual($collection);
             expect(count($result))->toBe(2);
@@ -344,7 +344,7 @@ describe("LinkService", function () {
 
             $service = new LinkService($linkRepository, $pipelines);
 
-            $service->findLinksByTag("example-tag");
+            $service->getLinksByTag("example-tag");
 
             expect(true)->toBeTrue(); // Mockery validates the call
         });
@@ -361,13 +361,13 @@ describe("LinkService", function () {
 
             $service = new LinkService($linkRepository, $pipelines);
 
-            $result = $service->findLinksByTag("unused-tag");
+            $result = $service->getLinksByTag("unused-tag");
 
             expect(count($result))->toBe(0);
         });
     });
 
-    describe("listLinks method", function () {
+    describe("getLinks method", function () {
         test("lists all links with default pagination", function () {
             $link1 = TestEntityFactory::createLink();
             $link2 = TestEntityFactory::createLink();
@@ -383,7 +383,7 @@ describe("LinkService", function () {
 
             $service = new LinkService($linkRepository, $pipelines);
 
-            $result = $service->listLinks();
+            $result = $service->getLinks();
 
             expect($result)->toEqual($collection);
             expect(count($result))->toBe(2);
@@ -403,7 +403,7 @@ describe("LinkService", function () {
 
             $service = new LinkService($linkRepository, $pipelines);
 
-            $result = $service->listLinks(25, 50);
+            $result = $service->getLinks(25, 50);
 
             expect(count($result))->toBe(1);
         });
@@ -418,7 +418,7 @@ describe("LinkService", function () {
 
             $service = new LinkService($linkRepository, $pipelines);
 
-            $result = $service->listLinks();
+            $result = $service->getLinks();
 
             expect(count($result))->toBe(0);
         });

@@ -95,7 +95,7 @@ describe("FavoritesReorderAction", function () {
                 $linkId2 = $favorite2->link->linkId->toString();
 
                 $favoriteService
-                    ->shouldReceive("getFavoritesForDashboardId")
+                    ->shouldReceive("getFavoritesForDashboard")
                     ->withAnyArgs()
                     ->andReturn($collection);
 
@@ -136,7 +136,7 @@ describe("FavoritesReorderAction", function () {
             $collection = new FavoriteCollection($favorite1, $favorite2);
 
             $favoriteService
-                ->shouldReceive("getFavoritesForDashboardId")
+                ->shouldReceive("getFavoritesForDashboard")
                 ->andReturn($collection);
 
             $favoriteService->shouldReceive("reorderFavorites");
@@ -177,7 +177,7 @@ describe("FavoritesReorderAction", function () {
             $collection = new FavoriteCollection();
 
             $favoriteService
-                ->shouldReceive("getFavoritesForDashboardId")
+                ->shouldReceive("getFavoritesForDashboard")
                 ->andReturn($collection);
 
             $favoriteService->shouldReceive("reorderFavorites");
@@ -208,7 +208,7 @@ describe("FavoritesReorderAction", function () {
             $collection = new FavoriteCollection($favorite1, $favorite2);
 
             $favoriteService
-                ->shouldReceive("getFavoritesForDashboardId")
+                ->shouldReceive("getFavoritesForDashboard")
                 ->andReturn($collection);
 
             $favoriteService->shouldReceive("reorderFavorites");
@@ -248,7 +248,7 @@ describe("FavoritesReorderAction", function () {
             $collection = new FavoriteCollection($favorite1, $favorite2);
 
             $favoriteService
-                ->shouldReceive("getFavoritesForDashboardId")
+                ->shouldReceive("getFavoritesForDashboard")
                 ->andReturn($collection);
 
             $favoriteService->shouldReceive("reorderFavorites");

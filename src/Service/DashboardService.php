@@ -100,10 +100,10 @@ final class DashboardService implements DashboardServiceInterface
     }
 
     #[\Override]
-    public function listAllDashboards(): DashboardCollection
+    public function getAllDashboards(): DashboardCollection
     {
         return $this->pipelines
-            ->listAllDashboards()
+            ->getAllDashboards()
             ->run($this->dashboardRepository->listAll(...));
     }
 

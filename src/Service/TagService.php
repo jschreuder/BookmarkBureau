@@ -36,10 +36,10 @@ final class TagService implements TagServiceInterface
     }
 
     #[\Override]
-    public function listAllTags(): TagCollection
+    public function getAllTags(): TagCollection
     {
         return $this->pipelines
-            ->listAllTags()
+            ->getAllTags()
             ->run($this->tagRepository->listAll(...));
     }
 
@@ -108,17 +108,15 @@ final class TagService implements TagServiceInterface
      * @throws LinkNotFoundException when link doesn't exist
      */
     #[\Override]
-    public function assignTagToLink(
-        UuidInterface $linkId,
-        string $tagName,
-    ): void {
+    public function addTagToLink(UuidInterface $linkId, string $tagName): void
+    {
         $newLinkWithTag = new LinkWithTagName(
             $this->linkRepository->findById($linkId),
             new TagName($tagName),
         );
 
         $this->pipelines
-            ->assignTagToLink()
+            ->addTagToLink()
             ->run(function (LinkWithTagName $linkWithTag): null {
                 // Check if tag exists
                 try {

@@ -98,13 +98,18 @@ final class FavoriteService implements FavoriteServiceInterface
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     #[\Override]
-    public function getFavoritesForDashboardId(
+    public function getFavoritesForDashboard(
         UuidInterface $dashboardId,
     ): FavoriteCollection {
         // Verify dashboard exists
         $this->dashboardRepository->findById($dashboardId);
 
-        return $this->favoriteRepository->listForDashboardId($dashboardId);
+        return $this->pipelines
+            ->getFavoritesForDashboard()
+            ->run(
+                $this->favoriteRepository->listForDashboardId(...),
+                $dashboardId,
+            );
     }
 
     #[\Override]

@@ -304,7 +304,7 @@ describe("DashboardService", function () {
         );
     });
 
-    describe("listAllDashboards method", function () {
+    describe("getAllDashboards method", function () {
         test("returns all dashboards", function () {
             $dashboard1 = TestEntityFactory::createDashboard();
             $dashboard2 = TestEntityFactory::createDashboard();
@@ -332,7 +332,7 @@ describe("DashboardService", function () {
                 $pipelines,
             );
 
-            $result = $service->listAllDashboards();
+            $result = $service->getAllDashboards();
 
             expect($result)->toEqual($collection);
             expect(count($result))->toBe(2);
@@ -363,7 +363,7 @@ describe("DashboardService", function () {
                 $pipelines,
             );
 
-            $result = $service->listAllDashboards();
+            $result = $service->getAllDashboards();
 
             expect(count($result))->toBe(0);
         });
@@ -708,7 +708,7 @@ describe("DashboardService", function () {
             expect($created)->toBeInstanceOf(Dashboard::class);
 
             // List
-            $all = $service->listAllDashboards();
+            $all = $service->getAllDashboards();
             expect(count($all))->toBe(1);
 
             // Update

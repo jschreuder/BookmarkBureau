@@ -75,7 +75,7 @@ describe("LinkTagCreateAction", function () {
 
     describe("execute method", function () {
         test(
-            "calls tagService.assignTagToLink with correct parameters",
+            "calls tagService.addTagToLink with correct parameters",
             function () {
                 $tagService = Mockery::mock(TagServiceInterface::class);
                 $uuid = Uuid::uuid4();
@@ -85,7 +85,7 @@ describe("LinkTagCreateAction", function () {
                 );
 
                 $tagService
-                    ->shouldReceive("assignTagToLink")
+                    ->shouldReceive("addTagToLink")
                     ->once()
                     ->with(Mockery::type(UuidInterface::class), "important");
 
@@ -125,7 +125,7 @@ describe("LinkTagCreateAction", function () {
             }
 
             $tagService
-                ->shouldReceive("assignTagToLink")
+                ->shouldReceive("addTagToLink")
                 ->once()
                 ->with(Mockery::type(UuidInterface::class), "important");
 

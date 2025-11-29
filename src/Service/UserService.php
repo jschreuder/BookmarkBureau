@@ -50,10 +50,10 @@ final readonly class UserService implements UserServiceInterface
     }
 
     #[\Override]
-    public function listAllUsers(): UserCollection
+    public function getAllUsers(): UserCollection
     {
         return $this->pipelines
-            ->listAllUsers()
+            ->getAllUsers()
             ->run($this->userRepository->listAll(...));
     }
 

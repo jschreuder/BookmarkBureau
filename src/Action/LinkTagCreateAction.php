@@ -33,7 +33,7 @@ final readonly class LinkTagCreateAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $this->tagService->assignTagToLink(
+        $this->tagService->addTagToLink(
             linkId: Uuid::fromString($data["id"]),
             tagName: $data["tag_name"],
         );

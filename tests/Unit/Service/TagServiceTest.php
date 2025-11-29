@@ -64,7 +64,7 @@ describe("TagService", function () {
         );
     });
 
-    describe("listAllTags method", function () {
+    describe("getAllTags method", function () {
         test("returns all tags from repository", function () {
             $tag1 = TestEntityFactory::createTag(tagName: new TagName("tag1"));
             $tag2 = TestEntityFactory::createTag(tagName: new TagName("tag2"));
@@ -84,7 +84,7 @@ describe("TagService", function () {
                 new TagServicePipelines(),
             );
 
-            $result = $service->listAllTags();
+            $result = $service->getAllTags();
 
             expect($result)->toBeInstanceOf(TagCollection::class);
             expect(iterator_count($result))->toBe(2);
@@ -107,7 +107,7 @@ describe("TagService", function () {
                 new TagServicePipelines(),
             );
 
-            $result = $service->listAllTags();
+            $result = $service->getAllTags();
 
             expect(iterator_count($result))->toBe(0);
         });
@@ -409,7 +409,7 @@ describe("TagService", function () {
         );
     });
 
-    describe("assignTagToLink method", function () {
+    describe("addTagToLink method", function () {
         test("assigns an existing tag to a link", function () {
             $linkId = Uuid::uuid4();
             $link = TestEntityFactory::createLink(id: $linkId);
@@ -444,7 +444,7 @@ describe("TagService", function () {
                 new TagServicePipelines(),
             );
 
-            $service->assignTagToLink($linkId, "my-tag");
+            $service->addTagToLink($linkId, "my-tag");
 
             expect(true)->toBeTrue();
         });
@@ -483,7 +483,7 @@ describe("TagService", function () {
                 new TagServicePipelines(),
             );
 
-            $service->assignTagToLink($linkId, "new-tag");
+            $service->addTagToLink($linkId, "new-tag");
 
             expect(true)->toBeTrue();
         });
@@ -520,7 +520,7 @@ describe("TagService", function () {
                 new TagServicePipelines(),
             );
 
-            $service->assignTagToLink($linkId, "my-tag");
+            $service->addTagToLink($linkId, "my-tag");
 
             expect(true)->toBeTrue();
         });
@@ -545,7 +545,7 @@ describe("TagService", function () {
                 );
 
                 expect(
-                    fn() => $service->assignTagToLink($linkId, "my-tag"),
+                    fn() => $service->addTagToLink($linkId, "my-tag"),
                 )->toThrow(LinkNotFoundException::class);
             },
         );
@@ -672,13 +672,13 @@ describe("TagService", function () {
                 $tagRepository
                     ->shouldReceive("listTagsForLinkId")
                     ->andReturn($tagCollection);
-                // For assignTagToLink
+                // For addTagToLink
                 $tagRepository->shouldReceive("findByName")->andReturn($tag);
                 $tagRepository
                     ->shouldReceive("hasTagForLinkId")
                     ->andReturn(false);
                 $tagRepository->shouldReceive("addTagToLinkId");
-                // For listAllTags
+                // For getAllTags
                 $tagRepository
                     ->shouldReceive("listAll")
                     ->andReturn($tagCollection);
@@ -699,14 +699,14 @@ describe("TagService", function () {
                 expect($created->tagName->value)->toBe("important");
 
                 // Assign tag to link
-                $service->assignTagToLink($linkId, "important");
+                $service->addTagToLink($linkId, "important");
 
                 // Get tags for link
                 $linkTags = $service->getTagsForLink($linkId);
                 expect(iterator_count($linkTags))->toBe(1);
 
                 // List all tags (not transactional)
-                $allTags = $service->listAllTags();
+                $allTags = $service->getAllTags();
                 expect(iterator_count($allTags))->toBe(1);
 
                 // Delete tag
@@ -754,7 +754,7 @@ describe("TagService", function () {
             expect($created2->tagName->value)->toBe("fuelphp");
 
             // List all tags (not transactional)
-            $allTags = $service->listAllTags();
+            $allTags = $service->getAllTags();
             expect(iterator_count($allTags))->toBe(2);
 
             // Search tags (not transactional)

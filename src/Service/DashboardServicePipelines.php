@@ -14,7 +14,7 @@ final readonly class DashboardServicePipelines
     /**
      * @param PipelineInterface<UuidInterface, Dashboard>|null $getDashboard
      * @param PipelineInterface<UuidInterface, DashboardWithCategoriesAndFavorites>|null $getFullDashboard
-     * @param PipelineInterface<null, DashboardCollection>|null $listAllDashboards
+     * @param PipelineInterface<null, DashboardCollection>|null $getAllDashboards
      * @param PipelineInterface<Dashboard, Dashboard>|null $createDashboard
      * @param PipelineInterface<Dashboard, Dashboard>|null $updateDashboard
      * @param PipelineInterface<Dashboard, null>|null $deleteDashboard
@@ -23,7 +23,7 @@ final readonly class DashboardServicePipelines
         private PipelineInterface $default = new NoPipeline(),
         private ?PipelineInterface $getDashboard = null,
         private ?PipelineInterface $getFullDashboard = null,
-        private ?PipelineInterface $listAllDashboards = null,
+        private ?PipelineInterface $getAllDashboards = null,
         private ?PipelineInterface $createDashboard = null,
         private ?PipelineInterface $updateDashboard = null,
         private ?PipelineInterface $deleteDashboard = null,
@@ -42,9 +42,9 @@ final readonly class DashboardServicePipelines
     }
 
     /** @return PipelineInterface<null, DashboardCollection> */
-    public function listAllDashboards(): PipelineInterface
+    public function getAllDashboards(): PipelineInterface
     {
-        return $this->listAllDashboards ?? $this->default;
+        return $this->getAllDashboards ?? $this->default;
     }
 
     /** @return PipelineInterface<Dashboard, Dashboard> */

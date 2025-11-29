@@ -35,7 +35,7 @@ final readonly class DashboardListAction implements ActionInterface
     #[\Override]
     public function execute(array $data): array
     {
-        $dashboards = $this->dashboardService->listAllDashboards();
+        $dashboards = $this->dashboardService->getAllDashboards();
 
         $result = [];
         foreach ($dashboards as $dashboard) {

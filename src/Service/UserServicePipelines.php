@@ -15,7 +15,7 @@ final readonly class UserServicePipelines
     /**
      * @param PipelineInterface<UuidInterface, User>|null $getUser
      * @param PipelineInterface<Email, User>|null $getUserByEmail
-     * @param PipelineInterface<null, UserCollection>|null $listAllUsers
+     * @param PipelineInterface<null, UserCollection>|null $getAllUsers
      * @param PipelineInterface<User, User>|null $createUser
      * @param PipelineInterface<User, null>|null $changePassword
      * @param PipelineInterface<User, null>|null $enableTotp
@@ -26,7 +26,7 @@ final readonly class UserServicePipelines
         private PipelineInterface $default = new NoPipeline(),
         private ?PipelineInterface $getUser = null,
         private ?PipelineInterface $getUserByEmail = null,
-        private ?PipelineInterface $listAllUsers = null,
+        private ?PipelineInterface $getAllUsers = null,
         private ?PipelineInterface $createUser = null,
         private ?PipelineInterface $changePassword = null,
         private ?PipelineInterface $enableTotp = null,
@@ -47,9 +47,9 @@ final readonly class UserServicePipelines
     }
 
     /** @return PipelineInterface<null, UserCollection> */
-    public function listAllUsers(): PipelineInterface
+    public function getAllUsers(): PipelineInterface
     {
-        return $this->listAllUsers ?? $this->default;
+        return $this->getAllUsers ?? $this->default;
     }
 
     /** @return PipelineInterface<User, User> */

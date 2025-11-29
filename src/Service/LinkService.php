@@ -113,19 +113,19 @@ final class LinkService implements LinkServiceInterface
     }
 
     #[\Override]
-    public function findLinksByTag(string $tagName): LinkCollection
+    public function getLinksByTag(string $tagName): LinkCollection
     {
         $searchTagNames = new TagNameCollection(new TagName($tagName));
         return $this->pipelines
-            ->findLinksByTag()
+            ->getLinksByTag()
             ->run($this->linkRepository->listForTags(...), $searchTagNames);
     }
 
     #[\Override]
-    public function listLinks(int $limit = 100, int $offset = 0): LinkCollection
+    public function getLinks(int $limit = 100, int $offset = 0): LinkCollection
     {
         return $this->pipelines
-            ->listLinks()
+            ->getLinks()
             ->run(fn() => $this->linkRepository->listAll($limit, $offset));
     }
 }

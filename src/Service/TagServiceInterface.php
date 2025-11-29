@@ -22,7 +22,7 @@ interface TagServiceInterface
     /**
      * Get all tags
      */
-    public function listAllTags(): TagCollection;
+    public function getAllTags(): TagCollection;
 
     /**
      * Get tags for a specific link
@@ -57,10 +57,7 @@ interface TagServiceInterface
      *
      * @throws LinkNotFoundException when link doesn't exist
      */
-    public function assignTagToLink(
-        UuidInterface $linkId,
-        string $tagName,
-    ): void;
+    public function addTagToLink(UuidInterface $linkId, string $tagName): void;
 
     /**
      * Remove a tag from a link

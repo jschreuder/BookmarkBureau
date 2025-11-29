@@ -27,7 +27,7 @@ final class ListCommand extends Command
         InputInterface $input,
         OutputInterface $output,
     ): int {
-        $users = $this->userService->listAllUsers();
+        $users = $this->userService->getAllUsers();
 
         if ($users->isEmpty()) {
             $output->writeln("<info>No users found</info>");
