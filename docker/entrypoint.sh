@@ -5,6 +5,11 @@ echo "BookmarkBureau starting..."
 
 # Copy distribution config files to active config if they don't exist
 # This allows users to customize configs by mounting volumes
+if [ ! -f /var/www/config/env.php ] && [ -f /var/www/config/env.php.dist ]; then
+    echo "Initializing env.php for production environment..."
+    echo "<?php return \"production\";" > /var/www/config/env.php
+fi
+
 if [ ! -f /var/www/config/production.php ] && [ -f /var/www/config/production.php.dist ]; then
     echo "Initializing production.php from distribution file..."
     cp /var/www/config/production.php.dist /var/www/config/production.php
