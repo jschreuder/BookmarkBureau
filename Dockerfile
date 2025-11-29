@@ -12,6 +12,9 @@ RUN npm ci --production=false
 # Copy frontend source
 COPY frontend/ ./
 
+# Create environment.ts for production build
+RUN echo "export const environment = { production: true, apiBaseUrl: '/api.php' };" > src/environments/environment.ts
+
 # Build Angular application in production mode
 RUN npm run build -- --configuration production
 
