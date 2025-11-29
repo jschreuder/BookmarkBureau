@@ -15,8 +15,8 @@ COPY frontend/ ./
 # Create environment.ts for production build
 RUN echo "export const environment = { production: true, apiBaseUrl: '/api.php' };" > src/environments/environment.ts
 
-# Build Angular application in production mode
-RUN npm run build -- --configuration production
+# Build Angular application in production mode with explicit output path
+RUN npm run build -- --configuration production --output-path=/build/dist
 
 # Stage 2: Install PHP dependencies
 FROM composer:2 AS php-builder
@@ -52,8 +52,8 @@ WORKDIR /var/www
 COPY --chown=www-data:www-data . .
 
 # Copy built frontend from stage 1
-# Note: Angular builds to /build/web/ based on outputPath config in angular.json
-COPY --from=frontend-builder --chown=www-data:www-data /build/web ./web/
+# Note: We override outputPath to /build/dist during Docker build
+COPY --from=frontend-builder --chown=www-data:www-data /build/dist ./web/
 
 # Copy PHP dependencies from stage 2
 COPY --from=php-builder --chown=www-data:www-data /build/vendor ./vendor
