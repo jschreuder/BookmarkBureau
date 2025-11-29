@@ -113,6 +113,19 @@
     button {
       flex-shrink: 0;
       min-width: 40px;
+
+      &.reorder-toggle {
+        transition: all 0.3s ease;
+
+        &.active {
+          background-color: rgba(102, 126, 234, 0.12);
+          color: #667eea;
+
+          mat-icon {
+            color: #667eea;
+          }
+        }
+      }
     }
   }
 
@@ -160,6 +173,18 @@
   }
 }
 
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &.cdk-drop-list-dragging {
+    .cdk-drag-preview {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
 .link-item {
   display: flex;
   align-items: center;
@@ -195,9 +220,9 @@
     }
 
     mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
     }
   }
 

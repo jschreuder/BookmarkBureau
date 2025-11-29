@@ -50,6 +50,7 @@ export class DashboardOverviewComponent implements OnInit {
   fullDashboard: FullDashboard | null = null;
   loading = true;
   error: string | null = null;
+  favoritesReorderMode = false;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
@@ -274,6 +275,35 @@ export class DashboardOverviewComponent implements OnInit {
       },
       error: (error) => {
         this.snackBar.open('Failed to reorder favorites', 'Close', { duration: 5000 });
+        // Reload dashboard to restore original order
+        this.loadDashboard();
+      },
+    });
+  }
+
+  onCategoryLinksDropped(event: CdkDragDrop<Link[]>, category: CategoryWithLinks): void {
+    if (event.previousIndex === event.currentIndex || !this.fullDashboard) {
+      return;
+    }
+
+    // Reorder the local category links array
+    const links = category.links;
+    const [draggedItem] = links.splice(event.previousIndex, 1);
+    links.splice(event.currentIndex, 0, draggedItem);
+
+    // Build the reorder payload matching CategoryLinkReorderAction format
+    // Note: sort_order must be positive (1-indexed, not 0-indexed)
+    const reorderLinks = links.map((link, index) => ({
+      link_id: link.id,
+      sort_order: index + 1,
+    }));
+
+    this.apiService.reorderCategoryLinks(category.id, reorderLinks).subscribe({
+      next: () => {
+        this.snackBar.open('Category links reordered successfully', 'Close', { duration: 3000 });
+      },
+      error: (error) => {
+        this.snackBar.open('Failed to reorder category links', 'Close', { duration: 5000 });
         // Reload dashboard to restore original order
         this.loadDashboard();
       },

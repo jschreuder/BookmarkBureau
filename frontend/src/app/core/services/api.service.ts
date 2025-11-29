@@ -209,4 +209,15 @@ export class ApiService {
       >(`${this.API_BASE}/dashboard/${dashboardId}/favorites`, { dashboard_id: dashboardId, links }, this.httpOptions)
       .pipe(map((response) => response.data || []));
   }
+
+  reorderCategoryLinks(
+    categoryId: string,
+    links: Array<{ link_id: string; sort_order: number }>,
+  ): Observable<Link[]> {
+    return this.http
+      .put<
+        ApiResponse<Link[]>
+      >(`${this.API_BASE}/category/${categoryId}/link`, { category_id: categoryId, links }, this.httpOptions)
+      .pipe(map((response) => response.data || []));
+  }
 }

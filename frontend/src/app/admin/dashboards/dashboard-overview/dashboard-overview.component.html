@@ -45,6 +45,15 @@
         >
           <mat-icon>add</mat-icon>
         </button>
+        <button
+          mat-icon-button
+          (click)="favoritesReorderMode = !favoritesReorderMode"
+          [matTooltip]="favoritesReorderMode ? 'Exit reorder mode' : 'Reorder favorites'"
+          [class.active]="favoritesReorderMode"
+          class="reorder-toggle"
+        >
+          <mat-icon>{{ favoritesReorderMode ? 'apps' : 'view_agenda' }}</mat-icon>
+        </button>
       </mat-card-header>
       <mat-divider></mat-divider>
       <mat-card-content>
@@ -55,19 +64,11 @@
         <div
           *ngIf="fullDashboard.favorites.length > 0"
           cdkDropList
-          class="favorites-grid"
+          [class.favorites-grid]="!favoritesReorderMode"
+          [class.favorites-list]="favoritesReorderMode"
           (cdkDropListDropped)="onFavoritesDropped($event)"
         >
           <div *ngFor="let link of fullDashboard.favorites" class="link-item" cdkDrag>
-            <button
-              cdkDragHandle
-              mat-icon-button
-              matTooltip="Drag to reorder"
-              class="drag-handle"
-              type="button"
-            >
-              <mat-icon>drag_handle</mat-icon>
-            </button>
             <div class="link-content">
               <mat-icon *ngIf="link.icon" class="link-icon">{{ link.icon }}</mat-icon>
               <div class="link-details">
@@ -94,6 +95,16 @@
                 class="remove-btn"
               >
                 <mat-icon>delete</mat-icon>
+              </button>
+              <button
+                *ngIf="favoritesReorderMode"
+                cdkDragHandle
+                mat-icon-button
+                matTooltip="Drag to reorder"
+                class="drag-handle"
+                type="button"
+              >
+                <mat-icon>drag_handle</mat-icon>
               </button>
             </div>
           </div>
@@ -155,11 +166,16 @@
               </div>
             </div>
 
-            <div class="category-links">
+            <div
+              class="category-links"
+              cdkDropList
+              [cdkDropListData]="category.links"
+              (cdkDropListDropped)="onCategoryLinksDropped($event, category)"
+            >
               <div *ngIf="category.links.length === 0" class="empty-category">
                 <p>No links in this category</p>
               </div>
-              <div *ngFor="let link of category.links" class="link-item">
+              <div *ngFor="let link of category.links" class="link-item" cdkDrag>
                 <div class="link-content">
                   <mat-icon *ngIf="link.icon" class="link-icon">{{ link.icon }}</mat-icon>
                   <div class="link-details">
@@ -186,6 +202,15 @@
                     class="remove-btn"
                   >
                     <mat-icon>delete</mat-icon>
+                  </button>
+                  <button
+                    cdkDragHandle
+                    mat-icon-button
+                    matTooltip="Drag to reorder"
+                    class="drag-handle"
+                    type="button"
+                  >
+                    <mat-icon>drag_handle</mat-icon>
                   </button>
                 </div>
               </div>
