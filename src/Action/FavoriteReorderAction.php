@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\Action;
 
 use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 use jschreuder\BookmarkBureau\Entity\Favorite;
+use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\FavoriteServiceInterface;
@@ -49,13 +50,33 @@ final readonly class FavoriteReorderAction implements ActionInterface
             $favoritesMap[$favorite->link->linkId->toString()] = $favorite;
         }
 
-        // Build the reordered collection based on the request order
-        $reorderedFavorites = [];
-        foreach ($data["links"] as $link) {
-            if (isset($favoritesMap[$link["link_id"]])) {
-                $reorderedFavorites[] = $favoritesMap[$link["link_id"]];
+        // Collect valid favorites with their sort_order, throw if link not favorited
+        $validFavorites = [];
+        foreach ($data["links"] as $linkData) {
+            $linkId = $linkData["link_id"];
+            if (!isset($favoritesMap[$linkId])) {
+                throw FavoriteNotFoundException::forDashboardAndLink(
+                    $dashboardId,
+                    Uuid::fromString($linkId),
+                );
             }
+            $validFavorites[] = [
+                "favorite" => $favoritesMap[$linkId],
+                "sort_order" => $linkData["sort_order"],
+            ];
         }
+
+        // Sort favorites by sort_order
+        usort(
+            $validFavorites,
+            fn($a, $b) => $a["sort_order"] <=> $b["sort_order"],
+        );
+
+        // Extract just the favorite objects in the sorted order
+        $reorderedFavorites = array_map(
+            fn($item) => $item["favorite"],
+            $validFavorites,
+        );
 
         // Reorder the favorites
         $this->favoriteService->reorderFavorites(
@@ -66,7 +87,7 @@ final readonly class FavoriteReorderAction implements ActionInterface
         // Transform each favorite to array
         return [
             "favorites" => array_map(
-                fn($favorite) => $this->outputSpec->transform($favorite),
+                $this->outputSpec->transform(...),
                 $reorderedFavorites,
             ),
         ];

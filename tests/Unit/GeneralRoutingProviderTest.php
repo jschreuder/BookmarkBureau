@@ -3,6 +3,7 @@
 use jschreuder\BookmarkBureau\GeneralRoutingProvider;
 use jschreuder\BookmarkBureau\ServiceContainer\DefaultServiceContainer;
 use jschreuder\BookmarkBureau\Config\RateLimitConfigInterface;
+use jschreuder\BookmarkBureau\Repository\LinkRepositoryInterface;
 use jschreuder\BookmarkBureau\Service\LinkServiceInterface;
 use jschreuder\BookmarkBureau\Service\CategoryServiceInterface;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
@@ -22,6 +23,9 @@ describe("GeneralRoutingProvider", function () {
         $container
             ->shouldReceive("getLinkService")
             ->andReturn(Mockery::mock(LinkServiceInterface::class));
+        $container
+            ->shouldReceive("getLinkRepository")
+            ->andReturn(Mockery::mock(LinkRepositoryInterface::class));
         $container
             ->shouldReceive("getCategoryService")
             ->andReturn(Mockery::mock(CategoryServiceInterface::class));
@@ -151,6 +155,33 @@ describe("GeneralRoutingProvider", function () {
                         &$capturedFactory,
                     ) {
                         if ($name === "favorite-reorder") {
+                            $capturedFactory = $factory;
+                        }
+                    });
+                $router
+                    ->shouldReceive("get", "post", "delete")
+                    ->andReturnNull();
+
+                $provider = new GeneralRoutingProvider(createMockContainer());
+                $provider->registerRoutes($router);
+
+                $controller = $capturedFactory();
+                expect($controller)->toBeInstanceOf(ControllerInterface::class);
+            },
+        );
+
+        test(
+            "category_link-reorder route handler returns ActionController instance",
+            function () {
+                $router = Mockery::mock(RouterInterface::class);
+                $capturedFactory = null;
+
+                $router
+                    ->shouldReceive("put")
+                    ->andReturnUsing(function ($name, $path, $factory) use (
+                        &$capturedFactory,
+                    ) {
+                        if ($name === "category_link-reorder") {
                             $capturedFactory = $factory;
                         }
                     });
@@ -388,6 +419,20 @@ describe("GeneralRoutingProvider", function () {
                 expect($registeredRoutes["category-delete"])->toBe([
                     "method" => "DELETE",
                     "path" => "/category/{id}",
+                ]);
+
+                // Category-Link routes
+                expect($registeredRoutes["category_link-create"])->toBe([
+                    "method" => "POST",
+                    "path" => "/category/{id}/link",
+                ]);
+                expect($registeredRoutes["category_link-delete"])->toBe([
+                    "method" => "DELETE",
+                    "path" => "/category/{id}/link",
+                ]);
+                expect($registeredRoutes["category_link-reorder"])->toBe([
+                    "method" => "PUT",
+                    "path" => "/category/{id}/link",
                 ]);
 
                 // Dashboard routes
