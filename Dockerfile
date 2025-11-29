@@ -52,14 +52,17 @@ WORKDIR /var/www
 COPY --chown=www-data:www-data . .
 
 # Copy built frontend from stage 1
-# Note: We override outputPath to /build/dist during Docker build
-COPY --from=frontend-builder --chown=www-data:www-data /build/dist ./web/
+# Angular creates a browser/ subdirectory, so we copy from /build/dist/browser/
+COPY --from=frontend-builder --chown=www-data:www-data /build/dist/browser/ ./web/
 
 # Copy PHP dependencies from stage 2
 COPY --from=php-builder --chown=www-data:www-data /build/vendor ./vendor
 
 # Copy Caddy configuration
 COPY --chown=www-data:www-data docker/Caddyfile /etc/caddy/Caddyfile
+
+# Copy PHP-FPM pool configuration
+COPY --chown=www-data:www-data docker/php-fpm.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Copy entrypoint script
 COPY --chown=www-data:www-data docker/entrypoint.sh /usr/local/bin/entrypoint.sh
