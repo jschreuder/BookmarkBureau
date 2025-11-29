@@ -16,7 +16,7 @@ final class SqliteDatabaseConfig implements DatabaseConfigInterface
     private PDO $dbInstance;
     private PipelineInterface $defaultPipeline;
 
-    public function __construct(private readonly string $dsn) {}
+    public function __construct(public readonly string $dsn) {}
 
     #[\Override]
     public function getDatabaseType(): string
