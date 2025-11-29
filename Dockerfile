@@ -52,7 +52,8 @@ WORKDIR /var/www
 COPY --chown=www-data:www-data . .
 
 # Copy built frontend from stage 1
-COPY --from=frontend-builder --chown=www-data:www-data /build/dist/frontend/browser ./web/
+# Note: Angular builds to /build/web/ based on outputPath config in angular.json
+COPY --from=frontend-builder --chown=www-data:www-data /build/web ./web/
 
 # Copy PHP dependencies from stage 2
 COPY --from=php-builder --chown=www-data:www-data /build/vendor ./vendor
