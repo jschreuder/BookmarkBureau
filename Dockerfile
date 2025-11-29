@@ -68,8 +68,8 @@ COPY --chown=www-data:www-data docker/php-fpm.conf /usr/local/etc/php-fpm.d/zz-d
 COPY --chown=www-data:www-data docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Create var directory for runtime data
-RUN mkdir -p var/logs && chown -R www-data:www-data var
+# Create var directory for runtime data (including PHP-FPM socket)
+RUN mkdir -p var/logs var/run && chown -R www-data:www-data var
 
 # Environment variables with sensible defaults
 ENV APP_ENV=production

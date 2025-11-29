@@ -20,10 +20,6 @@ mkdir -p /var/www/var/logs
 chmod 755 /var/www/var
 chmod 755 /var/www/var/logs
 
-# Ensure /run directory exists for PHP-FPM socket (we're running as www-data, not root)
-mkdir -p /run
-chmod 755 /run
-
 # Run database migrations if database doesn't exist
 if [ ! -f "$DB_PATH" ]; then
     echo "Database not found at $DB_PATH, running migrations..."

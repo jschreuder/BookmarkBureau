@@ -16,7 +16,7 @@
     @api {
         path /api.php*
     }
-    reverse_proxy @api unix//run/php-fpm.sock {
+    reverse_proxy @api unix//var/www/var/run/php-fpm.sock {
         transport fastcgi {
             root /var/www/web
         }
