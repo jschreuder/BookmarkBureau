@@ -132,7 +132,7 @@ describe("PdoTagRepository", function () {
         );
     });
 
-    describe("findAll", function () {
+    describe("listAll", function () {
         test("returns all tags ordered alphabetically", function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo, new TagEntityMapper());
@@ -145,7 +145,7 @@ describe("PdoTagRepository", function () {
             insertTestTag($pdo, $tag2);
             insertTestTag($pdo, $tag3);
 
-            $collection = $repo->findAll();
+            $collection = $repo->listAll();
 
             expect($collection)->toHaveCount(3);
             $tags = iterator_to_array($collection);
@@ -158,13 +158,13 @@ describe("PdoTagRepository", function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo, new TagEntityMapper());
 
-            $collection = $repo->findAll();
+            $collection = $repo->listAll();
 
             expect($collection)->toHaveCount(0);
         });
     });
 
-    describe("findTagsForLinkId", function () {
+    describe("listTagsForLinkId", function () {
         test(
             "returns all tags for a specific link ordered alphabetically",
             function () {
@@ -199,7 +199,7 @@ describe("PdoTagRepository", function () {
                     "INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)",
                 )->execute([$linkId->getBytes(), "middle"]);
 
-                $collection = $repo->findTagsForLinkId($linkId);
+                $collection = $repo->listTagsForLinkId($linkId);
 
                 expect($collection)->toHaveCount(3);
                 $tags = iterator_to_array($collection);
@@ -216,7 +216,7 @@ describe("PdoTagRepository", function () {
             $linkId = Uuid::uuid4();
             insertTestLinkForTag($pdo, $linkId);
 
-            $collection = $repo->findTagsForLinkId($linkId);
+            $collection = $repo->listTagsForLinkId($linkId);
 
             expect($collection)->toHaveCount(0);
         });
@@ -230,13 +230,13 @@ describe("PdoTagRepository", function () {
                 $nonExistentLinkId = Uuid::uuid4();
 
                 expect(
-                    fn() => $repo->findTagsForLinkId($nonExistentLinkId),
+                    fn() => $repo->listTagsForLinkId($nonExistentLinkId),
                 )->toThrow(LinkNotFoundException::class);
             },
         );
     });
 
-    describe("searchByName", function () {
+    describe("listForNamePrefix", function () {
         test("returns tags matching prefix search", function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo, new TagEntityMapper());
@@ -256,7 +256,7 @@ describe("PdoTagRepository", function () {
                 ),
             );
 
-            $collection = $repo->searchByName("p");
+            $collection = $repo->listForNamePrefix("p");
 
             expect($collection)->toHaveCount(2);
             $tags = iterator_to_array($collection);
@@ -282,7 +282,7 @@ describe("PdoTagRepository", function () {
                 TestEntityFactory::createTag(tagName: new TagName("alpha")),
             );
 
-            $collection = $repo->searchByName("z");
+            $collection = $repo->listForNamePrefix("z");
 
             expect($collection)->toHaveCount(2);
             $tags = iterator_to_array($collection);
@@ -303,7 +303,7 @@ describe("PdoTagRepository", function () {
                 );
             }
 
-            $collection = $repo->searchByName("test", limit: 2);
+            $collection = $repo->listForNamePrefix("test", limit: 2);
 
             expect($collection)->toHaveCount(2);
         });
@@ -317,7 +317,7 @@ describe("PdoTagRepository", function () {
                 TestEntityFactory::createTag(tagName: new TagName("php")),
             );
 
-            $collection = $repo->searchByName("python");
+            $collection = $repo->listForNamePrefix("python");
 
             expect($collection)->toHaveCount(0);
         });
@@ -508,7 +508,7 @@ describe("PdoTagRepository", function () {
                 tagName: new TagName("cascadeable"),
             );
             $repo->insert($tag);
-            $repo->assignToLinkId($linkId, "cascadeable");
+            $repo->addTagToLinkId($linkId, "cascadeable");
 
             // Verify tag was assigned
             $checkStmt = $pdo->prepare(
@@ -530,7 +530,7 @@ describe("PdoTagRepository", function () {
         });
     });
 
-    describe("assignToLinkId", function () {
+    describe("addTagToLinkId", function () {
         test("assigns a tag to a link", function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo, new TagEntityMapper());
@@ -542,11 +542,9 @@ describe("PdoTagRepository", function () {
             );
             $repo->insert($tag);
 
-            $repo->assignToLinkId($linkId, "assignable");
+            $repo->addTagToLinkId($linkId, "assignable");
 
-            expect(
-                $repo->isAssignedToLinkId($linkId, "assignable"),
-            )->toBeTrue();
+            expect($repo->hasTagForLinkId($linkId, "assignable"))->toBeTrue();
         });
 
         test(
@@ -559,7 +557,7 @@ describe("PdoTagRepository", function () {
                 insertTestLinkForTag($pdo, $linkId);
 
                 expect(
-                    fn() => $repo->assignToLinkId($linkId, "nonexistent"),
+                    fn() => $repo->addTagToLinkId($linkId, "nonexistent"),
                 )->toThrow(TagNotFoundException::class);
             },
         );
@@ -578,7 +576,7 @@ describe("PdoTagRepository", function () {
                 $nonExistentLinkId = Uuid::uuid4();
 
                 expect(
-                    fn() => $repo->assignToLinkId($nonExistentLinkId, "orphan"),
+                    fn() => $repo->addTagToLinkId($nonExistentLinkId, "orphan"),
                 )->toThrow(LinkNotFoundException::class);
             },
         );
@@ -594,16 +592,14 @@ describe("PdoTagRepository", function () {
             );
             $repo->insert($tag);
 
-            $repo->assignToLinkId($linkId, "idempotent");
-            $repo->assignToLinkId($linkId, "idempotent");
+            $repo->addTagToLinkId($linkId, "idempotent");
+            $repo->addTagToLinkId($linkId, "idempotent");
 
-            expect(
-                $repo->isAssignedToLinkId($linkId, "idempotent"),
-            )->toBeTrue();
+            expect($repo->hasTagForLinkId($linkId, "idempotent"))->toBeTrue();
         });
     });
 
-    describe("removeFromLinkId", function () {
+    describe("removeTagFromLinkId", function () {
         test("removes a tag from a link", function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo, new TagEntityMapper());
@@ -614,13 +610,11 @@ describe("PdoTagRepository", function () {
                 tagName: new TagName("removable"),
             );
             $repo->insert($tag);
-            $repo->assignToLinkId($linkId, "removable");
+            $repo->addTagToLinkId($linkId, "removable");
 
-            $repo->removeFromLinkId($linkId, "removable");
+            $repo->removeTagFromLinkId($linkId, "removable");
 
-            expect(
-                $repo->isAssignedToLinkId($linkId, "removable"),
-            )->toBeFalse();
+            expect($repo->hasTagForLinkId($linkId, "removable"))->toBeFalse();
         });
 
         test("silently succeeds when removing non-assigned tag", function () {
@@ -635,11 +629,9 @@ describe("PdoTagRepository", function () {
             $repo->insert($tag);
 
             // Should not throw
-            $repo->removeFromLinkId($linkId, "unassigned");
+            $repo->removeTagFromLinkId($linkId, "unassigned");
 
-            expect(
-                $repo->isAssignedToLinkId($linkId, "unassigned"),
-            )->toBeFalse();
+            expect($repo->hasTagForLinkId($linkId, "unassigned"))->toBeFalse();
         });
 
         test(
@@ -669,7 +661,7 @@ describe("PdoTagRepository", function () {
                 $linkId = Uuid::uuid4();
 
                 expect(
-                    fn() => $repoWithMock->removeFromLinkId(
+                    fn() => $repoWithMock->removeTagFromLinkId(
                         $linkId,
                         "some-tag",
                     ),
@@ -704,7 +696,7 @@ describe("PdoTagRepository", function () {
                 $linkId = Uuid::uuid4();
 
                 expect(
-                    fn() => $repoWithMock->removeFromLinkId(
+                    fn() => $repoWithMock->removeTagFromLinkId(
                         $linkId,
                         "some-tag",
                     ),
@@ -739,7 +731,7 @@ describe("PdoTagRepository", function () {
                 $linkId = Uuid::uuid4();
 
                 expect(
-                    fn() => $repoWithMock->removeFromLinkId(
+                    fn() => $repoWithMock->removeTagFromLinkId(
                         $linkId,
                         "some-tag",
                     ),
@@ -748,7 +740,7 @@ describe("PdoTagRepository", function () {
         );
     });
 
-    describe("isAssignedToLinkId", function () {
+    describe("hasTagForLinkId", function () {
         test("returns true when tag is assigned to link", function () {
             $pdo = createTagDatabase();
             $repo = new PdoTagRepository($pdo, new TagEntityMapper());
@@ -759,9 +751,9 @@ describe("PdoTagRepository", function () {
                 tagName: new TagName("assigned"),
             );
             $repo->insert($tag);
-            $repo->assignToLinkId($linkId, "assigned");
+            $repo->addTagToLinkId($linkId, "assigned");
 
-            expect($repo->isAssignedToLinkId($linkId, "assigned"))->toBeTrue();
+            expect($repo->hasTagForLinkId($linkId, "assigned"))->toBeTrue();
         });
 
         test("returns false when tag is not assigned to link", function () {
@@ -775,9 +767,7 @@ describe("PdoTagRepository", function () {
             );
             $repo->insert($tag);
 
-            expect(
-                $repo->isAssignedToLinkId($linkId, "unassigned"),
-            )->toBeFalse();
+            expect($repo->hasTagForLinkId($linkId, "unassigned"))->toBeFalse();
         });
 
         test("returns false when link does not exist", function () {
@@ -790,7 +780,7 @@ describe("PdoTagRepository", function () {
             $nonExistentLinkId = Uuid::uuid4();
 
             expect(
-                $repo->isAssignedToLinkId($nonExistentLinkId, "ghost"),
+                $repo->hasTagForLinkId($nonExistentLinkId, "ghost"),
             )->toBeFalse();
         });
     });

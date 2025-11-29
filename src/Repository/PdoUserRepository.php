@@ -69,7 +69,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
      * Get all users ordered by email
      */
     #[\Override]
-    public function findAll(): UserCollection
+    public function listAll(): UserCollection
     {
         $sql = SqlBuilder::buildSelect(
             "users",
@@ -132,7 +132,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
      * Check if a user with the given email already exists
      */
     #[\Override]
-    public function existsByEmail(Email $email): bool
+    public function hasUserWithEmail(Email $email): bool
     {
         $statement = $this->pdo->prepare(
             "SELECT 1 FROM users WHERE email = :email LIMIT 1",

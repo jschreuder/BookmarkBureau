@@ -16,23 +16,28 @@ interface LinkRepositoryInterface
      */
     public function findById(UuidInterface $linkId): Link;
 
-    public function findAll(int $limit = 100, int $offset = 0): LinkCollection;
+    public function listAll(int $limit = 100, int $offset = 0): LinkCollection;
 
     /**
      * Search links using fulltext index on title and description
      */
-    public function search(string $query, int $limit = 100): LinkCollection;
+    public function listForQuery(
+        string $query,
+        int $limit = 100,
+    ): LinkCollection;
 
     /**
      * Find links that match any number of tags (using AND condition)
      */
-    public function findByTags(TagNameCollection $tagNames): LinkCollection;
+    public function listForTags(TagNameCollection $tagNames): LinkCollection;
 
     /**
      * Get all links by category, ordered by sort_order
      * @throws CategoryNotFoundException when category doesn't exist
      */
-    public function findByCategoryId(UuidInterface $categoryId): LinkCollection;
+    public function listForCategoryId(
+        UuidInterface $categoryId,
+    ): LinkCollection;
 
     /**
      * Save a new link

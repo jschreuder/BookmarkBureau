@@ -50,7 +50,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
     }
 
     #[\Override]
-    public function findAll(int $limit = 100, int $offset = 0): LinkCollection
+    public function listAll(int $limit = 100, int $offset = 0): LinkCollection
     {
         $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
         $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
@@ -75,8 +75,10 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
      * Uses LIKE queries for cross-database compatibility (MySQL and SQLite)
      */
     #[\Override]
-    public function search(string $query, int $limit = 100): LinkCollection
-    {
+    public function listForQuery(
+        string $query,
+        int $limit = 100,
+    ): LinkCollection {
         $searchTerm = "%{$query}%";
         $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
         $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
@@ -105,7 +107,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
      * Uses INTERSECT queries for cross-database compatibility (MySQL 8.0+ and SQLite)
      */
     #[\Override]
-    public function findByTags(TagNameCollection $tagNames): LinkCollection
+    public function listForTags(TagNameCollection $tagNames): LinkCollection
     {
         if ($tagNames->isEmpty()) {
             return new LinkCollection();
@@ -149,7 +151,7 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
      * @throws CategoryNotFoundException when category doesn't exist
      */
     #[\Override]
-    public function findByCategoryId(UuidInterface $categoryId): LinkCollection
+    public function listForCategoryId(UuidInterface $categoryId): LinkCollection
     {
         $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
         $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");

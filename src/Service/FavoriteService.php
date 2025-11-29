@@ -38,7 +38,9 @@ final class FavoriteService implements FavoriteServiceInterface
         $link = $this->linkRepository->findById($linkId);
 
         // Check if already favorited
-        if ($this->favoriteRepository->isFavorite($dashboardId, $linkId)) {
+        if (
+            $this->favoriteRepository->hasLinkAsFavorite($dashboardId, $linkId)
+        ) {
             throw DuplicateFavoriteException::forDashboardAndLink(
                 $dashboardId,
                 $linkId,
@@ -47,7 +49,7 @@ final class FavoriteService implements FavoriteServiceInterface
 
         // Get the next sort order
         $sortOrder =
-            $this->favoriteRepository->getMaxSortOrderForDashboardId(
+            $this->favoriteRepository->computeMaxSortOrderForDashboardId(
                 $dashboardId,
             ) + 1;
 
@@ -102,7 +104,7 @@ final class FavoriteService implements FavoriteServiceInterface
         // Verify dashboard exists
         $this->dashboardRepository->findById($dashboardId);
 
-        return $this->favoriteRepository->findByDashboardId($dashboardId);
+        return $this->favoriteRepository->listForDashboardId($dashboardId);
     }
 
     #[\Override]

@@ -174,7 +174,7 @@ describe("PdoUserRepository", function () {
             $pdo = createUserDatabase();
             $repo = new PdoUserRepository($pdo, new UserEntityMapper());
 
-            $result = $repo->findAll();
+            $result = $repo->listAll();
 
             expect($result->count())->toBe(0);
             expect($result->isEmpty())->toBeTrue();
@@ -198,7 +198,7 @@ describe("PdoUserRepository", function () {
             insertTestUser($pdo, $user2);
             insertTestUser($pdo, $user3);
 
-            $result = $repo->findAll();
+            $result = $repo->listAll();
 
             expect($result->count())->toBe(3);
             $users = $result->toArray();
@@ -431,7 +431,7 @@ describe("PdoUserRepository", function () {
 
             insertTestUser($pdo, $user);
 
-            expect($repo->existsByEmail($email))->toBeTrue();
+            expect($repo->hasUserWithEmail($email))->toBeTrue();
         });
 
         test("returns false when email does not exist", function () {
@@ -439,7 +439,7 @@ describe("PdoUserRepository", function () {
             $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $email = new Email("nonexistent@example.com");
 
-            expect($repo->existsByEmail($email))->toBeFalse();
+            expect($repo->hasUserWithEmail($email))->toBeFalse();
         });
 
         test("returns false for empty database", function () {
@@ -447,7 +447,7 @@ describe("PdoUserRepository", function () {
             $repo = new PdoUserRepository($pdo, new UserEntityMapper());
             $email = new Email("any@example.com");
 
-            expect($repo->existsByEmail($email))->toBeFalse();
+            expect($repo->hasUserWithEmail($email))->toBeFalse();
         });
     });
 

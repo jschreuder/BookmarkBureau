@@ -48,7 +48,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * Get all tags ordered alphabetically
      */
     #[\Override]
-    public function findAll(): TagCollection
+    public function listAll(): TagCollection
     {
         $sql = SqlBuilder::buildSelect(
             "tags",
@@ -73,7 +73,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
     #[\Override]
-    public function findTagsForLinkId(UuidInterface $link): TagCollection
+    public function listTagsForLinkId(UuidInterface $link): TagCollection
     {
         // Verify that the link exists
         $linkCheck = $this->pdo->prepare(
@@ -108,8 +108,10 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * Get tags that match a search query (prefix search)
      */
     #[\Override]
-    public function searchByName(string $query, int $limit = 20): TagCollection
-    {
+    public function listForNamePrefix(
+        string $query,
+        int $limit = 20,
+    ): TagCollection {
         $searchTerm = "{$query}%";
 
         $sql = SqlBuilder::buildSelect(
@@ -188,7 +190,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * @throws LinkNotFoundException when link doesn't exist
      */
     #[\Override]
-    public function assignToLinkId(UuidInterface $linkId, string $tagName): void
+    public function addTagToLinkId(UuidInterface $linkId, string $tagName): void
     {
         // Verify tag exists
         $tagCheck = $this->pdo->prepare(
@@ -228,7 +230,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * @throws TagNotFoundException when tag doesn't exist (FK violation)
      */
     #[\Override]
-    public function removeFromLinkId(
+    public function removeTagFromLinkId(
         UuidInterface $linkId,
         string $tagName,
     ): void {
@@ -255,7 +257,7 @@ final readonly class PdoTagRepository implements TagRepositoryInterface
      * Check if a tag is assigned to a link
      */
     #[\Override]
-    public function isAssignedToLinkId(
+    public function hasTagForLinkId(
         UuidInterface $linkId,
         string $tagName,
     ): bool {

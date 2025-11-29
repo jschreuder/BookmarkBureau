@@ -58,7 +58,7 @@ final class CategoryService implements CategoryServiceInterface
 
         // Get the next sort order
         $sortOrder =
-            $this->categoryRepository->getMaxSortOrderForDashboardId(
+            $this->categoryRepository->computeCategoryMaxSortOrderForDashboardId(
                 $dashboardId,
             ) + 1;
 
@@ -122,7 +122,7 @@ final class CategoryService implements CategoryServiceInterface
         array $categoryIdToSortOrder,
     ): void {
         // Get all categories for the dashboard
-        $categories = $this->categoryRepository->findByDashboardId(
+        $categories = $this->categoryRepository->listForDashboardId(
             $dashboardId,
         );
 
@@ -162,7 +162,7 @@ final class CategoryService implements CategoryServiceInterface
 
         // Get the next sort order for links in this category
         $sortOrder =
-            $this->categoryRepository->getMaxSortOrderForCategoryId(
+            $this->categoryRepository->computeLinkMaxSortOrderForCategoryId(
                 $categoryId,
             ) + 1;
 

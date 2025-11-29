@@ -27,7 +27,7 @@ interface UserRepositoryInterface
     /**
      * Get all users
      */
-    public function findAll(): UserCollection;
+    public function listAll(): UserCollection;
 
     /**
      * Save a new user
@@ -47,7 +47,7 @@ interface UserRepositoryInterface
     /**
      * Check if a user with the given email already exists
      */
-    public function existsByEmail(Email $email): bool;
+    public function hasUserWithEmail(Email $email): bool;
 
     /**
      * Count total number of users

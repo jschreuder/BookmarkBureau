@@ -61,15 +61,15 @@ describe("DashboardService", function () {
                 CategoryRepositoryInterface::class,
             );
             $categoryRepository
-                ->shouldReceive("findByDashboardId")
+                ->shouldReceive("listForDashboardId")
                 ->with($dashboardId)
                 ->andReturn($categories);
             $categoryRepository
-                ->shouldReceive("findCategoryLinksForCategoryId")
+                ->shouldReceive("listCategoryLinksForCategoryId")
                 ->with($category1->categoryId)
                 ->andReturn($categoryLinks1);
             $categoryRepository
-                ->shouldReceive("findCategoryLinksForCategoryId")
+                ->shouldReceive("listCategoryLinksForCategoryId")
                 ->with($category2->categoryId)
                 ->andReturn($categoryLinks2);
 
@@ -77,7 +77,7 @@ describe("DashboardService", function () {
                 FavoriteRepositoryInterface::class,
             );
             $favoriteRepository
-                ->shouldReceive("findByDashboardId")
+                ->shouldReceive("listForDashboardId")
                 ->with($dashboardId)
                 ->andReturn($favorites);
 
@@ -153,7 +153,7 @@ describe("DashboardService", function () {
                 CategoryRepositoryInterface::class,
             );
             $categoryRepository
-                ->shouldReceive("findByDashboardId")
+                ->shouldReceive("listForDashboardId")
                 ->with($dashboardId)
                 ->andReturn($categories);
 
@@ -161,7 +161,7 @@ describe("DashboardService", function () {
                 FavoriteRepositoryInterface::class,
             );
             $favoriteRepository
-                ->shouldReceive("findByDashboardId")
+                ->shouldReceive("listForDashboardId")
                 ->with($dashboardId)
                 ->andReturn($favorites);
 
@@ -203,11 +203,11 @@ describe("DashboardService", function () {
                 CategoryRepositoryInterface::class,
             );
             $categoryRepository
-                ->shouldReceive("findByDashboardId")
+                ->shouldReceive("listForDashboardId")
                 ->with($dashboardId)
                 ->andReturn($categories);
             $categoryRepository
-                ->shouldReceive("findCategoryLinksForCategoryId")
+                ->shouldReceive("listCategoryLinksForCategoryId")
                 ->with($category->categoryId)
                 ->andReturn($categoryLinks);
 
@@ -215,7 +215,7 @@ describe("DashboardService", function () {
                 FavoriteRepositoryInterface::class,
             );
             $favoriteRepository
-                ->shouldReceive("findByDashboardId")
+                ->shouldReceive("listForDashboardId")
                 ->with($dashboardId)
                 ->andReturn($favorites);
 
@@ -314,7 +314,7 @@ describe("DashboardService", function () {
                 DashboardRepositoryInterface::class,
             );
             $dashboardRepository
-                ->shouldReceive("findAll")
+                ->shouldReceive("listAll")
                 ->andReturn($collection);
 
             $categoryRepository = Mockery::mock(
@@ -345,7 +345,7 @@ describe("DashboardService", function () {
                 DashboardRepositoryInterface::class,
             );
             $dashboardRepository
-                ->shouldReceive("findAll")
+                ->shouldReceive("listAll")
                 ->andReturn($collection);
 
             $categoryRepository = Mockery::mock(
@@ -676,7 +676,7 @@ describe("DashboardService", function () {
             $dashboardRepository->shouldReceive("insert")->once();
             $dashboardRepository->shouldReceive("update")->once();
             $dashboardRepository
-                ->shouldReceive("findAll")
+                ->shouldReceive("listAll")
                 ->andReturn($collection);
             $dashboardRepository
                 ->shouldReceive("findById")
@@ -781,15 +781,15 @@ describe("DashboardService", function () {
                     CategoryRepositoryInterface::class,
                 );
                 $categoryRepository
-                    ->shouldReceive("findByDashboardId")
+                    ->shouldReceive("listForDashboardId")
                     ->with($dashboardId)
                     ->andReturn($categories);
                 $categoryRepository
-                    ->shouldReceive("findCategoryLinksForCategoryId")
+                    ->shouldReceive("listCategoryLinksForCategoryId")
                     ->with($category1->categoryId)
                     ->andReturn($categoryLinks1);
                 $categoryRepository
-                    ->shouldReceive("findCategoryLinksForCategoryId")
+                    ->shouldReceive("listCategoryLinksForCategoryId")
                     ->with($category2->categoryId)
                     ->andReturn($categoryLinks2);
 
@@ -797,7 +797,7 @@ describe("DashboardService", function () {
                     FavoriteRepositoryInterface::class,
                 );
                 $favoriteRepository
-                    ->shouldReceive("findByDashboardId")
+                    ->shouldReceive("listForDashboardId")
                     ->with($dashboardId)
                     ->andReturn($favorites);
 

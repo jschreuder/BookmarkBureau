@@ -54,14 +54,14 @@ final readonly class UserService implements UserServiceInterface
     {
         return $this->pipelines
             ->listAllUsers()
-            ->run($this->userRepository->findAll(...));
+            ->run($this->userRepository->listAll(...));
     }
 
     #[\Override]
     public function createUser(Email $email, string $plainPassword): User
     {
         // Check if email already exists
-        if ($this->userRepository->existsByEmail($email)) {
+        if ($this->userRepository->hasUserWithEmail($email)) {
             throw DuplicateEmailException::forEmail($email);
         }
 

@@ -150,7 +150,7 @@ describe("PdoLinkRepository", function () {
         });
     });
 
-    describe("findAll", function () {
+    describe("listAll", function () {
         test("returns all links ordered by created_at descending", function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository(
@@ -173,7 +173,7 @@ describe("PdoLinkRepository", function () {
             insertTestLink($pdo, $link2);
             insertTestLink($pdo, $link3);
 
-            $collection = $repo->findAll();
+            $collection = $repo->listAll();
 
             expect($collection)->toHaveCount(3);
             $links = iterator_to_array($collection);
@@ -200,7 +200,7 @@ describe("PdoLinkRepository", function () {
                 insertTestLink($pdo, TestEntityFactory::createLink());
             }
 
-            $collection = $repo->findAll(limit: 2);
+            $collection = $repo->listAll(limit: 2);
 
             expect($collection)->toHaveCount(2);
         });
@@ -221,7 +221,7 @@ describe("PdoLinkRepository", function () {
             insertTestLink($pdo, $link2);
             insertTestLink($pdo, $link3);
 
-            $collection = $repo->findAll(limit: 10, offset: 1);
+            $collection = $repo->listAll(limit: 10, offset: 1);
 
             expect($collection)->toHaveCount(2);
         });
@@ -234,7 +234,7 @@ describe("PdoLinkRepository", function () {
                 new TagEntityMapper(),
             );
 
-            $collection = $repo->findAll();
+            $collection = $repo->listAll();
 
             expect($collection)->toHaveCount(0);
         });
@@ -438,7 +438,7 @@ describe("PdoLinkRepository", function () {
         });
     });
 
-    describe("findByTags", function () {
+    describe("listForTags", function () {
         test("returns empty collection when given empty tag list", function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository(
@@ -447,7 +447,7 @@ describe("PdoLinkRepository", function () {
                 new TagEntityMapper(),
             );
 
-            $collection = $repo->findByTags(new TagNameCollection());
+            $collection = $repo->listForTags(new TagNameCollection());
 
             expect($collection)->toHaveCount(0);
         });
@@ -463,7 +463,7 @@ describe("PdoLinkRepository", function () {
             $link = TestEntityFactory::createLink();
             insertTestLink($pdo, $link);
 
-            $collection = $repo->findByTags(
+            $collection = $repo->listForTags(
                 new TagNameCollection(new TagName("nonexistent")),
             );
 
@@ -527,7 +527,7 @@ describe("PdoLinkRepository", function () {
                 )->execute([$link3->linkId->getBytes(), "testing"]);
 
                 // Find links with both 'php' and 'middle' (AND condition)
-                $collection = $repo->findByTags(
+                $collection = $repo->listForTags(
                     new TagNameCollection(
                         new TagName("php"),
                         new TagName("middle"),
@@ -566,7 +566,7 @@ describe("PdoLinkRepository", function () {
                 "INSERT INTO link_tags (link_id, tag_name) VALUES (?, ?)",
             )->execute([$link1->linkId->getBytes(), "php"]);
 
-            $collection = $repo->findByTags(
+            $collection = $repo->listForTags(
                 new TagNameCollection(new TagName("php")),
             );
 
@@ -657,7 +657,7 @@ describe("PdoLinkRepository", function () {
                 )->execute([$link2->linkId->getBytes(), "backend"]);
 
                 // Find all links and verify each has correct tags
-                $collection = $repo->findAll();
+                $collection = $repo->listAll();
 
                 expect($collection)->toHaveCount(2);
                 $links = iterator_to_array($collection);
@@ -701,7 +701,7 @@ describe("PdoLinkRepository", function () {
         );
     });
 
-    describe("findByCategoryId", function () {
+    describe("listForCategoryId", function () {
         test("returns links in a category ordered by sort_order", function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository(
@@ -757,7 +757,7 @@ describe("PdoLinkRepository", function () {
                 2,
             ]);
 
-            $collection = $repo->findByCategoryId($categoryId);
+            $collection = $repo->listForCategoryId($categoryId);
 
             expect($collection)->toHaveCount(3);
             $links = iterator_to_array($collection);
@@ -784,7 +784,7 @@ describe("PdoLinkRepository", function () {
                 $nonExistentCategoryId = Uuid::uuid4();
 
                 expect(
-                    fn() => $repo->findByCategoryId($nonExistentCategoryId),
+                    fn() => $repo->listForCategoryId($nonExistentCategoryId),
                 )->toThrow(CategoryNotFoundException::class);
             },
         );
@@ -819,15 +819,15 @@ describe("PdoLinkRepository", function () {
                     "Empty Category",
                 ]);
 
-                $collection = $repo->findByCategoryId($categoryId);
+                $collection = $repo->listForCategoryId($categoryId);
 
                 expect($collection)->toHaveCount(0);
             },
         );
     });
 
-    describe("search", function () {
-        test("searches links by title using LIKE", function () {
+    describe("listForQuery", function () {
+        test("listForQueryes links by title using LIKE", function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository(
                 $pdo,
@@ -852,8 +852,8 @@ describe("PdoLinkRepository", function () {
             insertTestLink($pdo, $link2);
             insertTestLink($pdo, $link3);
 
-            // Search for "PHP" should find link1 and link3
-            $collection = $repo->search("PHP");
+            // listForQuery for "PHP" should find link1 and link3
+            $collection = $repo->listForQuery("PHP");
 
             expect($collection)->toHaveCount(2);
             $links = iterator_to_array($collection);
@@ -862,7 +862,7 @@ describe("PdoLinkRepository", function () {
             expect(in_array($link3->linkId->toString(), $ids))->toBeTrue();
         });
 
-        test("searches links by description using LIKE", function () {
+        test("listForQueryes links by description using LIKE", function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository(
                 $pdo,
@@ -882,7 +882,7 @@ describe("PdoLinkRepository", function () {
             insertTestLink($pdo, $link1);
             insertTestLink($pdo, $link2);
 
-            $collection = $repo->search("Middle");
+            $collection = $repo->listForQuery("Middle");
 
             expect($collection)->toHaveCount(1);
             $links = iterator_to_array($collection);
@@ -891,7 +891,7 @@ describe("PdoLinkRepository", function () {
             );
         });
 
-        test("search is case-insensitive", function () {
+        test("listForQuery is case-insensitive", function () {
             $pdo = createLinkDatabase();
             $repo = new PdoLinkRepository(
                 $pdo,
@@ -906,8 +906,8 @@ describe("PdoLinkRepository", function () {
 
             insertTestLink($pdo, $link);
 
-            // Search with different casing
-            $collection = $repo->search("php");
+            // listForQuery with different casing
+            $collection = $repo->listForQuery("php");
 
             expect($collection)->toHaveCount(1);
         });
@@ -927,7 +927,7 @@ describe("PdoLinkRepository", function () {
 
             insertTestLink($pdo, $link);
 
-            $collection = $repo->search("Python");
+            $collection = $repo->listForQuery("Python");
 
             expect($collection)->toHaveCount(0);
         });
@@ -950,7 +950,7 @@ describe("PdoLinkRepository", function () {
                 );
             }
 
-            $collection = $repo->search("Test", limit: 2);
+            $collection = $repo->listForQuery("Test", limit: 2);
 
             expect($collection)->toHaveCount(2);
         });

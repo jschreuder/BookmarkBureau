@@ -64,7 +64,7 @@ final readonly class PdoCategoryRepository implements
      * @throws DashboardNotFoundException when dashboard doesn't exist (FK violation)
      */
     #[\Override]
-    public function findByDashboardId(
+    public function listForDashboardId(
         UuidInterface $dashboardId,
     ): CategoryCollection {
         // Verify dashboard exists and reuse it for all categories
@@ -96,7 +96,7 @@ final readonly class PdoCategoryRepository implements
      * @throws CategoryNotFoundException when category doesn't exist
      */
     #[\Override]
-    public function findCategoryLinksForCategoryId(
+    public function listCategoryLinksForCategoryId(
         UuidInterface $categoryId,
     ): CategoryLinkCollection {
         // Verify category exists
@@ -146,7 +146,7 @@ final readonly class PdoCategoryRepository implements
      * Returns -1 if dashboard has no categories
      */
     #[\Override]
-    public function getMaxSortOrderForDashboardId(
+    public function computeCategoryMaxSortOrderForDashboardId(
         UuidInterface $dashboardId,
     ): int {
         $sql = SqlBuilder::buildMax(
@@ -168,8 +168,9 @@ final readonly class PdoCategoryRepository implements
      * Returns -1 if category has no links
      */
     #[\Override]
-    public function getMaxSortOrderForCategoryId(UuidInterface $categoryId): int
-    {
+    public function computeLinkMaxSortOrderForCategoryId(
+        UuidInterface $categoryId,
+    ): int {
         $sql = SqlBuilder::buildMax(
             "category_links",
             "sort_order",
@@ -325,12 +326,31 @@ final readonly class PdoCategoryRepository implements
     }
 
     /**
+     * Reorder links in a category
+     * The index (position) of each link in the collection becomes its sort order
+     * @throws CategoryNotFoundException when category doesn't exist
+     */
+    #[\Override]
+    public function reorderLinks(
+        UuidInterface $categoryId,
+        LinkCollection $links,
+    ): void {
+        // Verify category exists
+        $this->findById($categoryId);
+
+        $sortOrder = 0;
+        foreach ($links as $link) {
+            $this->updateLinkSortOrder($categoryId, $link->linkId, $sortOrder);
+            $sortOrder++;
+        }
+    }
+
+    /**
      * Update sort order for a link in a category
      * @throws CategoryNotFoundException when category doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
-    #[\Override]
-    public function updateLinkSortOrder(
+    private function updateLinkSortOrder(
         UuidInterface $categoryId,
         UuidInterface $linkId,
         int $sortOrder,
@@ -349,26 +369,6 @@ final readonly class PdoCategoryRepository implements
             ["category_id", "link_id"],
         );
         $this->pdo->prepare($query["sql"])->execute($query["params"]);
-    }
-
-    /**
-     * Reorder links in a category
-     * The index (position) of each link in the collection becomes its sort order
-     * @throws CategoryNotFoundException when category doesn't exist
-     */
-    #[\Override]
-    public function reorderLinks(
-        UuidInterface $categoryId,
-        LinkCollection $links,
-    ): void {
-        // Verify category exists
-        $this->findById($categoryId);
-
-        $sortOrder = 0;
-        foreach ($links as $link) {
-            $this->updateLinkSortOrder($categoryId, $link->linkId, $sortOrder);
-            $sortOrder++;
-        }
     }
 
     /**
@@ -393,7 +393,7 @@ final readonly class PdoCategoryRepository implements
      * Count links in a category
      */
     #[\Override]
-    public function countLinksInCategory(UuidInterface $categoryId): int
+    public function countLinksForCategoryId(UuidInterface $categoryId): int
     {
         $sql = SqlBuilder::buildCount(
             "category_links",

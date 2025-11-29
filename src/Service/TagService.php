@@ -40,7 +40,7 @@ final class TagService implements TagServiceInterface
     {
         return $this->pipelines
             ->listAllTags()
-            ->run($this->tagRepository->findAll(...));
+            ->run($this->tagRepository->listAll(...));
     }
 
     /**
@@ -55,7 +55,7 @@ final class TagService implements TagServiceInterface
                 // Verify link exists before fetching tags
                 $this->linkRepository->findById($lid);
 
-                return $this->tagRepository->findTagsForLinkId($lid);
+                return $this->tagRepository->listTagsForLinkId($lid);
             }, $linkId);
     }
 
@@ -133,12 +133,12 @@ final class TagService implements TagServiceInterface
 
                 // Assign tag to link (only if not already assigned)
                 if (
-                    !$this->tagRepository->isAssignedToLinkId(
+                    !$this->tagRepository->hasTagForLinkId(
                         $linkWithTag->link->linkId,
                         $linkWithTag->tagName->value,
                     )
                 ) {
-                    $this->tagRepository->assignToLinkId(
+                    $this->tagRepository->addTagToLinkId(
                         $linkWithTag->link->linkId,
                         $linkWithTag->tagName->value,
                     );
@@ -160,7 +160,7 @@ final class TagService implements TagServiceInterface
         $this->pipelines
             ->removeTagFromLink()
             ->run(function (LinkWithTagName $linkWithTag): null {
-                $this->tagRepository->removeFromLinkId(
+                $this->tagRepository->removeTagFromLinkId(
                     $linkWithTag->link->linkId,
                     $linkWithTag->tagName->value,
                 );
@@ -174,7 +174,7 @@ final class TagService implements TagServiceInterface
         return $this->pipelines
             ->searchTags()
             ->run(
-                fn(): TagCollection => $this->tagRepository->searchByName(
+                fn(): TagCollection => $this->tagRepository->listForNamePrefix(
                     $query,
                     $limit,
                 ),

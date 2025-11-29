@@ -62,7 +62,7 @@ final class FileUserRepository implements UserRepositoryInterface
      * Get all users ordered by email
      */
     #[\Override]
-    public function findAll(): UserCollection
+    public function listAll(): UserCollection
     {
         $this->loadUsers();
 
@@ -138,7 +138,7 @@ final class FileUserRepository implements UserRepositoryInterface
      * Check if a user with the given email already exists
      */
     #[\Override]
-    public function existsByEmail(Email $email): bool
+    public function hasUserWithEmail(Email $email): bool
     {
         $this->loadUsers();
         $emailString = (string) $email;

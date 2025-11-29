@@ -176,12 +176,12 @@ describe("FileUserRepository", function () {
         });
     });
 
-    describe("findAll", function () {
+    describe("listAll", function () {
         test("returns empty collection when no users exist", function () {
             $filePath = getTestFilePath();
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
 
-            $result = $repo->findAll();
+            $result = $repo->listAll();
 
             expect($result->count())->toBe(0);
             expect($result->isEmpty())->toBeTrue();
@@ -207,7 +207,7 @@ describe("FileUserRepository", function () {
             $repo->insert($user2);
             $repo->insert($user3);
 
-            $result = $repo->findAll();
+            $result = $repo->listAll();
 
             expect($result->count())->toBe(3);
             $users = $result->toArray();
@@ -234,7 +234,7 @@ describe("FileUserRepository", function () {
 
             // Create new repo instance to load from file
             $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
-            $result = $repo2->findAll();
+            $result = $repo2->listAll();
 
             expect($result->count())->toBe(2);
 
@@ -644,7 +644,7 @@ describe("FileUserRepository", function () {
         });
     });
 
-    describe("existsByEmail", function () {
+    describe("hasUserWithEmail", function () {
         test("returns true when email exists", function () {
             $filePath = getTestFilePath();
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
@@ -653,7 +653,7 @@ describe("FileUserRepository", function () {
 
             $repo->insert($user);
 
-            expect($repo->existsByEmail($email))->toBeTrue();
+            expect($repo->hasUserWithEmail($email))->toBeTrue();
 
             cleanupTestFile($filePath);
         });
@@ -663,7 +663,7 @@ describe("FileUserRepository", function () {
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $email = new Email("nonexistent@example.com");
 
-            expect($repo->existsByEmail($email))->toBeFalse();
+            expect($repo->hasUserWithEmail($email))->toBeFalse();
 
             cleanupTestFile($filePath);
         });
@@ -673,7 +673,7 @@ describe("FileUserRepository", function () {
             $repo = new FileUserRepository($filePath, new UserEntityMapper());
             $email = new Email("any@example.com");
 
-            expect($repo->existsByEmail($email))->toBeFalse();
+            expect($repo->hasUserWithEmail($email))->toBeFalse();
 
             cleanupTestFile($filePath);
         });
@@ -689,7 +689,7 @@ describe("FileUserRepository", function () {
             // Create new repo instance to load from file
             $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
 
-            expect($repo2->existsByEmail($email))->toBeTrue();
+            expect($repo2->hasUserWithEmail($email))->toBeTrue();
 
             cleanupTestFile($filePath);
         });

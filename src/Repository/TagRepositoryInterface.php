@@ -19,18 +19,21 @@ interface TagRepositoryInterface
     /**
      * Get all tags ordered alphabetically
      */
-    public function findAll(): TagCollection;
+    public function listAll(): TagCollection;
 
     /**
      * Get all tags for a specific link
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
-    public function findTagsForLinkId(UuidInterface $link): TagCollection;
+    public function listTagsForLinkId(UuidInterface $link): TagCollection;
 
     /**
      * Get tags that match a search query (prefix search)
      */
-    public function searchByName(string $query, int $limit = 20): TagCollection;
+    public function listForNamePrefix(
+        string $query,
+        int $limit = 20,
+    ): TagCollection;
 
     /**
      * Save a new tag
@@ -53,7 +56,7 @@ interface TagRepositoryInterface
      * @throws TagNotFoundException when tag doesn't exist
      * @throws LinkNotFoundException when link doesn't exist
      */
-    public function assignToLinkId(
+    public function addTagToLinkId(
         UuidInterface $linkId,
         string $tagName,
     ): void;
@@ -63,7 +66,7 @@ interface TagRepositoryInterface
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      * @throws TagNotFoundException when tag doesn't exist (FK violation)
      */
-    public function removeFromLinkId(
+    public function removeTagFromLinkId(
         UuidInterface $linkId,
         string $tagName,
     ): void;
@@ -71,7 +74,7 @@ interface TagRepositoryInterface
     /**
      * Check if a tag is assigned to a link
      */
-    public function isAssignedToLinkId(
+    public function hasTagForLinkId(
         UuidInterface $linkId,
         string $tagName,
     ): bool;

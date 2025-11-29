@@ -59,14 +59,14 @@ final class DashboardService implements DashboardServiceInterface
                 $dashboard = $this->dashboardRepository->findById($did);
 
                 // Get all categories for this dashboard
-                $categories = $this->categoryRepository->findByDashboardId(
+                $categories = $this->categoryRepository->listForDashboardId(
                     $dashboard->dashboardId,
                 );
 
                 // Build categories with their links
                 $categoriesWithLinks = [];
                 foreach ($categories as $category) {
-                    $categoryLinks = $this->categoryRepository->findCategoryLinksForCategoryId(
+                    $categoryLinks = $this->categoryRepository->listCategoryLinksForCategoryId(
                         $category->categoryId,
                     );
                     $links = new LinkCollection(
@@ -82,7 +82,7 @@ final class DashboardService implements DashboardServiceInterface
                 }
 
                 // Get all favorites for this dashboard
-                $favorites = $this->favoriteRepository->findByDashboardId(
+                $favorites = $this->favoriteRepository->listForDashboardId(
                     $dashboard->dashboardId,
                 );
 
@@ -104,9 +104,7 @@ final class DashboardService implements DashboardServiceInterface
     {
         return $this->pipelines
             ->listAllDashboards()
-            ->run(
-                fn(): DashboardCollection => $this->dashboardRepository->findAll(),
-            );
+            ->run($this->dashboardRepository->listAll(...));
     }
 
     #[\Override]

@@ -36,7 +36,7 @@ final readonly class PdoFavoriteRepository implements
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     #[\Override]
-    public function findByDashboardId(
+    public function listForDashboardId(
         UuidInterface $dashboardId,
     ): FavoriteCollection {
         // Verify dashboard exists and reuse it for all favorites
@@ -91,7 +91,7 @@ final readonly class PdoFavoriteRepository implements
      * Returns -1 if dashboard has no favorites
      */
     #[\Override]
-    public function getMaxSortOrderForDashboardId(
+    public function computeMaxSortOrderForDashboardId(
         UuidInterface $dashboardId,
     ): int {
         $sql = SqlBuilder::buildMax(
@@ -162,7 +162,7 @@ final readonly class PdoFavoriteRepository implements
         UuidInterface $linkId,
     ): void {
         // Check if the favorite exists
-        if (!$this->isFavorite($dashboardId, $linkId)) {
+        if (!$this->hasLinkAsFavorite($dashboardId, $linkId)) {
             throw FavoriteNotFoundException::forDashboardAndLink(
                 $dashboardId,
                 $linkId,
@@ -180,7 +180,7 @@ final readonly class PdoFavoriteRepository implements
      * Check if a link is favorited on a dashboard
      */
     #[\Override]
-    public function isFavorite(
+    public function hasLinkAsFavorite(
         UuidInterface $dashboardId,
         UuidInterface $linkId,
     ): bool {
@@ -193,36 +193,6 @@ final readonly class PdoFavoriteRepository implements
         ]);
 
         return $statement->fetch() !== false;
-    }
-
-    /**
-     * Update sort order for a favorite
-     * @throws FavoriteNotFoundException when favorite doesn't exist
-     */
-    #[\Override]
-    public function updateSortOrder(
-        UuidInterface $dashboardId,
-        UuidInterface $linkId,
-        int $sortOrder,
-    ): void {
-        // Check if the favorite exists
-        if (!$this->isFavorite($dashboardId, $linkId)) {
-            throw FavoriteNotFoundException::forDashboardAndLink(
-                $dashboardId,
-                $linkId,
-            );
-        }
-
-        $query = SqlBuilder::buildUpdate(
-            "favorites",
-            [
-                "dashboard_id" => $dashboardId->getBytes(),
-                "link_id" => $linkId->getBytes(),
-                "sort_order" => $sortOrder,
-            ],
-            ["dashboard_id", "link_id"],
-        );
-        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**
@@ -247,6 +217,35 @@ final readonly class PdoFavoriteRepository implements
             );
             $sortOrder++;
         }
+    }
+
+    /**
+     * Update sort order for a favorite
+     * @throws FavoriteNotFoundException when favorite doesn't exist
+     */
+    private function updateSortOrder(
+        UuidInterface $dashboardId,
+        UuidInterface $linkId,
+        int $sortOrder,
+    ): void {
+        // Check if the favorite exists
+        if (!$this->hasLinkAsFavorite($dashboardId, $linkId)) {
+            throw FavoriteNotFoundException::forDashboardAndLink(
+                $dashboardId,
+                $linkId,
+            );
+        }
+
+        $query = SqlBuilder::buildUpdate(
+            "favorites",
+            [
+                "dashboard_id" => $dashboardId->getBytes(),
+                "link_id" => $linkId->getBytes(),
+                "sort_order" => $sortOrder,
+            ],
+            ["dashboard_id", "link_id"],
+        );
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
     }
 
     /**
@@ -275,7 +274,7 @@ final readonly class PdoFavoriteRepository implements
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
     #[\Override]
-    public function findDashboardsWithLinkAsFavorite(
+    public function listDashboardsWithLinkAsFavorite(
         UuidInterface $linkId,
     ): DashboardCollection {
         // Verify link exists

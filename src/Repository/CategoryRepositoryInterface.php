@@ -23,7 +23,7 @@ interface CategoryRepositoryInterface
      * Get all categories for a dashboard, ordered by sort_order
      * @throws DashboardNotFoundException when dashboard doesn't exist (FK violation)
      */
-    public function findByDashboardId(
+    public function listForDashboardId(
         UuidInterface $dashboardId,
     ): CategoryCollection;
 
@@ -32,7 +32,7 @@ interface CategoryRepositoryInterface
      * Useful when you need the CategoryLink entity with sort_order info
      * @throws CategoryNotFoundException when category doesn't exist
      */
-    public function findCategoryLinksForCategoryId(
+    public function listCategoryLinksForCategoryId(
         UuidInterface $categoryId,
     ): CategoryLinkCollection;
 
@@ -40,7 +40,7 @@ interface CategoryRepositoryInterface
      * Get the highest sort_order value for categories in a dashboard
      * Returns -1 if dashboard has no categories
      */
-    public function getMaxSortOrderForDashboardId(
+    public function computeCategoryMaxSortOrderForDashboardId(
         UuidInterface $dashboardId,
     ): int;
 
@@ -48,7 +48,7 @@ interface CategoryRepositoryInterface
      * Get the highest sort_order value for links in a category
      * Returns -1 if category has no links
      */
-    public function getMaxSortOrderForCategoryId(
+    public function computeLinkMaxSortOrderForCategoryId(
         UuidInterface $categoryId,
     ): int;
 
@@ -98,17 +98,6 @@ interface CategoryRepositoryInterface
     ): bool;
 
     /**
-     * Update sort order for a link in a category
-     * @throws CategoryNotFoundException when category doesn't exist
-     * @throws LinkNotFoundException when link doesn't exist
-     */
-    public function updateLinkSortOrder(
-        UuidInterface $categoryId,
-        UuidInterface $linkId,
-        int $sortOrder,
-    ): void;
-
-    /**
      * Reorder links in a category
      * The index (position) of each link in the collection becomes its sort order
      * @throws CategoryNotFoundException when category doesn't exist
@@ -126,5 +115,5 @@ interface CategoryRepositoryInterface
     /**
      * Count links in a category
      */
-    public function countLinksInCategory(UuidInterface $categoryId): int;
+    public function countLinksForCategoryId(UuidInterface $categoryId): int;
 }

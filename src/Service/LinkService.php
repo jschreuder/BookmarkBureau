@@ -105,7 +105,7 @@ final class LinkService implements LinkServiceInterface
         return $this->pipelines
             ->searchLinks()
             ->run(
-                fn(): LinkCollection => $this->linkRepository->search(
+                fn(): LinkCollection => $this->linkRepository->listForQuery(
                     $query,
                     $limit,
                 ),
@@ -118,7 +118,7 @@ final class LinkService implements LinkServiceInterface
         $searchTagNames = new TagNameCollection(new TagName($tagName));
         return $this->pipelines
             ->findLinksByTag()
-            ->run($this->linkRepository->findByTags(...), $searchTagNames);
+            ->run($this->linkRepository->listForTags(...), $searchTagNames);
     }
 
     #[\Override]
@@ -126,6 +126,6 @@ final class LinkService implements LinkServiceInterface
     {
         return $this->pipelines
             ->listLinks()
-            ->run(fn() => $this->linkRepository->findAll($limit, $offset));
+            ->run(fn() => $this->linkRepository->listAll($limit, $offset));
     }
 }

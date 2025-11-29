@@ -15,7 +15,7 @@ interface FavoriteRepositoryInterface
     /**
      * Get all favorites for a dashboard, ordered by sort_order
      */
-    public function findByDashboardId(
+    public function listForDashboardId(
         UuidInterface $dashboardId,
     ): FavoriteCollection;
 
@@ -23,7 +23,7 @@ interface FavoriteRepositoryInterface
      * Get the highest sort_order value for favorites in a dashboard
      * Returns -1 if dashboard has no favorites
      */
-    public function getMaxSortOrderForDashboardId(
+    public function computeMaxSortOrderForDashboardId(
         UuidInterface $dashboardId,
     ): int;
 
@@ -50,20 +50,10 @@ interface FavoriteRepositoryInterface
     /**
      * Check if a link is favorited on a dashboard
      */
-    public function isFavorite(
+    public function hasLinkAsFavorite(
         UuidInterface $dashboardId,
         UuidInterface $linkId,
     ): bool;
-
-    /**
-     * Update sort order for a favorite
-     * @throws FavoriteNotFoundException when favorite doesn't exist
-     */
-    public function updateSortOrder(
-        UuidInterface $dashboardId,
-        UuidInterface $linkId,
-        int $sortOrder,
-    ): void;
 
     /**
      * Reorder favorites in a dashboard
@@ -86,7 +76,7 @@ interface FavoriteRepositoryInterface
      * Get all dashboards where a link is favorited
      * @throws LinkNotFoundException when link doesn't exist (FK violation)
      */
-    public function findDashboardsWithLinkAsFavorite(
+    public function listDashboardsWithLinkAsFavorite(
         UuidInterface $linkId,
     ): DashboardCollection;
 }

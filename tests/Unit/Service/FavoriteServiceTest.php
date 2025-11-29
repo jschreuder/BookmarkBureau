@@ -32,12 +32,12 @@ describe("FavoriteService", function () {
                     FavoriteRepositoryInterface::class,
                 );
                 $favoriteRepository
-                    ->shouldReceive("getMaxSortOrderForDashboardId")
+                    ->shouldReceive("computeMaxSortOrderForDashboardId")
                     ->with($dashboardId)
                     ->once()
                     ->andReturn(2);
                 $favoriteRepository
-                    ->shouldReceive("isFavorite")
+                    ->shouldReceive("hasLinkAsFavorite")
                     ->with($dashboardId, $linkId)
                     ->once()
                     ->andReturn(false);
@@ -92,12 +92,12 @@ describe("FavoriteService", function () {
                 FavoriteRepositoryInterface::class,
             );
             $favoriteRepository
-                ->shouldReceive("getMaxSortOrderForDashboardId")
+                ->shouldReceive("computeMaxSortOrderForDashboardId")
                 ->with($dashboardId)
                 ->once()
                 ->andReturn(-1);
             $favoriteRepository
-                ->shouldReceive("isFavorite")
+                ->shouldReceive("hasLinkAsFavorite")
                 ->with($dashboardId, $linkId)
                 ->once()
                 ->andReturn(false);
@@ -151,7 +151,7 @@ describe("FavoriteService", function () {
                     FavoriteRepositoryInterface::class,
                 );
                 $favoriteRepository
-                    ->shouldReceive("isFavorite")
+                    ->shouldReceive("hasLinkAsFavorite")
                     ->with($dashboardId, $linkId)
                     ->once()
                     ->andReturn(true);
@@ -455,12 +455,12 @@ describe("FavoriteService", function () {
             );
             // For first addFavorite
             $favoriteRepository
-                ->shouldReceive("isFavorite")
+                ->shouldReceive("hasLinkAsFavorite")
                 ->with($dashboardId, $linkId1)
                 ->once()
                 ->andReturn(false);
             $favoriteRepository
-                ->shouldReceive("getMaxSortOrderForDashboardId")
+                ->shouldReceive("computeMaxSortOrderForDashboardId")
                 ->with($dashboardId)
                 ->andReturn(-1, 0);
             $favoriteRepository
@@ -470,13 +470,13 @@ describe("FavoriteService", function () {
             // For reorderFavorites
             $favoriteRepository->shouldReceive("reorderFavorites");
             $favoriteRepository
-                ->shouldReceive("findByDashboardId")
+                ->shouldReceive("listForDashboardId")
                 ->andReturn(new FavoriteCollection($favorite1, $favorite2));
             // For removeFavorite
             $favoriteRepository->shouldReceive("removeFavorite");
             // For second addFavorite
             $favoriteRepository
-                ->shouldReceive("isFavorite")
+                ->shouldReceive("hasLinkAsFavorite")
                 ->with($dashboardId, $linkId2)
                 ->once()
                 ->andReturn(false);
@@ -542,12 +542,12 @@ describe("FavoriteService", function () {
                 );
                 // First addFavorite - not favorited yet
                 $favoriteRepository
-                    ->shouldReceive("isFavorite")
+                    ->shouldReceive("hasLinkAsFavorite")
                     ->with($dashboardId, $linkId)
                     ->once()
                     ->andReturn(false);
                 $favoriteRepository
-                    ->shouldReceive("getMaxSortOrderForDashboardId")
+                    ->shouldReceive("computeMaxSortOrderForDashboardId")
                     ->with($dashboardId)
                     ->once()
                     ->andReturn(-1);
@@ -558,7 +558,7 @@ describe("FavoriteService", function () {
 
                 // Second addFavorite - already favorited
                 $favoriteRepository
-                    ->shouldReceive("isFavorite")
+                    ->shouldReceive("hasLinkAsFavorite")
                     ->with($dashboardId, $linkId)
                     ->once()
                     ->andReturn(true);

@@ -165,7 +165,7 @@ describe("PdoFavoriteRepository", function () {
         return [$dashboardRepo, $linkRepo, $favoriteRepo];
     }
 
-    describe("findByDashboardId", function () {
+    describe("listForDashboardId", function () {
         test(
             "returns all favorites for a dashboard ordered by sort_order",
             function () {
@@ -202,7 +202,9 @@ describe("PdoFavoriteRepository", function () {
                     2,
                 );
 
-                $collection = $repo->findByDashboardId($dashboard->dashboardId);
+                $collection = $repo->listForDashboardId(
+                    $dashboard->dashboardId,
+                );
 
                 expect($collection)->toHaveCount(3);
                 $favorites = iterator_to_array($collection);
@@ -229,7 +231,9 @@ describe("PdoFavoriteRepository", function () {
 
                 insertTestDashboardForFavorite($pdo, $dashboard);
 
-                $collection = $repo->findByDashboardId($dashboard->dashboardId);
+                $collection = $repo->listForDashboardId(
+                    $dashboard->dashboardId,
+                );
 
                 expect($collection)->toHaveCount(0);
             },
@@ -245,13 +249,13 @@ describe("PdoFavoriteRepository", function () {
                 $nonExistentId = Uuid::uuid4();
 
                 expect(
-                    fn() => $repo->findByDashboardId($nonExistentId),
+                    fn() => $repo->listForDashboardId($nonExistentId),
                 )->toThrow(DashboardNotFoundException::class);
             },
         );
     });
 
-    describe("getMaxSortOrderForDashboardId", function () {
+    describe("computeMaxSortOrderForDashboardId", function () {
         test("returns the highest sort_order value", function () {
             $pdo = createFavoriteDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
@@ -271,7 +275,7 @@ describe("PdoFavoriteRepository", function () {
             insertFavorite($pdo, $dashboard->dashboardId, $link2->linkId, 3);
             insertFavorite($pdo, $dashboard->dashboardId, $link3->linkId, 1);
 
-            $maxSort = $repo->getMaxSortOrderForDashboardId(
+            $maxSort = $repo->computeMaxSortOrderForDashboardId(
                 $dashboard->dashboardId,
             );
 
@@ -287,7 +291,7 @@ describe("PdoFavoriteRepository", function () {
 
             insertTestDashboardForFavorite($pdo, $dashboard);
 
-            $maxSort = $repo->getMaxSortOrderForDashboardId(
+            $maxSort = $repo->computeMaxSortOrderForDashboardId(
                 $dashboard->dashboardId,
             );
 
@@ -320,7 +324,7 @@ describe("PdoFavoriteRepository", function () {
             );
 
             expect(
-                fn() => $repo->getMaxSortOrderForDashboardId($dashboardId),
+                fn() => $repo->computeMaxSortOrderForDashboardId($dashboardId),
             )->toThrow(RepositoryStorageException::class);
         });
     });
@@ -578,7 +582,10 @@ describe("PdoFavoriteRepository", function () {
             $repo->removeFavorite($dashboard->dashboardId, $link->linkId);
 
             expect(
-                $repo->isFavorite($dashboard->dashboardId, $link->linkId),
+                $repo->hasLinkAsFavorite(
+                    $dashboard->dashboardId,
+                    $link->linkId,
+                ),
             )->toBeFalse();
         });
 
@@ -605,7 +612,7 @@ describe("PdoFavoriteRepository", function () {
         );
     });
 
-    describe("isFavorite", function () {
+    describe("hasLinkAsFavorite", function () {
         test("returns true when link is favorited on dashboard", function () {
             $pdo = createFavoriteDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
@@ -619,7 +626,10 @@ describe("PdoFavoriteRepository", function () {
             insertFavorite($pdo, $dashboard->dashboardId, $link->linkId);
 
             expect(
-                $repo->isFavorite($dashboard->dashboardId, $link->linkId),
+                $repo->hasLinkAsFavorite(
+                    $dashboard->dashboardId,
+                    $link->linkId,
+                ),
             )->toBeTrue();
         });
 
@@ -637,52 +647,11 @@ describe("PdoFavoriteRepository", function () {
                 insertTestLinkForFavorite($pdo, $link);
 
                 expect(
-                    $repo->isFavorite($dashboard->dashboardId, $link->linkId),
-                )->toBeFalse();
-            },
-        );
-    });
-
-    describe("updateSortOrder", function () {
-        test("updates sort order for a favorite", function () {
-            $pdo = createFavoriteDatabase();
-            [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
-                $pdo,
-            );
-            $dashboard = TestEntityFactory::createDashboard();
-            $link = TestEntityFactory::createLink();
-
-            insertTestDashboardForFavorite($pdo, $dashboard);
-            insertTestLinkForFavorite($pdo, $link);
-            insertFavorite($pdo, $dashboard->dashboardId, $link->linkId, 0);
-
-            $repo->updateSortOrder($dashboard->dashboardId, $link->linkId, 5);
-
-            $collection = $repo->findByDashboardId($dashboard->dashboardId);
-            $favorites = iterator_to_array($collection);
-            expect($favorites[0]->sortOrder)->toBe(5);
-        });
-
-        test(
-            "throws FavoriteNotFoundException when favorite does not exist",
-            function () {
-                $pdo = createFavoriteDatabase();
-                [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
-                    $pdo,
-                );
-                $dashboard = TestEntityFactory::createDashboard();
-                $link = TestEntityFactory::createLink();
-
-                insertTestDashboardForFavorite($pdo, $dashboard);
-                insertTestLinkForFavorite($pdo, $link);
-
-                expect(
-                    fn() => $repo->updateSortOrder(
+                    $repo->hasLinkAsFavorite(
                         $dashboard->dashboardId,
                         $link->linkId,
-                        5,
                     ),
-                )->toThrow(FavoriteNotFoundException::class);
+                )->toBeFalse();
             },
         );
     });
@@ -725,7 +694,7 @@ describe("PdoFavoriteRepository", function () {
                 );
 
                 // Get current favorites and reorder them
-                $currentFavorites = $repo->findByDashboardId(
+                $currentFavorites = $repo->listForDashboardId(
                     $dashboard->dashboardId,
                 );
                 $favorites = iterator_to_array($currentFavorites);
@@ -741,7 +710,9 @@ describe("PdoFavoriteRepository", function () {
                     $reorderedFavorites,
                 );
 
-                $collection = $repo->findByDashboardId($dashboard->dashboardId);
+                $collection = $repo->listForDashboardId(
+                    $dashboard->dashboardId,
+                );
                 $reorderedArray = iterator_to_array($collection);
                 expect($reorderedArray[0]->link->linkId->toString())->toBe(
                     $link3->linkId->toString(),
@@ -823,7 +794,7 @@ describe("PdoFavoriteRepository", function () {
         });
     });
 
-    describe("findDashboardsWithLinkAsFavorite", function () {
+    describe("listDashboardsWithLinkAsFavorite", function () {
         test("returns all dashboards where a link is favorited", function () {
             $pdo = createFavoriteDatabase();
             [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
@@ -840,7 +811,7 @@ describe("PdoFavoriteRepository", function () {
             insertFavorite($pdo, $dashboard1->dashboardId, $link->linkId);
             insertFavorite($pdo, $dashboard2->dashboardId, $link->linkId);
 
-            $collection = $repo->findDashboardsWithLinkAsFavorite(
+            $collection = $repo->listDashboardsWithLinkAsFavorite(
                 $link->linkId,
             );
 
@@ -858,7 +829,7 @@ describe("PdoFavoriteRepository", function () {
 
                 insertTestLinkForFavorite($pdo, $link);
 
-                $collection = $repo->findDashboardsWithLinkAsFavorite(
+                $collection = $repo->listDashboardsWithLinkAsFavorite(
                     $link->linkId,
                 );
 
@@ -876,7 +847,7 @@ describe("PdoFavoriteRepository", function () {
                 $nonExistentId = Uuid::uuid4();
 
                 expect(
-                    fn() => $repo->findDashboardsWithLinkAsFavorite(
+                    fn() => $repo->listDashboardsWithLinkAsFavorite(
                         $nonExistentId,
                     ),
                 )->toThrow(LinkNotFoundException::class);

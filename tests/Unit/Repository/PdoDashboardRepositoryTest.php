@@ -169,7 +169,7 @@ describe("PdoDashboardRepository", function () {
         });
     });
 
-    describe("findAll", function () {
+    describe("listAll", function () {
         test("returns all dashboards ordered by title ascending", function () {
             $pdo = createDashboardDatabase();
             $repo = new PdoDashboardRepository(
@@ -191,7 +191,7 @@ describe("PdoDashboardRepository", function () {
             insertTestDashboard($pdo, $dashboard2);
             insertTestDashboard($pdo, $dashboard3);
 
-            $collection = $repo->findAll();
+            $collection = $repo->listAll();
 
             expect($collection)->toHaveCount(3);
             $dashboards = iterator_to_array($collection);
@@ -213,7 +213,7 @@ describe("PdoDashboardRepository", function () {
                 new DashboardEntityMapper(),
             );
 
-            $collection = $repo->findAll();
+            $collection = $repo->listAll();
 
             expect($collection)->toHaveCount(0);
         });
@@ -238,7 +238,7 @@ describe("PdoDashboardRepository", function () {
 
                 insertTestDashboard($pdo, $dashboard);
 
-                $collection = $repo->findAll();
+                $collection = $repo->listAll();
                 $dashboards = iterator_to_array($collection);
 
                 expect($dashboards[0]->description)->toBe("Test description");

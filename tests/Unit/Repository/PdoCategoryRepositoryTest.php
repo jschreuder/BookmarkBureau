@@ -250,7 +250,7 @@ describe("PdoCategoryRepository", function () {
         });
     });
 
-    describe("findByDashboardId", function () {
+    describe("listForDashboardId", function () {
         test(
             "returns all categories for a dashboard ordered by sort_order",
             function () {
@@ -282,7 +282,9 @@ describe("PdoCategoryRepository", function () {
                 insertTestCategoryEntity($pdo, $category2);
                 insertTestCategoryEntity($pdo, $category3);
 
-                $collection = $repo->findByDashboardId($dashboard->dashboardId);
+                $collection = $repo->listForDashboardId(
+                    $dashboard->dashboardId,
+                );
 
                 expect($collection)->toHaveCount(3);
                 $categories = iterator_to_array($collection);
@@ -309,7 +311,9 @@ describe("PdoCategoryRepository", function () {
 
                 insertTestDashboardForCategory($pdo, $dashboard);
 
-                $collection = $repo->findByDashboardId($dashboard->dashboardId);
+                $collection = $repo->listForDashboardId(
+                    $dashboard->dashboardId,
+                );
 
                 expect($collection)->toHaveCount(0);
             },
@@ -325,7 +329,7 @@ describe("PdoCategoryRepository", function () {
                 $nonExistentId = Uuid::uuid4();
 
                 expect(
-                    fn() => $repo->findByDashboardId($nonExistentId),
+                    fn() => $repo->listForDashboardId($nonExistentId),
                 )->toThrow(DashboardNotFoundException::class);
             },
         );
@@ -897,90 +901,6 @@ describe("PdoCategoryRepository", function () {
         });
     });
 
-    describe("updateLinkSortOrder", function () {
-        test("updates sort order for a link in a category", function () {
-            $pdo = createCategoryDatabase();
-            [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories(
-                $pdo,
-            );
-            $dashboard = TestEntityFactory::createDashboard();
-            $category = TestEntityFactory::createCategory(
-                dashboard: $dashboard,
-            );
-            $link = TestEntityFactory::createLink();
-
-            insertTestDashboardForCategory($pdo, $dashboard);
-            $repo->insert($category);
-            insertTestLinkForCategory($pdo, $link);
-            $repo->addLink($category->categoryId, $link->linkId, 0);
-
-            $repo->updateLinkSortOrder(
-                $category->categoryId,
-                $link->linkId,
-                10,
-            );
-
-            $stmt = $pdo->prepare(
-                "SELECT sort_order FROM category_links WHERE category_id = ? AND link_id = ?",
-            );
-            $stmt->execute([
-                $category->categoryId->getBytes(),
-                $link->linkId->getBytes(),
-            ]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            expect($result["sort_order"])->toBe(10);
-        });
-
-        test(
-            "throws CategoryNotFoundException when category does not exist",
-            function () {
-                $pdo = createCategoryDatabase();
-                [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories(
-                    $pdo,
-                );
-                $link = TestEntityFactory::createLink();
-                $nonExistentCategoryId = Uuid::uuid4();
-
-                insertTestLinkForCategory($pdo, $link);
-
-                expect(
-                    fn() => $repo->updateLinkSortOrder(
-                        $nonExistentCategoryId,
-                        $link->linkId,
-                        0,
-                    ),
-                )->toThrow(CategoryNotFoundException::class);
-            },
-        );
-
-        test(
-            "throws LinkNotFoundException when link does not exist",
-            function () {
-                $pdo = createCategoryDatabase();
-                [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories(
-                    $pdo,
-                );
-                $dashboard = TestEntityFactory::createDashboard();
-                $category = TestEntityFactory::createCategory(
-                    dashboard: $dashboard,
-                );
-                $nonExistentLinkId = Uuid::uuid4();
-
-                insertTestDashboardForCategory($pdo, $dashboard);
-                $repo->insert($category);
-
-                expect(
-                    fn() => $repo->updateLinkSortOrder(
-                        $category->categoryId,
-                        $nonExistentLinkId,
-                        0,
-                    ),
-                )->toThrow(LinkNotFoundException::class);
-            },
-        );
-    });
-
     describe("reorderLinks", function () {
         test("reorders links in a category using LinkCollection", function () {
             $pdo = createCategoryDatabase();
@@ -1086,7 +1006,7 @@ describe("PdoCategoryRepository", function () {
                 insertTestCategoryEntity($pdo, $category3);
 
                 expect(
-                    $repo->getMaxSortOrderForDashboardId(
+                    $repo->computeCategoryMaxSortOrderForDashboardId(
                         $dashboard->dashboardId,
                     ),
                 )->toBe(5);
@@ -1103,7 +1023,9 @@ describe("PdoCategoryRepository", function () {
             insertTestDashboardForCategory($pdo, $dashboard);
 
             expect(
-                $repo->getMaxSortOrderForDashboardId($dashboard->dashboardId),
+                $repo->computeCategoryMaxSortOrderForDashboardId(
+                    $dashboard->dashboardId,
+                ),
             )->toBe(-1);
         });
 
@@ -1132,7 +1054,9 @@ describe("PdoCategoryRepository", function () {
             );
 
             expect(
-                fn() => $repo->getMaxSortOrderForDashboardId($dashboardId),
+                fn() => $repo->computeCategoryMaxSortOrderForDashboardId(
+                    $dashboardId,
+                ),
             )->toThrow(RepositoryStorageException::class);
         });
     });
@@ -1180,7 +1104,9 @@ describe("PdoCategoryRepository", function () {
             ]);
 
             expect(
-                $repo->getMaxSortOrderForCategoryId($category->categoryId),
+                $repo->computeLinkMaxSortOrderForCategoryId(
+                    $category->categoryId,
+                ),
             )->toBe(7);
         });
 
@@ -1198,7 +1124,9 @@ describe("PdoCategoryRepository", function () {
             $repo->insert($category);
 
             expect(
-                $repo->getMaxSortOrderForCategoryId($category->categoryId),
+                $repo->computeLinkMaxSortOrderForCategoryId(
+                    $category->categoryId,
+                ),
             )->toBe(-1);
         });
 
@@ -1227,7 +1155,9 @@ describe("PdoCategoryRepository", function () {
             );
 
             expect(
-                fn() => $repo->getMaxSortOrderForCategoryId($categoryId),
+                fn() => $repo->computeLinkMaxSortOrderForCategoryId(
+                    $categoryId,
+                ),
             )->toThrow(RepositoryStorageException::class);
         });
     });
@@ -1313,7 +1243,9 @@ describe("PdoCategoryRepository", function () {
             $repo->addLink($category->categoryId, $link1->linkId, 0);
             $repo->addLink($category->categoryId, $link2->linkId, 1);
 
-            expect($repo->countLinksInCategory($category->categoryId))->toBe(2);
+            expect($repo->countLinksForCategoryId($category->categoryId))->toBe(
+                2,
+            );
         });
 
         test("returns 0 when category has no links", function () {
@@ -1329,7 +1261,9 @@ describe("PdoCategoryRepository", function () {
             insertTestDashboardForCategory($pdo, $dashboard);
             $repo->insert($category);
 
-            expect($repo->countLinksInCategory($category->categoryId))->toBe(0);
+            expect($repo->countLinksForCategoryId($category->categoryId))->toBe(
+                0,
+            );
         });
 
         test("throws RepositoryStorageException when fetch fails", function () {
@@ -1356,9 +1290,9 @@ describe("PdoCategoryRepository", function () {
                 new LinkEntityMapper(),
             );
 
-            expect(fn() => $repo->countLinksInCategory($categoryId))->toThrow(
-                RepositoryStorageException::class,
-            );
+            expect(
+                fn() => $repo->countLinksForCategoryId($categoryId),
+            )->toThrow(RepositoryStorageException::class);
         });
     });
 
@@ -1388,7 +1322,7 @@ describe("PdoCategoryRepository", function () {
                 $repo->addLink($category->categoryId, $link2->linkId, 0);
                 $repo->addLink($category->categoryId, $link3->linkId, 1);
 
-                $collection = $repo->findCategoryLinksForCategoryId(
+                $collection = $repo->listCategoryLinksForCategoryId(
                     $category->categoryId,
                 );
 
@@ -1419,7 +1353,7 @@ describe("PdoCategoryRepository", function () {
                 $nonExistentId = Uuid::uuid4();
 
                 expect(
-                    fn() => $repo->findCategoryLinksForCategoryId(
+                    fn() => $repo->listCategoryLinksForCategoryId(
                         $nonExistentId,
                     ),
                 )->toThrow(CategoryNotFoundException::class);
@@ -1441,7 +1375,7 @@ describe("PdoCategoryRepository", function () {
                 insertTestDashboardForCategory($pdo, $dashboard);
                 $repo->insert($category);
 
-                $collection = $repo->findCategoryLinksForCategoryId(
+                $collection = $repo->listCategoryLinksForCategoryId(
                     $category->categoryId,
                 );
 

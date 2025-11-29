@@ -46,7 +46,7 @@ final readonly class PdoDashboardRepository implements
      * Get all dashboards ordered by title
      */
     #[\Override]
-    public function findAll(): DashboardCollection
+    public function listAll(): DashboardCollection
     {
         $sql = SqlBuilder::buildSelect(
             "dashboards",

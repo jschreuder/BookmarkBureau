@@ -72,7 +72,7 @@ describe("TagService", function () {
 
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
             $tagRepository
-                ->shouldReceive("findAll")
+                ->shouldReceive("listAll")
                 ->once()
                 ->andReturn($tagCollection);
 
@@ -95,7 +95,7 @@ describe("TagService", function () {
 
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
             $tagRepository
-                ->shouldReceive("findAll")
+                ->shouldReceive("listAll")
                 ->once()
                 ->andReturn($tagCollection);
 
@@ -123,7 +123,7 @@ describe("TagService", function () {
 
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
             $tagRepository
-                ->shouldReceive("findTagsForLinkId")
+                ->shouldReceive("listTagsForLinkId")
                 ->with($linkId)
                 ->once()
                 ->andReturn($tagCollection);
@@ -154,7 +154,7 @@ describe("TagService", function () {
 
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
             $tagRepository
-                ->shouldReceive("findTagsForLinkId")
+                ->shouldReceive("listTagsForLinkId")
                 ->with($linkId)
                 ->once()
                 ->andReturn($tagCollection);
@@ -422,12 +422,12 @@ describe("TagService", function () {
                 ->once()
                 ->andReturn($tag);
             $tagRepository
-                ->shouldReceive("isAssignedToLinkId")
+                ->shouldReceive("hasTagForLinkId")
                 ->with($linkId, "my-tag")
                 ->once()
                 ->andReturn(false);
             $tagRepository
-                ->shouldReceive("assignToLinkId")
+                ->shouldReceive("addTagToLinkId")
                 ->with($linkId, "my-tag")
                 ->once();
 
@@ -461,12 +461,12 @@ describe("TagService", function () {
                 ->andThrow(TagNotFoundException::class);
             $tagRepository->shouldReceive("insert")->once();
             $tagRepository
-                ->shouldReceive("isAssignedToLinkId")
+                ->shouldReceive("hasTagForLinkId")
                 ->with($linkId, "new-tag")
                 ->once()
                 ->andReturn(false);
             $tagRepository
-                ->shouldReceive("assignToLinkId")
+                ->shouldReceive("addTagToLinkId")
                 ->with($linkId, "new-tag")
                 ->once();
 
@@ -500,12 +500,12 @@ describe("TagService", function () {
                 ->once()
                 ->andReturn($tag);
             $tagRepository
-                ->shouldReceive("isAssignedToLinkId")
+                ->shouldReceive("hasTagForLinkId")
                 ->with($linkId, "my-tag")
                 ->once()
                 ->andReturn(true);
-            // assignToLinkId should not be called
-            $tagRepository->shouldNotReceive("assignToLinkId");
+            // addTagToLinkId should not be called
+            $tagRepository->shouldNotReceive("addTagToLinkId");
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository
@@ -558,7 +558,7 @@ describe("TagService", function () {
 
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
             $tagRepository
-                ->shouldReceive("removeFromLinkId")
+                ->shouldReceive("removeTagFromLinkId")
                 ->with($linkId, "my-tag")
                 ->once();
 
@@ -589,7 +589,7 @@ describe("TagService", function () {
 
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
             $tagRepository
-                ->shouldReceive("searchByName")
+                ->shouldReceive("listForNamePrefix")
                 ->with("api", 20)
                 ->once()
                 ->andReturn($tagCollection);
@@ -613,7 +613,7 @@ describe("TagService", function () {
 
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
             $tagRepository
-                ->shouldReceive("searchByName")
+                ->shouldReceive("listForNamePrefix")
                 ->with("api", 5)
                 ->once()
                 ->andReturn($tagCollection);
@@ -636,7 +636,7 @@ describe("TagService", function () {
 
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
             $tagRepository
-                ->shouldReceive("searchByName")
+                ->shouldReceive("listForNamePrefix")
                 ->with("xyz", 20)
                 ->once()
                 ->andReturn($tagCollection);
@@ -670,17 +670,17 @@ describe("TagService", function () {
                 $tagRepository->shouldReceive("insert")->once();
                 // For getTagsForLink
                 $tagRepository
-                    ->shouldReceive("findTagsForLinkId")
+                    ->shouldReceive("listTagsForLinkId")
                     ->andReturn($tagCollection);
                 // For assignTagToLink
                 $tagRepository->shouldReceive("findByName")->andReturn($tag);
                 $tagRepository
-                    ->shouldReceive("isAssignedToLinkId")
+                    ->shouldReceive("hasTagForLinkId")
                     ->andReturn(false);
-                $tagRepository->shouldReceive("assignToLinkId");
+                $tagRepository->shouldReceive("addTagToLinkId");
                 // For listAllTags
                 $tagRepository
-                    ->shouldReceive("findAll")
+                    ->shouldReceive("listAll")
                     ->andReturn($tagCollection);
                 // For deleteTag
                 $tagRepository->shouldReceive("delete");
@@ -727,10 +727,10 @@ describe("TagService", function () {
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
             $tagRepository->shouldReceive("insert")->times(2);
             $tagRepository
-                ->shouldReceive("findAll")
+                ->shouldReceive("listAll")
                 ->andReturn($tagsCollection);
             $tagRepository
-                ->shouldReceive("searchByName")
+                ->shouldReceive("listForNamePrefix")
                 ->with("php", 20)
                 ->andReturn($searchResult);
             $tagRepository
@@ -750,8 +750,8 @@ describe("TagService", function () {
             $created1 = $service->createTag("php", "#4F46E5");
             expect($created1->tagName->value)->toBe("php");
 
-            $created2 = $service->createTag("laravel", "#FF2D20");
-            expect($created2->tagName->value)->toBe("laravel");
+            $created2 = $service->createTag("fuelphp", "#FF2D20");
+            expect($created2->tagName->value)->toBe("fuelphp");
 
             // List all tags (not transactional)
             $allTags = $service->listAllTags();

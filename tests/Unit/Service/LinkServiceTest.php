@@ -259,7 +259,7 @@ describe("LinkService", function () {
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository
-                ->shouldReceive("search")
+                ->shouldReceive("listForQuery")
                 ->with("test query", 100)
                 ->andReturn($collection);
 
@@ -278,7 +278,7 @@ describe("LinkService", function () {
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository
-                ->shouldReceive("search")
+                ->shouldReceive("listForQuery")
                 ->with("test query", 50)
                 ->andReturn($collection);
 
@@ -295,7 +295,9 @@ describe("LinkService", function () {
             $collection = new LinkCollection();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("search")->andReturn($collection);
+            $linkRepository
+                ->shouldReceive("listForQuery")
+                ->andReturn($collection);
 
             $pipelines = new LinkServicePipelines();
 
@@ -315,7 +317,7 @@ describe("LinkService", function () {
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository
-                ->shouldReceive("findByTags")
+                ->shouldReceive("listForTags")
                 ->with(Mockery::type(TagNameCollection::class))
                 ->andReturn($collection);
 
@@ -334,7 +336,7 @@ describe("LinkService", function () {
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository
-                ->shouldReceive("findByTags")
+                ->shouldReceive("listForTags")
                 ->with(Mockery::type(TagNameCollection::class))
                 ->andReturn($collection);
 
@@ -352,7 +354,7 @@ describe("LinkService", function () {
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository
-                ->shouldReceive("findByTags")
+                ->shouldReceive("listForTags")
                 ->andReturn($collection);
 
             $pipelines = new LinkServicePipelines();
@@ -373,7 +375,7 @@ describe("LinkService", function () {
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository
-                ->shouldReceive("findAll")
+                ->shouldReceive("listAll")
                 ->with(100, 0)
                 ->andReturn($collection);
 
@@ -393,7 +395,7 @@ describe("LinkService", function () {
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository
-                ->shouldReceive("findAll")
+                ->shouldReceive("listAll")
                 ->with(25, 50)
                 ->andReturn($collection);
 
@@ -410,7 +412,7 @@ describe("LinkService", function () {
             $collection = new LinkCollection();
 
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository->shouldReceive("findAll")->andReturn($collection);
+            $linkRepository->shouldReceive("listAll")->andReturn($collection);
 
             $pipelines = new LinkServicePipelines();
 
@@ -485,7 +487,7 @@ describe("LinkService", function () {
             $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
             $linkRepository->shouldReceive("insert")->twice();
             $linkRepository
-                ->shouldReceive("search")
+                ->shouldReceive("listForQuery")
                 ->with("example", 100)
                 ->andReturn($searchResults);
 

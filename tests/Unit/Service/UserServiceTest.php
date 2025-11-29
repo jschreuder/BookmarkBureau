@@ -26,7 +26,7 @@ describe("UserService", function () {
 
                 $userRepository = Mockery::mock(UserRepositoryInterface::class);
                 $userRepository
-                    ->shouldReceive("existsByEmail")
+                    ->shouldReceive("hasUserWithEmail")
                     ->with($email)
                     ->andReturn(false);
                 $userRepository->shouldReceive("insert")->once();
@@ -60,7 +60,7 @@ describe("UserService", function () {
 
                 $userRepository = Mockery::mock(UserRepositoryInterface::class);
                 $userRepository
-                    ->shouldReceive("existsByEmail")
+                    ->shouldReceive("hasUserWithEmail")
                     ->with($email)
                     ->andReturn(true);
 
@@ -87,7 +87,7 @@ describe("UserService", function () {
 
             $userRepository = Mockery::mock(UserRepositoryInterface::class);
             $userRepository
-                ->shouldReceive("existsByEmail")
+                ->shouldReceive("hasUserWithEmail")
                 ->with($email)
                 ->andReturn(false);
             $userRepository->shouldReceive("insert")->once();
@@ -214,7 +214,7 @@ describe("UserService", function () {
         test("returns empty collection when no users exist", function () {
             $userRepository = Mockery::mock(UserRepositoryInterface::class);
             $userRepository
-                ->shouldReceive("findAll")
+                ->shouldReceive("listAll")
                 ->andReturn(new UserCollection());
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);
@@ -239,7 +239,7 @@ describe("UserService", function () {
 
             $userRepository = Mockery::mock(UserRepositoryInterface::class);
             $userRepository
-                ->shouldReceive("findAll")
+                ->shouldReceive("listAll")
                 ->andReturn($userCollection);
 
             $passwordHasher = Mockery::mock(PasswordHasherInterface::class);

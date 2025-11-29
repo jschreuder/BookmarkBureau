@@ -17,7 +17,7 @@ interface DashboardRepositoryInterface
     /**
      * Get all dashboards ordered by title
      */
-    public function findAll(): DashboardCollection;
+    public function listAll(): DashboardCollection;
 
     /**
      * Save a new dashboard

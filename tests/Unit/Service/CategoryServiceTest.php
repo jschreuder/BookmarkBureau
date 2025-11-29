@@ -90,7 +90,7 @@ describe("CategoryService", function () {
                 CategoryRepositoryInterface::class,
             );
             $categoryRepository
-                ->shouldReceive("getMaxSortOrderForDashboardId")
+                ->shouldReceive("computeCategoryMaxSortOrderForDashboardId")
                 ->with($dashboardId)
                 ->andReturn(2);
             $categoryRepository->shouldReceive("insert")->once();
@@ -135,7 +135,7 @@ describe("CategoryService", function () {
                 CategoryRepositoryInterface::class,
             );
             $categoryRepository
-                ->shouldReceive("getMaxSortOrderForDashboardId")
+                ->shouldReceive("computeCategoryMaxSortOrderForDashboardId")
                 ->with($dashboardId)
                 ->andReturn(-1);
             $categoryRepository->shouldReceive("insert")->once();
@@ -206,7 +206,7 @@ describe("CategoryService", function () {
                 CategoryRepositoryInterface::class,
             );
             $categoryRepository
-                ->shouldReceive("getMaxSortOrderForDashboardId")
+                ->shouldReceive("computeCategoryMaxSortOrderForDashboardId")
                 ->andReturn(-1);
 
             $dashboardRepository = Mockery::mock(
@@ -434,7 +434,7 @@ describe("CategoryService", function () {
                 CategoryRepositoryInterface::class,
             );
             $categoryRepository
-                ->shouldReceive("findByDashboardId")
+                ->shouldReceive("listForDashboardId")
                 ->with($dashboardId)
                 ->andReturn($categories);
             $categoryRepository->shouldReceive("update")->times(3);
@@ -475,7 +475,7 @@ describe("CategoryService", function () {
                 CategoryRepositoryInterface::class,
             );
             $categoryRepository
-                ->shouldReceive("findByDashboardId")
+                ->shouldReceive("listForDashboardId")
                 ->with($dashboardId)
                 ->andReturn($categories);
             $categoryRepository->shouldReceive("update")->once();
@@ -518,7 +518,7 @@ describe("CategoryService", function () {
                 ->with($categoryId)
                 ->andReturn(TestEntityFactory::createCategory());
             $categoryRepository
-                ->shouldReceive("getMaxSortOrderForCategoryId")
+                ->shouldReceive("computeLinkMaxSortOrderForCategoryId")
                 ->with($categoryId)
                 ->andReturn(4);
             $categoryRepository
@@ -568,7 +568,7 @@ describe("CategoryService", function () {
                 ->with($categoryId)
                 ->andReturn(TestEntityFactory::createCategory());
             $categoryRepository
-                ->shouldReceive("getMaxSortOrderForCategoryId")
+                ->shouldReceive("computeLinkMaxSortOrderForCategoryId")
                 ->with($categoryId)
                 ->andReturn(-1);
             $categoryRepository
@@ -804,7 +804,7 @@ describe("CategoryService", function () {
                     CategoryRepositoryInterface::class,
                 );
                 $categoryRepository
-                    ->shouldReceive("getMaxSortOrderForDashboardId")
+                    ->shouldReceive("computeCategoryMaxSortOrderForDashboardId")
                     ->andReturn(-1);
                 $categoryRepository->shouldReceive("insert")->times(1);
                 // 1 update + 1 reorder = 2 update calls
@@ -813,10 +813,10 @@ describe("CategoryService", function () {
                     ->shouldReceive("findById")
                     ->andReturn($category);
                 $categoryRepository
-                    ->shouldReceive("findByDashboardId")
+                    ->shouldReceive("listForDashboardId")
                     ->andReturn(new CategoryCollection($category));
                 $categoryRepository
-                    ->shouldReceive("getMaxSortOrderForCategoryId")
+                    ->shouldReceive("computeLinkMaxSortOrderForCategoryId")
                     ->andReturn(-1);
                 $categoryRepository
                     ->shouldReceive("addLink")
@@ -901,7 +901,7 @@ describe("CategoryService", function () {
             // Second call returns 2 (after first create)
             // Third call returns the same value for reorder (doesn't increment)
             $categoryRepository
-                ->shouldReceive("getMaxSortOrderForDashboardId")
+                ->shouldReceive("computeCategoryMaxSortOrderForDashboardId")
                 ->with($dashboardId)
                 ->andReturn(1, 2);
 
@@ -913,7 +913,7 @@ describe("CategoryService", function () {
             // For reorder, return the categories
             $categories = new CategoryCollection($category1, $category2);
             $categoryRepository
-                ->shouldReceive("findByDashboardId")
+                ->shouldReceive("listForDashboardId")
                 ->with($dashboardId)
                 ->andReturn($categories);
 
