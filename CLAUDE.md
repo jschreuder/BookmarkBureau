@@ -149,6 +149,31 @@ final readonly class ImplementationClass implements SpecificInterface
 - Value Objects: `Value\*` namespace (immutable, validate in constructor)
 - Traits: `*Trait` suffix
 
+#### Repositories & Services
+
+##### Repositories (Storage/Technical)
+
+- `findBy*()` → single entity (throws if not found)
+- `listAll()` / `listFor*()` → collection (empty if none)
+- `has*()` → boolean check
+- `count*()` → integer count
+- `computeMax*()` → computed primitive value
+- `add*()` / `remove*()` → manage associations
+- `insert()` / `update()` / `delete()` → persistence operations
+- Always include "Id" suffix and expect ID instead of entity unless Entity is necessary (e.g., `listForDashboardId`)
+- Use technical, storage-oriented language
+
+##### Services (Domain/Behavioral)
+
+- `get*()` → single entity (throws if not found)
+- `getAll*()` / `get*By*()` / `get*For*()` → collection (empty if none)
+- `search*()` → text-based queries
+- `create*()` / `update*()` / `delete*()` → CRUD operations
+- `add*()` / `remove*()` → manage associations
+- Domain verbs for behaviors (`change*`, `verify*`, `enable*`, `reorder*`)
+- Never use "Id" suffix - use entity name even when expecting the ID (e.g., `getFavoritesForDashboard`)
+- Use behavioral, domain-oriented language
+
 ### The Action Pattern
 
 **For Simple CRUD Operations:**
