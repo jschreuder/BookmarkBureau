@@ -73,8 +73,14 @@
     }
   }
 
-  .edit-dashboard-btn {
+  .dashboard-actions {
+    display: flex;
+    gap: 8px;
     flex-shrink: 0;
+  }
+
+  .edit-dashboard-btn,
+  .view-dashboard-btn {
     color: white;
 
     &:hover {

@@ -142,6 +142,16 @@ describe('DashboardOverviewComponent', () => {
     expect(compiled.textContent).toContain('Test Category');
   });
 
+  it('should open dashboard in new window when viewing', () => {
+    fixture.detectChanges();
+
+    const openSpy = vi.spyOn(window, 'open');
+    component.viewDashboard();
+
+    expect(openSpy).toHaveBeenCalledWith('/dashboard/test-id', '_blank');
+    openSpy.mockRestore();
+  });
+
   describe('Favorites Reordering', () => {
     it('should toggle reorder mode for favorites', () => {
       fixture.detectChanges();

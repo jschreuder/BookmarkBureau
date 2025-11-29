@@ -23,14 +23,24 @@
           <p class="description">{{ fullDashboard.dashboard.description }}</p>
         </div>
       </div>
-      <button
-        mat-icon-button
-        (click)="editDashboard()"
-        matTooltip="Edit Dashboard"
-        class="edit-dashboard-btn"
-      >
-        <mat-icon>edit</mat-icon>
-      </button>
+      <div class="dashboard-actions">
+        <button
+          mat-icon-button
+          (click)="editDashboard()"
+          matTooltip="Edit Dashboard"
+          class="edit-dashboard-btn"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          (click)="viewDashboard()"
+          matTooltip="View Dashboard"
+          class="view-dashboard-btn"
+        >
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
     </div>
 
     <!-- Favorites Section -->

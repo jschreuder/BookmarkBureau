@@ -204,6 +204,10 @@ export class DashboardOverviewComponent implements OnInit {
     this.router.navigate(['/admin/dashboards', this.dashboardId, 'edit']);
   }
 
+  viewDashboard(): void {
+    window.open(`/dashboard/${this.dashboardId}`, '_blank');
+  }
+
   editFavorite(link: Link): void {
     const dialogRef = this.dialog.open(EditLinkDialogComponent, {
       width: '600px',
