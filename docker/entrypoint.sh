@@ -16,9 +16,10 @@ if [ ! -f /var/www/config/production.php ] && [ -f /var/www/config/production.ph
 fi
 
 # Ensure var directory exists with correct permissions
-mkdir -p /var/www/var/logs
+mkdir -p /var/www/var/logs /var/www/var/run
 chmod 755 /var/www/var
 chmod 755 /var/www/var/logs
+chmod 755 /var/www/var/run
 
 # Run database migrations if database doesn't exist
 if [ ! -f "$DB_PATH" ]; then
