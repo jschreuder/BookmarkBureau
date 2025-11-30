@@ -130,8 +130,8 @@ describe('AddLinkDialogComponent', () => {
 
     it('should render icon input field', () => {
       const compiled = fixture.nativeElement;
-      const iconInput = compiled.querySelector('input[formControlName="icon"]');
-      expect(iconInput).toBeTruthy();
+      const iconPicker = compiled.querySelector('app-icon-picker');
+      expect(iconPicker).toBeTruthy();
     });
 
     it('should render cancel and submit buttons', () => {

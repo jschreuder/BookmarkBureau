@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Dashboard } from '../../../core/models';
 import { ApiService } from '../../../core/services/api.service';
+import { IconPickerComponent } from '../../../shared/components/icon-picker/icon-picker.component';
 
 @Component({
   selector: 'app-dashboard-form',
@@ -25,6 +26,7 @@ import { ApiService } from '../../../core/services/api.service';
     MatIconModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
+    IconPickerComponent,
   ],
   template: `
     <div class="form-header">
@@ -59,11 +61,7 @@ import { ApiService } from '../../../core/services/api.service';
           </mat-form-field>
 
           <!-- Icon Field -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Icon (Material Icon Name)</mat-label>
-            <input matInput formControlName="icon" placeholder="e.g., dashboard, home, settings" />
-            <mat-hint>Optional. Use Material Design icon names.</mat-hint>
-          </mat-form-field>
+          <app-icon-picker formControlName="icon"></app-icon-picker>
 
           <!-- Form Actions -->
           <div class="form-actions">

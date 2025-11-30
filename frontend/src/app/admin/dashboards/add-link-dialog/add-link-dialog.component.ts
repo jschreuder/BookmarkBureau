@@ -9,6 +9,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 import { Link } from '../../../core/models';
+import { IconPickerComponent } from '../../../shared/components/icon-picker/icon-picker.component';
 
 export interface AddLinkDialogData {
   dashboardId: string;
@@ -27,6 +28,7 @@ export interface AddLinkDialogData {
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
+    IconPickerComponent,
   ],
   template: `
     <h2 mat-dialog-title>
@@ -63,11 +65,7 @@ export interface AddLinkDialogData {
           ></textarea>
         </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Icon (Optional)</mat-label>
-          <input matInput formControlName="icon" placeholder="e.g., link, language, book" />
-          <mat-hint>Material icon name</mat-hint>
-        </mat-form-field>
+        <app-icon-picker formControlName="icon"></app-icon-picker>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">

@@ -45,6 +45,7 @@
     "@vitest/coverage-v8": "^3.2.4",
     "jasmine-core": "~5.9.0",
     "jsdom": "^27.1.0",
+    "material-design-icons-iconfont": "^6.7.0",
     "typescript": "~5.9.2",
     "vitest": "^3.2.4"
   }
