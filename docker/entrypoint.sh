@@ -33,13 +33,14 @@ else
     php vendor/bin/phinx migrate -e production
 fi
 
-# Initialize rate limit database if it doesn't exist
+# Initialize rate limit database schema
 if [ ! -f "$RATELIMIT_DB_PATH" ]; then
     echo "Initializing rate limit database at $RATELIMIT_DB_PATH..."
-    # Rate limit DB doesn't need migrations, it's created on first use
     touch "$RATELIMIT_DB_PATH"
     chmod 644 "$RATELIMIT_DB_PATH"
 fi
+echo "Setting up rate limit database schema..."
+php vendor/bin/console security:create-ratelimit-db
 
 # Check if users file exists, if not create a default one
 USERS_FILE=${USERS_FILE:-/var/www/var/users.json}
