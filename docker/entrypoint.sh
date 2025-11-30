@@ -40,7 +40,7 @@ if [ ! -f "$RATELIMIT_DB_PATH" ]; then
     chmod 644 "$RATELIMIT_DB_PATH"
 fi
 echo "Setting up rate limit database schema..."
-php vendor/bin/console security:create-ratelimit-db
+php console security:create-ratelimit-db
 
 # Check if users file exists, if not create a default one
 USERS_FILE=${USERS_FILE:-/var/www/var/users.json}
