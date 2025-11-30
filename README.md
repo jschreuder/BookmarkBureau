@@ -193,16 +193,20 @@ This three-pillar approach creates a complete domain language: Entities represen
 ```bash
 # Using Docker
 docker run -d \
+  --name bookmarkbureau \
   -p 8080:8080 \
   -v bb-data:/var/www/var \
   -e JWT_SECRET=$(openssl rand -hex 32) \
+  -e SITE_URL=http://localhost:8080/api.php \
   ghcr.io/jschreuder/bookmark-bureau:latest
 
 # Using Podman (rootless)
 podman run -d \
+  --name bookmarkbureau \
   -p 8080:8080 \
   -v bb-data:/var/www/var \
   -e JWT_SECRET=$(openssl rand -hex 32) \
+  -e SITE_URL=http://localhost:8080/api.php \
   ghcr.io/jschreuder/bookmark-bureau:latest
 
 # Using docker-compose
@@ -213,7 +217,7 @@ docker-compose up -d
 
 **Environment Variables**:
 - `JWT_SECRET` (required) - Secret key for JWT tokens (use a secure random value)
-- `SITE_URL` (optional) - Base URL, default: `http://localhost:8080`
+- `SITE_URL` (optional) - Base URL including `/api.php`, default: `http://localhost:8080/api.php`
 - `SESSION_TTL` (optional) - Session timeout in seconds, default: `1800` (30 min)
 
 Access the application at `http://localhost:8080`

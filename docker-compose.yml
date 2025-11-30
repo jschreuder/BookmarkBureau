@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   bookmark-bureau:
@@ -14,7 +14,7 @@ services:
       - DB_PATH=/var/www/var/bb.db
       - RATELIMIT_DB_PATH=/var/www/var/ratelimit.db
       - JWT_SECRET=change-me-in-production
-      - SITE_URL=http://localhost:8080
+      - SITE_URL=http://localhost:8080/api.php
       - APP_NAME=bookmark-bureau
       - SESSION_TTL=1800
       - REMEMBER_ME_TTL=2592000
@@ -23,7 +23,15 @@ services:
       - bb-data:/var/www/var
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080/",
+        ]
       interval: 30s
       timeout: 3s
       retries: 3

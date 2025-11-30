@@ -76,7 +76,7 @@ ENV APP_ENV=production
 ENV DB_PATH=/var/www/var/bb.db
 ENV RATELIMIT_DB_PATH=/var/www/var/ratelimit.db
 ENV JWT_SECRET=change-me-in-production
-ENV SITE_URL=http://localhost:8080
+ENV SITE_URL=http://localhost:8080/api.php
 
 # Expose port
 EXPOSE 8080
