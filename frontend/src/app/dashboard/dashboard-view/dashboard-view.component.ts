@@ -309,6 +309,10 @@ import { Observable, catchError, of } from 'rxjs';
         margin-right: 6px;
       }
 
+      .category-card ::ng-deep mat-card-content {
+        padding-top: 8px;
+      }
+
       .link-list {
         display: flex;
         flex-direction: column;
