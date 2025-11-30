@@ -12,17 +12,22 @@
     # Enable compression
     encode gzip
 
-    # API endpoint - route to PHP-FPM
+    # API endpoint - route to PHP-FPM (must come before try_files)
     @api {
-        path /api.php*
+        path /api.php /api.php/*
     }
-    reverse_proxy @api unix//var/www/var/run/php-fpm.sock {
-        transport fastcgi {
-            root /var/www/web
+    handle @api {
+        reverse_proxy unix//var/www/var/run/php-fpm.sock {
+            transport fastcgi {
+                root /var/www/web
+                split .php
+            }
         }
     }
 
     # Angular SPA - serve static files, fallback to index.html for client-side routing
-    try_files {path} /index.html
-    file_server
+    handle {
+        try_files {path} /index.html
+        file_server
+    }
 }
