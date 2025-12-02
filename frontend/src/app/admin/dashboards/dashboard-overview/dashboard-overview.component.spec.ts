@@ -145,7 +145,7 @@ describe('DashboardOverviewComponent', () => {
   it('should open dashboard in new window when viewing', () => {
     fixture.detectChanges();
 
-    const openSpy = vi.spyOn(window, 'open');
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
     component.viewDashboard();
 
     expect(openSpy).toHaveBeenCalledWith('/dashboard/test-id', '_blank');
