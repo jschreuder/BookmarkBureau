@@ -57,26 +57,22 @@ describe('AdminLayoutComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have menu items array defined', () => {
-    expect(component.menuItems).toBeDefined();
+  it('should have dashboardsExpanded property', () => {
+    expect(component.dashboardsExpanded).toBeDefined();
+    expect(component.dashboardsExpanded).toBe(true);
   });
 
-  it('should have 2 menu items', () => {
-    expect(component.menuItems.length).toBe(2);
+  it('should toggle dashboards expansion', () => {
+    expect(component.dashboardsExpanded).toBe(true);
+    component.toggleDashboards();
+    expect(component.dashboardsExpanded).toBe(false);
+    component.toggleDashboards();
+    expect(component.dashboardsExpanded).toBe(true);
   });
 
-  it('should have Dashboards menu item', () => {
-    const dashboardsItem = component.menuItems.find((item) => item.label === 'Dashboards');
-    expect(dashboardsItem).toBeDefined();
-    expect(dashboardsItem?.path).toBe('/admin/dashboards');
-    expect(dashboardsItem?.icon).toBe('dashboard');
-  });
-
-  it('should have Tags menu item', () => {
-    const tagsItem = component.menuItems.find((item) => item.label === 'Tags');
-    expect(tagsItem).toBeDefined();
-    expect(tagsItem?.path).toBe('/admin/tags');
-    expect(tagsItem?.icon).toBe('label');
+  it('should have topDashboards array', () => {
+    expect(component.topDashboards).toBeDefined();
+    expect(Array.isArray(component.topDashboards)).toBe(true);
   });
 
   it('should render sidenav container', () => {
@@ -129,7 +125,25 @@ describe('AdminLayoutComponent', () => {
 
   it('should render menu items in nav list', () => {
     const listItems = fixture.nativeElement.querySelectorAll('mat-nav-list a[mat-list-item]');
-    expect(listItems.length).toBeGreaterThanOrEqual(2); // At least the 2 main menu items
+    expect(listItems.length).toBeGreaterThanOrEqual(2); // Dashboards and Tags
+  });
+
+  it('should render Dashboards section with expand icon', () => {
+    const dashboardsSection = fixture.nativeElement.querySelector('.nav-section');
+    expect(dashboardsSection).toBeTruthy();
+
+    const sectionHeader = dashboardsSection.querySelector('.section-header');
+    expect(sectionHeader).toBeTruthy();
+
+    const expandIcon = sectionHeader.querySelector('.expand-icon');
+    expect(expandIcon).toBeTruthy();
+    expect(expandIcon.textContent).toContain('expand_more'); // Should be expanded by default
+  });
+
+  it('should render Tags menu item', () => {
+    const tagsLink = fixture.nativeElement.querySelector('a[routerLink="/admin/tags"]');
+    expect(tagsLink).toBeTruthy();
+    expect(tagsLink.textContent).toContain('Tags');
   });
 
   it('should render Back to Dashboards link', () => {
@@ -196,12 +210,12 @@ describe('AdminLayoutComponent', () => {
     const allLinks = fixture.nativeElement.querySelectorAll('mat-nav-list a[mat-list-item]');
     expect(allLinks.length).toBeGreaterThanOrEqual(2);
 
-    // Check if links exist by looking at the menu items
-    const dashboardsItem = component.menuItems.find((item) => item.path === '/admin/dashboards');
-    const tagsItem = component.menuItems.find((item) => item.path === '/admin/tags');
+    // Check if Dashboards and Tags links exist
+    const dashboardsLink = fixture.nativeElement.querySelector('a[routerLink="/admin/dashboards"]');
+    const tagsLink = fixture.nativeElement.querySelector('a[routerLink="/admin/tags"]');
 
-    expect(dashboardsItem).toBeTruthy();
-    expect(tagsItem).toBeTruthy();
+    expect(dashboardsLink).toBeTruthy();
+    expect(tagsLink).toBeTruthy();
   });
 
   it('should render all menu item icons correctly', () => {

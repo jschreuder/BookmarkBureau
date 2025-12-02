@@ -9,29 +9,47 @@
     </div>
 
     <mat-nav-list class="menu-list">
-      <a
-        *ngFor="let item of menuItems"
-        mat-list-item
-        [routerLink]="item.path"
-        routerLinkActive="active-link"
-      >
-        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-        <span matListItemTitle>{{ item.label }}</span>
-      </a>
+      <!-- Dashboards section -->
+      <div class="nav-section">
+        <a
+          mat-list-item
+          routerLink="/admin/dashboards"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="section-header"
+          (click)="toggleDashboards()"
+        >
+          <mat-icon matListItemIcon>dashboard</mat-icon>
+          <span matListItemTitle>Dashboards</span>
+          <span matListItemMeta>
+            <mat-icon class="expand-icon">{{
+              dashboardsExpanded ? 'expand_more' : 'chevron_right'
+            }}</mat-icon>
+          </span>
+        </a>
 
-      <!-- Divider before top dashboards -->
-      <mat-divider class="dashboard-divider"></mat-divider>
+        <!-- Nested dashboard list -->
+        <div class="nested-list" *ngIf="dashboardsExpanded">
+          <a
+            *ngFor="let dashboard of topDashboards"
+            mat-list-item
+            [routerLink]="['/admin/dashboards', dashboard.id, 'overview']"
+            routerLinkActive="active-link"
+            class="nested-item"
+          >
+            <mat-icon matListItemIcon>article</mat-icon>
+            <span matListItemTitle>{{ dashboard.title }}</span>
+          </a>
+        </div>
+      </div>
 
-      <!-- Top 10 dashboards -->
-      <a
-        *ngFor="let dashboard of topDashboards"
-        mat-list-item
-        [routerLink]="['/admin/dashboards', dashboard.id, 'overview']"
-        routerLinkActive="active-link"
-        class="dashboard-link"
-      >
-        <mat-icon matListItemIcon>article</mat-icon>
-        <span matListItemTitle>{{ dashboard.title }}</span>
+      <!-- Divider before other menu items -->
+      <mat-divider class="section-divider"></mat-divider>
+
+      <!-- Tags -->
+      <a mat-list-item routerLink="/admin/tags" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>label</mat-icon>
+        <span matListItemTitle>Tags</span>
       </a>
     </mat-nav-list>
 

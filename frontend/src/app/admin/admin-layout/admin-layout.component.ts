@@ -10,13 +10,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { ApiService } from '../../core/services/api.service';
 import { Dashboard } from '../../core/models';
 
-interface MenuItem {
-  path?: string;
-  icon: string;
-  label: string;
-  isDivider?: boolean;
-}
-
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
@@ -36,15 +29,15 @@ interface MenuItem {
 export class AdminLayoutComponent implements OnInit {
   private apiService = inject(ApiService);
 
-  menuItems: MenuItem[] = [
-    { path: '/admin/dashboards', icon: 'dashboard', label: 'Dashboards' },
-    { icon: 'label', label: 'Tags', path: '/admin/tags' },
-  ];
-
+  dashboardsExpanded = true;
   topDashboards: Dashboard[] = [];
 
   ngOnInit(): void {
     this.loadTopDashboards();
+  }
+
+  toggleDashboards(): void {
+    this.dashboardsExpanded = !this.dashboardsExpanded;
   }
 
   loadTopDashboards(): void {

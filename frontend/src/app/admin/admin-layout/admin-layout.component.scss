@@ -46,25 +46,49 @@
     flex: 1;
     padding-top: 8px;
 
-    .dashboard-divider {
-      margin: 8px 0;
+    .nav-section {
+      .section-header {
+        font-weight: 500;
+
+        .expand-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+          color: rgba(0, 0, 0, 0.54);
+        }
+
+        &.active-link {
+          padding-left: 12px;
+        }
+      }
+
+      .nested-list {
+        .nested-item {
+          font-size: 13px;
+          height: 36px;
+          padding-left: 52px;
+          color: rgba(0, 0, 0, 0.6);
+
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            margin-left: 8px;
+          }
+
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+          }
+
+          &.active-link {
+            padding-left: 48px;
+          }
+        }
+      }
     }
 
-    .dashboard-link {
-      font-size: 13px;
-      height: 36px;
-      padding: 0 16px;
-      color: rgba(0, 0, 0, 0.6);
-
-      mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-      }
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.04);
-      }
+    .section-divider {
+      margin: 12px 0;
     }
   }
 
@@ -75,7 +99,7 @@
 
 .active-link {
   background-color: rgba(0, 0, 0, 0.08) !important;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #667eea !important;
 }
 
 mat-sidenav-content {
