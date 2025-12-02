@@ -9,7 +9,7 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
  * Strategy:
  * - Monitors user activity (mouse, keyboard, touch events)
  * - On activity detected, checks if token should be refreshed
- * - Refreshes token if it's within the final 10% of its lifetime
+ * - Refreshes token if less than 10 minutes remain until expiration
  * - Avoids excessive refreshes by debouncing activity (5 second window)
  * - Automatically stops monitoring when user logs out
  */
@@ -24,6 +24,7 @@ export class TokenRefreshService {
   private activity$ = new Subject<void>();
   private isMonitoring = false;
   private activityDebounceMs = 5000; // Debounce activity for 5 seconds
+  private refreshThresholdMs = 10 * 60 * 1000; // Refresh when less than 10 minutes remain
   private activityHandlers: Map<string, () => void> = new Map();
 
   /**
@@ -77,6 +78,17 @@ export class TokenRefreshService {
     }
   }
 
+  /**
+   * Set custom refresh threshold in milliseconds
+   * @param thresholdMs Time in milliseconds before expiration to trigger refresh
+   */
+  public setRefreshThreshold(thresholdMs: number): void {
+    if (thresholdMs <= 0) {
+      throw new Error('Refresh threshold must be positive');
+    }
+    this.refreshThresholdMs = thresholdMs;
+  }
+
   private setupActivityListeners(): void {
     // Run outside Angular zone to avoid triggering change detection on every event
     this.ngZone.runOutsideAngular(() => {
@@ -108,19 +120,11 @@ export class TokenRefreshService {
       return;
     }
 
-    const expiresAt = this.auth.getTokenExpiresAt();
-    if (!expiresAt) {
-      return;
-    }
-
     // Get time until expiry
     const timeUntilExpiry = this.auth.getTimeUntilExpiry();
 
-    // Refresh if token is in final 10% of its lifetime
-    // Example: if token lasts 1 hour, refresh in last 6 minutes
-    const refreshThresholdMs = (expiresAt - (Date.now() - timeUntilExpiry)) * 0.1;
-
-    if (timeUntilExpiry < refreshThresholdMs) {
+    // Refresh if less than threshold time remains (default: 10 minutes)
+    if (timeUntilExpiry <= this.refreshThresholdMs) {
       this.performRefresh();
     }
   }
