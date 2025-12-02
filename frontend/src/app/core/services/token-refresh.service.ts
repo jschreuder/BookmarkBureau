@@ -130,6 +130,11 @@ export class TokenRefreshService {
   }
 
   private performRefresh(): void {
+    // Verify token still exists before attempting refresh
+    if (!this.auth.getToken()) {
+      return;
+    }
+
     // Run refresh in Angular zone so that any side effects are detected
     this.ngZone.run(() => {
       this.auth.refreshToken().subscribe({

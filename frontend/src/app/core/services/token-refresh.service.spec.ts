@@ -12,6 +12,7 @@ describe('TokenRefreshService', () => {
     const authServiceMock = {
       hasValidToken: vi.fn(),
       getTimeUntilExpiry: vi.fn(),
+      getToken: vi.fn(),
       refreshToken: vi.fn(),
       logout: vi.fn(),
       isAuthenticated$: of(true),
@@ -45,6 +46,7 @@ describe('TokenRefreshService', () => {
       // Setup: token has 5 minutes remaining (less than 10 minute threshold)
       vi.mocked(authService.hasValidToken).mockReturnValue(true);
       vi.mocked(authService.getTimeUntilExpiry).mockReturnValue(5 * 60 * 1000); // 5 minutes
+      vi.mocked(authService.getToken).mockReturnValue('existing-token');
       vi.mocked(authService.refreshToken).mockReturnValue(
         of({
           token: 'new-token',
@@ -89,6 +91,29 @@ describe('TokenRefreshService', () => {
 
     it('should not refresh if token is invalid', (done) => {
       vi.mocked(authService.hasValidToken).mockReturnValue(false);
+      vi.mocked(authService.refreshToken).mockReturnValue(
+        of({
+          token: 'new-token',
+          type: 'Bearer',
+          expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+        }),
+      );
+
+      service.initializeMonitoring();
+      service.triggerRefreshCheck();
+
+      setTimeout(() => {
+        expect(authService.refreshToken).not.toHaveBeenCalled();
+        service.stopMonitoring();
+        done();
+      }, 6000);
+    });
+
+    it('should not refresh if token does not exist', (done) => {
+      // Setup: token validation passes initially but token is removed before refresh
+      vi.mocked(authService.hasValidToken).mockReturnValue(true);
+      vi.mocked(authService.getTimeUntilExpiry).mockReturnValue(5 * 60 * 1000); // 5 minutes
+      vi.mocked(authService.getToken).mockReturnValue(null); // Token was cleared
       vi.mocked(authService.refreshToken).mockReturnValue(
         of({
           token: 'new-token',
