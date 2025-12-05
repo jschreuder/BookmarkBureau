@@ -30,103 +30,96 @@ import { Observable, catchError, of } from 'rxjs';
       <p>Loading dashboard...</p>
     </div>
 
-    <div class="container" *ngIf="dashboard$ | async as data">
-      <div class="dashboard-header">
-        <div class="header-content">
-          <mat-icon class="dashboard-icon" *ngIf="data.dashboard.icon">
-            {{ data.dashboard.icon }}
-          </mat-icon>
-          <mat-icon class="dashboard-icon" *ngIf="!data.dashboard.icon"> dashboard </mat-icon>
-          <div>
-            <h1>{{ data.dashboard.title }}</h1>
-            <p class="description">{{ data.dashboard.description }}</p>
+    <div *ngIf="dashboard$ | async as data">
+      <!-- Compact Top Bar -->
+      <div class="dashboard-toolbar">
+        <div class="toolbar-content">
+          <div class="toolbar-header">
+            <mat-icon class="toolbar-icon" *ngIf="data.dashboard.icon">
+              {{ data.dashboard.icon }}
+            </mat-icon>
+            <mat-icon class="toolbar-icon" *ngIf="!data.dashboard.icon">dashboard</mat-icon>
+            <span class="toolbar-title">{{ data.dashboard.title }}</span>
+          </div>
+
+          <!-- Favorites in Toolbar -->
+          <div class="toolbar-favorites" *ngIf="data.favorites && data.favorites.length > 0">
+            <mat-chip
+              *ngFor="let link of data.favorites"
+              (click)="openLink(link.url)"
+              class="favorite-chip"
+            >
+              <mat-icon *ngIf="link.icon">{{ link.icon }}</mat-icon>
+              {{ link.title }}
+            </mat-chip>
           </div>
         </div>
       </div>
 
-      <section class="favorites-section" *ngIf="data.favorites && data.favorites.length > 0">
-        <div class="section-header">
-          <h2><mat-icon>star</mat-icon> Favorites</h2>
-        </div>
-        <div class="link-grid">
-          <mat-card
-            class="link-card"
-            *ngFor="let link of data.favorites"
-            (click)="openLink(link.url)"
-          >
-            <mat-card-content>
-              <mat-icon color="accent" *ngIf="link.icon">
-                {{ link.icon }}
-              </mat-icon>
-              <mat-icon color="accent" *ngIf="!link.icon"> link </mat-icon>
-              <div class="link-info">
-                <h3>{{ link.title }}</h3>
-                <p class="link-url">{{ link.url }}</p>
-                <p class="link-description" *ngIf="link.description">
-                  {{ link.description }}
-                </p>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
-      </section>
+      <!-- Description as Quote -->
+      <div class="description-quote" *ngIf="data.dashboard.description">
+        <p>{{ data.dashboard.description }}</p>
+      </div>
 
-      <section class="categories-section" *ngIf="data.categories && data.categories.length > 0">
-        <div class="section-header">
-          <h2><mat-icon>folder</mat-icon> Categories</h2>
-        </div>
-
-        <div class="categories-grid">
-          <mat-card class="category-card" *ngFor="let category of data.categories">
-            <mat-card-header [style.background-color]="category.color || '#667eea'">
-              <mat-icon
-                mat-card-avatar
-                class="category-icon"
-                [style.color]="getTextColor(category.color)"
-              >
-                folder
-              </mat-icon>
-              <mat-card-title [style.color]="getTextColor(category.color)">{{
-                category.title
-              }}</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="link-list">
-                <div
-                  class="link-item"
-                  *ngFor="let link of category.links"
-                  (click)="openLink(link.url)"
+      <!-- Main Content Container -->
+      <div class="container">
+        <!-- Categories Section -->
+        <section class="categories-section" *ngIf="data.categories && data.categories.length > 0">
+          <div class="categories-grid">
+            <mat-card class="category-card" *ngFor="let category of data.categories">
+              <mat-card-header [style.background-color]="category.color || '#667eea'">
+                <mat-icon
+                  mat-card-avatar
+                  class="category-icon"
+                  [style.color]="getTextColor(category.color)"
                 >
-                  <mat-icon *ngIf="link.icon">{{ link.icon }}</mat-icon>
-                  <mat-icon *ngIf="!link.icon">link</mat-icon>
-                  <div class="link-info">
-                    <h4>{{ link.title }}</h4>
-                    <p class="link-url">{{ link.url }}</p>
-                    <mat-chip-set *ngIf="link.tags && link.tags.length > 0">
-                      <mat-chip *ngFor="let tag of link.tags">{{ tag.tag_name }}</mat-chip>
-                    </mat-chip-set>
+                  folder
+                </mat-icon>
+                <mat-card-title [style.color]="getTextColor(category.color)">{{
+                  category.title
+                }}</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="link-list">
+                  <div
+                    class="link-item"
+                    *ngFor="let link of category.links"
+                    (click)="openLink(link.url)"
+                  >
+                    <mat-icon *ngIf="link.icon">{{ link.icon }}</mat-icon>
+                    <mat-icon *ngIf="!link.icon">link</mat-icon>
+                    <div class="link-info">
+                      <h4>{{ link.title }}</h4>
+                      <p class="link-description" *ngIf="link.description">
+                        {{ link.description }}
+                      </p>
+                      <mat-chip-set *ngIf="link.tags && link.tags.length > 0">
+                        <mat-chip *ngFor="let tag of link.tags">{{ tag.tag_name }}</mat-chip>
+                      </mat-chip-set>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
-      </section>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </section>
 
-      <div
-        class="empty-state"
-        *ngIf="
-          (!data.favorites || data.favorites.length === 0) &&
-          (!data.categories || data.categories.length === 0)
-        "
-      >
-        <mat-icon>inbox</mat-icon>
-        <h2>No content yet</h2>
-        <p>Visit the admin panel to add links and categories to this dashboard.</p>
-        <button mat-raised-button color="primary" routerLink="/admin">
-          <mat-icon>settings</mat-icon>
-          Go to Admin
-        </button>
+        <!-- Empty State -->
+        <div
+          class="empty-state"
+          *ngIf="
+            (!data.favorites || data.favorites.length === 0) &&
+            (!data.categories || data.categories.length === 0)
+          "
+        >
+          <mat-icon>inbox</mat-icon>
+          <h2>No content yet</h2>
+          <p>Visit the admin panel to add links and categories to this dashboard.</p>
+          <button mat-raised-button color="primary" routerLink="/admin">
+            <mat-icon>settings</mat-icon>
+            Go to Admin
+          </button>
+        </div>
       </div>
     </div>
 
@@ -140,7 +133,7 @@ import { Observable, catchError, of } from 'rxjs';
   styles: [
     `
       .container {
-        padding: 24px;
+        padding: 20px;
         max-width: 1200px;
         margin: 0 auto;
       }
@@ -157,120 +150,105 @@ import { Observable, catchError, of } from 'rxjs';
         margin-bottom: 16px;
       }
 
-      .dashboard-header {
-        margin-bottom: 40px;
-        padding: 24px;
+      /* Compact Toolbar */
+      .dashboard-toolbar {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 8px;
+        padding: 16px 0;
         color: white;
       }
 
-      .header-content {
-        display: flex;
-        align-items: start;
-        gap: 16px;
-      }
-
-      .dashboard-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
-      }
-
-      .dashboard-header h1 {
-        margin: 0 0 8px 0;
-        font-size: 32px;
-        font-weight: 400;
-      }
-
-      .description {
-        margin: 0;
-        opacity: 0.9;
-        font-size: 16px;
-      }
-
-      .favorites-section,
-      .categories-section {
-        margin-bottom: 40px;
-      }
-
-      .section-header {
-        margin-bottom: 16px;
-      }
-
-      .section-header h2 {
+      .toolbar-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
         display: flex;
         align-items: center;
-        gap: 8px;
-        margin: 0;
-        font-size: 24px;
-        font-weight: 400;
+        justify-content: space-between;
+        gap: 24px;
       }
 
-      .link-grid {
+      .toolbar-header {
         display: flex;
-        flex-wrap: wrap;
+        align-items: center;
         gap: 12px;
       }
 
-      .link-card {
-        flex: 0 1 auto;
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
-        cursor: pointer;
-        border-radius: 24px;
-        padding: 8px 16px;
+      .toolbar-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
       }
 
-      .link-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      .toolbar-title {
+        font-size: 24px;
+        font-weight: 500;
       }
 
-      .link-card mat-card-content {
+      .toolbar-favorites {
         display: flex;
         gap: 8px;
+        flex-wrap: wrap;
         align-items: center;
-        flex-direction: row;
-        text-align: left;
-        padding: 0;
       }
 
-      .link-card mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-        flex-shrink: 0;
+      .favorite-chip {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+        border: none !important;
+        transition:
+          transform 0.2s,
+          background-color 0.2s;
       }
 
-      .link-info {
+      .favorite-chip:hover {
+        transform: scale(1.05);
+        background-color: rgba(255, 255, 255, 0.3) !important;
+      }
+
+      .favorite-chip ::ng-deep .mdc-evolution-chip__action--primary {
+        cursor: pointer !important;
+      }
+
+      .favorite-chip ::ng-deep .mat-mdc-chip-action-label {
         display: flex;
         align-items: center;
-        gap: 0;
-        white-space: nowrap;
+        gap: 4px;
+        color: white !important;
       }
 
-      .link-info h3 {
+      .favorite-chip mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: white !important;
+        vertical-align: middle;
+      }
+
+      /* Description Quote */
+      .description-quote {
+        text-align: center;
+        padding: 16px 24px 12px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .description-quote p {
         margin: 0;
         font-size: 14px;
-        font-weight: 500;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-style: italic;
+        color: rgba(0, 0, 0, 0.5);
+        line-height: 1.5;
       }
 
-      .link-url {
-        display: none;
-      }
-
-      .link-description {
-        display: none;
+      /* Categories Section */
+      .categories-section {
+        margin-top: 8px;
       }
 
       .categories-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
+        gap: 20px;
       }
 
       @media (max-width: 1200px) {
@@ -283,6 +261,16 @@ import { Observable, catchError, of } from 'rxjs';
         .categories-grid {
           grid-template-columns: 1fr;
         }
+
+        .toolbar-content {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        .toolbar-favorites {
+          width: 100%;
+        }
       }
 
       .category-card {
@@ -292,7 +280,7 @@ import { Observable, catchError, of } from 'rxjs';
 
       .category-card ::ng-deep .mat-card-header {
         align-items: center;
-        padding: 14px 24px !important;
+        padding: 12px 20px !important;
         margin: 0 !important;
       }
 
@@ -316,13 +304,13 @@ import { Observable, catchError, of } from 'rxjs';
       .link-list {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 12px;
       }
 
       .link-item {
         display: flex;
         gap: 12px;
-        padding: 12px;
+        padding: 10px;
         border-radius: 4px;
         transition: background-color 0.2s;
         cursor: pointer;
@@ -336,16 +324,24 @@ import { Observable, catchError, of } from 'rxjs';
         color: rgba(0, 0, 0, 0.6);
       }
 
-      .link-item h4 {
+      .link-info h4 {
         margin: 0 0 4px 0;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 500;
+      }
+
+      .link-description {
+        margin: 0;
+        font-size: 13px;
+        color: rgba(0, 0, 0, 0.6);
+        line-height: 1.4;
       }
 
       .link-item mat-chip-set {
         margin-top: 8px;
       }
 
+      /* Empty State */
       .empty-state {
         text-align: center;
         padding: 64px 24px;
@@ -371,6 +367,7 @@ import { Observable, catchError, of } from 'rxjs';
         color: rgba(0, 0, 0, 0.5);
       }
 
+      /* Error State */
       .error-container {
         text-align: center;
         padding: 64px 24px;

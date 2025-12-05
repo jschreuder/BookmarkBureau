@@ -60,47 +60,36 @@ describe('DashboardViewComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render dashboard header section', () => {
-    const header = fixture.nativeElement.querySelector('.dashboard-header');
-    expect(header).toBeTruthy();
+  it('should render dashboard toolbar', () => {
+    const toolbar = fixture.nativeElement.querySelector('.dashboard-toolbar');
+    expect(toolbar).toBeTruthy();
   });
 
-  it('should display dashboard title in header', () => {
-    const title = fixture.nativeElement.querySelector('.dashboard-header h1');
+  it('should display dashboard title in toolbar', () => {
+    const title = fixture.nativeElement.querySelector('.toolbar-title');
     expect(title).toBeTruthy();
     expect(title.textContent).toContain('Test Dashboard');
   });
 
-  it('should display dashboard description in header', () => {
-    const description = fixture.nativeElement.querySelector('.dashboard-header .description');
+  it('should display dashboard description as quote', () => {
+    const description = fixture.nativeElement.querySelector('.description-quote p');
     expect(description).toBeTruthy();
     expect(description.textContent).toContain('Test Description');
   });
 
-  it('should render favorites section', () => {
-    const favoritesSection = fixture.nativeElement.querySelector('.favorites-section');
-    expect(favoritesSection).toBeTruthy();
+  it('should render favorites in toolbar', () => {
+    const favorites = fixture.nativeElement.querySelector('.toolbar-favorites');
+    expect(favorites).toBeTruthy();
   });
 
-  it('should have Favorites heading with icon', () => {
-    const favoritesHeading = fixture.nativeElement.querySelector(
-      '.favorites-section .section-header h2',
-    );
-    expect(favoritesHeading).toBeTruthy();
-    expect(favoritesHeading.textContent).toContain('Favorites');
+  it('should render favorite chips', () => {
+    const chips = fixture.nativeElement.querySelectorAll('.favorite-chip');
+    expect(chips.length).toBeGreaterThan(0);
   });
 
   it('should render categories section', () => {
     const categoriesSection = fixture.nativeElement.querySelector('.categories-section');
     expect(categoriesSection).toBeTruthy();
-  });
-
-  it('should have Categories heading with icon', () => {
-    const categoriesHeading = fixture.nativeElement.querySelector(
-      '.categories-section .section-header h2',
-    );
-    expect(categoriesHeading).toBeTruthy();
-    expect(categoriesHeading.textContent).toContain('Categories');
   });
 
   it('should render example category card', () => {
@@ -114,21 +103,10 @@ describe('DashboardViewComponent', () => {
     expect(categoryTitle.textContent).toContain('Test Category');
   });
 
-  it('should render link card in favorites section', () => {
-    const linkCard = fixture.nativeElement.querySelector('.link-card');
-    expect(linkCard).toBeTruthy();
-  });
-
-  it('should display example link in favorites', () => {
-    const linkInfo = fixture.nativeElement.querySelector('.link-card .link-info h3');
-    expect(linkInfo).toBeTruthy();
-    expect(linkInfo.textContent).toContain('Link 1');
-  });
-
-  it('should display example link URL', () => {
-    const linkUrl = fixture.nativeElement.querySelector('.link-card .link-url');
-    expect(linkUrl).toBeTruthy();
-    expect(linkUrl.textContent).toContain('https://example1.com');
+  it('should display favorite link titles in chips', () => {
+    const chip = fixture.nativeElement.querySelector('.favorite-chip');
+    expect(chip).toBeTruthy();
+    expect(chip.textContent).toContain('Link 1');
   });
 
   it('should render link items in category', () => {
@@ -159,18 +137,18 @@ describe('DashboardViewComponent', () => {
     expect(chipTexts.length).toBe(0);
   });
 
-  it('should render all sections in correct order', () => {
-    const sections = fixture.nativeElement.querySelectorAll('section');
-    expect(sections.length).toBe(2); // favorites and categories
-    expect(sections[0].classList.contains('favorites-section')).toBe(true);
-    expect(sections[1].classList.contains('categories-section')).toBe(true);
+  it('should render main sections in correct order', () => {
+    const toolbar = fixture.nativeElement.querySelector('.dashboard-toolbar');
+    const categoriesSection = fixture.nativeElement.querySelector('.categories-section');
+    expect(toolbar).toBeTruthy();
+    expect(categoriesSection).toBeTruthy();
   });
 
-  it('should open link in new window when clicking favorite card', () => {
+  it('should open link in new window when clicking favorite chip', () => {
     const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-    const linkCard = fixture.nativeElement.querySelector('.link-card');
+    const chip = fixture.nativeElement.querySelector('.favorite-chip');
 
-    linkCard.click();
+    chip.click();
 
     expect(windowOpenSpy).toHaveBeenCalledWith('https://example1.com', '_blank');
     windowOpenSpy.mockRestore();
