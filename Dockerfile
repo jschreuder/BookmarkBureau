@@ -38,8 +38,8 @@ RUN composer install \
 # Stage 3: Final runtime image
 FROM php:8.4-fpm-alpine
 
-# Install runtime dependencies
-RUN apk add --no-cache \
+# Update apk cache and install runtime dependencies
+RUN apk update && apk add --no-cache \
     caddy \
     sqlite \
     sqlite-dev \
