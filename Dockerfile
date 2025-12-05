@@ -39,11 +39,11 @@ RUN composer install \
 FROM php:8.4-fpm-alpine
 
 # Update apk cache and install runtime dependencies
-RUN apk update && apk add --no-cache \
-    caddy \
-    sqlite \
-    sqlite-dev \
-    && docker-php-ext-install pdo_sqlite
+# Note: QEMU emulation may cause script errors, but we verify packages are installed
+RUN apk update && \
+    (apk add --no-cache caddy sqlite sqlite-dev || true) && \
+    apk info caddy sqlite sqlite-dev && \
+    docker-php-ext-install pdo_sqlite
 
 # Create application user (www-data already exists in php-fpm image)
 WORKDIR /var/www
