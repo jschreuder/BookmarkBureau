@@ -143,6 +143,74 @@ describe("IpAddress", function () {
 
             expect($ip)->toBe("192.168.1.1");
         });
+
+        test(
+            "should prioritize X-Real-IP over X-Forwarded-For when trust is enabled",
+            function () {
+                $request = new ServerRequest(
+                    [
+                        "REMOTE_ADDR" => "10.0.0.1",
+                        "HTTP_X_REAL_IP" => "192.168.1.160",
+                        "HTTP_X_FORWARDED_FOR" => "172.21.0.1",
+                    ],
+                    [],
+                    "/test",
+                    "GET",
+                );
+
+                $ip = IpAddress::fromRequest($request, trustProxyHeaders: true);
+
+                expect($ip)->toBe("192.168.1.160");
+            },
+        );
+
+        test("should use X-Real-IP when trust is enabled", function () {
+            $request = new ServerRequest(
+                [
+                    "REMOTE_ADDR" => "10.0.0.1",
+                    "HTTP_X_REAL_IP" => "203.0.113.5",
+                ],
+                [],
+                "/test",
+                "GET",
+            );
+
+            $ip = IpAddress::fromRequest($request, trustProxyHeaders: true);
+
+            expect($ip)->toBe("203.0.113.5");
+        });
+
+        test("should ignore X-Real-IP when trust is disabled", function () {
+            $request = new ServerRequest(
+                [
+                    "REMOTE_ADDR" => "192.168.1.100",
+                    "HTTP_X_REAL_IP" => "203.0.113.5",
+                ],
+                [],
+                "/test",
+                "GET",
+            );
+
+            $ip = IpAddress::fromRequest($request, trustProxyHeaders: false);
+
+            expect($ip)->toBe("192.168.1.100");
+        });
+
+        test("should normalize IPv6 from X-Real-IP", function () {
+            $request = new ServerRequest(
+                [
+                    "REMOTE_ADDR" => "10.0.0.1",
+                    "HTTP_X_REAL_IP" => "::ffff:192.168.1.1",
+                ],
+                [],
+                "/test",
+                "GET",
+            );
+
+            $ip = IpAddress::fromRequest($request, trustProxyHeaders: true);
+
+            expect($ip)->toBe("192.168.1.1");
+        });
     });
 
     describe("normalize method", function () {

@@ -8,6 +8,11 @@ final class IpAddress
 {
     /**
      * Extract IP address from PSR-7 request with optional proxy header support.
+     *
+     * When trustProxyHeaders is enabled, checks headers in this priority:
+     * 1. X-Real-IP (used by Synology, nginx, and many reverse proxies)
+     * 2. X-Forwarded-For (standard header, uses first/leftmost IP)
+     * 3. REMOTE_ADDR (direct connection, no proxy)
      */
     public static function fromRequest(
         ServerRequestInterface $request,
@@ -15,8 +20,19 @@ final class IpAddress
     ): string {
         $serverParams = $request->getServerParams();
 
-        // Check for proxy headers (X-Forwarded-For) if configured
+        // Check for proxy headers if configured
         if ($trustProxyHeaders) {
+            // Try X-Real-IP first (used by Synology NAS, nginx, and many reverse proxies)
+            $realIp =
+                isset($serverParams["HTTP_X_REAL_IP"]) &&
+                \is_string($serverParams["HTTP_X_REAL_IP"])
+                    ? $serverParams["HTTP_X_REAL_IP"]
+                    : null;
+            if ($realIp) {
+                return self::normalize($realIp);
+            }
+
+            // Fall back to X-Forwarded-For
             $forwardedFor =
                 isset($serverParams["HTTP_X_FORWARDED_FOR"]) &&
                 \is_string($serverParams["HTTP_X_FORWARDED_FOR"])
@@ -28,7 +44,6 @@ final class IpAddress
                 $ips = array_map("trim", explode(",", $forwardedFor));
                 $clientIp = $ips[0];
 
-                // Normalize IPv6 addresses
                 return self::normalize($clientIp);
             }
         }
