@@ -15,9 +15,8 @@ if [ ! -f /var/www/config/production.php ] && [ -f /var/www/config/production.ph
     cp /var/www/config/production.php.dist /var/www/config/production.php
 fi
 
-# Ensure var directory exists with correct permissions
+# Ensure var subdirectories exist with correct permissions
 mkdir -p /var/www/var/logs /var/www/var/run
-chmod 755 /var/www/var
 chmod 755 /var/www/var/logs
 chmod 755 /var/www/var/run
 
