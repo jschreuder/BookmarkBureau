@@ -220,6 +220,9 @@ docker-compose up -d
 - `SITE_URL` (optional) - Base URL including `/api.php`, default: `http://localhost:8080/api.php`
 - `SESSION_TTL` (optional) - Session timeout in seconds, default: `1800` (30 min)
 - `TRUST_PROXY_HEADERS` (optional) - Trust X-Forwarded-For headers, default: `false` (set to `true` when behind reverse proxy)
+- `ADMIN_IP_WHITELIST` (optional) - Comma-separated IPs/CIDR ranges allowed to access admin routes, default: empty (all IPs allowed)
+  - Example: `ADMIN_IP_WHITELIST=192.168.1.0/24,10.0.0.5` restricts to local network only
+  - Public routes (login, dashboard view) are always accessible regardless of whitelist
 
 Access the application at `http://localhost:8080`
 
@@ -244,7 +247,14 @@ Access the application at `http://localhost:8080`
    - SQLite is used (suitable for personal use, not high-traffic scenarios)
    - Session tokens valid until expiry (30 min default, no server-side revocation except JTI blacklist)
 
-4. **Recommended Additional Protections**
+4. **IP Whitelisting (Recommended for Internet Exposure)**
+   - Restrict admin access to your local network or specific IPs
+   - Example: `ADMIN_IP_WHITELIST=192.168.1.0/24` (allows only local network)
+   - Supports CIDR notation and multiple ranges: `192.168.1.0/24,10.0.0.5,2001:db8::/64`
+   - Public routes (login, dashboard view) remain accessible from anywhere
+   - Requires `TRUST_PROXY_HEADERS=true` when behind reverse proxy
+
+5. **Recommended Additional Protections**
    - Configure firewall rules at NAS/router level
    - Use fail2ban or similar for additional brute-force protection
    - Monitor logs regularly (`/var/www/var/logs/`)

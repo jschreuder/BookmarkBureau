@@ -24,6 +24,10 @@ services:
       - REMEMBER_ME_TTL=2592000
       # Set to 'true' when behind a reverse proxy (Synology NAS, nginx, Caddy, etc.)
       - TRUST_PROXY_HEADERS=${TRUST_PROXY_HEADERS:-false}
+      # Optional: Restrict admin access to specific IP ranges (CIDR notation supported)
+      # Example: ADMIN_IP_WHITELIST=192.168.1.0/24,10.0.0.5
+      # Leave empty to allow all IPs (login/public routes are always accessible)
+      - ADMIN_IP_WHITELIST=${ADMIN_IP_WHITELIST:-}
     volumes:
       # Persist database and runtime data
       - bb-data:/var/www/var

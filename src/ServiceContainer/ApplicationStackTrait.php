@@ -16,8 +16,10 @@ use jschreuder\Middle\ServerMiddleware\RoutingMiddleware;
 use jschreuder\Middle\ServerMiddleware\RequestFilterMiddleware;
 use jschreuder\Middle\ServerMiddleware\RequestValidatorMiddleware;
 use jschreuder\Middle\Exception\ValidationFailedException;
+use jschreuder\BookmarkBureau\Config\IpWhitelistConfigInterface;
 use jschreuder\BookmarkBureau\Controller\ErrorHandlerController;
 use jschreuder\BookmarkBureau\Controller\NotFoundHandlerController;
+use jschreuder\BookmarkBureau\HttpMiddleware\IpWhitelistMiddleware;
 use jschreuder\BookmarkBureau\HttpMiddleware\JwtAuthenticationMiddleware;
 use jschreuder\BookmarkBureau\HttpMiddleware\RequireAuthenticationMiddleware;
 use jschreuder\BookmarkBureau\Service\JwtServiceInterface;
@@ -28,21 +30,25 @@ use Psr\Log\LoggerInterface;
 trait ApplicationStackTrait
 {
     abstract public function getLoggerConfig(): LoggerConfigInterface;
+    abstract public function getIpWhitelistConfig(): IpWhitelistConfigInterface;
     abstract public function siteUrlString(): string;
     abstract public function getJwtService(): JwtServiceInterface;
 
     public function getApp(): ApplicationStack
     {
+        $publicRoutes = ["home", "auth.login", "dashboard-view"];
+
         return new ApplicationStack(
             new ControllerRunner(),
             new RequestValidatorMiddleware($this->getValidationErrorHandler()),
             new RequestFilterMiddleware(),
             new JsonRequestParserMiddleware(),
-            new RequireAuthenticationMiddleware([
-                "home",
-                "auth.login",
-                "dashboard-view",
-            ]),
+            new IpWhitelistMiddleware(
+                $this->getIpWhitelistConfig()->getAllowedIpRanges(),
+                $publicRoutes,
+                $this->getIpWhitelistConfig()->trustProxyHeaders(),
+            ),
+            new RequireAuthenticationMiddleware($publicRoutes),
             new JwtAuthenticationMiddleware($this->getJwtService()),
             new RoutingMiddleware(
                 $this->getAppRouter(),

@@ -5,6 +5,7 @@ require_once __DIR__ . "/../vendor/autoload.php";
 
 use jschreuder\BookmarkBureau\Config\SqliteDatabaseConfig;
 use jschreuder\BookmarkBureau\Config\DefaultAuthConfig;
+use jschreuder\BookmarkBureau\Config\DefaultIpWhitelistConfig;
 use jschreuder\BookmarkBureau\Config\MonologLoggerConfig;
 use jschreuder\BookmarkBureau\Config\DefaultRateLimitConfig;
 use jschreuder\BookmarkBureau\Config\FileUserStorageConfig;
@@ -90,6 +91,11 @@ $userStorageConfig = new FileUserStorageConfig(
     filePath: __DIR__ . "/../var/users.json",
 );
 
+$ipWhitelistConfig = new DefaultIpWhitelistConfig(
+    allowedIpRanges: [], // Empty = allow all IPs (dev mode)
+    trustProxyHeaders: false,
+);
+
 // Create and return an array of config objects
 return [
     "databaseConfig" => $databaseConfig,
@@ -97,6 +103,7 @@ return [
     "authConfig" => $authConfig,
     "loggerConfig" => $loggerConfig,
     "rateLimitConfig" => $rateLimitConfig,
+    "ipWhitelistConfig" => $ipWhitelistConfig,
     "userStorageConfig" => $userStorageConfig,
     "siteUrl" => "http://localhost:8080/api.php",
 ];

@@ -58,6 +58,7 @@ use jschreuder\BookmarkBureau\Entity\Value\Url;
 use jschreuder\BookmarkBureau\ServiceContainer\DefaultServiceContainer;
 use jschreuder\BookmarkBureau\Config\SqliteDatabaseConfig;
 use jschreuder\BookmarkBureau\Config\DefaultAuthConfig;
+use jschreuder\BookmarkBureau\Config\DefaultIpWhitelistConfig;
 use jschreuder\BookmarkBureau\Config\MonologLoggerConfig;
 use jschreuder\BookmarkBureau\Config\DefaultRateLimitConfig;
 use jschreuder\BookmarkBureau\Config\FileUserStorageConfig;
@@ -261,12 +262,18 @@ class TestContainerHelper
             filePath: sys_get_temp_dir() . "/test_users.json",
         );
 
+        $ipWhitelistConfig = new DefaultIpWhitelistConfig(
+            allowedIpRanges: [],
+            trustProxyHeaders: false,
+        );
+
         return [
             "databaseConfig" => $databaseConfig,
             "rateLimitDatabaseConfig" => $rateLimitDatabaseConfig,
             "authConfig" => $authConfig,
             "loggerConfig" => $loggerConfig,
             "rateLimitConfig" => $rateLimitConfig,
+            "ipWhitelistConfig" => $ipWhitelistConfig,
             "userStorageConfig" => $userStorageConfig,
             "siteUrl" => "http://test-localhost",
         ];

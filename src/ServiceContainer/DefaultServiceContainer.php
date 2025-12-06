@@ -4,6 +4,7 @@ namespace jschreuder\BookmarkBureau\ServiceContainer;
 
 use jschreuder\BookmarkBureau\Config\AuthConfigInterface;
 use jschreuder\BookmarkBureau\Config\DatabaseConfigInterface;
+use jschreuder\BookmarkBureau\Config\IpWhitelistConfigInterface;
 use jschreuder\BookmarkBureau\Config\LoggerConfigInterface;
 use jschreuder\BookmarkBureau\Config\RateLimitConfigInterface;
 use jschreuder\BookmarkBureau\Config\UserStorageConfigInterface;
@@ -27,6 +28,7 @@ class DefaultServiceContainer
         private AuthConfigInterface $authConfig,
         private LoggerConfigInterface $loggerConfig,
         private RateLimitConfigInterface $rateLimitConfig,
+        private IpWhitelistConfigInterface $ipWhitelistConfig,
         private UserStorageConfigInterface $userStorageConfig,
         private string $siteUrl,
     ) {}
@@ -54,6 +56,11 @@ class DefaultServiceContainer
     public function getRateLimitConfig(): RateLimitConfigInterface
     {
         return $this->rateLimitConfig;
+    }
+
+    public function getIpWhitelistConfig(): IpWhitelistConfigInterface
+    {
+        return $this->ipWhitelistConfig;
     }
 
     public function getUserStorageConfig(): UserStorageConfigInterface

@@ -71,4 +71,84 @@ final class IpAddress
         // Return as-is if valid IPv4 or fallback
         return $ip;
     }
+
+    /**
+     * Check if an IP address is within a given range (supports CIDR notation).
+     *
+     * @param string $ip IP address to check
+     * @param string $range IP or CIDR range (e.g., "192.168.1.0/24" or "10.0.0.5")
+     */
+    public static function inRange(string $ip, string $range): bool
+    {
+        // Single IP address (no CIDR)
+        if (!str_contains($range, "/")) {
+            return $ip === $range;
+        }
+
+        // CIDR range (e.g., 192.168.1.0/24)
+        [$subnet, $mask] = explode("/", $range, 2);
+        $mask = (int) $mask;
+
+        // Validate CIDR mask
+        if ($mask < 0 || $mask > 128) {
+            return false;
+        }
+
+        // Convert IPs to binary for comparison
+        $ipBin = @inet_pton($ip);
+        $subnetBin = @inet_pton($subnet);
+
+        if ($ipBin === false || $subnetBin === false) {
+            return false;
+        }
+
+        // IPv4 vs IPv6 check
+        if (strlen($ipBin) !== strlen($subnetBin)) {
+            return false;
+        }
+
+        // Calculate the number of bits to compare
+        $bytesToCompare = (int) floor($mask / 8);
+        $bitsInLastByte = $mask % 8;
+
+        // Compare full bytes
+        if (
+            substr($ipBin, 0, $bytesToCompare) !==
+            substr($subnetBin, 0, $bytesToCompare)
+        ) {
+            return false;
+        }
+
+        // Compare remaining bits in the last byte
+        if ($bitsInLastByte > 0) {
+            $ipLastByte = ord($ipBin[$bytesToCompare] ?? "\0");
+            $subnetLastByte = ord($subnetBin[$bytesToCompare] ?? "\0");
+            $bitMask = 0xff << 8 - $bitsInLastByte;
+
+            if (($ipLastByte & $bitMask) !== ($subnetLastByte & $bitMask)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if an IP address matches any range in a list of allowed ranges.
+     *
+     * @param string $ip IP address to check
+     * @param array<string> $allowedRanges Array of IPs or CIDR ranges
+     */
+    public static function matchesAnyRange(
+        string $ip,
+        array $allowedRanges,
+    ): bool {
+        foreach ($allowedRanges as $range) {
+            if (self::inRange($ip, $range)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

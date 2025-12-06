@@ -7,6 +7,7 @@ use jschreuder\BookmarkBureau\Config\SqliteDatabaseConfig;
 use jschreuder\BookmarkBureau\Config\DefaultAuthConfig;
 use jschreuder\BookmarkBureau\Config\MonologLoggerConfig;
 use jschreuder\BookmarkBureau\Config\DefaultRateLimitConfig;
+use jschreuder\BookmarkBureau\Config\DefaultIpWhitelistConfig;
 use jschreuder\BookmarkBureau\Config\FileUserStorageConfig;
 
 /**
@@ -31,6 +32,8 @@ use jschreuder\BookmarkBureau\Config\FileUserStorageConfig;
  * - RATELIMIT_IP_THRESHOLD: Max login attempts per IP (default: 100)
  * - RATELIMIT_WINDOW_MINUTES: Rate limit window in minutes (default: 10)
  * - TRUST_PROXY_HEADERS: Trust X-Forwarded-For headers (default: false, set to true when behind reverse proxy)
+ * - ADMIN_IP_WHITELIST: Comma-separated list of allowed IPs/CIDR ranges for admin access (default: empty = all allowed)
+ *                       Example: "192.168.1.0/24,10.0.0.5" - restricts access to local network only
  */
 
 // Validate required environment variables
@@ -110,6 +113,21 @@ $userStorageConfig = new FileUserStorageConfig(
     filePath: $_ENV["USERS_FILE"] ?? "/var/www/var/users.json",
 );
 
+// Parse IP whitelist from comma-separated string
+$trustProxy = filter_var(
+    $_ENV["TRUST_PROXY_HEADERS"] ?? "false",
+    FILTER_VALIDATE_BOOLEAN,
+);
+$ipWhitelistRaw = $_ENV["ADMIN_IP_WHITELIST"] ?? "";
+$ipWhitelistRanges = !empty($ipWhitelistRaw)
+    ? array_map("trim", explode(",", $ipWhitelistRaw))
+    : [];
+
+$ipWhitelistConfig = new DefaultIpWhitelistConfig(
+    allowedIpRanges: $ipWhitelistRanges,
+    trustProxyHeaders: $trustProxy,
+);
+
 // Return configuration array
 return [
     "databaseConfig" => $databaseConfig,
@@ -117,6 +135,7 @@ return [
     "authConfig" => $authConfig,
     "loggerConfig" => $loggerConfig,
     "rateLimitConfig" => $rateLimitConfig,
+    "ipWhitelistConfig" => $ipWhitelistConfig,
     "userStorageConfig" => $userStorageConfig,
     "siteUrl" => $_ENV["SITE_URL"],
 ];
