@@ -219,8 +219,38 @@ docker-compose up -d
 - `JWT_SECRET` (required) - Secret key for JWT tokens (use a secure random value)
 - `SITE_URL` (optional) - Base URL including `/api.php`, default: `http://localhost:8080/api.php`
 - `SESSION_TTL` (optional) - Session timeout in seconds, default: `1800` (30 min)
+- `TRUST_PROXY_HEADERS` (optional) - Trust X-Forwarded-For headers, default: `false` (set to `true` when behind reverse proxy)
 
 Access the application at `http://localhost:8080`
+
+### Security Considerations for Internet Exposure
+
+**Important**: This is a demonstration project. Before exposing to the internet:
+
+1. **Behind Reverse Proxy (Required)**
+   - Deploy behind a reverse proxy (nginx, Caddy, Synology NAS, etc.)
+   - Enable HTTPS at the reverse proxy level
+   - Set `TRUST_PROXY_HEADERS=true` when behind a trusted reverse proxy
+   - Ensure reverse proxy adds `X-Forwarded-For` headers for proper rate limiting
+
+2. **JWT Secret (Critical)**
+   - Generate a secure random secret: `openssl rand -hex 32`
+   - Never use the default `change-me-in-production` value
+   - Store securely (environment variable or secrets manager)
+
+3. **Known Limitations**
+   - No multi-user authorization (all authenticated users can modify all data)
+   - Rate limiting only on login endpoints (no API endpoint throttling)
+   - SQLite is used (suitable for personal use, not high-traffic scenarios)
+   - Session tokens valid until expiry (30 min default, no server-side revocation except JTI blacklist)
+
+4. **Recommended Additional Protections**
+   - Configure firewall rules at NAS/router level
+   - Use fail2ban or similar for additional brute-force protection
+   - Monitor logs regularly (`/var/www/var/logs/`)
+   - Keep Docker images updated
+
+**For personal/demonstration use only. Not recommended for multi-user production environments.**
 
 ### Local Development
 

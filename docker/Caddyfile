@@ -12,6 +12,20 @@
     # Enable compression
     encode gzip
 
+    # Security headers
+    header {
+        # Prevent clickjacking attacks
+        X-Frame-Options "DENY"
+        # Prevent MIME type sniffing
+        X-Content-Type-Options "nosniff"
+        # Control referrer information
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Content Security Policy - restrictive default, adjust as needed
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        # Remove server identification
+        -Server
+    }
+
     # API endpoint - route to PHP-FPM (must come before try_files)
     @api {
         path /api.php /api.php/*

@@ -13,11 +13,17 @@ services:
       - APP_ENV=production
       - DB_PATH=/var/www/var/bb.db
       - RATELIMIT_DB_PATH=/var/www/var/ratelimit.db
-      - JWT_SECRET=change-me-in-production
-      - SITE_URL=http://localhost:8080/api.php
+      # SECURITY: Generate a secure JWT secret before deploying to production
+      # Example: export JWT_SECRET=$(openssl rand -hex 32)
+      # Or create a .env file with: JWT_SECRET=your-secure-random-hex-string
+      # WARNING: The default below is INSECURE and should only be used for local testing
+      - JWT_SECRET=${JWT_SECRET:-INSECURE_DEFAULT_CHANGE_ME_FOR_PRODUCTION}
+      - SITE_URL=${SITE_URL:-http://localhost:8080/api.php}
       - APP_NAME=bookmark-bureau
       - SESSION_TTL=1800
       - REMEMBER_ME_TTL=2592000
+      # Set to 'true' when behind a reverse proxy (Synology NAS, nginx, Caddy, etc.)
+      - TRUST_PROXY_HEADERS=${TRUST_PROXY_HEADERS:-false}
     volumes:
       # Persist database and runtime data
       - bb-data:/var/www/var

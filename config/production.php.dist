@@ -30,6 +30,7 @@ use jschreuder\BookmarkBureau\Config\FileUserStorageConfig;
  * - RATELIMIT_USERNAME_THRESHOLD: Max login attempts per username (default: 10)
  * - RATELIMIT_IP_THRESHOLD: Max login attempts per IP (default: 100)
  * - RATELIMIT_WINDOW_MINUTES: Rate limit window in minutes (default: 10)
+ * - TRUST_PROXY_HEADERS: Trust X-Forwarded-For headers (default: false, set to true when behind reverse proxy)
  */
 
 // Validate required environment variables
@@ -99,7 +100,10 @@ $rateLimitConfig = new DefaultRateLimitConfig(
     windowMinutes: isset($_ENV["RATELIMIT_WINDOW_MINUTES"])
         ? (int) $_ENV["RATELIMIT_WINDOW_MINUTES"]
         : 10,
-    trustProxyHeaders: false,
+    trustProxyHeaders: filter_var(
+        $_ENV["TRUST_PROXY_HEADERS"] ?? "false",
+        FILTER_VALIDATE_BOOLEAN,
+    ),
 );
 
 $userStorageConfig = new FileUserStorageConfig(
