@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   bookmark-bureau:
-    image: ghcr.io/jschreuder/bookmark-bureau:latest
+    image: ghcr.io/jschreuder/bookmarkbureau:latest
     container_name: bookmark-bureau
     ports:
       - "8080:8080"
