@@ -2,10 +2,7 @@ version: "3.8"
 
 services:
   bookmark-bureau:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: bookmark-bureau:latest
+    image: ghcr.io/jschreuder/bookmark-bureau:latest
     container_name: bookmark-bureau
     ports:
       - "8080:8080"
