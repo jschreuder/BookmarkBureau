@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, ViewportScroller } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -45,12 +45,14 @@ export class DashboardOverviewComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly viewportScroller = inject(ViewportScroller);
 
   dashboardId: string = '';
   fullDashboard: FullDashboard | null = null;
   loading = true;
   error: string | null = null;
   favoritesReorderMode = false;
+  private savedScrollPosition: [number, number] | null = null;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
@@ -64,18 +66,33 @@ export class DashboardOverviewComponent implements OnInit {
     });
   }
 
-  loadDashboard(): void {
+  loadDashboard(preserveScroll = false): void {
+    // Save current scroll position if requested
+    if (preserveScroll) {
+      this.savedScrollPosition = this.viewportScroller.getScrollPosition();
+    }
+
     this.loading = true;
     this.error = null;
     this.apiService.getDashboard(this.dashboardId).subscribe({
       next: (dashboard) => {
         this.fullDashboard = dashboard;
         this.loading = false;
+
+        // Restore scroll position after Angular updates the DOM
+        if (preserveScroll && this.savedScrollPosition) {
+          // Use requestAnimationFrame to ensure DOM is fully rendered
+          requestAnimationFrame(() => {
+            this.viewportScroller.scrollToPosition(this.savedScrollPosition!);
+            this.savedScrollPosition = null;
+          });
+        }
       },
       error: (error) => {
         this.error = 'Failed to load dashboard';
         this.snackBar.open('Failed to load dashboard', 'Close', { duration: 5000 });
         this.loading = false;
+        this.savedScrollPosition = null;
       },
     });
   }
@@ -90,7 +107,7 @@ export class DashboardOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.loadDashboard();
+        this.loadDashboard(true);
         this.snackBar.open('Category added successfully', 'Close', { duration: 3000 });
       }
     });
@@ -106,7 +123,7 @@ export class DashboardOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.loadDashboard();
+        this.loadDashboard(true);
         this.snackBar.open('Link added to favorites', 'Close', { duration: 3000 });
       }
     });
@@ -122,7 +139,7 @@ export class DashboardOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.loadDashboard();
+        this.loadDashboard(true);
         this.snackBar.open('Link added to category', 'Close', { duration: 3000 });
       }
     });
@@ -142,7 +159,7 @@ export class DashboardOverviewComponent implements OnInit {
         this.apiService.deleteCategory(category.id).subscribe({
           next: () => {
             this.snackBar.open('Category deleted successfully', 'Close', { duration: 3000 });
-            this.loadDashboard();
+            this.loadDashboard(true);
           },
           error: (error) => {
             this.snackBar.open('Failed to delete category', 'Close', { duration: 5000 });
@@ -166,7 +183,7 @@ export class DashboardOverviewComponent implements OnInit {
         this.apiService.removeFavorite(this.dashboardId, link.id).subscribe({
           next: () => {
             this.snackBar.open('Removed from favorites', 'Close', { duration: 3000 });
-            this.loadDashboard();
+            this.loadDashboard(true);
           },
           error: (error) => {
             this.snackBar.open('Failed to remove favorite', 'Close', { duration: 5000 });
@@ -190,7 +207,7 @@ export class DashboardOverviewComponent implements OnInit {
         this.apiService.deleteLink(linkId).subscribe({
           next: () => {
             this.snackBar.open('Link deleted successfully', 'Close', { duration: 3000 });
-            this.loadDashboard();
+            this.loadDashboard(true);
           },
           error: (_error) => {
             this.snackBar.open('Failed to delete link', 'Close', { duration: 5000 });
@@ -218,7 +235,7 @@ export class DashboardOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.loadDashboard();
+        this.loadDashboard(true);
         this.snackBar.open('Favorite updated successfully', 'Close', { duration: 3000 });
       }
     });
@@ -234,7 +251,7 @@ export class DashboardOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.loadDashboard();
+        this.loadDashboard(true);
         this.snackBar.open('Category updated successfully', 'Close', { duration: 3000 });
       }
     });
@@ -250,7 +267,7 @@ export class DashboardOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.loadDashboard();
+        this.loadDashboard(true);
         this.snackBar.open('Link updated successfully', 'Close', { duration: 3000 });
       }
     });

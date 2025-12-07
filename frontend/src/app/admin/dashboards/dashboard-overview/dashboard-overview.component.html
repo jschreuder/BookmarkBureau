@@ -1,6 +1,6 @@
 <div class="dashboard-overview">
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading-spinner">
+  <!-- Loading Overlay (only for initial load) -->
+  <div *ngIf="loading && !fullDashboard" class="loading-spinner">
     <mat-spinner diameter="50"></mat-spinner>
   </div>
 
@@ -11,7 +11,7 @@
   </div>
 
   <!-- Dashboard Content -->
-  <ng-container *ngIf="fullDashboard && !loading">
+  <ng-container *ngIf="fullDashboard">
     <!-- Dashboard Summary -->
     <div class="dashboard-header">
       <div class="header-content">
