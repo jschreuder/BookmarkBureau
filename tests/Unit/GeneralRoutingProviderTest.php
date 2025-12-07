@@ -226,6 +226,34 @@ describe("GeneralRoutingProvider", function () {
         );
 
         test(
+            "tag-list route handler returns ActionController instance",
+            function () {
+                $router = Mockery::mock(RouterInterface::class);
+                $capturedFactory = null;
+
+                $router
+                    ->shouldReceive("get")
+                    ->andReturnUsing(function ($name, $path, $factory) use (
+                        &$capturedFactory,
+                    ) {
+                        if ($name === "tag-list") {
+                            $capturedFactory = $factory;
+                        }
+                    });
+                $router
+                    ->shouldReceive("post", "put", "delete")
+                    ->andReturnNull();
+
+                $provider = new GeneralRoutingProvider(createMockContainer());
+                $provider->registerRoutes($router);
+
+                expect($capturedFactory)->not->toBeNull();
+                $controller = $capturedFactory();
+                expect($controller)->toBeInstanceOf(ControllerInterface::class);
+            },
+        );
+
+        test(
             "dashboard-read route handler returns ActionController instance",
             function () {
                 $router = Mockery::mock(RouterInterface::class);
@@ -476,6 +504,10 @@ describe("GeneralRoutingProvider", function () {
                 ]);
 
                 // Tag routes
+                expect($registeredRoutes["tag-list"])->toBe([
+                    "method" => "GET",
+                    "path" => "/tag",
+                ]);
                 expect($registeredRoutes["tag-read"])->toBe([
                     "method" => "GET",
                     "path" => "/tag/{id}",

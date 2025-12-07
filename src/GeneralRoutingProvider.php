@@ -25,6 +25,7 @@ use jschreuder\BookmarkBureau\Action\LinkTagCreateAction;
 use jschreuder\BookmarkBureau\Action\LinkTagDeleteAction;
 use jschreuder\BookmarkBureau\Action\TagCreateAction;
 use jschreuder\BookmarkBureau\Action\TagDeleteAction;
+use jschreuder\BookmarkBureau\Action\TagListAction;
 use jschreuder\BookmarkBureau\Action\TagReadAction;
 use jschreuder\BookmarkBureau\Action\TagUpdateAction;
 use jschreuder\BookmarkBureau\Controller\DashboardViewController;
@@ -139,6 +140,15 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
 
         // Tags
         new ResourceRouteBuilder($router, "tag", "/tag")
+            ->registerCustom(
+                "GET",
+                "list",
+                "",
+                fn() => new TagListAction(
+                    $this->container->getTagService(),
+                    new TagOutputSpec(),
+                ),
+            )
             ->registerRead(
                 fn() => new TagReadAction(
                     $this->container->getTagService(),
