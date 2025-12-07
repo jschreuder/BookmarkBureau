@@ -17,12 +17,11 @@ use Closure;
  */
 final readonly class ResourceRouteBuilder
 {
-    private const string ID_SEGMENT = "/{id}";
-
     public function __construct(
         private RouterInterface $router,
         private string $resourceName,
         private string $pathSegment,
+        private string $idSegment = "/{id}",
     ) {}
 
     /**
@@ -34,7 +33,7 @@ final readonly class ResourceRouteBuilder
     {
         $this->router->get(
             "{$this->resourceName}-read",
-            $this->pathSegment . self::ID_SEGMENT,
+            "{$this->pathSegment}{$this->idSegment}",
             fn(): ControllerInterface => new ActionController(
                 $actionFactory(),
                 new JsonResponseTransformer(),
@@ -88,7 +87,7 @@ final readonly class ResourceRouteBuilder
     {
         $this->router->put(
             "{$this->resourceName}-update",
-            $this->pathSegment . self::ID_SEGMENT,
+            "{$this->pathSegment}{$this->idSegment}",
             fn(): ControllerInterface => new ActionController(
                 $actionFactory(),
                 new JsonResponseTransformer(),
@@ -106,7 +105,7 @@ final readonly class ResourceRouteBuilder
     {
         $this->router->delete(
             "{$this->resourceName}-delete",
-            $this->pathSegment . self::ID_SEGMENT,
+            "{$this->pathSegment}{$this->idSegment}",
             fn(): ControllerInterface => new ActionController(
                 $actionFactory(),
                 new JsonResponseTransformer(),

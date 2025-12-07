@@ -978,4 +978,237 @@ describe("ResourceRouteBuilder", function () {
             },
         );
     });
+
+    describe("custom ID segment", function () {
+        test("uses default ID segment when not provided", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router
+                ->shouldReceive("get")
+                ->with("product-read", "/product/{id}", Mockery::any())
+                ->once()
+                ->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder($router, "product", "/product");
+            $builder->registerRead(fn() => $action);
+        });
+
+        test("uses custom ID segment in read route", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router
+                ->shouldReceive("get")
+                ->with("product-read", "/product/{productId}", Mockery::any())
+                ->once()
+                ->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder(
+                $router,
+                "product",
+                "/product",
+                "/{productId}",
+            );
+            $builder->registerRead(fn() => $action);
+        });
+
+        test("uses custom ID segment in update route", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router
+                ->shouldReceive("put")
+                ->with("item-update", "/item/{itemId}", Mockery::any())
+                ->once()
+                ->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder(
+                $router,
+                "item",
+                "/item",
+                "/{itemId}",
+            );
+            $builder->registerUpdate(fn() => $action);
+        });
+
+        test("uses custom ID segment in delete route", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router
+                ->shouldReceive("delete")
+                ->with("item-delete", "/item/{uuid}", Mockery::any())
+                ->once()
+                ->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder(
+                $router,
+                "item",
+                "/item",
+                "/{uuid}",
+            );
+            $builder->registerDelete(fn() => $action);
+        });
+
+        test("list route is not affected by ID segment", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router
+                ->shouldReceive("get")
+                ->with("product-list", "/product", Mockery::any())
+                ->once()
+                ->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder(
+                $router,
+                "product",
+                "/product",
+                "/{customId}",
+            );
+            $builder->registerList(fn() => $action);
+        });
+
+        test("create route is not affected by ID segment", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router
+                ->shouldReceive("post")
+                ->with("product-create", "/product", Mockery::any())
+                ->once()
+                ->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder(
+                $router,
+                "product",
+                "/product",
+                "/{customId}",
+            );
+            $builder->registerCreate(fn() => $action);
+        });
+
+        test(
+            "custom routes with path suffix are not affected by ID segment",
+            function () {
+                $router = Mockery::mock(RouterInterface::class);
+                $router
+                    ->shouldReceive("post")
+                    ->with(
+                        "product-reorder",
+                        "/product/reorder",
+                        Mockery::any(),
+                    )
+                    ->once()
+                    ->andReturn($router);
+
+                $action = Mockery::mock(ActionInterface::class);
+                $builder = new ResourceRouteBuilder(
+                    $router,
+                    "product",
+                    "/product",
+                    "/{customId}",
+                );
+                $builder->registerCustom(
+                    "POST",
+                    "reorder",
+                    "/reorder",
+                    fn() => $action,
+                );
+            },
+        );
+
+        test("all CRUD operations respect custom ID segment", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router
+                ->shouldReceive("get")
+                ->with("item-read", "/item/{uuid}", Mockery::any())
+                ->once()
+                ->andReturn($router);
+            $router
+                ->shouldReceive("get")
+                ->with("item-list", "/item", Mockery::any())
+                ->once()
+                ->andReturn($router);
+            $router
+                ->shouldReceive("post")
+                ->with("item-create", "/item", Mockery::any())
+                ->once()
+                ->andReturn($router);
+            $router
+                ->shouldReceive("put")
+                ->with("item-update", "/item/{uuid}", Mockery::any())
+                ->once()
+                ->andReturn($router);
+            $router
+                ->shouldReceive("delete")
+                ->with("item-delete", "/item/{uuid}", Mockery::any())
+                ->once()
+                ->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder(
+                $router,
+                "item",
+                "/item",
+                "/{uuid}",
+            );
+
+            $builder
+                ->registerRead(fn() => $action)
+                ->registerList(fn() => $action)
+                ->registerCreate(fn() => $action)
+                ->registerUpdate(fn() => $action)
+                ->registerDelete(fn() => $action);
+        });
+
+        test("nested resource paths with custom ID segments", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router
+                ->shouldReceive("get")
+                ->with(
+                    "favorite-read",
+                    "/dashboard/{dashboardUuid}/favorites/{favoriteUuid}",
+                    Mockery::any(),
+                )
+                ->once()
+                ->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder(
+                $router,
+                "favorite",
+                "/dashboard/{dashboardUuid}/favorites",
+                "/{favoriteUuid}",
+            );
+            $builder->registerRead(fn() => $action);
+        });
+
+        test("empty ID segment removes ID from routes entirely", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router
+                ->shouldReceive("get")
+                ->with("product-read", "/product", Mockery::any())
+                ->once()
+                ->andReturn($router);
+            $router
+                ->shouldReceive("put")
+                ->with("product-update", "/product", Mockery::any())
+                ->once()
+                ->andReturn($router);
+            $router
+                ->shouldReceive("delete")
+                ->with("product-delete", "/product", Mockery::any())
+                ->once()
+                ->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder(
+                $router,
+                "product",
+                "/product",
+                "",
+            );
+
+            $builder
+                ->registerRead(fn() => $action)
+                ->registerUpdate(fn() => $action)
+                ->registerDelete(fn() => $action);
+        });
+    });
 });
