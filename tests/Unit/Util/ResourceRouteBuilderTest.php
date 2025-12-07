@@ -24,6 +24,80 @@ describe("ResourceRouteBuilder", function () {
         );
     });
 
+    describe("registerList", function () {
+        test("registers GET route with list action", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router
+                ->shouldReceive("get")
+                ->with("product-list", "/product", Mockery::any())
+                ->once()
+                ->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder($router, "product", "/product");
+
+            $result = $builder->registerList(fn() => $action);
+
+            expect($result)->toBe($builder);
+        });
+
+        test("returns self for method chaining", function () {
+            $router = Mockery::mock(RouterInterface::class);
+            $router->shouldReceive("get")->andReturn($router);
+
+            $action = Mockery::mock(ActionInterface::class);
+            $builder = new ResourceRouteBuilder($router, "product", "/product");
+
+            $result = $builder->registerList(fn() => $action);
+
+            expect($result)->toBeInstanceOf(ResourceRouteBuilder::class);
+            expect($result)->toBe($builder);
+        });
+
+        test(
+            "defers action instantiation until controller is invoked",
+            function () {
+                $router = Mockery::mock(RouterInterface::class);
+                $capturedController = null;
+
+                $router
+                    ->shouldReceive("get")
+                    ->with(
+                        "item-list",
+                        "/item",
+                        Mockery::on(function ($controller) use (
+                            &$capturedController,
+                        ) {
+                            $capturedController = $controller;
+                            return true;
+                        }),
+                    )
+                    ->once()
+                    ->andReturn($router);
+
+                $action = Mockery::mock(ActionInterface::class);
+                $actionCalled = false;
+
+                $actionFactory = function () use ($action, &$actionCalled) {
+                    $actionCalled = true;
+                    return $action;
+                };
+
+                $builder = new ResourceRouteBuilder($router, "item", "/item");
+                $builder->registerList($actionFactory);
+
+                expect($actionCalled)->toBeFalse();
+                expect($capturedController)->not->toBeNull();
+
+                $createdController = $capturedController();
+                expect($createdController)->toBeInstanceOf(
+                    ControllerInterface::class,
+                );
+                expect($actionCalled)->toBeTrue();
+            },
+        );
+    });
+
     describe("registerRead", function () {
         test("registers GET route with read action", function () {
             $router = Mockery::mock(RouterInterface::class);

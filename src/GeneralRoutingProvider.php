@@ -140,10 +140,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
 
         // Tags
         new ResourceRouteBuilder($router, "tag", "/tag")
-            ->registerCustom(
-                "GET",
-                "list",
-                "",
+            ->registerList(
                 fn() => new TagListAction(
                     $this->container->getTagService(),
                     new TagOutputSpec(),
@@ -197,10 +194,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
 
         // Dashboards
         new ResourceRouteBuilder($router, "dashboard", "/dashboard")
-            ->registerCustom(
-                "GET",
-                "list",
-                "",
+            ->registerList(
                 fn() => new DashboardListAction(
                     $this->container->getDashboardService(),
                     new DashboardOutputSpec(),

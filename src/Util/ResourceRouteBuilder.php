@@ -44,6 +44,24 @@ final readonly class ResourceRouteBuilder
     }
 
     /**
+     * Register a GET route for reading a list of resources.
+     *
+     * @param Closure(): ActionInterface $actionFactory Closure that creates the action when needed
+     */
+    public function registerList(Closure $actionFactory): self
+    {
+        $this->router->get(
+            "{$this->resourceName}-list",
+            $this->pathSegment,
+            fn(): ControllerInterface => new ActionController(
+                $actionFactory(),
+                new JsonResponseTransformer(),
+            ),
+        );
+        return $this;
+    }
+
+    /**
      * Register a POST route for creating a resource.
      *
      * @param Closure(): ActionInterface $actionFactory Closure that creates the action when needed
