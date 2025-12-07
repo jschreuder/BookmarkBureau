@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Dashboard } from '../../core/models';
 
 @Component({
@@ -28,6 +29,8 @@ import { Dashboard } from '../../core/models';
 })
 export class AdminLayoutComponent implements OnInit {
   private apiService = inject(ApiService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
 
   dashboardsExpanded = true;
   topDashboards: Dashboard[] = [];
@@ -57,5 +60,14 @@ export class AdminLayoutComponent implements OnInit {
         this.topDashboards = [];
       },
     });
+  }
+
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
+
+  navigateToDashboards(): void {
+    this.router.navigate(['/dashboard']);
   }
 }

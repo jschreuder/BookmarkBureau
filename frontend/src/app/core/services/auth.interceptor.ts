@@ -1,15 +1,13 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
-import { throwError, Subject } from 'rxjs';
-import { catchError, switchMap, take } from 'rxjs/operators';
+import { throwError, NEVER } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
-
-// Shared state for managing token refresh
-let isRefreshing = false;
-const refreshTokenSubject = new Subject<string>();
+import { InvalidTokenDialogService } from './invalid-token-dialog.service';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const auth = inject(AuthService);
+  const invalidTokenDialog = inject(InvalidTokenDialogService);
   const token = auth.getToken();
 
   // Add token to request if available
@@ -25,67 +23,11 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     catchError((error: HttpErrorResponse) => {
       // Handle 401 Unauthorized responses
       if (error.status === 401) {
-        return handle401Error(request, next, auth);
+        invalidTokenDialog.showInvalidTokenDialog();
+        // Return NEVER to prevent error propagation to components
+        return NEVER;
       }
       return throwError(() => error);
     }),
   );
 };
-
-function handle401Error(request: any, next: any, auth: AuthService) {
-  // If refresh is already in progress, queue the request
-  if (isRefreshing) {
-    return new Promise<any>((resolve, reject) => {
-      refreshTokenSubject
-        .pipe(
-          take(1),
-          switchMap((token) => {
-            const retryRequest = request.clone({
-              setHeaders: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            return next(retryRequest);
-          }),
-          catchError((err) => {
-            reject(err);
-            return throwError(() => err);
-          }),
-        )
-        .subscribe({
-          next: (event) => resolve(event),
-          error: (err) => reject(err),
-        });
-    });
-  }
-
-  // Start refresh process
-  isRefreshing = true;
-
-  return new Promise<any>((resolve, reject) => {
-    auth
-      .refreshToken()
-      .pipe(
-        switchMap((response) => {
-          isRefreshing = false;
-          refreshTokenSubject.next(response.token);
-          const retryRequest = request.clone({
-            setHeaders: {
-              Authorization: `Bearer ${response.token}`,
-            },
-          });
-          return next(retryRequest);
-        }),
-        catchError((err) => {
-          isRefreshing = false;
-          auth.logout();
-          reject(err);
-          return throwError(() => err);
-        }),
-      )
-      .subscribe({
-        next: (event) => resolve(event),
-        error: (err) => reject(err),
-      });
-  });
-}

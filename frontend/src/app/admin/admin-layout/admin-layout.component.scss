@@ -94,6 +94,19 @@
 
   .sidenav-footer {
     padding: 8px 0 16px 0;
+
+    .footer-button {
+      border: none;
+      background: none;
+      color: rgba(0, 0, 0, 0.87);
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
   }
 }
 

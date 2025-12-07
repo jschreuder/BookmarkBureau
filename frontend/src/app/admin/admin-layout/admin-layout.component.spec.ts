@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdminLayoutComponent } from './admin-layout.component';
 import { provideRouter } from '@angular/router';
-import { provideLocationMocks } from '@angular/common/testing';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -10,16 +9,25 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { of } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
+import { Router } from '@angular/router';
+import { vi } from 'vitest';
 
 describe('AdminLayoutComponent', () => {
   let component: AdminLayoutComponent;
   let fixture: ComponentFixture<AdminLayoutComponent>;
   let mockApiService: any;
+  let mockAuthService: any;
+  let router: Router;
 
   beforeEach(async () => {
-    // Create a mock for ApiService that returns empty observable
+    // Create mocks
     mockApiService = {
       listDashboards: () => of([]),
+    };
+
+    mockAuthService = {
+      logout: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
@@ -34,10 +42,12 @@ describe('AdminLayoutComponent', () => {
       ],
       providers: [
         { provide: ApiService, useValue: mockApiService },
+        { provide: AuthService, useValue: mockAuthService },
         provideRouter([]),
-        provideLocationMocks(),
       ],
     }).compileComponents();
+
+    router = TestBed.inject(Router);
 
     fixture = TestBed.createComponent(AdminLayoutComponent);
     component = fixture.componentInstance;
@@ -146,20 +156,26 @@ describe('AdminLayoutComponent', () => {
     expect(tagsLink.textContent).toContain('Tags');
   });
 
-  it('should render Back to Dashboards link', () => {
-    const backLink = fixture.nativeElement.querySelector(
-      '.sidenav-footer a[routerLink="/dashboard"]',
+  it('should render Back to Dashboards button', () => {
+    const backButton = fixture.nativeElement.querySelector('.sidenav-footer .footer-button');
+    const buttons = fixture.nativeElement.querySelectorAll('.sidenav-footer .footer-button');
+    expect(buttons.length).toBe(2);
+
+    const backToDbButton = Array.from(buttons).find((btn: any) =>
+      btn.textContent.includes('Back to Dashboards'),
     );
-    expect(backLink).toBeTruthy();
-    expect(backLink.textContent).toContain('Back to Dashboards');
+    expect(backToDbButton).toBeTruthy();
   });
 
   it('should have arrow_back icon for back button', () => {
-    const backIcon = fixture.nativeElement.querySelector(
-      '.sidenav-footer a[routerLink="/dashboard"] mat-icon',
-    );
+    const buttons = fixture.nativeElement.querySelectorAll('.sidenav-footer .footer-button');
+    const backToDbButton = Array.from(buttons).find((btn: any) =>
+      btn.textContent.includes('Back to Dashboards'),
+    ) as HTMLElement;
+
+    const backIcon = backToDbButton?.querySelector('mat-icon');
     expect(backIcon).toBeTruthy();
-    expect(backIcon.textContent).toContain('arrow_back');
+    expect(backIcon?.textContent).toContain('arrow_back');
   });
 
   it('should render sidenav footer with divider', () => {
@@ -241,5 +257,24 @@ describe('AdminLayoutComponent', () => {
     menuLinks.forEach((link: HTMLElement) => {
       expect(link.getAttribute('routerLinkActive')).toBe('active-link');
     });
+  });
+
+  it('should render logout button', () => {
+    const buttons = fixture.nativeElement.querySelectorAll('.sidenav-footer .footer-button');
+    const logoutButton = Array.from(buttons).find((btn: any) => btn.textContent.includes('Logout'));
+    expect(logoutButton).toBeTruthy();
+  });
+
+  it('should call logout and navigate on logout button click', () => {
+    const navigateSpy = vi.spyOn(router, 'navigate');
+    const buttons = fixture.nativeElement.querySelectorAll('.sidenav-footer .footer-button');
+    const logoutButton = Array.from(buttons).find((btn: any) =>
+      btn.textContent.includes('Logout'),
+    ) as HTMLElement;
+
+    logoutButton.click();
+
+    expect(mockAuthService.logout).toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
   });
 });

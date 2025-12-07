@@ -55,10 +55,14 @@
 
     <div class="sidenav-footer">
       <mat-divider></mat-divider>
-      <a mat-list-item routerLink="/dashboard">
+      <button mat-list-item (click)="logout()" class="footer-button">
+        <mat-icon matListItemIcon>logout</mat-icon>
+        <span matListItemTitle>Logout</span>
+      </button>
+      <button mat-list-item (click)="navigateToDashboards()" class="footer-button">
         <mat-icon matListItemIcon>arrow_back</mat-icon>
         <span matListItemTitle>Back to Dashboards</span>
-      </a>
+      </button>
     </div>
   </mat-sidenav>
 
