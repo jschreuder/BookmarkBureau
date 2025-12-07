@@ -492,16 +492,15 @@ describe("GeneralRoutingProvider", function () {
                 // Favorite routes
                 expect($registeredRoutes["favorite-create"])->toBe([
                     "method" => "POST",
-                    "path" => "/dashboard/{dashboard_id}/favorites",
+                    "path" => "/dashboard/{dashboard_id}/favorite",
                 ]);
                 expect($registeredRoutes["favorite-delete"])->toBe([
                     "method" => "DELETE",
-                    "path" =>
-                        "/dashboard/{dashboard_id}/favorites/{favorite_id}",
+                    "path" => "/dashboard/{dashboard_id}/favorite/{link_id}",
                 ]);
                 expect($registeredRoutes["favorite-reorder"])->toBe([
                     "method" => "PUT",
-                    "path" => "/dashboard/{dashboard_id}/favorites",
+                    "path" => "/dashboard/{dashboard_id}/favorite",
                 ]);
 
                 // Tag routes
