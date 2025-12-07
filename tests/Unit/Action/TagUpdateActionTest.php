@@ -7,56 +7,88 @@ use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
 use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\Middle\Exception\ValidationFailedException;
 
-describe('TagUpdateAction', function () {
-    describe('filter method', function () {
-        test('filters all fields with whitespace trimmed', function () {
+describe("TagUpdateAction", function () {
+    describe("filter method", function () {
+        test("filters all fields with whitespace trimmed", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
-            $action = new TagUpdateAction($tagService, new TagInputSpec(), new TagOutputSpec());
+            $action = new TagUpdateAction(
+                $tagService,
+                new TagInputSpec(),
+                new TagOutputSpec(),
+            );
 
-            $filtered = $action->filter(['id' => '  important  ', 'color' => '  #FF0000  ']);
+            $filtered = $action->filter([
+                "tag_name" => "  important  ",
+                "color" => "  #FF0000  ",
+            ]);
 
-            expect($filtered['id'])->toBe('important');
-            expect($filtered['color'])->toBe('#FF0000');
+            expect($filtered["tag_name"])->toBe("important");
+            expect($filtered["color"])->toBe("#FF0000");
         });
     });
 
-    describe('validate method', function () {
-        test('passes validation with valid data', function () {
+    describe("validate method", function () {
+        test("passes validation with valid data", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
-            $action = new TagUpdateAction($tagService, new TagInputSpec(), new TagOutputSpec());
+            $action = new TagUpdateAction(
+                $tagService,
+                new TagInputSpec(),
+                new TagOutputSpec(),
+            );
 
             try {
-                $action->validate(['id' => 'important', 'color' => '#FF0000']);
+                $action->validate([
+                    "tag_name" => "important",
+                    "color" => "#FF0000",
+                ]);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
         });
 
-        test('throws validation error for empty id', function () {
+        test("throws validation error for empty id", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
-            $action = new TagUpdateAction($tagService, new TagInputSpec(), new TagOutputSpec());
+            $action = new TagUpdateAction(
+                $tagService,
+                new TagInputSpec(),
+                new TagOutputSpec(),
+            );
 
-            expect(fn() => $action->validate(['id' => '', 'color' => '#FF0000']))
-                ->toThrow(ValidationFailedException::class);
+            expect(
+                fn() => $action->validate([
+                    "tag_name" => "",
+                    "color" => "#FF0000",
+                ]),
+            )->toThrow(ValidationFailedException::class);
         });
     });
 
-    describe('execute method', function () {
-        test('calls tagService.updateTag with correct parameters', function () {
+    describe("execute method", function () {
+        test("calls tagService.updateTag with correct parameters", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
-            $action = new TagUpdateAction($tagService, new TagInputSpec(), new TagOutputSpec());
-            $updatedTag = TestEntityFactory::createTag(tagName: new TagName('important'));
+            $action = new TagUpdateAction(
+                $tagService,
+                new TagInputSpec(),
+                new TagOutputSpec(),
+            );
+            $updatedTag = TestEntityFactory::createTag(
+                tagName: new TagName("important"),
+            );
 
-            $tagService->shouldReceive('updateTag')
+            $tagService
+                ->shouldReceive("updateTag")
                 ->once()
-                ->with('important', '#FF0000')
+                ->with("important", "#FF0000")
                 ->andReturn($updatedTag);
 
-            $result = $action->execute(['id' => 'important', 'color' => '#FF0000']);
+            $result = $action->execute([
+                "tag_name" => "important",
+                "color" => "#FF0000",
+            ]);
 
             expect($result)->toBeArray();
-            expect($result['tag_name'])->toBe('important');
+            expect($result["tag_name"])->toBe("important");
         });
     });
 });

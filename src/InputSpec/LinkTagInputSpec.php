@@ -10,7 +10,7 @@ use Respect\Validation\Validator;
 
 final class LinkTagInputSpec implements InputSpecInterface
 {
-    private const array FIELDS = ["id", "tag_name"];
+    private const array FIELDS = ["link_id", "tag_name"];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -18,7 +18,7 @@ final class LinkTagInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
-    /** @return array{id: string, tag_name: string} */
+    /** @return array{link_id: string, tag_name: string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -26,7 +26,7 @@ final class LinkTagInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             $filtered[$field] = match ($field) {
-                "id" => Filter::start($rawData, "id", "")
+                "link_id" => Filter::start($rawData, "link_id", "")
                     ->string(allowNull: false)
                     ->trim()
                     ->done(),
@@ -40,11 +40,11 @@ final class LinkTagInputSpec implements InputSpecInterface
             };
         }
 
-        /** @var array{id: string, tag_name: string} */
+        /** @var array{link_id: string, tag_name: string} */
         return $filtered;
     }
 
-    /** @param array{id: string, tag_name: string} $data */
+    /** @param array{link_id: string, tag_name: string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
@@ -52,7 +52,10 @@ final class LinkTagInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                "id" => $validator->key("id", Validator::notEmpty()->uuid()),
+                "link_id" => $validator->key(
+                    "link_id",
+                    Validator::notEmpty()->uuid(),
+                ),
                 "tag_name" => $validator->key(
                     "tag_name",
                     Validator::notEmpty()->length(1, 256),

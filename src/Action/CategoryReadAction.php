@@ -33,11 +33,11 @@ final readonly class CategoryReadAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string} $data */
+    /** @param array{category_id: string} $data */
     #[\Override]
     public function execute(array $data): array
     {
-        $categoryId = Uuid::fromString($data["id"]);
+        $categoryId = Uuid::fromString($data["category_id"]);
         $category = $this->categoryService->getCategory($categoryId);
         return $this->outputSpec->transform($category);
     }

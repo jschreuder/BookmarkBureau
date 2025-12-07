@@ -24,7 +24,7 @@ final readonly class DashboardOutputSpec implements OutputSpecInterface
     private function doTransform(object $dashboard): array
     {
         return [
-            "id" => $dashboard->dashboardId->toString(),
+            "dashboard_id" => $dashboard->dashboardId->toString(),
             "title" => $dashboard->title->value,
             "description" => $dashboard->description,
             "icon" => $dashboard->icon?->value,

@@ -10,7 +10,7 @@ describe('LinkInputSpec', function () {
             $spec = new LinkInputSpec();
             $fields = $spec->getAvailableFields();
 
-            expect($fields)->toContain('id');
+            expect($fields)->toContain('link_id');
             expect($fields)->toContain('url');
             expect($fields)->toContain('title');
             expect($fields)->toContain('description');
@@ -25,14 +25,14 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => "  {$linkId}  ",
+                'link_id' => "  {$linkId}  ",
                 'url' => '  https://example.com  ',
                 'title' => '  Test Link  ',
                 'description' => '  A test link  ',
                 'icon' => '  link  ',
             ]);
 
-            expect($filtered['id'])->toBe($linkId);
+            expect($filtered['link_id'])->toBe($linkId);
             expect($filtered['url'])->toBe('https://example.com');
             expect($filtered['title'])->toBe('Test Link');
             expect($filtered['description'])->toBe('A test link');
@@ -44,7 +44,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com',
                 'title' => '<script>alert("xss")</script>Test<strong>Bold</strong>',
                 'description' => 'A test',
@@ -58,7 +58,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com',
                 'title' => 'Test',
                 'description' => '<p>A test</p> <script>bad</script>description',
@@ -72,7 +72,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com/path?query=value',
                 'title' => 'Test',
                 'description' => 'A test',
@@ -90,7 +90,7 @@ describe('LinkInputSpec', function () {
                 'description' => 'A test',
             ]);
 
-            expect($filtered['id'])->toBe('');
+            expect($filtered['link_id'])->toBe('');
         });
 
         test('handles missing url key with empty string', function () {
@@ -98,7 +98,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'title' => 'Test',
                 'description' => 'A test',
             ]);
@@ -111,7 +111,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com',
                 'description' => 'A test',
             ]);
@@ -124,7 +124,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com',
                 'title' => 'Test',
             ]);
@@ -137,7 +137,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com',
                 'title' => 'Test',
                 'description' => 'A test',
@@ -151,7 +151,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com',
                 'title' => 'Test',
                 'description' => 'A test',
@@ -160,7 +160,7 @@ describe('LinkInputSpec', function () {
                 'another_field' => 'also ignored'
             ]);
 
-            expect($filtered)->toHaveKey('id');
+            expect($filtered)->toHaveKey('link_id');
             expect($filtered)->toHaveKey('url');
             expect($filtered)->toHaveKey('title');
             expect($filtered)->toHaveKey('description');
@@ -174,7 +174,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com',
                 'title' => 'Test',
                 'description' => 'A test',
@@ -189,14 +189,14 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com',
                 'title' => 'Test',
                 'description' => 'A test',
                 'icon' => 'link',
-            ], ['id', 'url', 'title']);
+            ], ['link_id', 'url', 'title']);
 
-            expect($filtered)->toHaveKey('id');
+            expect($filtered)->toHaveKey('link_id');
             expect($filtered)->toHaveKey('url');
             expect($filtered)->toHaveKey('title');
             expect($filtered)->not->toHaveKey('description');
@@ -209,7 +209,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             expect(function() use ($spec, $linkId) {
-                $spec->filter(['id' => $linkId], ['unknown_field']);
+                $spec->filter(['link_id' => $linkId], ['unknown_field']);
             })->toThrow(InvalidArgumentException::class);
         });
     });
@@ -221,7 +221,7 @@ describe('LinkInputSpec', function () {
 
             try {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 'https://example.com',
                     'title' => 'Test Link',
                     'description' => 'A test link',
@@ -239,7 +239,7 @@ describe('LinkInputSpec', function () {
 
             try {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 'https://example.com',
                     'title' => 'Test Link',
                     'description' => null,
@@ -257,7 +257,7 @@ describe('LinkInputSpec', function () {
 
             try {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 'https://example.com',
                     'title' => 'Test Link',
                     'description' => '',
@@ -285,7 +285,7 @@ describe('LinkInputSpec', function () {
             foreach ($validUrls as $url) {
                 try {
                     $spec->validate([
-                        'id' => $linkId,
+                        'link_id' => $linkId,
                         'url' => $url,
                         'title' => 'Test',
                         'description' => 'A test',
@@ -303,7 +303,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec) {
                 $spec->validate([
-                    'id' => 'not-a-uuid',
+                    'link_id' => 'not-a-uuid',
                     'url' => 'https://example.com',
                     'title' => 'Test',
                     'description' => 'A test',
@@ -316,7 +316,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec) {
                 $spec->validate([
-                    'id' => '',
+                    'link_id' => '',
                     'url' => 'https://example.com',
                     'title' => 'Test',
                     'description' => 'A test',
@@ -342,7 +342,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec, $linkId) {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 'not-a-valid-url',
                     'title' => 'Test',
                     'description' => 'A test',
@@ -356,7 +356,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec, $linkId) {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => '',
                     'title' => 'Test',
                     'description' => 'A test',
@@ -370,7 +370,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec, $linkId) {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'title' => 'Test',
                     'description' => 'A test',
                 ]);
@@ -383,7 +383,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec, $linkId) {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 'https://example.com',
                     'title' => '',
                     'description' => 'A test',
@@ -397,7 +397,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec, $linkId) {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 'https://example.com',
                     'description' => 'A test',
                 ]);
@@ -410,7 +410,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec, $linkId) {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 'https://example.com',
                     'title' => str_repeat('a', 257),
                     'description' => 'A test',
@@ -424,7 +424,7 @@ describe('LinkInputSpec', function () {
 
             try {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 'https://example.com',
                     'title' => 'A title at max length',
                     'description' => 'A test',
@@ -442,7 +442,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec, $linkId) {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 'https://example.com',
                     'title' => 'Test',
                     'description' => 123,
@@ -456,7 +456,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec, $linkId) {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 'https://example.com',
                     'title' => 'Test',
                     'description' => 'A test',
@@ -470,7 +470,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec) {
                 $spec->validate([
-                    'id' => 12345,
+                    'link_id' => 12345,
                     'url' => 'https://example.com',
                     'title' => 'Test',
                     'description' => 'A test',
@@ -484,7 +484,7 @@ describe('LinkInputSpec', function () {
 
             expect(function() use ($spec, $linkId) {
                 $spec->validate([
-                    'id' => $linkId,
+                    'link_id' => $linkId,
                     'url' => 12345,
                     'title' => 'Test',
                     'description' => 'A test',
@@ -497,7 +497,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             try {
-                $spec->validate(['id' => $linkId], ['id']);
+                $spec->validate(['link_id' => $linkId], ['link_id']);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
@@ -509,7 +509,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             expect(function() use ($spec, $linkId) {
-                $spec->validate(['id' => $linkId], ['unknown_field']);
+                $spec->validate(['link_id' => $linkId], ['unknown_field']);
             })->toThrow(InvalidArgumentException::class);
         });
     });
@@ -520,7 +520,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $rawData = [
-                'id' => "  {$linkId}  ",
+                'link_id' => "  {$linkId}  ",
                 'url' => '  https://example.com  ',
                 'title' => '  Test Link  ',
                 'description' => '  A test link  ',
@@ -543,7 +543,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $rawData = [
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com',
                 'title' => 'Test',
                 'description' => 'A test',
@@ -570,7 +570,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $rawData = [
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'https://example.com',
                 'title' => '<script>Test</script>Link',
                 'description' => '<p>A test</p> link',
@@ -595,14 +595,14 @@ describe('LinkInputSpec', function () {
             $spec = new LinkInputSpec();
 
             $rawData = [
-                'id' => 'invalid-uuid',
+                'link_id' => 'invalid-uuid',
                 'url' => 'https://example.com',
                 'title' => 'Test',
                 'description' => 'A test'
             ];
             $filtered = $spec->filter($rawData);
 
-            expect($filtered['id'])->toBe('invalid-uuid');
+            expect($filtered['link_id'])->toBe('invalid-uuid');
 
             expect(function() use ($spec, $filtered) {
                 $spec->validate($filtered);
@@ -614,7 +614,7 @@ describe('LinkInputSpec', function () {
             $linkId = Uuid::uuid4()->toString();
 
             $rawData = [
-                'id' => $linkId,
+                'link_id' => $linkId,
                 'url' => 'not-a-url',
                 'title' => 'Test',
                 'description' => 'A test'
@@ -634,7 +634,7 @@ describe('LinkInputSpec', function () {
             $linkId2 = Uuid::uuid4()->toString();
 
             $filtered1 = $spec->filter([
-                'id' => "  {$linkId1}  ",
+                'link_id' => "  {$linkId1}  ",
                 'url' => '  https://example.com  ',
                 'title' => 'Link 1',
                 'description' => 'First link',
@@ -642,15 +642,15 @@ describe('LinkInputSpec', function () {
             $spec->validate($filtered1);
 
             $filtered2 = $spec->filter([
-                'id' => "  {$linkId2}  ",
+                'link_id' => "  {$linkId2}  ",
                 'url' => '  https://other.com  ',
                 'title' => 'Link 2',
                 'description' => 'Second link',
             ]);
             $spec->validate($filtered2);
 
-            expect($filtered1['id'])->toBe($linkId1);
-            expect($filtered2['id'])->toBe($linkId2);
+            expect($filtered1['link_id'])->toBe($linkId1);
+            expect($filtered2['link_id'])->toBe($linkId2);
         });
     });
 });

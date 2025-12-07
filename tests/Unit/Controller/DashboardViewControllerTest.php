@@ -20,9 +20,7 @@ describe("DashboardViewController", function () {
     $createController = function (
         ?DashboardServiceInterface $dashboardService = null,
     ) {
-        $dashboardService =
-            $dashboardService ??
-            Mockery::mock(DashboardServiceInterface::class);
+        $dashboardService ??= Mockery::mock(DashboardServiceInterface::class);
         $responseTransformer = new JsonResponseTransformer();
         $dashboardOutputSpec = new DashboardOutputSpec();
         $categoryOutputSpec = new CategoryOutputSpec();
@@ -52,7 +50,7 @@ describe("DashboardViewController", function () {
 
     describe("filterRequest method", function () use ($createController) {
         test(
-            "extracts id from route attributes and sets as parsed body",
+            "extracts dashboard_id from route attributes and sets as parsed body",
             function () use ($createController) {
                 $controller = $createController();
 
@@ -62,12 +60,15 @@ describe("DashboardViewController", function () {
                     method: "GET",
                     serverParams: [],
                 );
-                $request = $request->withAttribute("id", $dashboardId);
+                $request = $request->withAttribute(
+                    "dashboard_id",
+                    $dashboardId,
+                );
 
                 $filtered = $controller->filterRequest($request);
 
                 expect($filtered->getParsedBody())->toBe([
-                    "id" => $dashboardId,
+                    "dashboard_id" => $dashboardId,
                 ]);
             },
         );
@@ -89,7 +90,9 @@ describe("DashboardViewController", function () {
             },
         );
 
-        test("handles null id attribute", function () use ($createController) {
+        test("handles null dashboard_id attribute", function () use (
+            $createController,
+        ) {
             $controller = $createController();
 
             $request = new ServerRequest(
@@ -97,7 +100,7 @@ describe("DashboardViewController", function () {
                 method: "GET",
                 serverParams: [],
             );
-            $request = $request->withAttribute("id", null);
+            $request = $request->withAttribute("dashboard_id", null);
 
             $filtered = $controller->filterRequest($request);
 
@@ -117,7 +120,9 @@ describe("DashboardViewController", function () {
                 method: "GET",
                 serverParams: [],
             );
-            $request = $request->withParsedBody(["id" => $dashboardId]);
+            $request = $request->withParsedBody([
+                "dashboard_id" => $dashboardId,
+            ]);
 
             // Should not throw exception
             $controller->validateRequest($request);
@@ -144,7 +149,7 @@ describe("DashboardViewController", function () {
         );
 
         test(
-            "throws InvalidArgumentException when id is not a valid UUID",
+            "throws InvalidArgumentException when dashboard_id is not a valid UUID",
             function () use ($createController) {
                 $controller = $createController();
 
@@ -153,7 +158,9 @@ describe("DashboardViewController", function () {
                     method: "GET",
                     serverParams: [],
                 );
-                $request = $request->withParsedBody(["id" => "invalid-uuid"]);
+                $request = $request->withParsedBody([
+                    "dashboard_id" => "invalid-uuid",
+                ]);
 
                 expect(fn() => $controller->validateRequest($request))->toThrow(
                     InvalidArgumentException::class,
@@ -241,7 +248,7 @@ describe("DashboardViewController", function () {
                     serverParams: [],
                 );
                 $request = $request->withParsedBody([
-                    "id" => $dashboardId->toString(),
+                    "dashboard_id" => $dashboardId->toString(),
                 ]);
 
                 $response = $controller->execute($request);
@@ -297,7 +304,7 @@ describe("DashboardViewController", function () {
                     serverParams: [],
                 );
                 $request = $request->withParsedBody([
-                    "id" => $dashboardId->toString(),
+                    "dashboard_id" => $dashboardId->toString(),
                 ]);
 
                 $response = $controller->execute($request);
@@ -352,7 +359,7 @@ describe("DashboardViewController", function () {
                 serverParams: [],
             );
             $request = $request->withParsedBody([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
             $response = $controller->execute($request);
@@ -401,7 +408,7 @@ describe("DashboardViewController", function () {
                 serverParams: [],
             );
             $request = $request->withParsedBody([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
             $response = $controller->execute($request);
@@ -435,7 +442,7 @@ describe("DashboardViewController", function () {
                 serverParams: [],
             );
             $request = $request->withParsedBody([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
             $response = $controller->execute($request);
@@ -522,11 +529,14 @@ describe("DashboardViewController", function () {
                 method: "GET",
                 serverParams: [],
             );
-            $request = $request->withAttribute("id", $dashboardId->toString());
+            $request = $request->withAttribute(
+                "dashboard_id",
+                $dashboardId->toString(),
+            );
 
             // Filter the request
             $filtered = $controller->filterRequest($request);
-            expect($filtered->getParsedBody())->toHaveKey("id");
+            expect($filtered->getParsedBody())->toHaveKey("dashboard_id");
 
             // Validate the request
             $controller->validateRequest($filtered);
@@ -555,7 +565,10 @@ describe("DashboardViewController", function () {
                     method: "GET",
                     serverParams: [],
                 );
-                $request = $request->withAttribute("id", "not-a-uuid");
+                $request = $request->withAttribute(
+                    "dashboard_id",
+                    "not-a-uuid",
+                );
 
                 $filtered = $controller->filterRequest($request);
 

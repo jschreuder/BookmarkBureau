@@ -514,7 +514,7 @@ describe("LinkCreateAction", function () {
                     "icon" => "test-icon",
                 ]);
 
-                expect($result)->toHaveKey("id");
+                expect($result)->toHaveKey("link_id");
                 expect($result)->toHaveKey("url");
                 expect($result)->toHaveKey("title");
                 expect($result)->toHaveKey("description");
@@ -661,7 +661,7 @@ describe("LinkCreateAction", function () {
             try {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
-                expect($result)->toHaveKey("id");
+                expect($result)->toHaveKey("link_id");
                 expect($result)->toHaveKey("url");
                 expect($result)->toHaveKey("title");
             } catch (ValidationFailedException $e) {

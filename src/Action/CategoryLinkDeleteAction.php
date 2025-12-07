@@ -28,12 +28,12 @@ final readonly class CategoryLinkDeleteAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string, link_id: string} $data */
+    /** @param array{category_id: string, link_id: string} $data */
     #[\Override]
     public function execute(array $data): array
     {
         $this->categoryService->removeLinkFromCategory(
-            categoryId: Uuid::fromString($data["id"]),
+            categoryId: Uuid::fromString($data["category_id"]),
             linkId: Uuid::fromString($data["link_id"]),
         );
         return [];

@@ -24,14 +24,14 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$linkId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
                 "url" => "https://example.com",
                 "title" => "Test",
                 "description" => "Test Description",
                 "icon" => null,
             ]);
 
-            expect($filtered["id"])->toBe($linkId->toString());
+            expect($filtered["link_id"])->toBe($linkId->toString());
         });
 
         test("trims whitespace from URL", function () {
@@ -46,7 +46,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "  https://example.com  ",
                 "title" => "Test",
                 "description" => "Test Description",
@@ -68,7 +68,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "  Test Title  ",
                 "description" => "Test Description",
@@ -90,7 +90,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Test",
                 "description" => "  Test Description  ",
@@ -112,7 +112,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Test",
                 "description" => "Test Description",
@@ -134,7 +134,7 @@ describe("LinkUpdateAction", function () {
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["link_id"])->toBe("");
             expect($filtered["url"])->toBe("");
             expect($filtered["title"])->toBe("");
             expect($filtered["description"])->toBe("");
@@ -153,7 +153,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Test",
                 "description" => "Test Description",
@@ -177,7 +177,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $data = [
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Test Title",
                 "description" => "Test Description",
@@ -204,7 +204,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $data = [
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Test Title",
                 "description" => "",
@@ -231,7 +231,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $data = [
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Test Title",
                 "description" => "Test Description",
@@ -257,7 +257,7 @@ describe("LinkUpdateAction", function () {
             );
 
             $data = [
-                "id" => "not-a-uuid",
+                "link_id" => "not-a-uuid",
                 "url" => "https://example.com",
                 "title" => "Test Title",
                 "description" => "Test Description",
@@ -280,7 +280,7 @@ describe("LinkUpdateAction", function () {
             );
 
             $data = [
-                "id" => "",
+                "link_id" => "",
                 "url" => "https://example.com",
                 "title" => "Test Title",
                 "description" => "Test Description",
@@ -304,7 +304,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $data = [
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "ht!tp://invalid",
                 "title" => "Test Title",
                 "description" => "Test Description",
@@ -328,7 +328,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $data = [
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "",
                 "title" => "Test Title",
                 "description" => "Test Description",
@@ -352,7 +352,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $data = [
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "",
                 "description" => "Test Description",
@@ -378,7 +378,7 @@ describe("LinkUpdateAction", function () {
                 $linkId = Uuid::uuid4();
 
                 $data = [
-                    "id" => $linkId->toString(),
+                    "link_id" => $linkId->toString(),
                     "url" => "https://example.com",
                     "title" => str_repeat("a", 257),
                     "description" => "Test Description",
@@ -403,7 +403,7 @@ describe("LinkUpdateAction", function () {
             $linkId = Uuid::uuid4();
 
             $data = [
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Test Title",
                 "icon" => null,
@@ -425,7 +425,7 @@ describe("LinkUpdateAction", function () {
             );
 
             $data = [
-                "id" => "invalid-uuid",
+                "link_id" => "invalid-uuid",
                 "url" => "https://example.com",
                 "title" => "Test Title",
                 "description" => "Test Description",
@@ -448,7 +448,7 @@ describe("LinkUpdateAction", function () {
             );
 
             $data = [
-                "id" => "not-uuid",
+                "link_id" => "not-uuid",
                 "url" => "ht!tp://inv",
                 "title" => "",
                 "description" => null,
@@ -460,7 +460,7 @@ describe("LinkUpdateAction", function () {
                 expect(true)->toBeFalse();
             } catch (ValidationFailedException $e) {
                 $errors = $e->getValidationErrors();
-                expect($errors)->toHaveKey("id");
+                expect($errors)->toHaveKey("link_id");
                 expect($errors)->toHaveKey("url");
                 expect($errors)->toHaveKey("title");
             }
@@ -498,14 +498,14 @@ describe("LinkUpdateAction", function () {
                 );
 
                 $result = $action->execute([
-                    "id" => $linkId->toString(),
+                    "link_id" => $linkId->toString(),
                     "url" => "https://example.com",
                     "title" => "Test Title",
                     "description" => "Test Description",
                     "icon" => "test-icon",
                 ]);
 
-                expect($result)->toHaveKey("id");
+                expect($result)->toHaveKey("link_id");
                 expect($result)->toHaveKey("url");
                 expect($result)->toHaveKey("title");
                 expect($result)->toHaveKey("description");
@@ -536,7 +536,7 @@ describe("LinkUpdateAction", function () {
                 );
 
                 $result = $action->execute([
-                    "id" => $linkId->toString(),
+                    "link_id" => $linkId->toString(),
                     "url" => "https://example.com",
                     "title" => "Test Title",
                     "description" => "Test Description",
@@ -580,7 +580,7 @@ describe("LinkUpdateAction", function () {
             );
 
             $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Test Title",
                 "description" => "Long description",
@@ -617,7 +617,7 @@ describe("LinkUpdateAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $linkId->toString(),
+                    "link_id" => $linkId->toString(),
                     "url" => "https://example.com",
                     "title" => "Test Title",
                     "description" => "Test Description",
@@ -655,7 +655,7 @@ describe("LinkUpdateAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $linkId->toString(),
+                    "link_id" => $linkId->toString(),
                     "url" => "https://example.com",
                     "title" => "Test Title",
                     "description" => "Test Description",
@@ -696,7 +696,7 @@ describe("LinkUpdateAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$linkId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
                 "url" => "  https://example.com  ",
                 "title" => "  Test Title  ",
                 "description" => "  Test Description  ",
@@ -708,7 +708,7 @@ describe("LinkUpdateAction", function () {
             try {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
-                expect($result)->toHaveKey("id");
+                expect($result)->toHaveKey("link_id");
                 expect($result)->toHaveKey("url");
                 expect($result)->toHaveKey("title");
             } catch (ValidationFailedException $e) {
@@ -741,7 +741,7 @@ describe("LinkUpdateAction", function () {
             );
 
             $rawData = [
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Test Title",
                 "description" => "Test Description",
@@ -776,7 +776,7 @@ describe("LinkUpdateAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$linkId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
                 "url" => "https://example.com",
                 "title" => "Test Title",
                 "description" => "Test Description",
@@ -784,7 +784,7 @@ describe("LinkUpdateAction", function () {
             ];
 
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe($linkId->toString());
+            expect($filtered["link_id"])->toBe($linkId->toString());
 
             $action->validate($filtered);
             $action->execute($filtered);

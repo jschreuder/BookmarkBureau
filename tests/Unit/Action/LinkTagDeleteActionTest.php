@@ -18,11 +18,11 @@ describe("LinkTagDeleteAction", function () {
             );
 
             $filtered = $action->filter([
-                "id" => "  {$uuid}  ",
+                "link_id" => "  {$uuid}  ",
                 "tag_name" => "  important  ",
             ]);
 
-            expect($filtered["id"])->toBe($uuid);
+            expect($filtered["link_id"])->toBe($uuid);
             expect($filtered["tag_name"])->toBe("important");
         });
     });
@@ -37,7 +37,10 @@ describe("LinkTagDeleteAction", function () {
             );
 
             try {
-                $action->validate(["id" => $uuid, "tag_name" => "important"]);
+                $action->validate([
+                    "link_id" => $uuid,
+                    "tag_name" => "important",
+                ]);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
@@ -53,7 +56,7 @@ describe("LinkTagDeleteAction", function () {
 
             expect(
                 fn() => $action->validate([
-                    "id" => "not-a-uuid",
+                    "link_id" => "not-a-uuid",
                     "tag_name" => "important",
                 ]),
             )->toThrow(ValidationFailedException::class);
@@ -68,7 +71,10 @@ describe("LinkTagDeleteAction", function () {
             );
 
             expect(
-                fn() => $action->validate(["id" => $uuid, "tag_name" => ""]),
+                fn() => $action->validate([
+                    "link_id" => $uuid,
+                    "tag_name" => "",
+                ]),
             )->toThrow(ValidationFailedException::class);
         });
     });
@@ -90,7 +96,7 @@ describe("LinkTagDeleteAction", function () {
                     ->with(Mockery::type(UuidInterface::class), "important");
 
                 $result = $action->execute([
-                    "id" => $uuid->toString(),
+                    "link_id" => $uuid->toString(),
                     "tag_name" => "important",
                 ]);
 
@@ -109,12 +115,12 @@ describe("LinkTagDeleteAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$uuid->toString()}  ",
+                "link_id" => "  {$uuid->toString()}  ",
                 "tag_name" => "  important  ",
                 "extra" => "ignored",
             ];
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe($uuid->toString());
+            expect($filtered["link_id"])->toBe($uuid->toString());
             expect($filtered["tag_name"])->toBe("important");
 
             try {

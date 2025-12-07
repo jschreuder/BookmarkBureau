@@ -179,10 +179,10 @@ describe("CategoryLinkReorderAction", function () {
             ]);
 
             expect($result["links"])->toHaveCount(2);
-            expect($result["links"][0])->toHaveKey("id");
+            expect($result["links"][0])->toHaveKey("link_id");
             expect($result["links"][0])->toHaveKey("url");
             expect($result["links"][0])->toHaveKey("title");
-            expect($result["links"][1])->toHaveKey("id");
+            expect($result["links"][1])->toHaveKey("link_id");
             expect($result["links"][1])->toHaveKey("url");
             expect($result["links"][1])->toHaveKey("title");
         });
@@ -429,8 +429,8 @@ describe("CategoryLinkReorderAction", function () {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
                 expect($result["links"])->toHaveCount(2);
-                expect($result["links"][0])->toHaveKey("id");
-                expect($result["links"][1])->toHaveKey("id");
+                expect($result["links"][0])->toHaveKey("link_id");
+                expect($result["links"][1])->toHaveKey("link_id");
             } catch (ValidationFailedException $e) {
                 throw $e;
             }

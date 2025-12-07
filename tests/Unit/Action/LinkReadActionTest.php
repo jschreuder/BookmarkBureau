@@ -16,58 +16,58 @@ describe("LinkReadAction", function () {
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$linkId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
             ]);
 
-            expect($filtered["id"])->toBe($linkId->toString());
+            expect($filtered["link_id"])->toBe($linkId->toString());
         });
 
         test("handles missing id key with empty string", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["link_id"])->toBe("");
         });
 
         test("preserves valid id without modification", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
-            expect($filtered["id"])->toBe($linkId->toString());
+            expect($filtered["link_id"])->toBe($linkId->toString());
         });
 
         test("ignores additional fields in input", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Should be ignored",
                 "extra_field" => "ignored",
             ]);
 
-            expect($filtered)->toHaveKey("id");
+            expect($filtered)->toHaveKey("link_id");
             expect($filtered)->not->toHaveKey("url");
             expect($filtered)->not->toHaveKey("title");
             expect($filtered)->not->toHaveKey("extra_field");
@@ -77,12 +77,12 @@ describe("LinkReadAction", function () {
     describe("validate method", function () {
         test("passes validation with valid UUID", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
             $linkId = Uuid::uuid4();
 
-            $data = ["id" => $linkId->toString()];
+            $data = ["link_id" => $linkId->toString()];
 
             try {
                 $action->validate($data);
@@ -94,11 +94,11 @@ describe("LinkReadAction", function () {
 
         test("throws validation error for invalid UUID", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
-            $data = ["id" => "not-a-uuid"];
+            $data = ["link_id" => "not-a-uuid"];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -107,11 +107,11 @@ describe("LinkReadAction", function () {
 
         test("throws validation error for empty id", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
-            $data = ["id" => ""];
+            $data = ["link_id" => ""];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -120,7 +120,7 @@ describe("LinkReadAction", function () {
 
         test("throws validation error for missing id key", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
@@ -133,11 +133,11 @@ describe("LinkReadAction", function () {
 
         test("throws validation error for whitespace-only id", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
-            $data = ["id" => "   "];
+            $data = ["link_id" => "   "];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -146,11 +146,11 @@ describe("LinkReadAction", function () {
 
         test("throws validation error for null id", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
-            $data = ["id" => null];
+            $data = ["link_id" => null];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -159,12 +159,12 @@ describe("LinkReadAction", function () {
 
         test("validates UUID in different formats", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
             $linkId = Uuid::uuid4();
 
-            $data = ["id" => $linkId->toString()];
+            $data = ["link_id" => $linkId->toString()];
 
             try {
                 $action->validate($data);
@@ -187,16 +187,16 @@ describe("LinkReadAction", function () {
                 ->once()
                 ->andReturn($link);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect($result)->toBeArray();
-            expect($result)->toHaveKey("id");
+            expect($result)->toHaveKey("link_id");
         });
 
         test("returns transformed link data", function () {
@@ -209,16 +209,16 @@ describe("LinkReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect($result)->toBeArray();
-            expect($result)->toHaveKey("id");
+            expect($result)->toHaveKey("link_id");
             expect($result)->toHaveKey("url");
             expect($result)->toHaveKey("title");
             expect($result)->toHaveKey("description");
@@ -242,15 +242,15 @@ describe("LinkReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
-            expect($result["id"])->toBe($linkId->toString());
+            expect($result["link_id"])->toBe($linkId->toString());
             expect($result["url"])->toBe("https://example.com");
             expect($result["title"])->toBe("Test Link");
             expect($result["description"])->toBe("Test Description");
@@ -269,7 +269,7 @@ describe("LinkReadAction", function () {
                     ->once()
                     ->andReturn($link);
 
-                $inputSpec = new IdInputSpec();
+                $inputSpec = new IdInputSpec("link_id");
                 $outputSpec = new LinkOutputSpec(new TagOutputSpec());
                 $action = new LinkReadAction(
                     $linkService,
@@ -278,7 +278,7 @@ describe("LinkReadAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $linkId->toString(),
+                    "link_id" => $linkId->toString(),
                 ]);
 
                 expect(true)->toBeTrue();
@@ -298,12 +298,12 @@ describe("LinkReadAction", function () {
                     return $link;
                 });
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect($uuidCapture->toString())->toBe($linkId->toString());
@@ -319,12 +319,12 @@ describe("LinkReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect($result["icon"])->toBeNull();
@@ -343,12 +343,12 @@ describe("LinkReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect($result["icon"])->toBe("test-icon");
@@ -370,12 +370,12 @@ describe("LinkReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $result = $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect($result["created_at"])->toBe(
@@ -399,12 +399,12 @@ describe("LinkReadAction", function () {
                 ->once()
                 ->andReturn($link);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $rawData = [
-                "id" => "  {$linkId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
@@ -413,7 +413,7 @@ describe("LinkReadAction", function () {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
                 expect($result)->toBeArray();
-                expect($result["id"])->toBe($linkId->toString());
+                expect($result["link_id"])->toBe($linkId->toString());
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
@@ -430,12 +430,12 @@ describe("LinkReadAction", function () {
                 ->once()
                 ->andReturn($link);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $rawData = [
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Should be ignored",
                 "extra" => "data",
@@ -449,7 +449,7 @@ describe("LinkReadAction", function () {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
                 expect($result)->toBeArray();
-                expect($result["id"])->toBe($linkId->toString());
+                expect($result["link_id"])->toBe($linkId->toString());
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
@@ -465,22 +465,22 @@ describe("LinkReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $rawData = [
-                "id" => "  {$linkId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe($linkId->toString());
+            expect($filtered["link_id"])->toBe($linkId->toString());
 
             $action->validate($filtered);
             $result = $action->execute($filtered);
 
             expect($result)->toBeArray();
-            expect($result["id"])->toBe($linkId->toString());
+            expect($result["link_id"])->toBe($linkId->toString());
         });
 
         test("validation failure prevents service call", function () {
@@ -488,12 +488,12 @@ describe("LinkReadAction", function () {
 
             $linkService->shouldNotReceive("getLink");
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
             $rawData = [
-                "id" => "invalid-uuid",
+                "link_id" => "invalid-uuid",
             ];
 
             $filtered = $action->filter($rawData);
@@ -519,16 +519,16 @@ describe("LinkReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($link);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $outputSpec = new LinkOutputSpec(new TagOutputSpec());
             $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
 
-            $rawData = ["id" => $linkId->toString()];
+            $rawData = ["link_id" => $linkId->toString()];
             $filtered = $action->filter($rawData);
             $action->validate($filtered);
             $result = $action->execute($filtered);
 
-            expect($result["id"])->toBe($linkId->toString());
+            expect($result["link_id"])->toBe($linkId->toString());
             expect($result["url"])->toBe("https://test.example.com");
             expect($result["title"])->toBe("Integration Test");
             expect($result["description"])->toBe("Full workflow test");

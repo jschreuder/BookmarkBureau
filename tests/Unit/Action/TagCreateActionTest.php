@@ -16,11 +16,11 @@ describe("TagCreateAction", function () {
             $action = new TagCreateAction($tagService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([
-                "id" => "  important  ",
+                "tag_name" => "  important  ",
                 "color" => "#FF0000",
             ]);
 
-            expect($filtered["id"])->toBe("important");
+            expect($filtered["tag_name"])->toBe("important");
         });
 
         test("trims whitespace from color", function () {
@@ -30,7 +30,7 @@ describe("TagCreateAction", function () {
             $action = new TagCreateAction($tagService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([
-                "id" => "important",
+                "tag_name" => "important",
                 "color" => "  #FF0000  ",
             ]);
 
@@ -45,7 +45,7 @@ describe("TagCreateAction", function () {
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["tag_name"])->toBe("");
             expect($filtered["color"])->toBeNull();
         });
 
@@ -56,7 +56,7 @@ describe("TagCreateAction", function () {
             $action = new TagCreateAction($tagService, $inputSpec, $outputSpec);
 
             $filtered = $action->filter([
-                "id" => "important",
+                "tag_name" => "important",
                 "color" => null,
             ]);
 
@@ -72,7 +72,7 @@ describe("TagCreateAction", function () {
             $action = new TagCreateAction($tagService, $inputSpec, $outputSpec);
 
             $data = [
-                "id" => "important",
+                "tag_name" => "important",
                 "color" => "#FF0000",
             ];
 
@@ -91,7 +91,7 @@ describe("TagCreateAction", function () {
             $action = new TagCreateAction($tagService, $inputSpec, $outputSpec);
 
             $data = [
-                "id" => "important",
+                "tag_name" => "important",
                 "color" => null,
             ];
 
@@ -110,7 +110,7 @@ describe("TagCreateAction", function () {
             $action = new TagCreateAction($tagService, $inputSpec, $outputSpec);
 
             $data = [
-                "id" => "",
+                "tag_name" => "",
                 "color" => "#FF0000",
             ];
 
@@ -150,7 +150,7 @@ describe("TagCreateAction", function () {
                 ->andReturn($createdTag);
 
             $result = $action->execute([
-                "id" => "important",
+                "tag_name" => "important",
                 "color" => "#FF0000",
             ]);
 
@@ -173,7 +173,7 @@ describe("TagCreateAction", function () {
                 ->andReturn($createdTag);
 
             $result = $action->execute([
-                "id" => "important",
+                "tag_name" => "important",
                 "color" => null,
             ]);
 
@@ -193,7 +193,7 @@ describe("TagCreateAction", function () {
             $tagService->shouldReceive("createTag")->andReturn($createdTag);
 
             $result = $action->execute([
-                "id" => "important",
+                "tag_name" => "important",
                 "color" => "#FF0000",
             ]);
 
@@ -210,13 +210,13 @@ describe("TagCreateAction", function () {
             $createdTag = TestEntityFactory::createTag();
 
             $rawData = [
-                "id" => "  important  ",
+                "tag_name" => "  important  ",
                 "color" => "  #FF0000  ",
                 "extra_field" => "ignored",
             ];
 
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe("important");
+            expect($filtered["tag_name"])->toBe("important");
             expect($filtered["color"])->toBe("#FF0000");
 
             try {

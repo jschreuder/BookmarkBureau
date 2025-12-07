@@ -33,11 +33,11 @@ final readonly class DashboardUpdateAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string, title: string, description: string, icon: ?string} $data */
+    /** @param array{dashboard_id: string, title: string, description: string, icon: ?string} $data */
     #[\Override]
     public function execute(array $data): array
     {
-        $dashboardId = Uuid::fromString($data["id"]);
+        $dashboardId = Uuid::fromString($data["dashboard_id"]);
         $dashboard = $this->dashboardService->updateDashboard(
             dashboardId: $dashboardId,
             title: $data["title"],

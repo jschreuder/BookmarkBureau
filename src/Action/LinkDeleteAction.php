@@ -29,11 +29,11 @@ final readonly class LinkDeleteAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string} $data */
+    /** @param array{link_id: string} $data */
     #[\Override]
     public function execute(array $data): array
     {
-        $linkId = Uuid::fromString($data["id"]);
+        $linkId = Uuid::fromString($data["link_id"]);
         $this->linkService->deleteLink($linkId);
 
         return [];

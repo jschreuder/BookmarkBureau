@@ -23,14 +23,14 @@ describe("CategoryUpdateAction", function () {
             $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
                 "dashboard_id" => Uuid::uuid4()->toString(),
                 "title" => "Test Category",
                 "color" => null,
                 "sort_order" => 1,
             ]);
 
-            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["category_id"])->toBe($categoryId->toString());
         });
 
         test("trims whitespace from title", function () {
@@ -45,7 +45,7 @@ describe("CategoryUpdateAction", function () {
             $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "dashboard_id" => Uuid::uuid4()->toString(),
                 "title" => "  Test Category  ",
                 "color" => null,
@@ -67,7 +67,7 @@ describe("CategoryUpdateAction", function () {
             $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "dashboard_id" => Uuid::uuid4()->toString(),
                 "title" => "Test Category",
                 "color" => "  #FF0000  ",
@@ -89,7 +89,7 @@ describe("CategoryUpdateAction", function () {
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["category_id"])->toBe("");
             expect($filtered["dashboard_id"])->toBe("");
             expect($filtered["title"])->toBe("");
             expect($filtered["color"])->toBeNull();
@@ -108,7 +108,7 @@ describe("CategoryUpdateAction", function () {
             $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "dashboard_id" => Uuid::uuid4()->toString(),
                 "title" => "Test Category",
                 "color" => null,
@@ -133,7 +133,7 @@ describe("CategoryUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $data = [
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test Category",
                 "color" => "#FF0000",
@@ -161,7 +161,7 @@ describe("CategoryUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $data = [
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test Category",
                 "color" => null,
@@ -187,7 +187,7 @@ describe("CategoryUpdateAction", function () {
             );
 
             $data = [
-                "id" => "not-a-uuid",
+                "category_id" => "not-a-uuid",
                 "dashboard_id" => Uuid::uuid4()->toString(),
                 "title" => "Test Category",
                 "color" => null,
@@ -210,7 +210,7 @@ describe("CategoryUpdateAction", function () {
             );
 
             $data = [
-                "id" => "",
+                "category_id" => "",
                 "dashboard_id" => Uuid::uuid4()->toString(),
                 "title" => "Test Category",
                 "color" => null,
@@ -234,7 +234,7 @@ describe("CategoryUpdateAction", function () {
             $categoryId = Uuid::uuid4();
 
             $data = [
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "dashboard_id" => Uuid::uuid4()->toString(),
                 "title" => "",
                 "color" => null,
@@ -262,7 +262,7 @@ describe("CategoryUpdateAction", function () {
                 $categoryId = Uuid::uuid4();
 
                 $data = [
-                    "id" => $categoryId->toString(),
+                    "category_id" => $categoryId->toString(),
                     "dashboard_id" => Uuid::uuid4()->toString(),
                     "title" => str_repeat("a", 257),
                     "color" => null,
@@ -287,7 +287,7 @@ describe("CategoryUpdateAction", function () {
             $categoryId = Uuid::uuid4();
 
             $data = [
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "dashboard_id" => Uuid::uuid4()->toString(),
                 "title" => "Test Category",
                 "color" => "invalid-color",
@@ -310,7 +310,7 @@ describe("CategoryUpdateAction", function () {
             );
 
             $data = [
-                "id" => "not-uuid",
+                "category_id" => "not-uuid",
                 "dashboard_id" => "not-uuid",
                 "title" => "",
                 "color" => null,
@@ -362,14 +362,14 @@ describe("CategoryUpdateAction", function () {
                 );
 
                 $result = $action->execute([
-                    "id" => $categoryId->toString(),
+                    "category_id" => $categoryId->toString(),
                     "dashboard_id" => $dashboardId->toString(),
                     "title" => "Test Category",
                     "color" => "#FF0000",
                     "sort_order" => 1,
                 ]);
 
-                expect($result)->toHaveKey("id");
+                expect($result)->toHaveKey("category_id");
                 expect($result)->toHaveKey("dashboard_id");
                 expect($result)->toHaveKey("title");
                 expect($result)->toHaveKey("color");
@@ -408,7 +408,7 @@ describe("CategoryUpdateAction", function () {
                 );
 
                 $result = $action->execute([
-                    "id" => $categoryId->toString(),
+                    "category_id" => $categoryId->toString(),
                     "dashboard_id" => $dashboardId->toString(),
                     "title" => "Test Category",
                     "color" => "#FF0000",
@@ -458,7 +458,7 @@ describe("CategoryUpdateAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $categoryId->toString(),
+                    "category_id" => $categoryId->toString(),
                     "dashboard_id" => $dashboardId->toString(),
                     "title" => "Test Category",
                     "color" => "#FF0000",
@@ -503,7 +503,7 @@ describe("CategoryUpdateAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $categoryId->toString(),
+                    "category_id" => $categoryId->toString(),
                     "dashboard_id" => $dashboardId->toString(),
                     "title" => "Test Category",
                     "color" => null,
@@ -541,7 +541,7 @@ describe("CategoryUpdateAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $categoryId->toString(),
+                    "category_id" => $categoryId->toString(),
                     "dashboard_id" => Uuid::uuid4()->toString(),
                     "title" => "Test Category",
                     "color" => null,
@@ -582,7 +582,7 @@ describe("CategoryUpdateAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
                 "dashboard_id" => "  {$dashboardId->toString()}  ",
                 "title" => "  Test Category  ",
                 "color" => "  #FF0000  ",
@@ -594,7 +594,7 @@ describe("CategoryUpdateAction", function () {
             try {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
-                expect($result)->toHaveKey("id");
+                expect($result)->toHaveKey("category_id");
                 expect($result)->toHaveKey("title");
             } catch (ValidationFailedException $e) {
                 throw $e;
@@ -629,7 +629,7 @@ describe("CategoryUpdateAction", function () {
             );
 
             $rawData = [
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test Category",
                 "color" => null,
@@ -667,7 +667,7 @@ describe("CategoryUpdateAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
                 "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test Category",
                 "color" => null,
@@ -675,7 +675,7 @@ describe("CategoryUpdateAction", function () {
             ];
 
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["category_id"])->toBe($categoryId->toString());
 
             $action->validate($filtered);
             $action->execute($filtered);

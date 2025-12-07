@@ -37,9 +37,9 @@ final readonly class DashboardViewController implements
         ServerRequestInterface $request,
     ): ServerRequestInterface {
         // Extract UUID from route attributes
-        $id = $request->getAttribute("id");
+        $id = $request->getAttribute("dashboard_id");
         if ($id !== null) {
-            return $request->withParsedBody(["id" => $id]);
+            return $request->withParsedBody(["dashboard_id" => $id]);
         }
 
         return $request->withParsedBody([]);
@@ -51,11 +51,11 @@ final readonly class DashboardViewController implements
         $data = (array) $request->getParsedBody();
 
         // Validate that ID is present and is a valid UUID
-        if (!isset($data["id"])) {
+        if (!isset($data["dashboard_id"])) {
             throw new InvalidArgumentException("Dashboard ID is required");
         }
 
-        if (!v::uuid()->validate($data["id"])) {
+        if (!v::uuid()->validate($data["dashboard_id"])) {
             throw new InvalidArgumentException("Invalid dashboard ID format");
         }
     }
@@ -63,9 +63,9 @@ final readonly class DashboardViewController implements
     #[\Override]
     public function execute(ServerRequestInterface $request): ResponseInterface
     {
-        /** @var array{id: string} $data */
+        /** @var array{dashboard_id: string} $data */
         $data = (array) $request->getParsedBody();
-        $dashboardId = Uuid::fromString($data["id"]);
+        $dashboardId = Uuid::fromString($data["dashboard_id"]);
 
         // Fetch the complete dashboard view (dashboard + categories with links + favorites)
         $dashboardView = $this->dashboardService->getFullDashboard(

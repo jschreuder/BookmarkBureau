@@ -11,7 +11,7 @@ use Respect\Validation\Validator;
 final class CategoryInputSpec implements InputSpecInterface
 {
     private const array FIELDS = [
-        "id",
+        "category_id",
         "dashboard_id",
         "title",
         "color",
@@ -24,7 +24,7 @@ final class CategoryInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
-    /** @return array{id: string, dashboard_id: string, title: string, color: ?string, sort_order: int} */
+    /** @return array{category_id: string, dashboard_id: string, title: string, color: ?string, sort_order: int} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -32,7 +32,7 @@ final class CategoryInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             $filtered[$field] = match ($field) {
-                "id" => Filter::start($rawData, "id", "")
+                "category_id" => Filter::start($rawData, "category_id", "")
                     ->string(allowNull: false)
                     ->trim()
                     ->done(),
@@ -58,11 +58,11 @@ final class CategoryInputSpec implements InputSpecInterface
             };
         }
 
-        /** @var array{id: string, dashboard_id: string, title: string, color: ?string, sort_order: int} */
+        /** @var array{category_id: string, dashboard_id: string, title: string, color: ?string, sort_order: int} */
         return $filtered;
     }
 
-    /** @param array{id: string, dashboard_id: string, title: string, color: ?string, sort_order: int} $data */
+    /** @param array{category_id: string, dashboard_id: string, title: string, color: ?string, sort_order: int} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
@@ -70,7 +70,10 @@ final class CategoryInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                "id" => $validator->key("id", Validator::notEmpty()->uuid()),
+                "category_id" => $validator->key(
+                    "category_id",
+                    Validator::notEmpty()->uuid(),
+                ),
                 "dashboard_id" => $validator->key(
                     "dashboard_id",
                     Validator::notEmpty()->uuid(),

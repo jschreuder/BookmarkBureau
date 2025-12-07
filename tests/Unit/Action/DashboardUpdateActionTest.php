@@ -23,13 +23,13 @@ describe("DashboardUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$dashboardId->toString()}  ",
+                "dashboard_id" => "  {$dashboardId->toString()}  ",
                 "title" => "Test",
                 "description" => "Test Description",
                 "icon" => null,
             ]);
 
-            expect($filtered["id"])->toBe($dashboardId->toString());
+            expect($filtered["dashboard_id"])->toBe($dashboardId->toString());
         });
 
         test("trims whitespace from title", function () {
@@ -44,7 +44,7 @@ describe("DashboardUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "  Test Title  ",
                 "description" => "Test Description",
                 "icon" => null,
@@ -65,7 +65,7 @@ describe("DashboardUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test",
                 "description" => "  Test Description  ",
                 "icon" => null,
@@ -86,7 +86,7 @@ describe("DashboardUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test",
                 "description" => "Test Description",
                 "icon" => "  test-icon  ",
@@ -107,7 +107,7 @@ describe("DashboardUpdateAction", function () {
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["dashboard_id"])->toBe("");
             expect($filtered["title"])->toBe("");
             expect($filtered["description"])->toBe("");
             expect($filtered["icon"])->toBeNull();
@@ -125,7 +125,7 @@ describe("DashboardUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test",
                 "description" => "Test Description",
                 "icon" => null,
@@ -148,7 +148,7 @@ describe("DashboardUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $data = [
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test Title",
                 "description" => "Test Description",
                 "icon" => "test-icon",
@@ -174,7 +174,7 @@ describe("DashboardUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $data = [
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test Title",
                 "description" => "",
                 "icon" => "test-icon",
@@ -200,7 +200,7 @@ describe("DashboardUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $data = [
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test Title",
                 "description" => "Test Description",
                 "icon" => null,
@@ -225,7 +225,7 @@ describe("DashboardUpdateAction", function () {
             );
 
             $data = [
-                "id" => "not-a-uuid",
+                "dashboard_id" => "not-a-uuid",
                 "title" => "Test Title",
                 "description" => "Test Description",
                 "icon" => null,
@@ -247,7 +247,7 @@ describe("DashboardUpdateAction", function () {
             );
 
             $data = [
-                "id" => "",
+                "dashboard_id" => "",
                 "title" => "Test Title",
                 "description" => "Test Description",
                 "icon" => null,
@@ -270,7 +270,7 @@ describe("DashboardUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $data = [
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "",
                 "description" => "Test Description",
                 "icon" => null,
@@ -297,7 +297,7 @@ describe("DashboardUpdateAction", function () {
                 $dashboardId = Uuid::uuid4();
 
                 $data = [
-                    "id" => $dashboardId->toString(),
+                    "dashboard_id" => $dashboardId->toString(),
                     "title" => str_repeat("a", 257),
                     "description" => "Test Description",
                     "icon" => null,
@@ -321,7 +321,7 @@ describe("DashboardUpdateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $data = [
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test Title",
                 "icon" => null,
             ];
@@ -342,7 +342,7 @@ describe("DashboardUpdateAction", function () {
             );
 
             $data = [
-                "id" => "invalid-uuid",
+                "dashboard_id" => "invalid-uuid",
                 "title" => "Test Title",
                 "description" => "Test Description",
                 "icon" => null,
@@ -364,7 +364,7 @@ describe("DashboardUpdateAction", function () {
             );
 
             $data = [
-                "id" => "not-uuid",
+                "dashboard_id" => "not-uuid",
                 "title" => "",
                 "description" => null,
                 "icon" => null,
@@ -375,7 +375,7 @@ describe("DashboardUpdateAction", function () {
                 expect(true)->toBeFalse();
             } catch (ValidationFailedException $e) {
                 $errors = $e->getValidationErrors();
-                expect($errors)->toHaveKey("id");
+                expect($errors)->toHaveKey("dashboard_id");
                 expect($errors)->toHaveKey("title");
             }
         });
@@ -413,13 +413,13 @@ describe("DashboardUpdateAction", function () {
                 );
 
                 $result = $action->execute([
-                    "id" => $dashboardId->toString(),
+                    "dashboard_id" => $dashboardId->toString(),
                     "title" => "Test Title",
                     "description" => "Test Description",
                     "icon" => "test-icon",
                 ]);
 
-                expect($result)->toHaveKey("id");
+                expect($result)->toHaveKey("dashboard_id");
                 expect($result)->toHaveKey("title");
                 expect($result)->toHaveKey("description");
                 expect($result)->toHaveKey("icon");
@@ -453,7 +453,7 @@ describe("DashboardUpdateAction", function () {
                 );
 
                 $result = $action->execute([
-                    "id" => $dashboardId->toString(),
+                    "dashboard_id" => $dashboardId->toString(),
                     "title" => "Test Title",
                     "description" => "Test Description",
                     "icon" => "test-icon",
@@ -499,7 +499,7 @@ describe("DashboardUpdateAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $dashboardId->toString(),
+                    "dashboard_id" => $dashboardId->toString(),
                     "title" => "Test Title",
                     "description" => "Long description",
                     "icon" => "test-icon",
@@ -540,7 +540,7 @@ describe("DashboardUpdateAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $dashboardId->toString(),
+                    "dashboard_id" => $dashboardId->toString(),
                     "title" => "Test Title",
                     "description" => "Test Description",
                     "icon" => null,
@@ -580,7 +580,7 @@ describe("DashboardUpdateAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $dashboardId->toString(),
+                    "dashboard_id" => $dashboardId->toString(),
                     "title" => "Test Title",
                     "description" => "Test Description",
                     "icon" => null,
@@ -619,7 +619,7 @@ describe("DashboardUpdateAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$dashboardId->toString()}  ",
+                "dashboard_id" => "  {$dashboardId->toString()}  ",
                 "title" => "  Test Title  ",
                 "description" => "  Test Description  ",
                 "icon" => "  test-icon  ",
@@ -630,7 +630,7 @@ describe("DashboardUpdateAction", function () {
             try {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
-                expect($result)->toHaveKey("id");
+                expect($result)->toHaveKey("dashboard_id");
                 expect($result)->toHaveKey("title");
             } catch (ValidationFailedException $e) {
                 throw $e;
@@ -664,7 +664,7 @@ describe("DashboardUpdateAction", function () {
             );
 
             $rawData = [
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test Title",
                 "description" => "Test Description",
                 "icon" => null,
@@ -700,14 +700,14 @@ describe("DashboardUpdateAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$dashboardId->toString()}  ",
+                "dashboard_id" => "  {$dashboardId->toString()}  ",
                 "title" => "Test Title",
                 "description" => "Test Description",
                 "icon" => null,
             ];
 
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe($dashboardId->toString());
+            expect($filtered["dashboard_id"])->toBe($dashboardId->toString());
 
             $action->validate($filtered);
             $action->execute($filtered);

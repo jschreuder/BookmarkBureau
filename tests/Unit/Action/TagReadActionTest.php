@@ -19,9 +19,9 @@ describe("TagReadAction", function () {
                 new TagOutputSpec(),
             );
 
-            $filtered = $action->filter(["id" => "  important  "]);
+            $filtered = $action->filter(["tag_name" => "  important  "]);
 
-            expect($filtered["id"])->toBe("important");
+            expect($filtered["tag_name"])->toBe("important");
         });
     });
 
@@ -35,7 +35,7 @@ describe("TagReadAction", function () {
             );
 
             try {
-                $action->validate(["id" => "important"]);
+                $action->validate(["tag_name" => "important"]);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
@@ -50,7 +50,7 @@ describe("TagReadAction", function () {
                 new TagOutputSpec(),
             );
 
-            expect(fn() => $action->validate(["id" => ""]))->toThrow(
+            expect(fn() => $action->validate(["tag_name" => ""]))->toThrow(
                 ValidationFailedException::class,
             );
         });
@@ -75,7 +75,7 @@ describe("TagReadAction", function () {
                 ->once()
                 ->andReturn($tag);
 
-            $result = $action->execute(["id" => "important"]);
+            $result = $action->execute(["tag_name" => "important"]);
 
             expect($result)->toBeArray();
             expect($result["tag_name"])->toBe("important");
@@ -96,7 +96,7 @@ describe("TagReadAction", function () {
                 ->andThrow(TagNotFoundException::class);
 
             expect(
-                fn() => $action->execute(["id" => "nonexistent"]),
+                fn() => $action->execute(["tag_name" => "nonexistent"]),
             )->toThrow(TagNotFoundException::class);
         });
     });
@@ -110,9 +110,9 @@ describe("TagReadAction", function () {
                 new TagOutputSpec(),
             );
 
-            $rawData = ["id" => "  important  "];
+            $rawData = ["tag_name" => "  important  "];
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe("important");
+            expect($filtered["tag_name"])->toBe("important");
 
             try {
                 $action->validate($filtered);

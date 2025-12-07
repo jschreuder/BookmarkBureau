@@ -121,7 +121,7 @@ describe("DashboardListAction", function () {
 
             expect($result)->toHaveKey("dashboards");
             expect($result["dashboards"])->toHaveCount(1);
-            expect($result["dashboards"][0])->toHaveKey("id");
+            expect($result["dashboards"][0])->toHaveKey("dashboard_id");
             expect($result["dashboards"][0])->toHaveKey("title");
             expect($result["dashboards"][0])->toHaveKey("description");
             expect($result["dashboards"][0])->toHaveKey("created_at");
@@ -241,7 +241,7 @@ describe("DashboardListAction", function () {
             $result = $action->execute([]);
 
             $dashboard = $result["dashboards"][0];
-            expect($dashboard)->toHaveKey("id");
+            expect($dashboard)->toHaveKey("dashboard_id");
             expect($dashboard)->toHaveKey("title");
             expect($dashboard)->toHaveKey("description");
             expect($dashboard)->toHaveKey("icon");

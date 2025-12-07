@@ -23,11 +23,11 @@ describe("CategoryLinkCreateAction", function () {
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
                 "link_id" => "  {$linkId->toString()}  ",
             ]);
 
-            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["category_id"])->toBe($categoryId->toString());
             expect($filtered["link_id"])->toBe($linkId->toString());
         });
 
@@ -43,7 +43,7 @@ describe("CategoryLinkCreateAction", function () {
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["category_id"])->toBe("");
             expect($filtered["link_id"])->toBe("");
         });
     });
@@ -62,7 +62,7 @@ describe("CategoryLinkCreateAction", function () {
             $linkId = Uuid::uuid4();
 
             $data = [
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "link_id" => $linkId->toString(),
             ];
 
@@ -85,7 +85,7 @@ describe("CategoryLinkCreateAction", function () {
             );
 
             $data = [
-                "id" => "not-a-uuid",
+                "category_id" => "not-a-uuid",
                 "link_id" => Uuid::uuid4()->toString(),
             ];
 
@@ -105,7 +105,7 @@ describe("CategoryLinkCreateAction", function () {
             );
 
             $data = [
-                "id" => Uuid::uuid4()->toString(),
+                "category_id" => Uuid::uuid4()->toString(),
                 "link_id" => "not-a-uuid",
             ];
 
@@ -144,7 +144,7 @@ describe("CategoryLinkCreateAction", function () {
             );
 
             $data = [
-                "id" => Uuid::uuid4()->toString(),
+                "category_id" => Uuid::uuid4()->toString(),
             ];
 
             expect(fn() => $action->validate($data))->toThrow(
@@ -186,7 +186,7 @@ describe("CategoryLinkCreateAction", function () {
                 );
 
                 $result = $action->execute([
-                    "id" => $categoryId->toString(),
+                    "category_id" => $categoryId->toString(),
                     "link_id" => $linkId->toString(),
                 ]);
 
@@ -228,7 +228,7 @@ describe("CategoryLinkCreateAction", function () {
             );
 
             $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "link_id" => $linkId->toString(),
             ]);
 
@@ -257,7 +257,7 @@ describe("CategoryLinkCreateAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "link_id" => $linkId->toString(),
             ]);
 
@@ -290,7 +290,7 @@ describe("CategoryLinkCreateAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
                 "link_id" => "  {$linkId->toString()}  ",
             ];
 

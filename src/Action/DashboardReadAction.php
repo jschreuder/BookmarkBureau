@@ -33,11 +33,11 @@ final readonly class DashboardReadAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string} $data */
+    /** @param array{dashboard_id: string} $data */
     #[\Override]
     public function execute(array $data): array
     {
-        $dashboardId = Uuid::fromString($data["id"]);
+        $dashboardId = Uuid::fromString($data["dashboard_id"]);
         $dashboard = $this->dashboardService->getDashboard($dashboardId);
         return $this->outputSpec->transform($dashboard);
     }

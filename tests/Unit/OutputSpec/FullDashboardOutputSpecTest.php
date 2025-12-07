@@ -136,7 +136,7 @@ describe("FullDashboardOutputSpec", function () {
                     "favorites",
                 ]);
                 expect($result["dashboard"])->toHaveKeys([
-                    "id",
+                    "dashboard_id",
                     "title",
                     "description",
                     "icon",
@@ -161,7 +161,7 @@ describe("FullDashboardOutputSpec", function () {
 
             $result = $spec->transform($dashboardView);
 
-            expect($result["dashboard"]["id"])->toBe(
+            expect($result["dashboard"]["dashboard_id"])->toBe(
                 $dashboard->dashboardId->toString(),
             );
             expect($result["dashboard"]["title"])->toBe("My Dashboard");
@@ -441,7 +441,7 @@ describe("FullDashboardOutputSpec", function () {
 
             $result = $spec->transform($dashboardView);
 
-            expect($result["categories"][0]["links"][0]["id"])->toBe(
+            expect($result["categories"][0]["links"][0]["link_id"])->toBe(
                 $link->linkId->toString(),
             );
             expect($result["categories"][0]["links"][0]["url"])->toBe(
@@ -454,7 +454,7 @@ describe("FullDashboardOutputSpec", function () {
                 "Example description",
             );
             expect($result["categories"][0]["links"][0])->toHaveKeys([
-                "id",
+                "link_id",
                 "url",
                 "title",
                 "description",
@@ -483,7 +483,7 @@ describe("FullDashboardOutputSpec", function () {
 
             $result = $spec->transform($dashboardView);
 
-            expect($result["favorites"][0]["id"])->toBe(
+            expect($result["favorites"][0]["link_id"])->toBe(
                 $favorite->linkId->toString(),
             );
             expect($result["favorites"][0]["url"])->toBe(
@@ -494,7 +494,7 @@ describe("FullDashboardOutputSpec", function () {
                 "Favorite description",
             );
             expect($result["favorites"][0])->toHaveKeys([
-                "id",
+                "link_id",
                 "url",
                 "title",
                 "description",
@@ -527,7 +527,7 @@ describe("FullDashboardOutputSpec", function () {
 
             $result = $spec->transform($dashboardView);
 
-            expect($result["categories"][0]["id"])->toBe(
+            expect($result["categories"][0]["category_id"])->toBe(
                 $category->categoryId->toString(),
             );
             expect($result["categories"][0]["dashboard_id"])->toBe(
@@ -537,7 +537,7 @@ describe("FullDashboardOutputSpec", function () {
             expect($result["categories"][0]["color"])->toBe("#123456");
             expect($result["categories"][0]["sort_order"])->toBe(42);
             expect($result["categories"][0])->toHaveKeys([
-                "id",
+                "category_id",
                 "dashboard_id",
                 "title",
                 "color",
@@ -845,7 +845,9 @@ describe("FullDashboardOutputSpec", function () {
             $dashboardOutputSpec = new DashboardOutputSpec();
             $expectedDashboard = $dashboardOutputSpec->transform($dashboard);
 
-            expect($result["dashboard"]["id"])->toBe($expectedDashboard["id"]);
+            expect($result["dashboard"]["dashboard_id"])->toBe(
+                $expectedDashboard["dashboard_id"],
+            );
             expect($result["dashboard"]["title"])->toBe(
                 $expectedDashboard["title"],
             );
@@ -856,8 +858,8 @@ describe("FullDashboardOutputSpec", function () {
             $categoryOutputSpec = new CategoryOutputSpec();
             $expectedCategory = $categoryOutputSpec->transform($category);
 
-            expect($result["categories"][0]["id"])->toBe(
-                $expectedCategory["id"],
+            expect($result["categories"][0]["category_id"])->toBe(
+                $expectedCategory["category_id"],
             );
             expect($result["categories"][0]["title"])->toBe(
                 $expectedCategory["title"],
@@ -866,16 +868,16 @@ describe("FullDashboardOutputSpec", function () {
             $linkOutputSpec = new LinkOutputSpec(new TagOutputSpec());
             $expectedLink = $linkOutputSpec->transform($link);
 
-            expect($result["categories"][0]["links"][0]["id"])->toBe(
-                $expectedLink["id"],
+            expect($result["categories"][0]["links"][0]["link_id"])->toBe(
+                $expectedLink["link_id"],
             );
             expect($result["categories"][0]["links"][0]["url"])->toBe(
                 $expectedLink["url"],
             );
 
             $expectedFavorite = $linkOutputSpec->transform($favorite);
-            expect($result["favorites"][0]["id"])->toBe(
-                $expectedFavorite["id"],
+            expect($result["favorites"][0]["link_id"])->toBe(
+                $expectedFavorite["link_id"],
             );
             expect($result["favorites"][0]["url"])->toBe(
                 $expectedFavorite["url"],

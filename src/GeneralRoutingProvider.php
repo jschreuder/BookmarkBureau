@@ -110,43 +110,55 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
 
         // Resources
         $this->registerLinkRoutes(
-            new ResourceRouteBuilder($router, "link", "/link"),
+            new ResourceRouteBuilder($router, "link", "/link", "/{link_id}"),
         );
 
         $this->registerTagRoutes(
-            new ResourceRouteBuilder($router, "tag", "/tag"),
+            new ResourceRouteBuilder($router, "tag", "/tag", "/{tag_name}"),
         );
 
         $this->registerLinkTagRoutes(
             new ResourceRouteBuilder(
                 $router,
                 "link_tag",
-                "/link/{id}/tag",
+                "/link/{link_id}/tag",
                 "/{tag_name}",
             ),
         );
 
         $this->registerDashboardRoutes(
-            new ResourceRouteBuilder($router, "dashboard", "/dashboard"),
+            new ResourceRouteBuilder(
+                $router,
+                "dashboard",
+                "/dashboard",
+                "/{dashboard_id}",
+            ),
         );
 
         $this->registerFavoriteRoutes(
             new ResourceRouteBuilder(
                 $router,
                 "favorite",
-                "/dashboard/{id}/favorites",
+                "/dashboard/{dashboard_id}/favorites",
+                "/{favorite_id}",
             ),
         );
 
         $this->registerCategoryRoutes(
-            new ResourceRouteBuilder($router, "category", "/category"),
+            new ResourceRouteBuilder(
+                $router,
+                "category",
+                "/category",
+                "/{category_id}",
+            ),
         );
 
         $this->registerCategoryLinkRoutes(
             new ResourceRouteBuilder(
                 $router,
                 "category_link",
-                "/category/{id}/link",
+                "/category/{category_id}/link",
+                "/{link_id}",
             ),
         );
 
@@ -154,7 +166,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
         // This route must be last as it uses a catch-all /{id} pattern with UUID validation
         $router->get(
             "dashboard-view",
-            "/{id}",
+            "/{dashboard_id}",
             fn() => new DashboardViewController(
                 $this->container->getDashboardService(),
                 new JsonResponseTransformer(),
@@ -178,7 +190,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerRead(
                 fn() => new LinkReadAction(
                     $this->container->getLinkService(),
-                    new IdInputSpec(),
+                    new IdInputSpec("link_id"),
                     new LinkOutputSpec(new TagOutputSpec()),
                 ),
             )
@@ -199,7 +211,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerDelete(
                 fn() => new LinkDeleteAction(
                     $this->container->getLinkService(),
-                    new IdInputSpec(),
+                    new IdInputSpec("link_id"),
                 ),
             );
     }
@@ -272,7 +284,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerRead(
                 fn() => new DashboardReadAction(
                     $this->container->getDashboardService(),
-                    new IdInputSpec(),
+                    new IdInputSpec("dashboard_id"),
                     new DashboardOutputSpec(),
                 ),
             )
@@ -293,7 +305,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerDelete(
                 fn() => new DashboardDeleteAction(
                     $this->container->getDashboardService(),
-                    new DashboardInputSpec(),
+                    new IdInputSpec("dashboard_id"),
                 ),
             );
     }
@@ -308,10 +320,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                     new FavoriteOutputSpec(),
                 ),
             )
-            ->registerCustom(
-                "DELETE",
-                "delete",
-                "",
+            ->registerDelete(
                 fn() => new FavoriteDeleteAction(
                     $this->container->getFavoriteService(),
                     new FavoriteInputSpec(),
@@ -335,7 +344,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerRead(
                 fn() => new CategoryReadAction(
                     $this->container->getCategoryService(),
-                    new IdInputSpec(),
+                    new IdInputSpec("category_id"),
                     new CategoryOutputSpec(),
                 ),
             )
@@ -356,7 +365,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ->registerDelete(
                 fn() => new CategoryDeleteAction(
                     $this->container->getCategoryService(),
-                    new CategoryInputSpec(),
+                    new IdInputSpec("category_id"),
                 ),
             );
     }
@@ -372,10 +381,7 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                     new CategoryLinkOutputSpec(),
                 ),
             )
-            ->registerCustom(
-                "DELETE",
-                "delete",
-                "",
+            ->registerDelete(
                 fn() => new CategoryLinkDeleteAction(
                     $this->container->getCategoryService(),
                     new CategoryLinkInputSpec(),

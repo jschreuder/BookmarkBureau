@@ -34,12 +34,12 @@ final readonly class TagCreateAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string, color: ?string} $data */
+    /** @param array{tag_name: string, color: ?string} $data */
     #[\Override]
     public function execute(array $data): array
     {
         $tag = $this->tagService->createTag(
-            tagName: $data["id"],
+            tagName: $data["tag_name"],
             color: $data["color"],
         );
         return $this->outputSpec->transform($tag);

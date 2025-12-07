@@ -20,11 +20,11 @@ describe("CategoryLinkDeleteAction", function () {
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
                 "link_id" => "  {$linkId->toString()}  ",
             ]);
 
-            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["category_id"])->toBe($categoryId->toString());
             expect($filtered["link_id"])->toBe($linkId->toString());
         });
 
@@ -38,7 +38,7 @@ describe("CategoryLinkDeleteAction", function () {
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["category_id"])->toBe("");
             expect($filtered["link_id"])->toBe("");
         });
     });
@@ -55,7 +55,7 @@ describe("CategoryLinkDeleteAction", function () {
             $linkId = Uuid::uuid4();
 
             $data = [
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "link_id" => $linkId->toString(),
             ];
 
@@ -76,7 +76,7 @@ describe("CategoryLinkDeleteAction", function () {
             );
 
             $data = [
-                "id" => "not-a-uuid",
+                "category_id" => "not-a-uuid",
                 "link_id" => Uuid::uuid4()->toString(),
             ];
 
@@ -94,7 +94,7 @@ describe("CategoryLinkDeleteAction", function () {
             );
 
             $data = [
-                "id" => Uuid::uuid4()->toString(),
+                "category_id" => Uuid::uuid4()->toString(),
                 "link_id" => "not-a-uuid",
             ];
 
@@ -129,7 +129,7 @@ describe("CategoryLinkDeleteAction", function () {
             );
 
             $data = [
-                "id" => Uuid::uuid4()->toString(),
+                "category_id" => Uuid::uuid4()->toString(),
             ];
 
             expect(fn() => $action->validate($data))->toThrow(
@@ -159,7 +159,7 @@ describe("CategoryLinkDeleteAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "link_id" => $linkId->toString(),
             ]);
 
@@ -191,7 +191,7 @@ describe("CategoryLinkDeleteAction", function () {
             );
 
             $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "link_id" => $linkId->toString(),
             ]);
 
@@ -216,7 +216,7 @@ describe("CategoryLinkDeleteAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
                 "link_id" => "  {$linkId->toString()}  ",
             ];
 

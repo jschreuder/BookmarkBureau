@@ -29,12 +29,12 @@ final readonly class LinkTagCreateAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string, tag_name: string} $data */
+    /** @param array{link_id: string, tag_name: string} $data */
     #[\Override]
     public function execute(array $data): array
     {
         $this->tagService->addTagToLink(
-            linkId: Uuid::fromString($data["id"]),
+            linkId: Uuid::fromString($data["link_id"]),
             tagName: $data["tag_name"],
         );
 

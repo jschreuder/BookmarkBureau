@@ -169,14 +169,14 @@ describe("CategoryCreateAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => Uuid::uuid4()->toString(),
+                "category_id" => Uuid::uuid4()->toString(),
                 "dashboard_id" => $dashboardId->toString(),
                 "title" => "Test Category",
                 "color" => null,
                 "sort_order" => 1,
             ]);
 
-            expect($filtered)->not->toHaveKey("id");
+            expect($filtered)->not->toHaveKey("category_id");
         });
     });
 
@@ -418,7 +418,7 @@ describe("CategoryCreateAction", function () {
                     "sort_order" => 1,
                 ]);
 
-                expect($result)->toHaveKey("id");
+                expect($result)->toHaveKey("category_id");
                 expect($result)->toHaveKey("dashboard_id");
                 expect($result)->toHaveKey("title");
                 expect($result)->toHaveKey("color");
@@ -634,7 +634,7 @@ describe("CategoryCreateAction", function () {
             try {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
-                expect($result)->toHaveKey("id");
+                expect($result)->toHaveKey("category_id");
                 expect($result)->toHaveKey("title");
             } catch (ValidationFailedException $e) {
                 throw $e;

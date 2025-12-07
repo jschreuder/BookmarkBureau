@@ -373,7 +373,7 @@ describe("JsonResponseTransformer", function () {
 
             $body = json_decode($response->getBody()->getContents(), true);
             expect($body)->toHaveKeys([
-                "id",
+                "link_id",
                 "url",
                 "title",
                 "description",
@@ -396,7 +396,7 @@ describe("JsonResponseTransformer", function () {
 
             $body = json_decode($response->getBody()->getContents(), true);
             expect($body)->toHaveKeys([
-                "id",
+                "category_id",
                 "dashboard_id",
                 "title",
                 "color",
@@ -404,7 +404,7 @@ describe("JsonResponseTransformer", function () {
                 "created_at",
                 "updated_at",
             ]);
-            expect($body["id"])->toBeString();
+            expect($body["category_id"])->toBeString();
         });
 
         test("transforms output from DashboardOutputSpec", function () {
@@ -417,7 +417,7 @@ describe("JsonResponseTransformer", function () {
 
             $body = json_decode($response->getBody()->getContents(), true);
             expect($body)->toHaveKeys([
-                "id",
+                "dashboard_id",
                 "title",
                 "description",
                 "icon",
@@ -444,7 +444,7 @@ describe("JsonResponseTransformer", function () {
                 $body = json_decode($response->getBody()->getContents(), true);
                 expect($body["success"])->toBeTrue();
                 expect($body["data"])->toHaveKeys([
-                    "id",
+                    "link_id",
                     "url",
                     "title",
                     "description",
@@ -478,7 +478,11 @@ describe("JsonResponseTransformer", function () {
                 expect($body["success"])->toBeTrue();
                 expect($body["data"])->toBeArray();
                 expect(count($body["data"]))->toBe(2);
-                expect($body["data"][0])->toHaveKeys(["id", "url", "title"]);
+                expect($body["data"][0])->toHaveKeys([
+                    "link_id",
+                    "url",
+                    "title",
+                ]);
             },
         );
 
@@ -536,7 +540,7 @@ describe("JsonResponseTransformer", function () {
             // Verify all items have required fields
             foreach ($body["data"] as $item) {
                 expect($item)->toHaveKeys([
-                    "id",
+                    "link_id",
                     "url",
                     "title",
                     "description",
@@ -563,7 +567,7 @@ describe("JsonResponseTransformer", function () {
 
             expect($response->getStatusCode())->toBe(201);
             $body = json_decode($response->getBody()->getContents(), true);
-            expect($body["data"]["id"])->toBeString();
+            expect($body["data"]["link_id"])->toBeString();
         });
     });
 

@@ -10,7 +10,7 @@ describe('LinkTagInputSpec', function () {
             $spec = new LinkTagInputSpec();
             $fields = $spec->getAvailableFields();
 
-            expect($fields)->toContain('id');
+            expect($fields)->toContain('link_id');
             expect($fields)->toContain('tag_name');
             expect(count($fields))->toBe(2);
         });
@@ -22,11 +22,11 @@ describe('LinkTagInputSpec', function () {
             $uuid = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => "  {$uuid}  ",
+                'link_id' => "  {$uuid}  ",
                 'tag_name' => '  Test Tag  ',
             ]);
 
-            expect($filtered['id'])->toBe($uuid);
+            expect($filtered['link_id'])->toBe($uuid);
             expect($filtered['tag_name'])->toBe('Test Tag');
         });
 
@@ -37,7 +37,7 @@ describe('LinkTagInputSpec', function () {
                 'tag_name' => 'Test Tag',
             ]);
 
-            expect($filtered['id'])->toBe('');
+            expect($filtered['link_id'])->toBe('');
         });
 
         test('handles missing tag_name key with empty string', function () {
@@ -45,7 +45,7 @@ describe('LinkTagInputSpec', function () {
             $uuid = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $uuid,
+                'link_id' => $uuid,
             ]);
 
             expect($filtered['tag_name'])->toBe('');
@@ -56,12 +56,12 @@ describe('LinkTagInputSpec', function () {
             $uuid = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $uuid,
+                'link_id' => $uuid,
                 'tag_name' => 'Test Tag',
                 'extra_field' => 'ignored',
             ]);
 
-            expect($filtered)->toHaveKey('id');
+            expect($filtered)->toHaveKey('link_id');
             expect($filtered)->toHaveKey('tag_name');
             expect($filtered)->not->toHaveKey('extra_field');
         });
@@ -71,11 +71,11 @@ describe('LinkTagInputSpec', function () {
             $uuid = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $uuid,
+                'link_id' => $uuid,
                 'tag_name' => 'Test Tag',
-            ], ['id']);
+            ], ['link_id']);
 
-            expect($filtered)->toHaveKey('id');
+            expect($filtered)->toHaveKey('link_id');
             expect($filtered)->not->toHaveKey('tag_name');
             expect(count($filtered))->toBe(1);
         });
@@ -85,7 +85,7 @@ describe('LinkTagInputSpec', function () {
             $uuid = Uuid::uuid4()->toString();
 
             expect(function() use ($spec, $uuid) {
-                $spec->filter(['id' => $uuid], ['unknown_field']);
+                $spec->filter(['link_id' => $uuid], ['unknown_field']);
             })->toThrow(InvalidArgumentException::class);
         });
     });
@@ -97,7 +97,7 @@ describe('LinkTagInputSpec', function () {
 
             try {
                 $spec->validate([
-                    'id' => $uuid,
+                    'link_id' => $uuid,
                     'tag_name' => 'Test Tag',
                 ]);
                 expect(true)->toBeTrue();
@@ -111,7 +111,7 @@ describe('LinkTagInputSpec', function () {
 
             expect(function() use ($spec) {
                 $spec->validate([
-                    'id' => 'not-a-uuid',
+                    'link_id' => 'not-a-uuid',
                     'tag_name' => 'Test Tag',
                 ]);
             })->toThrow(ValidationFailedException::class);
@@ -122,7 +122,7 @@ describe('LinkTagInputSpec', function () {
 
             expect(function() use ($spec) {
                 $spec->validate([
-                    'id' => '',
+                    'link_id' => '',
                     'tag_name' => 'Test Tag',
                 ]);
             })->toThrow(ValidationFailedException::class);
@@ -144,7 +144,7 @@ describe('LinkTagInputSpec', function () {
 
             expect(function() use ($spec, $uuid) {
                 $spec->validate([
-                    'id' => $uuid,
+                    'link_id' => $uuid,
                     'tag_name' => '',
                 ]);
             })->toThrow(ValidationFailedException::class);
@@ -156,7 +156,7 @@ describe('LinkTagInputSpec', function () {
 
             expect(function() use ($spec, $uuid) {
                 $spec->validate([
-                    'id' => $uuid,
+                    'link_id' => $uuid,
                 ]);
             })->toThrow(ValidationFailedException::class);
         });
@@ -167,7 +167,7 @@ describe('LinkTagInputSpec', function () {
 
             expect(function() use ($spec, $uuid) {
                 $spec->validate([
-                    'id' => $uuid,
+                    'link_id' => $uuid,
                     'tag_name' => str_repeat('a', 257),
                 ]);
             })->toThrow(ValidationFailedException::class);
@@ -179,7 +179,7 @@ describe('LinkTagInputSpec', function () {
 
             try {
                 $spec->validate([
-                    'id' => $uuid,
+                    'link_id' => $uuid,
                     'tag_name' => str_repeat('a', 256),
                 ]);
                 expect(true)->toBeTrue();
@@ -193,7 +193,7 @@ describe('LinkTagInputSpec', function () {
             $uuid = Uuid::uuid4()->toString();
 
             try {
-                $spec->validate(['id' => $uuid], ['id']);
+                $spec->validate(['link_id' => $uuid], ['link_id']);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
@@ -205,7 +205,7 @@ describe('LinkTagInputSpec', function () {
             $uuid = Uuid::uuid4()->toString();
 
             expect(function() use ($spec, $uuid) {
-                $spec->validate(['id' => $uuid], ['unknown_field']);
+                $spec->validate(['link_id' => $uuid], ['unknown_field']);
             })->toThrow(InvalidArgumentException::class);
         });
     });
@@ -216,7 +216,7 @@ describe('LinkTagInputSpec', function () {
             $uuid = Uuid::uuid4()->toString();
 
             $rawData = [
-                'id' => "  {$uuid}  ",
+                'link_id' => "  {$uuid}  ",
                 'tag_name' => '  Test Tag  ',
                 'extra' => 'ignored'
             ];
@@ -236,7 +236,7 @@ describe('LinkTagInputSpec', function () {
             $uuid = Uuid::uuid4()->toString();
 
             $rawData = [
-                'id' => $uuid,
+                'link_id' => $uuid,
                 'tag_name' => 'Test Tag',
                 'extra_field' => 'ignored',
             ];
@@ -257,12 +257,12 @@ describe('LinkTagInputSpec', function () {
             $spec = new LinkTagInputSpec();
 
             $rawData = [
-                'id' => 'invalid-uuid',
+                'link_id' => 'invalid-uuid',
                 'tag_name' => 'Test Tag'
             ];
             $filtered = $spec->filter($rawData);
 
-            expect($filtered['id'])->toBe('invalid-uuid');
+            expect($filtered['link_id'])->toBe('invalid-uuid');
 
             expect(function() use ($spec, $filtered) {
                 $spec->validate($filtered);
@@ -275,19 +275,19 @@ describe('LinkTagInputSpec', function () {
             $uuid2 = Uuid::uuid4()->toString();
 
             $filtered1 = $spec->filter([
-                'id' => "  {$uuid1}  ",
+                'link_id' => "  {$uuid1}  ",
                 'tag_name' => '  Important  ',
             ]);
             $spec->validate($filtered1);
 
             $filtered2 = $spec->filter([
-                'id' => "  {$uuid2}  ",
+                'link_id' => "  {$uuid2}  ",
                 'tag_name' => '  Work  ',
             ]);
             $spec->validate($filtered2);
 
-            expect($filtered1['id'])->toBe($uuid1);
-            expect($filtered2['id'])->toBe($uuid2);
+            expect($filtered1['link_id'])->toBe($uuid1);
+            expect($filtered2['link_id'])->toBe($uuid2);
         });
     });
 });

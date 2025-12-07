@@ -14,7 +14,7 @@ use Respect\Validation\Validator;
  */
 final class TagNameInputSpec implements InputSpecInterface
 {
-    private const array FIELDS = ["id"];
+    private const array FIELDS = ["tag_name"];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -22,7 +22,7 @@ final class TagNameInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
-    /** @return array{id: string} */
+    /** @return array{tag_name: string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -31,7 +31,7 @@ final class TagNameInputSpec implements InputSpecInterface
 
         foreach ($fields as $field) {
             $filtered[$field] = match ($field) {
-                "id" => Filter::start($rawData, "id", "")
+                "tag_name" => Filter::start($rawData, "tag_name", "")
                     ->string(allowNull: false)
                     ->trim()
                     ->done(),
@@ -41,11 +41,11 @@ final class TagNameInputSpec implements InputSpecInterface
             };
         }
 
-        /** @var array{id: string} */
+        /** @var array{tag_name: string} */
         return $filtered;
     }
 
-    /** @param array{id: string} $data */
+    /** @param array{tag_name: string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
@@ -54,8 +54,8 @@ final class TagNameInputSpec implements InputSpecInterface
 
         foreach ($fields as $field) {
             match ($field) {
-                "id" => $validator->key(
-                    "id",
+                "tag_name" => $validator->key(
+                    "tag_name",
                     Validator::notEmpty()->length(1, 256),
                 ),
                 default => throw new InvalidArgumentException(

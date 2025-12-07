@@ -11,54 +11,54 @@ describe("LinkDeleteAction", function () {
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$linkId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
             ]);
 
-            expect($filtered["id"])->toBe($linkId->toString());
+            expect($filtered["link_id"])->toBe($linkId->toString());
         });
 
         test("handles missing id key with empty string", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["link_id"])->toBe("");
         });
 
         test("preserves valid id without modification", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
-            expect($filtered["id"])->toBe($linkId->toString());
+            expect($filtered["link_id"])->toBe($linkId->toString());
         });
 
         test("ignores additional fields in input", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
             $linkId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Should be ignored",
                 "extra_field" => "ignored",
             ]);
 
-            expect($filtered)->toHaveKey("id");
+            expect($filtered)->toHaveKey("link_id");
             expect($filtered)->not->toHaveKey("url");
             expect($filtered)->not->toHaveKey("title");
             expect($filtered)->not->toHaveKey("extra_field");
@@ -68,11 +68,11 @@ describe("LinkDeleteAction", function () {
     describe("validate method", function () {
         test("passes validation with valid UUID", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
             $linkId = Uuid::uuid4();
 
-            $data = ["id" => $linkId->toString()];
+            $data = ["link_id" => $linkId->toString()];
 
             try {
                 $action->validate($data);
@@ -84,10 +84,10 @@ describe("LinkDeleteAction", function () {
 
         test("throws validation error for invalid UUID", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
-            $data = ["id" => "not-a-uuid"];
+            $data = ["link_id" => "not-a-uuid"];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -96,10 +96,10 @@ describe("LinkDeleteAction", function () {
 
         test("throws validation error for empty id", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
-            $data = ["id" => ""];
+            $data = ["link_id" => ""];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -108,7 +108,7 @@ describe("LinkDeleteAction", function () {
 
         test("throws validation error for missing id key", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
             $data = [];
@@ -120,10 +120,10 @@ describe("LinkDeleteAction", function () {
 
         test("throws validation error for whitespace-only id", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
-            $data = ["id" => "   "];
+            $data = ["link_id" => "   "];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -132,10 +132,10 @@ describe("LinkDeleteAction", function () {
 
         test("throws validation error for null id", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
-            $data = ["id" => null];
+            $data = ["link_id" => null];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -144,11 +144,11 @@ describe("LinkDeleteAction", function () {
 
         test("validates UUID in different formats", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
             $linkId = Uuid::uuid4();
 
-            $data = ["id" => $linkId->toString()];
+            $data = ["link_id" => $linkId->toString()];
 
             try {
                 $action->validate($data);
@@ -169,11 +169,11 @@ describe("LinkDeleteAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->once();
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
             $result = $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect($result)->toBe([]);
@@ -187,11 +187,11 @@ describe("LinkDeleteAction", function () {
                 ->shouldReceive("deleteLink")
                 ->with(Mockery::type(UuidInterface::class));
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
             $result = $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect($result)->toEqual([]);
@@ -209,11 +209,11 @@ describe("LinkDeleteAction", function () {
                     ->with(Mockery::type(UuidInterface::class))
                     ->once();
 
-                $inputSpec = new IdInputSpec();
+                $inputSpec = new IdInputSpec("link_id");
                 $action = new LinkDeleteAction($linkService, $inputSpec);
 
                 $action->execute([
-                    "id" => $linkId->toString(),
+                    "link_id" => $linkId->toString(),
                 ]);
 
                 expect(true)->toBeTrue();
@@ -231,11 +231,11 @@ describe("LinkDeleteAction", function () {
                     $uuidCapture = $uuid;
                 });
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
             $action->execute([
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
             ]);
 
             expect($uuidCapture->toString())->toBe($linkId->toString());
@@ -252,11 +252,11 @@ describe("LinkDeleteAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->once();
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
             $rawData = [
-                "id" => "  {$linkId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
@@ -279,11 +279,11 @@ describe("LinkDeleteAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->once();
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
             $rawData = [
-                "id" => $linkId->toString(),
+                "link_id" => $linkId->toString(),
                 "url" => "https://example.com",
                 "title" => "Should be ignored",
                 "extra" => "data",
@@ -310,15 +310,15 @@ describe("LinkDeleteAction", function () {
                 ->shouldReceive("deleteLink")
                 ->with(Mockery::type(UuidInterface::class));
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
             $rawData = [
-                "id" => "  {$linkId->toString()}  ",
+                "link_id" => "  {$linkId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe($linkId->toString());
+            expect($filtered["link_id"])->toBe($linkId->toString());
 
             $action->validate($filtered);
             $result = $action->execute($filtered);
@@ -331,11 +331,11 @@ describe("LinkDeleteAction", function () {
 
             $linkService->shouldNotReceive("deleteLink");
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("link_id");
             $action = new LinkDeleteAction($linkService, $inputSpec);
 
             $rawData = [
-                "id" => "invalid-uuid",
+                "link_id" => "invalid-uuid",
             ];
 
             $filtered = $action->filter($rawData);

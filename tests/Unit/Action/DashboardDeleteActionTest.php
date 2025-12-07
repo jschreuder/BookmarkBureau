@@ -11,54 +11,54 @@ describe("DashboardDeleteAction", function () {
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$dashboardId->toString()}  ",
+                "dashboard_id" => "  {$dashboardId->toString()}  ",
             ]);
 
-            expect($filtered["id"])->toBe($dashboardId->toString());
+            expect($filtered["dashboard_id"])->toBe($dashboardId->toString());
         });
 
         test("handles missing id key with empty string", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["dashboard_id"])->toBe("");
         });
 
         test("preserves valid id without modification", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
-            expect($filtered["id"])->toBe($dashboardId->toString());
+            expect($filtered["dashboard_id"])->toBe($dashboardId->toString());
         });
 
         test("ignores additional fields in input", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Should be ignored",
                 "description" => "Should be ignored",
                 "extra_field" => "ignored",
             ]);
 
-            expect($filtered)->toHaveKey("id");
+            expect($filtered)->toHaveKey("dashboard_id");
             expect($filtered)->not->toHaveKey("title");
             expect($filtered)->not->toHaveKey("description");
             expect($filtered)->not->toHaveKey("extra_field");
@@ -68,11 +68,11 @@ describe("DashboardDeleteAction", function () {
     describe("validate method", function () {
         test("passes validation with valid UUID", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
             $dashboardId = Uuid::uuid4();
 
-            $data = ["id" => $dashboardId->toString()];
+            $data = ["dashboard_id" => $dashboardId->toString()];
 
             try {
                 $action->validate($data);
@@ -84,10 +84,10 @@ describe("DashboardDeleteAction", function () {
 
         test("throws validation error for invalid UUID", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
-            $data = ["id" => "not-a-uuid"];
+            $data = ["dashboard_id" => "not-a-uuid"];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -96,10 +96,10 @@ describe("DashboardDeleteAction", function () {
 
         test("throws validation error for empty id", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
-            $data = ["id" => ""];
+            $data = ["dashboard_id" => ""];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -108,7 +108,7 @@ describe("DashboardDeleteAction", function () {
 
         test("throws validation error for missing id key", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
             $data = [];
@@ -120,10 +120,10 @@ describe("DashboardDeleteAction", function () {
 
         test("throws validation error for whitespace-only id", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
-            $data = ["id" => "   "];
+            $data = ["dashboard_id" => "   "];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -132,10 +132,10 @@ describe("DashboardDeleteAction", function () {
 
         test("throws validation error for null id", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
-            $data = ["id" => null];
+            $data = ["dashboard_id" => null];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -144,11 +144,11 @@ describe("DashboardDeleteAction", function () {
 
         test("validates UUID in different formats", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
             $dashboardId = Uuid::uuid4();
 
-            $data = ["id" => $dashboardId->toString()];
+            $data = ["dashboard_id" => $dashboardId->toString()];
 
             try {
                 $action->validate($data);
@@ -169,11 +169,11 @@ describe("DashboardDeleteAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->once();
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
             $result = $action->execute([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
             expect($result)->toBe([]);
@@ -187,11 +187,11 @@ describe("DashboardDeleteAction", function () {
                 ->shouldReceive("deleteDashboard")
                 ->with(Mockery::type(UuidInterface::class));
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
             $result = $action->execute([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
             expect($result)->toEqual([]);
@@ -211,14 +211,14 @@ describe("DashboardDeleteAction", function () {
                     ->with(Mockery::type(UuidInterface::class))
                     ->once();
 
-                $inputSpec = new IdInputSpec();
+                $inputSpec = new IdInputSpec("dashboard_id");
                 $action = new DashboardDeleteAction(
                     $dashboardService,
                     $inputSpec,
                 );
 
                 $action->execute([
-                    "id" => $dashboardId->toString(),
+                    "dashboard_id" => $dashboardId->toString(),
                 ]);
 
                 expect(true)->toBeTrue();
@@ -236,11 +236,11 @@ describe("DashboardDeleteAction", function () {
                     $uuidCapture = $uuid;
                 });
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
             $action->execute([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
             expect($uuidCapture->toString())->toBe($dashboardId->toString());
@@ -257,11 +257,11 @@ describe("DashboardDeleteAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->once();
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
             $rawData = [
-                "id" => "  {$dashboardId->toString()}  ",
+                "dashboard_id" => "  {$dashboardId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
@@ -284,11 +284,11 @@ describe("DashboardDeleteAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->once();
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
             $rawData = [
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Should be ignored",
                 "description" => "Should be ignored",
                 "extra" => "data",
@@ -315,15 +315,15 @@ describe("DashboardDeleteAction", function () {
                 ->shouldReceive("deleteDashboard")
                 ->with(Mockery::type(UuidInterface::class));
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
             $rawData = [
-                "id" => "  {$dashboardId->toString()}  ",
+                "dashboard_id" => "  {$dashboardId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe($dashboardId->toString());
+            expect($filtered["dashboard_id"])->toBe($dashboardId->toString());
 
             $action->validate($filtered);
             $result = $action->execute($filtered);
@@ -336,11 +336,11 @@ describe("DashboardDeleteAction", function () {
 
             $dashboardService->shouldNotReceive("deleteDashboard");
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $action = new DashboardDeleteAction($dashboardService, $inputSpec);
 
             $rawData = [
-                "id" => "invalid-uuid",
+                "dashboard_id" => "invalid-uuid",
             ];
 
             $filtered = $action->filter($rawData);

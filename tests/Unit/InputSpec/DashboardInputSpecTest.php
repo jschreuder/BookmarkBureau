@@ -10,7 +10,7 @@ describe('DashboardInputSpec', function () {
             $spec = new DashboardInputSpec();
             $fields = $spec->getAvailableFields();
 
-            expect($fields)->toContain('id');
+            expect($fields)->toContain('dashboard_id');
             expect($fields)->toContain('title');
             expect($fields)->toContain('description');
             expect($fields)->toContain('icon');
@@ -24,13 +24,13 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => "  {$dashboardId}  ",
+                'dashboard_id' => "  {$dashboardId}  ",
                 'title' => '  Test Dashboard  ',
                 'description' => '  A test dashboard  ',
                 'icon' => '  home  ',
             ]);
 
-            expect($filtered['id'])->toBe($dashboardId);
+            expect($filtered['dashboard_id'])->toBe($dashboardId);
             expect($filtered['title'])->toBe('Test Dashboard');
             expect($filtered['description'])->toBe('A test dashboard');
             expect($filtered['icon'])->toBe('home');
@@ -41,7 +41,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $dashboardId,
+                'dashboard_id' => $dashboardId,
                 'title' => '<script>alert("xss")</script>Test<strong>Bold</strong>',
                 'description' => 'A test',
             ]);
@@ -54,7 +54,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $dashboardId,
+                'dashboard_id' => $dashboardId,
                 'title' => 'Test',
                 'description' => '<p>A test</p> <script>bad</script>description',
             ]);
@@ -70,7 +70,7 @@ describe('DashboardInputSpec', function () {
                 'description' => 'A test',
             ]);
 
-            expect($filtered['id'])->toBe('');
+            expect($filtered['dashboard_id'])->toBe('');
         });
 
         test('handles missing title key with empty string', function () {
@@ -78,7 +78,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $dashboardId,
+                'dashboard_id' => $dashboardId,
                 'description' => 'A test',
             ]);
 
@@ -90,7 +90,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $dashboardId,
+                'dashboard_id' => $dashboardId,
                 'title' => 'Test',
             ]);
 
@@ -102,7 +102,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $dashboardId,
+                'dashboard_id' => $dashboardId,
                 'title' => 'Test',
                 'description' => 'A test',
             ]);
@@ -115,7 +115,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $dashboardId,
+                'dashboard_id' => $dashboardId,
                 'title' => 'Test',
                 'description' => 'A test',
                 'icon' => 'home',
@@ -123,7 +123,7 @@ describe('DashboardInputSpec', function () {
                 'another_field' => 'also ignored'
             ]);
 
-            expect($filtered)->toHaveKey('id');
+            expect($filtered)->toHaveKey('dashboard_id');
             expect($filtered)->toHaveKey('title');
             expect($filtered)->toHaveKey('description');
             expect($filtered)->toHaveKey('icon');
@@ -136,7 +136,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $dashboardId,
+                'dashboard_id' => $dashboardId,
                 'title' => 'Test',
                 'description' => 'A test',
                 'icon' => null,
@@ -150,13 +150,13 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $filtered = $spec->filter([
-                'id' => $dashboardId,
+                'dashboard_id' => $dashboardId,
                 'title' => 'Test',
                 'description' => 'A test',
                 'icon' => 'home',
-            ], ['id', 'title']);
+            ], ['dashboard_id', 'title']);
 
-            expect($filtered)->toHaveKey('id');
+            expect($filtered)->toHaveKey('dashboard_id');
             expect($filtered)->toHaveKey('title');
             expect($filtered)->not->toHaveKey('description');
             expect($filtered)->not->toHaveKey('icon');
@@ -168,7 +168,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             expect(function() use ($spec, $dashboardId) {
-                $spec->filter(['id' => $dashboardId], ['unknown_field']);
+                $spec->filter(['dashboard_id' => $dashboardId], ['unknown_field']);
             })->toThrow(InvalidArgumentException::class);
         });
     });
@@ -180,7 +180,7 @@ describe('DashboardInputSpec', function () {
 
             try {
                 $spec->validate([
-                    'id' => $dashboardId,
+                    'dashboard_id' => $dashboardId,
                     'title' => 'Test Dashboard',
                     'description' => 'A test dashboard',
                     'icon' => 'home',
@@ -197,7 +197,7 @@ describe('DashboardInputSpec', function () {
 
             try {
                 $spec->validate([
-                    'id' => $dashboardId,
+                    'dashboard_id' => $dashboardId,
                     'title' => 'Test Dashboard',
                     'description' => null,
                     'icon' => null,
@@ -214,7 +214,7 @@ describe('DashboardInputSpec', function () {
 
             try {
                 $spec->validate([
-                    'id' => $dashboardId,
+                    'dashboard_id' => $dashboardId,
                     'title' => 'Test Dashboard',
                     'description' => '',
                     'icon' => null,
@@ -230,7 +230,7 @@ describe('DashboardInputSpec', function () {
 
             expect(function() use ($spec) {
                 $spec->validate([
-                    'id' => 'not-a-uuid',
+                    'dashboard_id' => 'not-a-uuid',
                     'title' => 'Test',
                     'description' => 'A test',
                 ]);
@@ -242,7 +242,7 @@ describe('DashboardInputSpec', function () {
 
             expect(function() use ($spec) {
                 $spec->validate([
-                    'id' => '',
+                    'dashboard_id' => '',
                     'title' => 'Test',
                     'description' => 'A test',
                 ]);
@@ -266,7 +266,7 @@ describe('DashboardInputSpec', function () {
 
             expect(function() use ($spec, $dashboardId) {
                 $spec->validate([
-                    'id' => $dashboardId,
+                    'dashboard_id' => $dashboardId,
                     'title' => '',
                     'description' => 'A test',
                 ]);
@@ -279,7 +279,7 @@ describe('DashboardInputSpec', function () {
 
             expect(function() use ($spec, $dashboardId) {
                 $spec->validate([
-                    'id' => $dashboardId,
+                    'dashboard_id' => $dashboardId,
                     'description' => 'A test',
                 ]);
             })->toThrow(ValidationFailedException::class);
@@ -291,7 +291,7 @@ describe('DashboardInputSpec', function () {
 
             expect(function() use ($spec, $dashboardId) {
                 $spec->validate([
-                    'id' => $dashboardId,
+                    'dashboard_id' => $dashboardId,
                     'title' => str_repeat('a', 257),
                     'description' => 'A test',
                 ]);
@@ -304,7 +304,7 @@ describe('DashboardInputSpec', function () {
 
             try {
                 $spec->validate([
-                    'id' => $dashboardId,
+                    'dashboard_id' => $dashboardId,
                     'title' => 'A title at max length',
                     'description' => 'A test',
                     'icon' => null,
@@ -321,7 +321,7 @@ describe('DashboardInputSpec', function () {
 
             expect(function() use ($spec, $dashboardId) {
                 $spec->validate([
-                    'id' => $dashboardId,
+                    'dashboard_id' => $dashboardId,
                     'title' => 'Test',
                     'description' => 123,
                 ]);
@@ -334,7 +334,7 @@ describe('DashboardInputSpec', function () {
 
             expect(function() use ($spec, $dashboardId) {
                 $spec->validate([
-                    'id' => $dashboardId,
+                    'dashboard_id' => $dashboardId,
                     'title' => 'Test',
                     'description' => 'A test',
                     'icon' => 123,
@@ -347,7 +347,7 @@ describe('DashboardInputSpec', function () {
 
             expect(function() use ($spec) {
                 $spec->validate([
-                    'id' => 12345,
+                    'dashboard_id' => 12345,
                     'title' => 'Test',
                     'description' => 'A test',
                 ]);
@@ -359,7 +359,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             try {
-                $spec->validate(['id' => $dashboardId], ['id']);
+                $spec->validate(['dashboard_id' => $dashboardId], ['dashboard_id']);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
@@ -371,7 +371,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             expect(function() use ($spec, $dashboardId) {
-                $spec->validate(['id' => $dashboardId], ['unknown_field']);
+                $spec->validate(['dashboard_id' => $dashboardId], ['unknown_field']);
             })->toThrow(InvalidArgumentException::class);
         });
     });
@@ -382,7 +382,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $rawData = [
-                'id' => "  {$dashboardId}  ",
+                'dashboard_id' => "  {$dashboardId}  ",
                 'title' => '  Test Dashboard  ',
                 'description' => '  A test dashboard  ',
                 'icon' => '  home  ',
@@ -404,7 +404,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $rawData = [
-                'id' => $dashboardId,
+                'dashboard_id' => $dashboardId,
                 'title' => 'Test',
                 'description' => 'A test',
                 'icon' => 'home',
@@ -430,7 +430,7 @@ describe('DashboardInputSpec', function () {
             $dashboardId = Uuid::uuid4()->toString();
 
             $rawData = [
-                'id' => $dashboardId,
+                'dashboard_id' => $dashboardId,
                 'title' => '<script>Test</script>Dashboard',
                 'description' => '<p>A test</p> dashboard',
             ];
@@ -453,10 +453,10 @@ describe('DashboardInputSpec', function () {
         test('validation failure after filter with invalid UUID', function () {
             $spec = new DashboardInputSpec();
 
-            $rawData = ['id' => 'invalid-uuid', 'title' => 'Test', 'description' => 'A test'];
+            $rawData = ['dashboard_id' => 'invalid-uuid', 'title' => 'Test', 'description' => 'A test'];
             $filtered = $spec->filter($rawData);
 
-            expect($filtered['id'])->toBe('invalid-uuid');
+            expect($filtered['dashboard_id'])->toBe('invalid-uuid');
 
             expect(function() use ($spec, $filtered) {
                 $spec->validate($filtered);
@@ -469,21 +469,21 @@ describe('DashboardInputSpec', function () {
             $dashboardId2 = Uuid::uuid4()->toString();
 
             $filtered1 = $spec->filter([
-                'id' => "  {$dashboardId1}  ",
+                'dashboard_id' => "  {$dashboardId1}  ",
                 'title' => 'Dashboard 1',
                 'description' => 'First dashboard',
             ]);
             $spec->validate($filtered1);
 
             $filtered2 = $spec->filter([
-                'id' => "  {$dashboardId2}  ",
+                'dashboard_id' => "  {$dashboardId2}  ",
                 'title' => 'Dashboard 2',
                 'description' => 'Second dashboard',
             ]);
             $spec->validate($filtered2);
 
-            expect($filtered1['id'])->toBe($dashboardId1);
-            expect($filtered2['id'])->toBe($dashboardId2);
+            expect($filtered1['dashboard_id'])->toBe($dashboardId1);
+            expect($filtered2['dashboard_id'])->toBe($dashboardId2);
         });
     });
 });

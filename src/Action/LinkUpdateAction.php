@@ -33,11 +33,11 @@ final readonly class LinkUpdateAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string, url: string, title: string, description: string, icon: ?string} $data */
+    /** @param array{link_id: string, url: string, title: string, description: string, icon: ?string} $data */
     #[\Override]
     public function execute(array $data): array
     {
-        $linkId = Uuid::fromString($data["id"]);
+        $linkId = Uuid::fromString($data["link_id"]);
         $link = $this->linkService->updateLink(
             linkId: $linkId,
             url: $data["url"],

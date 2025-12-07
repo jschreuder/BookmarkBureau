@@ -10,7 +10,13 @@ use Respect\Validation\Validator;
 
 final class LinkInputSpec implements InputSpecInterface
 {
-    private const array FIELDS = ["id", "url", "title", "description", "icon"];
+    private const array FIELDS = [
+        "link_id",
+        "url",
+        "title",
+        "description",
+        "icon",
+    ];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -18,7 +24,7 @@ final class LinkInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
-    /** @return array{id: string, url: string, title: string, description: string, icon: ?string} */
+    /** @return array{link_id: string, url: string, title: string, description: string, icon: ?string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -26,7 +32,7 @@ final class LinkInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             $filtered[$field] = match ($field) {
-                "id" => Filter::start($rawData, "id", "")
+                "link_id" => Filter::start($rawData, "link_id", "")
                     ->string(allowNull: false)
                     ->trim()
                     ->done(),
@@ -54,11 +60,11 @@ final class LinkInputSpec implements InputSpecInterface
             };
         }
 
-        /** @var array{id: string, url: string, title: string, description: string, icon: ?string} */
+        /** @var array{link_id: string, url: string, title: string, description: string, icon: ?string} */
         return $filtered;
     }
 
-    /** @param array{id: string, url: string, title: string, description: string, icon: ?string} $data */
+    /** @param array{link_id: string, url: string, title: string, description: string, icon: ?string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
@@ -66,7 +72,10 @@ final class LinkInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                "id" => $validator->key("id", Validator::notEmpty()->uuid()),
+                "link_id" => $validator->key(
+                    "link_id",
+                    Validator::notEmpty()->uuid(),
+                ),
                 "url" => $validator->key("url", Validator::notEmpty()->url()),
                 "title" => $validator->key(
                     "title",

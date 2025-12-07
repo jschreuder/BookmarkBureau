@@ -10,7 +10,12 @@ use Respect\Validation\Validator;
 
 final class DashboardInputSpec implements InputSpecInterface
 {
-    private const array FIELDS = ["id", "title", "description", "icon"];
+    private const array FIELDS = [
+        "dashboard_id",
+        "title",
+        "description",
+        "icon",
+    ];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -18,7 +23,7 @@ final class DashboardInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
-    /** @return array{id: string, title: string, description: string, icon: ?string} */
+    /** @return array{dashboard_id: string, title: string, description: string, icon: ?string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -26,7 +31,7 @@ final class DashboardInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             $filtered[$field] = match ($field) {
-                "id" => Filter::start($rawData, "id", "")
+                "dashboard_id" => Filter::start($rawData, "dashboard_id", "")
                     ->string(allowNull: false)
                     ->trim()
                     ->done(),
@@ -50,11 +55,11 @@ final class DashboardInputSpec implements InputSpecInterface
             };
         }
 
-        /** @var array{id: string, title: string, description: string, icon: ?string} */
+        /** @var array{dashboard_id: string, title: string, description: string, icon: ?string} */
         return $filtered;
     }
 
-    /** @param array{id: string, title: string, description: string, icon: ?string} $data */
+    /** @param array{dashboard_id: string, title: string, description: string, icon: ?string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
@@ -62,7 +67,10 @@ final class DashboardInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                "id" => $validator->key("id", Validator::notEmpty()->uuid()),
+                "dashboard_id" => $validator->key(
+                    "dashboard_id",
+                    Validator::notEmpty()->uuid(),
+                ),
                 "title" => $validator->key(
                     "title",
                     Validator::notEmpty()->length(1, 256),

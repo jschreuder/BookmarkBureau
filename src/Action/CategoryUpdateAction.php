@@ -33,11 +33,11 @@ final readonly class CategoryUpdateAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string, title: string, color: ?string} $data */
+    /** @param array{category_id: string, title: string, color: ?string} $data */
     #[\Override]
     public function execute(array $data): array
     {
-        $categoryId = Uuid::fromString($data["id"]);
+        $categoryId = Uuid::fromString($data["category_id"]);
         $category = $this->categoryService->updateCategory(
             categoryId: $categoryId,
             title: $data["title"],

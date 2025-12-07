@@ -58,7 +58,7 @@ describe("CategoryOutputSpec", function () {
 
             expect($result)->toBeArray();
             expect($result)->toHaveKeys([
-                "id",
+                "category_id",
                 "dashboard_id",
                 "title",
                 "color",
@@ -74,8 +74,8 @@ describe("CategoryOutputSpec", function () {
 
             $result = $spec->transform($category);
 
-            expect($result["id"])->toBeString();
-            expect($result["id"])->toBe($category->categoryId->toString());
+            expect($result["category_id"])->toBeString();
+            expect($result["category_id"])->toBe($category->categoryId->toString());
         });
 
         test("returns dashboard ID as string", function () {
@@ -279,9 +279,9 @@ describe("CategoryOutputSpec", function () {
             $result1 = $spec->transform($category1);
             $result2 = $spec->transform($category2);
 
-            expect($result1["id"])->not->toBe($result2["id"]);
-            expect($result1["id"])->toBe($category1->categoryId->toString());
-            expect($result2["id"])->toBe($category2->categoryId->toString());
+            expect($result1["category_id"])->not->toBe($result2["category_id"]);
+            expect($result1["category_id"])->toBe($category1->categoryId->toString());
+            expect($result2["category_id"])->toBe($category2->categoryId->toString());
         });
 
         test("handles category with special characters in title", function () {

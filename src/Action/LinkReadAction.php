@@ -33,11 +33,11 @@ final readonly class LinkReadAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string} $data */
+    /** @param array{link_id: string} $data */
     #[\Override]
     public function execute(array $data): array
     {
-        $link = $this->linkService->getLink(Uuid::fromString($data["id"]));
+        $link = $this->linkService->getLink(Uuid::fromString($data["link_id"]));
         return $this->outputSpec->transform($link);
     }
 }

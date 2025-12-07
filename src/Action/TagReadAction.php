@@ -3,8 +3,6 @@
 namespace jschreuder\BookmarkBureau\Action;
 
 use jschreuder\BookmarkBureau\Entity\Tag;
-use jschreuder\BookmarkBureau\Entity\Value\TagName;
-use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\BookmarkBureau\InputSpec\InputSpecInterface;
 use jschreuder\BookmarkBureau\OutputSpec\OutputSpecInterface;
 use jschreuder\BookmarkBureau\Service\TagServiceInterface;
@@ -34,11 +32,11 @@ final readonly class TagReadAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string} $data */
+    /** @param array{tag_name: string} $data */
     #[\Override]
     public function execute(array $data): array
     {
-        $tag = $this->tagService->getTag($data["id"]);
+        $tag = $this->tagService->getTag($data["tag_name"]);
         return $this->outputSpec->transform($tag);
     }
 }

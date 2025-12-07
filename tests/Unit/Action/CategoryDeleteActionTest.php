@@ -11,54 +11,54 @@ describe("CategoryDeleteAction", function () {
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
             $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
             ]);
 
-            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["category_id"])->toBe($categoryId->toString());
         });
 
         test("handles missing id key with empty string", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["category_id"])->toBe("");
         });
 
         test("preserves valid id without modification", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
             $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
-            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["category_id"])->toBe($categoryId->toString());
         });
 
         test("ignores additional fields in input", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
             $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "title" => "Should be ignored",
                 "color" => "Should be ignored",
                 "extra_field" => "ignored",
             ]);
 
-            expect($filtered)->toHaveKey("id");
+            expect($filtered)->toHaveKey("category_id");
             expect($filtered)->not->toHaveKey("title");
             expect($filtered)->not->toHaveKey("color");
             expect($filtered)->not->toHaveKey("extra_field");
@@ -68,11 +68,11 @@ describe("CategoryDeleteAction", function () {
     describe("validate method", function () {
         test("passes validation with valid UUID", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
             $categoryId = Uuid::uuid4();
 
-            $data = ["id" => $categoryId->toString()];
+            $data = ["category_id" => $categoryId->toString()];
 
             try {
                 $action->validate($data);
@@ -84,10 +84,10 @@ describe("CategoryDeleteAction", function () {
 
         test("throws validation error for invalid UUID", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
-            $data = ["id" => "not-a-uuid"];
+            $data = ["category_id" => "not-a-uuid"];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -96,10 +96,10 @@ describe("CategoryDeleteAction", function () {
 
         test("throws validation error for empty id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
-            $data = ["id" => ""];
+            $data = ["category_id" => ""];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -108,7 +108,7 @@ describe("CategoryDeleteAction", function () {
 
         test("throws validation error for missing id key", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
             $data = [];
@@ -120,10 +120,10 @@ describe("CategoryDeleteAction", function () {
 
         test("throws validation error for whitespace-only id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
-            $data = ["id" => "   "];
+            $data = ["category_id" => "   "];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -132,10 +132,10 @@ describe("CategoryDeleteAction", function () {
 
         test("throws validation error for null id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
-            $data = ["id" => null];
+            $data = ["category_id" => null];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -144,11 +144,11 @@ describe("CategoryDeleteAction", function () {
 
         test("validates UUID in different formats", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
             $categoryId = Uuid::uuid4();
 
-            $data = ["id" => $categoryId->toString()];
+            $data = ["category_id" => $categoryId->toString()];
 
             try {
                 $action->validate($data);
@@ -169,11 +169,11 @@ describe("CategoryDeleteAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->once();
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($result)->toBe([]);
@@ -187,11 +187,11 @@ describe("CategoryDeleteAction", function () {
                 ->shouldReceive("deleteCategory")
                 ->with(Mockery::type(UuidInterface::class));
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($result)->toEqual([]);
@@ -211,14 +211,14 @@ describe("CategoryDeleteAction", function () {
                     ->with(Mockery::type(UuidInterface::class))
                     ->once();
 
-                $inputSpec = new IdInputSpec();
+                $inputSpec = new IdInputSpec("category_id");
                 $action = new CategoryDeleteAction(
                     $categoryService,
                     $inputSpec,
                 );
 
                 $action->execute([
-                    "id" => $categoryId->toString(),
+                    "category_id" => $categoryId->toString(),
                 ]);
 
                 expect(true)->toBeTrue();
@@ -236,11 +236,11 @@ describe("CategoryDeleteAction", function () {
                     $uuidCapture = $uuid;
                 });
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
             $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($uuidCapture->toString())->toBe($categoryId->toString());
@@ -257,11 +257,11 @@ describe("CategoryDeleteAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->once();
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
             $rawData = [
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
@@ -284,11 +284,11 @@ describe("CategoryDeleteAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->once();
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
             $rawData = [
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "title" => "Should be ignored",
                 "color" => "Should be ignored",
                 "extra" => "data",
@@ -315,15 +315,15 @@ describe("CategoryDeleteAction", function () {
                 ->shouldReceive("deleteCategory")
                 ->with(Mockery::type(UuidInterface::class));
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
             $rawData = [
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["category_id"])->toBe($categoryId->toString());
 
             $action->validate($filtered);
             $result = $action->execute($filtered);
@@ -336,11 +336,11 @@ describe("CategoryDeleteAction", function () {
 
             $categoryService->shouldNotReceive("deleteCategory");
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $action = new CategoryDeleteAction($categoryService, $inputSpec);
 
             $rawData = [
-                "id" => "invalid-uuid",
+                "category_id" => "invalid-uuid",
             ];
 
             $filtered = $action->filter($rawData);

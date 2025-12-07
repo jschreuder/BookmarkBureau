@@ -28,11 +28,11 @@ final readonly class TagDeleteAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string} $data */
+    /** @param array{tag_name: string} $data */
     #[\Override]
     public function execute(array $data): array
     {
-        $this->tagService->deleteTag($data["id"]);
+        $this->tagService->deleteTag($data["tag_name"]);
 
         return [];
     }

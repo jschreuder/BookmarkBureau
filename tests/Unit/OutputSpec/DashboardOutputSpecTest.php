@@ -59,7 +59,7 @@ describe("DashboardOutputSpec", function () {
 
             expect($result)->toBeArray();
             expect($result)->toHaveKeys([
-                "id",
+                "dashboard_id",
                 "title",
                 "description",
                 "icon",
@@ -74,8 +74,8 @@ describe("DashboardOutputSpec", function () {
 
             $result = $spec->transform($dashboard);
 
-            expect($result["id"])->toBeString();
-            expect($result["id"])->toBe($dashboard->dashboardId->toString());
+            expect($result["dashboard_id"])->toBeString();
+            expect($result["dashboard_id"])->toBe($dashboard->dashboardId->toString());
         });
 
         test("returns dashboard title as string", function () {
@@ -238,9 +238,9 @@ describe("DashboardOutputSpec", function () {
             $result1 = $spec->transform($dashboard1);
             $result2 = $spec->transform($dashboard2);
 
-            expect($result1["id"])->not->toBe($result2["id"]);
-            expect($result1["id"])->toBe($dashboard1->dashboardId->toString());
-            expect($result2["id"])->toBe($dashboard2->dashboardId->toString());
+            expect($result1["dashboard_id"])->not->toBe($result2["dashboard_id"]);
+            expect($result1["dashboard_id"])->toBe($dashboard1->dashboardId->toString());
+            expect($result2["dashboard_id"])->toBe($dashboard2->dashboardId->toString());
         });
     });
 

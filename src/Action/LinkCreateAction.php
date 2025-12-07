@@ -24,7 +24,9 @@ final readonly class LinkCreateAction implements ActionInterface
     public function filter(array $rawData): array
     {
         // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ["id"]);
+        $fields = array_diff($this->inputSpec->getAvailableFields(), [
+            "link_id",
+        ]);
         return $this->inputSpec->filter($rawData, $fields);
     }
 
@@ -32,7 +34,9 @@ final readonly class LinkCreateAction implements ActionInterface
     public function validate(array $data): void
     {
         // Create operations need all fields except 'id', since it doesn't exist yet
-        $fields = array_diff($this->inputSpec->getAvailableFields(), ["id"]);
+        $fields = array_diff($this->inputSpec->getAvailableFields(), [
+            "link_id",
+        ]);
         $this->inputSpec->validate($data, $fields);
     }
 

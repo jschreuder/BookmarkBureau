@@ -33,12 +33,12 @@ final readonly class CategoryLinkCreateAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{id: string, link_id: string} $data */
+    /** @param array{category_id: string, link_id: string} $data */
     #[\Override]
     public function execute(array $data): array
     {
         $categoryLink = $this->categoryService->addLinkToCategory(
-            categoryId: Uuid::fromString($data["id"]),
+            categoryId: Uuid::fromString($data["category_id"]),
             linkId: Uuid::fromString($data["link_id"]),
         );
         return $this->outputSpec->transform($categoryLink);

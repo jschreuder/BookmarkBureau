@@ -15,7 +15,7 @@ describe("CategoryReadAction", function () {
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -25,15 +25,15 @@ describe("CategoryReadAction", function () {
             $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
             ]);
 
-            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["category_id"])->toBe($categoryId->toString());
         });
 
         test("handles missing id key with empty string", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -43,12 +43,12 @@ describe("CategoryReadAction", function () {
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["category_id"])->toBe("");
         });
 
         test("preserves valid id without modification", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -58,15 +58,15 @@ describe("CategoryReadAction", function () {
             $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
-            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["category_id"])->toBe($categoryId->toString());
         });
 
         test("ignores additional fields in input", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -76,13 +76,13 @@ describe("CategoryReadAction", function () {
             $categoryId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "title" => "Should be ignored",
                 "color" => "#FF0000",
                 "extra_field" => "ignored",
             ]);
 
-            expect($filtered)->toHaveKey("id");
+            expect($filtered)->toHaveKey("category_id");
             expect($filtered)->not->toHaveKey("title");
             expect($filtered)->not->toHaveKey("color");
             expect($filtered)->not->toHaveKey("extra_field");
@@ -92,7 +92,7 @@ describe("CategoryReadAction", function () {
     describe("validate method", function () {
         test("passes validation with valid UUID", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -101,7 +101,7 @@ describe("CategoryReadAction", function () {
             );
             $categoryId = Uuid::uuid4();
 
-            $data = ["id" => $categoryId->toString()];
+            $data = ["category_id" => $categoryId->toString()];
 
             try {
                 $action->validate($data);
@@ -113,7 +113,7 @@ describe("CategoryReadAction", function () {
 
         test("throws validation error for invalid UUID", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -121,7 +121,7 @@ describe("CategoryReadAction", function () {
                 $outputSpec,
             );
 
-            $data = ["id" => "not-a-uuid"];
+            $data = ["category_id" => "not-a-uuid"];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -130,7 +130,7 @@ describe("CategoryReadAction", function () {
 
         test("throws validation error for empty id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -138,7 +138,7 @@ describe("CategoryReadAction", function () {
                 $outputSpec,
             );
 
-            $data = ["id" => ""];
+            $data = ["category_id" => ""];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -147,7 +147,7 @@ describe("CategoryReadAction", function () {
 
         test("throws validation error for missing id key", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -164,7 +164,7 @@ describe("CategoryReadAction", function () {
 
         test("throws validation error for whitespace-only id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -172,7 +172,7 @@ describe("CategoryReadAction", function () {
                 $outputSpec,
             );
 
-            $data = ["id" => "   "];
+            $data = ["category_id" => "   "];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -181,7 +181,7 @@ describe("CategoryReadAction", function () {
 
         test("throws validation error for null id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -189,7 +189,7 @@ describe("CategoryReadAction", function () {
                 $outputSpec,
             );
 
-            $data = ["id" => null];
+            $data = ["category_id" => null];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -198,7 +198,7 @@ describe("CategoryReadAction", function () {
 
         test("validates UUID in different formats", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -207,7 +207,7 @@ describe("CategoryReadAction", function () {
             );
             $categoryId = Uuid::uuid4();
 
-            $data = ["id" => $categoryId->toString()];
+            $data = ["category_id" => $categoryId->toString()];
 
             try {
                 $action->validate($data);
@@ -230,7 +230,7 @@ describe("CategoryReadAction", function () {
                 ->once()
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -239,11 +239,11 @@ describe("CategoryReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($result)->toBeArray();
-            expect($result)->toHaveKey("id");
+            expect($result)->toHaveKey("category_id");
         });
 
         test("returns transformed category data", function () {
@@ -256,7 +256,7 @@ describe("CategoryReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -265,11 +265,11 @@ describe("CategoryReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($result)->toBeArray();
-            expect($result)->toHaveKey("id");
+            expect($result)->toHaveKey("category_id");
             expect($result)->toHaveKey("dashboard_id");
             expect($result)->toHaveKey("title");
             expect($result)->toHaveKey("color");
@@ -293,7 +293,7 @@ describe("CategoryReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -302,10 +302,10 @@ describe("CategoryReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
-            expect($result["id"])->toBe($categoryId->toString());
+            expect($result["category_id"])->toBe($categoryId->toString());
             expect($result["title"])->toBe("Test Category");
             expect($result["color"])->toBe("#FF5733");
             expect($result["sort_order"])->toBe(5);
@@ -326,7 +326,7 @@ describe("CategoryReadAction", function () {
                     ->once()
                     ->andReturn($category);
 
-                $inputSpec = new IdInputSpec();
+                $inputSpec = new IdInputSpec("category_id");
                 $outputSpec = new CategoryOutputSpec();
                 $action = new CategoryReadAction(
                     $categoryService,
@@ -335,7 +335,7 @@ describe("CategoryReadAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $categoryId->toString(),
+                    "category_id" => $categoryId->toString(),
                 ]);
 
                 expect(true)->toBeTrue();
@@ -358,7 +358,7 @@ describe("CategoryReadAction", function () {
                     return $category;
                 });
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -367,7 +367,7 @@ describe("CategoryReadAction", function () {
             );
 
             $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($uuidCapture->toString())->toBe($categoryId->toString());
@@ -386,7 +386,7 @@ describe("CategoryReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -395,7 +395,7 @@ describe("CategoryReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($result["color"])->toBeNull();
@@ -414,7 +414,7 @@ describe("CategoryReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -423,7 +423,7 @@ describe("CategoryReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($result["color"])->toBe("#00FF00");
@@ -445,7 +445,7 @@ describe("CategoryReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -454,7 +454,7 @@ describe("CategoryReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($result["created_at"])->toBe(
@@ -480,7 +480,7 @@ describe("CategoryReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -489,7 +489,7 @@ describe("CategoryReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($result["dashboard_id"])->toBe($dashboardId->toString());
@@ -508,7 +508,7 @@ describe("CategoryReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -517,7 +517,7 @@ describe("CategoryReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
             ]);
 
             expect($result["sort_order"])->toBe(10);
@@ -536,7 +536,7 @@ describe("CategoryReadAction", function () {
                 ->once()
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -545,7 +545,7 @@ describe("CategoryReadAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
@@ -554,7 +554,7 @@ describe("CategoryReadAction", function () {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
                 expect($result)->toBeArray();
-                expect($result["id"])->toBe($categoryId->toString());
+                expect($result["category_id"])->toBe($categoryId->toString());
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
@@ -571,7 +571,7 @@ describe("CategoryReadAction", function () {
                 ->once()
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -580,7 +580,7 @@ describe("CategoryReadAction", function () {
             );
 
             $rawData = [
-                "id" => $categoryId->toString(),
+                "category_id" => $categoryId->toString(),
                 "title" => "Should be ignored",
                 "color" => "#FF0000",
                 "extra" => "data",
@@ -594,7 +594,7 @@ describe("CategoryReadAction", function () {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
                 expect($result)->toBeArray();
-                expect($result["id"])->toBe($categoryId->toString());
+                expect($result["category_id"])->toBe($categoryId->toString());
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
@@ -610,7 +610,7 @@ describe("CategoryReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -619,17 +619,17 @@ describe("CategoryReadAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$categoryId->toString()}  ",
+                "category_id" => "  {$categoryId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
-            expect($filtered["id"])->toBe($categoryId->toString());
+            expect($filtered["category_id"])->toBe($categoryId->toString());
 
             $action->validate($filtered);
             $result = $action->execute($filtered);
 
             expect($result)->toBeArray();
-            expect($result["id"])->toBe($categoryId->toString());
+            expect($result["category_id"])->toBe($categoryId->toString());
         });
 
         test("validation failure prevents service call", function () {
@@ -637,7 +637,7 @@ describe("CategoryReadAction", function () {
 
             $categoryService->shouldNotReceive("getCategory");
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -646,7 +646,7 @@ describe("CategoryReadAction", function () {
             );
 
             $rawData = [
-                "id" => "invalid-uuid",
+                "category_id" => "invalid-uuid",
             ];
 
             $filtered = $action->filter($rawData);
@@ -674,7 +674,7 @@ describe("CategoryReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($category);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("category_id");
             $outputSpec = new CategoryOutputSpec();
             $action = new CategoryReadAction(
                 $categoryService,
@@ -682,12 +682,12 @@ describe("CategoryReadAction", function () {
                 $outputSpec,
             );
 
-            $rawData = ["id" => $categoryId->toString()];
+            $rawData = ["category_id" => $categoryId->toString()];
             $filtered = $action->filter($rawData);
             $action->validate($filtered);
             $result = $action->execute($filtered);
 
-            expect($result["id"])->toBe($categoryId->toString());
+            expect($result["category_id"])->toBe($categoryId->toString());
             expect($result["dashboard_id"])->toBe($dashboardId->toString());
             expect($result["title"])->toBe("Integration Test Category");
             expect($result["color"])->toBe("#ABCDEF");

@@ -14,7 +14,7 @@ describe("DashboardReadAction", function () {
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -24,15 +24,15 @@ describe("DashboardReadAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => "  {$dashboardId->toString()}  ",
+                "dashboard_id" => "  {$dashboardId->toString()}  ",
             ]);
 
-            expect($filtered["id"])->toBe($dashboardId->toString());
+            expect($filtered["dashboard_id"])->toBe($dashboardId->toString());
         });
 
         test("handles missing id key with empty string", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -42,12 +42,12 @@ describe("DashboardReadAction", function () {
 
             $filtered = $action->filter([]);
 
-            expect($filtered["id"])->toBe("");
+            expect($filtered["dashboard_id"])->toBe("");
         });
 
         test("preserves valid id without modification", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -57,15 +57,15 @@ describe("DashboardReadAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
-            expect($filtered["id"])->toBe($dashboardId->toString());
+            expect($filtered["dashboard_id"])->toBe($dashboardId->toString());
         });
 
         test("ignores additional fields in input", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -75,13 +75,13 @@ describe("DashboardReadAction", function () {
             $dashboardId = Uuid::uuid4();
 
             $filtered = $action->filter([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Should be ignored",
                 "description" => "Also ignored",
                 "extra_field" => "ignored",
             ]);
 
-            expect($filtered)->toHaveKey("id");
+            expect($filtered)->toHaveKey("dashboard_id");
             expect($filtered)->not->toHaveKey("title");
             expect($filtered)->not->toHaveKey("description");
             expect($filtered)->not->toHaveKey("extra_field");
@@ -91,7 +91,7 @@ describe("DashboardReadAction", function () {
     describe("validate method", function () {
         test("passes validation with valid UUID", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -100,7 +100,7 @@ describe("DashboardReadAction", function () {
             );
             $dashboardId = Uuid::uuid4();
 
-            $data = ["id" => $dashboardId->toString()];
+            $data = ["dashboard_id" => $dashboardId->toString()];
 
             try {
                 $action->validate($data);
@@ -112,7 +112,7 @@ describe("DashboardReadAction", function () {
 
         test("throws validation error for invalid UUID", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -120,7 +120,7 @@ describe("DashboardReadAction", function () {
                 $outputSpec,
             );
 
-            $data = ["id" => "not-a-uuid"];
+            $data = ["dashboard_id" => "not-a-uuid"];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -129,7 +129,7 @@ describe("DashboardReadAction", function () {
 
         test("throws validation error for empty id", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -137,7 +137,7 @@ describe("DashboardReadAction", function () {
                 $outputSpec,
             );
 
-            $data = ["id" => ""];
+            $data = ["dashboard_id" => ""];
 
             expect(fn() => $action->validate($data))->toThrow(
                 ValidationFailedException::class,
@@ -146,7 +146,7 @@ describe("DashboardReadAction", function () {
 
         test("throws validation error for missing id key", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -174,7 +174,7 @@ describe("DashboardReadAction", function () {
                 ->once()
                 ->andReturn($dashboard);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -183,11 +183,11 @@ describe("DashboardReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
             expect($result)->toBeArray();
-            expect($result)->toHaveKey("id");
+            expect($result)->toHaveKey("dashboard_id");
         });
 
         test("returns transformed dashboard data", function () {
@@ -200,7 +200,7 @@ describe("DashboardReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($dashboard);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -209,11 +209,11 @@ describe("DashboardReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
             expect($result)->toBeArray();
-            expect($result)->toHaveKey("id");
+            expect($result)->toHaveKey("dashboard_id");
             expect($result)->toHaveKey("title");
             expect($result)->toHaveKey("description");
         });
@@ -235,7 +235,7 @@ describe("DashboardReadAction", function () {
                     ->once()
                     ->andReturn($dashboard);
 
-                $inputSpec = new IdInputSpec();
+                $inputSpec = new IdInputSpec("dashboard_id");
                 $outputSpec = new DashboardOutputSpec();
                 $action = new DashboardReadAction(
                     $dashboardService,
@@ -244,7 +244,7 @@ describe("DashboardReadAction", function () {
                 );
 
                 $action->execute([
-                    "id" => $dashboardId->toString(),
+                    "dashboard_id" => $dashboardId->toString(),
                 ]);
 
                 expect(true)->toBeTrue();
@@ -266,7 +266,7 @@ describe("DashboardReadAction", function () {
                 ->with(Mockery::type(UuidInterface::class))
                 ->andReturn($dashboard);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -275,10 +275,10 @@ describe("DashboardReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
-            expect($result["id"])->toBe($dashboardId->toString());
+            expect($result["dashboard_id"])->toBe($dashboardId->toString());
             expect($result["title"])->toBe("Test Dashboard");
             expect($result["description"])->toBe("Test Description");
             expect($result["icon"])->toBe("test-icon");
@@ -293,7 +293,7 @@ describe("DashboardReadAction", function () {
                 ->shouldReceive("getDashboard")
                 ->andReturn($dashboard);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -302,7 +302,7 @@ describe("DashboardReadAction", function () {
             );
 
             $result = $action->execute([
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
             ]);
 
             expect($result["created_at"])->toMatch(
@@ -326,7 +326,7 @@ describe("DashboardReadAction", function () {
                 ->once()
                 ->andReturn($dashboard);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -335,7 +335,7 @@ describe("DashboardReadAction", function () {
             );
 
             $rawData = [
-                "id" => "  {$dashboardId->toString()}  ",
+                "dashboard_id" => "  {$dashboardId->toString()}  ",
             ];
 
             $filtered = $action->filter($rawData);
@@ -344,7 +344,7 @@ describe("DashboardReadAction", function () {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
                 expect($result)->toBeArray();
-                expect($result["id"])->toBe($dashboardId->toString());
+                expect($result["dashboard_id"])->toBe($dashboardId->toString());
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
@@ -361,7 +361,7 @@ describe("DashboardReadAction", function () {
                 ->once()
                 ->andReturn($dashboard);
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -370,7 +370,7 @@ describe("DashboardReadAction", function () {
             );
 
             $rawData = [
-                "id" => $dashboardId->toString(),
+                "dashboard_id" => $dashboardId->toString(),
                 "title" => "Should be ignored",
                 "description" => "Also ignored",
                 "extra" => "data",
@@ -384,7 +384,7 @@ describe("DashboardReadAction", function () {
                 $action->validate($filtered);
                 $result = $action->execute($filtered);
                 expect($result)->toBeArray();
-                expect($result["id"])->toBe($dashboardId->toString());
+                expect($result["dashboard_id"])->toBe($dashboardId->toString());
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
@@ -395,7 +395,7 @@ describe("DashboardReadAction", function () {
 
             $dashboardService->shouldNotReceive("getDashboard");
 
-            $inputSpec = new IdInputSpec();
+            $inputSpec = new IdInputSpec("dashboard_id");
             $outputSpec = new DashboardOutputSpec();
             $action = new DashboardReadAction(
                 $dashboardService,
@@ -404,7 +404,7 @@ describe("DashboardReadAction", function () {
             );
 
             $rawData = [
-                "id" => "invalid-uuid",
+                "dashboard_id" => "invalid-uuid",
             ];
 
             $filtered = $action->filter($rawData);

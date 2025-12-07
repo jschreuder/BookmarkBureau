@@ -14,15 +14,15 @@ use Respect\Validation\Validator;
  */
 final class IdInputSpec implements InputSpecInterface
 {
-    private const array FIELDS = ["id"];
+    public function __construct(private string $idName = "id") {}
 
     #[\Override]
     public function getAvailableFields(): array
     {
-        return self::FIELDS;
+        return [$this->idName];
     }
 
-    /** @return array{id: string} */
+    /** @return non-empty-array<string, string> */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -31,7 +31,7 @@ final class IdInputSpec implements InputSpecInterface
 
         foreach ($fields as $field) {
             $filtered[$field] = match ($field) {
-                "id" => Filter::start($rawData, "id", "")
+                $this->idName => Filter::start($rawData, $this->idName, "")
                     ->string(allowNull: false)
                     ->trim()
                     ->done(),
@@ -41,11 +41,11 @@ final class IdInputSpec implements InputSpecInterface
             };
         }
 
-        /** @var array{id: string} */
+        /** @var non-empty-array<string, string> */
         return $filtered;
     }
 
-    /** @param array{id: string} $data */
+    /** @param non-empty-array<string, string> $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
@@ -54,7 +54,10 @@ final class IdInputSpec implements InputSpecInterface
 
         foreach ($fields as $field) {
             $validator = match ($field) {
-                "id" => $validator->key("id", Validator::notEmpty()->uuid()),
+                $this->idName => $validator->key(
+                    $this->idName,
+                    Validator::notEmpty()->uuid(),
+                ),
                 default => throw new InvalidArgumentException(
                     "Unknown field: {$field}",
                 ),

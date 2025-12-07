@@ -24,7 +24,7 @@ final readonly class CategoryOutputSpec implements OutputSpecInterface
     private function doTransform(object $category): array
     {
         return [
-            "id" => $category->categoryId->toString(),
+            "category_id" => $category->categoryId->toString(),
             "dashboard_id" => $category->dashboard->dashboardId->toString(),
             "title" => $category->title->value,
             "color" => $category->color?->value,

@@ -69,7 +69,7 @@ describe("LinkOutputSpec", function () {
 
             expect($result)->toBeArray();
             expect($result)->toHaveKeys([
-                "id",
+                "link_id",
                 "url",
                 "title",
                 "description",
@@ -86,8 +86,8 @@ describe("LinkOutputSpec", function () {
 
             $result = $spec->transform($link);
 
-            expect($result["id"])->toBeString();
-            expect($result["id"])->toBe($link->linkId->toString());
+            expect($result["link_id"])->toBeString();
+            expect($result["link_id"])->toBe($link->linkId->toString());
         });
 
         test("returns link URL as string", function () use ($createSpec) {
@@ -313,9 +313,9 @@ describe("LinkOutputSpec", function () {
             $result1 = $spec->transform($link1);
             $result2 = $spec->transform($link2);
 
-            expect($result1["id"])->not->toBe($result2["id"]);
-            expect($result1["id"])->toBe($link1->linkId->toString());
-            expect($result2["id"])->toBe($link2->linkId->toString());
+            expect($result1["link_id"])->not->toBe($result2["link_id"]);
+            expect($result1["link_id"])->toBe($link1->linkId->toString());
+            expect($result2["link_id"])->toBe($link2->linkId->toString());
         });
 
         test("handles link with different datetime zones", function () use (
