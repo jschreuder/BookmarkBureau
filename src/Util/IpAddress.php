@@ -104,48 +104,40 @@ final class IpAddress
         [$subnet, $mask] = explode("/", $range, 2);
         $mask = (int) $mask;
 
-        // Validate CIDR mask
-        if ($mask < 0 || $mask > 128) {
-            return false;
-        }
+        // Validate inputs and convert to binary
+        $isValid = $mask >= 0 && $mask <= 128;
+        $ipBin = $isValid ? @inet_pton($ip) : false;
+        $subnetBin = $isValid ? @inet_pton($subnet) : false;
 
-        // Convert IPs to binary for comparison
-        $ipBin = @inet_pton($ip);
-        $subnetBin = @inet_pton($subnet);
+        // Check binary conversion success and IP version match
+        $isValid =
+            $isValid &&
+            $ipBin !== false &&
+            $subnetBin !== false &&
+            \strlen($ipBin) === \strlen($subnetBin);
 
-        if ($ipBin === false || $subnetBin === false) {
-            return false;
-        }
+        // Compare network portions if validation passed
+        if ($isValid) {
+            $bytesToCompare = (int) floor($mask / 8);
+            $bitsInLastByte = $mask % 8;
 
-        // IPv4 vs IPv6 check
-        if (strlen($ipBin) !== strlen($subnetBin)) {
-            return false;
-        }
+            // Compare full bytes
+            $isValid =
+                substr($ipBin, 0, $bytesToCompare) ===
+                substr($subnetBin, 0, $bytesToCompare);
 
-        // Calculate the number of bits to compare
-        $bytesToCompare = (int) floor($mask / 8);
-        $bitsInLastByte = $mask % 8;
+            // Compare remaining bits in the last byte
+            if ($isValid && $bitsInLastByte > 0) {
+                $ipLastByte = \ord($ipBin[$bytesToCompare] ?? "\0");
+                $subnetLastByte = \ord($subnetBin[$bytesToCompare] ?? "\0");
+                $bitMask = 0xff << 8 - $bitsInLastByte;
 
-        // Compare full bytes
-        if (
-            substr($ipBin, 0, $bytesToCompare) !==
-            substr($subnetBin, 0, $bytesToCompare)
-        ) {
-            return false;
-        }
-
-        // Compare remaining bits in the last byte
-        if ($bitsInLastByte > 0) {
-            $ipLastByte = ord($ipBin[$bytesToCompare] ?? "\0");
-            $subnetLastByte = ord($subnetBin[$bytesToCompare] ?? "\0");
-            $bitMask = 0xff << 8 - $bitsInLastByte;
-
-            if (($ipLastByte & $bitMask) !== ($subnetLastByte & $bitMask)) {
-                return false;
+                $isValid =
+                    ($ipLastByte & $bitMask) === ($subnetLastByte & $bitMask);
             }
         }
 
-        return true;
+        return $isValid;
     }
 
     /**
