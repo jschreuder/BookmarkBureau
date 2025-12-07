@@ -314,6 +314,7 @@ import { Observable, catchError, of } from 'rxjs';
         border-radius: 4px;
         transition: background-color 0.2s;
         cursor: pointer;
+        align-items: flex-start;
       }
 
       .link-item:hover {
@@ -322,6 +323,12 @@ import { Observable, catchError, of } from 'rxjs';
 
       .link-item mat-icon {
         color: rgba(0, 0, 0, 0.6);
+        flex-shrink: 0;
+      }
+
+      .link-info {
+        flex: 1;
+        min-width: 0;
       }
 
       .link-info h4 {
@@ -335,6 +342,8 @@ import { Observable, catchError, of } from 'rxjs';
         font-size: 13px;
         color: rgba(0, 0, 0, 0.6);
         line-height: 1.4;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
 
       .link-item mat-chip-set {
