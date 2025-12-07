@@ -18,7 +18,7 @@ describe('DashboardOverviewComponent', () => {
   let activatedRoute: any;
 
   const mockDashboard: Dashboard = {
-    id: 'test-id',
+    dashboard_id: 'test-id',
     title: 'Test Dashboard',
     description: 'Test Description',
     icon: 'dashboard',
@@ -27,7 +27,7 @@ describe('DashboardOverviewComponent', () => {
   };
 
   const mockLink1: Link = {
-    id: 'link-id-1',
+    link_id: 'link-id-1',
     url: 'https://example.com',
     title: 'Example Link 1',
     description: 'Test description 1',
@@ -37,7 +37,7 @@ describe('DashboardOverviewComponent', () => {
   };
 
   const mockLink2: Link = {
-    id: 'link-id-2',
+    link_id: 'link-id-2',
     url: 'https://example2.com',
     title: 'Example Link 2',
     description: 'Test description 2',
@@ -47,7 +47,7 @@ describe('DashboardOverviewComponent', () => {
   };
 
   const mockLink3: Link = {
-    id: 'link-id-3',
+    link_id: 'link-id-3',
     url: 'https://example3.com',
     title: 'Example Link 3',
     description: 'Test description 3',
@@ -57,7 +57,7 @@ describe('DashboardOverviewComponent', () => {
   };
 
   const mockCategory: CategoryWithLinks = {
-    id: 'cat-id',
+    category_id: 'cat-id',
     dashboard_id: 'test-id',
     title: 'Test Category',
     color: '#667eea',
@@ -189,7 +189,7 @@ describe('DashboardOverviewComponent', () => {
 
       // Verify the order changed
       expect(
-        component.fullDashboard.favorites[component.fullDashboard.favorites.length - 1].id,
+        component.fullDashboard.favorites[component.fullDashboard.favorites.length - 1].link_id,
       ).toBe('link-id-1');
     });
 
@@ -226,7 +226,7 @@ describe('DashboardOverviewComponent', () => {
       component.onCategoryLinksDropped(event as CdkDragDrop<any>, category);
 
       // Verify the order changed
-      expect(category.links[2].id).toBe('link-id-1');
+      expect(category.links[2].link_id).toBe('link-id-1');
     });
 
     it('should not reorder when drop index is same as previous', () => {

@@ -19,7 +19,7 @@ describe('EditCategoryDialogComponent', () => {
   let dialogRef: any;
   let snackBar: any;
   const mockCategory: Category = {
-    id: '1',
+    category_id: '1',
     dashboard_id: 'dashboard-1',
     title: 'Work',
     color: '#667eea',
@@ -104,7 +104,7 @@ describe('EditCategoryDialogComponent', () => {
 
       component.onSubmit();
 
-      expect(apiService.updateCategory).toHaveBeenCalledWith(mockCategory.id, {
+      expect(apiService.updateCategory).toHaveBeenCalledWith(mockCategory.category_id, {
         title: 'Updated Category',
         color: '#ff0000',
         dashboard_id: mockCategory.dashboard_id,

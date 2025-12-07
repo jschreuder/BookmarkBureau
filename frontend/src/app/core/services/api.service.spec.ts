@@ -21,7 +21,7 @@ describe('ApiService', () => {
 
   // Mock data
   const mockDashboard: Dashboard = {
-    id: '123e4567-e89b-12d3-a456-426614174000',
+    dashboard_id: '123e4567-e89b-12d3-a456-426614174000',
     title: 'Home',
     description: 'Home dashboard',
     icon: 'home',
@@ -30,7 +30,7 @@ describe('ApiService', () => {
   };
 
   const mockLink: Link = {
-    id: 'link-1',
+    link_id: 'link-1',
     url: 'https://example.com',
     title: 'Example Site',
     description: 'An example site',
@@ -39,8 +39,8 @@ describe('ApiService', () => {
   };
 
   const mockCategory: CategoryWithLinks = {
-    id: 'cat-1',
-    dashboard_id: mockDashboard.id,
+    category_id: 'cat-1',
+    dashboard_id: mockDashboard.dashboard_id,
     title: 'Work',
     color: '#FF5722',
     sort_order: 1,
@@ -55,8 +55,8 @@ describe('ApiService', () => {
   };
 
   const mockFavorite: Favorite = {
-    dashboard_id: mockDashboard.id,
-    link_id: mockLink.id,
+    dashboard_id: mockDashboard.dashboard_id,
+    link_id: mockLink.link_id,
     sort_order: 1,
     created_at: '2024-01-01T00:00:00Z',
   };
@@ -116,11 +116,11 @@ describe('ApiService', () => {
         data: mockFullDashboard,
       };
 
-      service.getDashboard(mockDashboard.id).subscribe((dashboard) => {
+      service.getDashboard(mockDashboard.dashboard_id).subscribe((dashboard) => {
         expect(dashboard).toEqual(mockFullDashboard);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/${mockDashboard.id}`);
+      const req = httpMock.expectOne(`${apiBase}/${mockDashboard.dashboard_id}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });
@@ -131,11 +131,11 @@ describe('ApiService', () => {
         data: mockDashboard,
       };
 
-      service.getDashboardBasic(mockDashboard.id).subscribe((dashboard) => {
+      service.getDashboardBasic(mockDashboard.dashboard_id).subscribe((dashboard) => {
         expect(dashboard).toEqual(mockDashboard);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}`);
+      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.dashboard_id}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });
@@ -169,11 +169,11 @@ describe('ApiService', () => {
         data: mockDashboard,
       };
 
-      service.updateDashboard(mockDashboard.id, updates).subscribe((dashboard) => {
+      service.updateDashboard(mockDashboard.dashboard_id, updates).subscribe((dashboard) => {
         expect(dashboard).toEqual(mockDashboard);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}`);
+      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.dashboard_id}`);
       expect(req.request.method).toBe('PUT');
       expect(req.request.body).toEqual(updates);
       req.flush(mockResponse);
@@ -184,11 +184,11 @@ describe('ApiService', () => {
         success: true,
       };
 
-      service.deleteDashboard(mockDashboard.id).subscribe((result) => {
+      service.deleteDashboard(mockDashboard.dashboard_id).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}`);
+      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.dashboard_id}`);
       expect(req.request.method).toBe('DELETE');
       req.flush(mockResponse);
     });
@@ -201,11 +201,11 @@ describe('ApiService', () => {
         data: mockCategory,
       };
 
-      service.getCategory(mockCategory.id).subscribe((category) => {
+      service.getCategory(mockCategory.category_id).subscribe((category) => {
         expect(category).toEqual(mockCategory);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/category/${mockCategory.id}`);
+      const req = httpMock.expectOne(`${apiBase}/category/${mockCategory.category_id}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });
@@ -238,11 +238,11 @@ describe('ApiService', () => {
         data: mockCategory,
       };
 
-      service.updateCategory(mockCategory.id, updates as any).subscribe((category) => {
+      service.updateCategory(mockCategory.category_id, updates as any).subscribe((category) => {
         expect(category).toEqual(mockCategory);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/category/${mockCategory.id}`);
+      const req = httpMock.expectOne(`${apiBase}/category/${mockCategory.category_id}`);
       expect(req.request.method).toBe('PUT');
       expect(req.request.body).toEqual(updates);
       req.flush(mockResponse);
@@ -253,11 +253,11 @@ describe('ApiService', () => {
         success: true,
       };
 
-      service.deleteCategory(mockCategory.id).subscribe((result) => {
+      service.deleteCategory(mockCategory.category_id).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
-      const req = httpMock.expectOne(`${apiBase}/category/${mockCategory.id}`);
+      const req = httpMock.expectOne(`${apiBase}/category/${mockCategory.category_id}`);
       expect(req.request.method).toBe('DELETE');
       req.flush(mockResponse);
     });
@@ -270,11 +270,11 @@ describe('ApiService', () => {
         data: mockLink,
       };
 
-      service.getLink(mockLink.id).subscribe((link) => {
+      service.getLink(mockLink.link_id).subscribe((link) => {
         expect(link).toEqual(mockLink);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/link/${mockLink.id}`);
+      const req = httpMock.expectOne(`${apiBase}/link/${mockLink.link_id}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });
@@ -308,11 +308,11 @@ describe('ApiService', () => {
         data: mockLink,
       };
 
-      service.updateLink(mockLink.id, updates).subscribe((link) => {
+      service.updateLink(mockLink.link_id, updates).subscribe((link) => {
         expect(link).toEqual(mockLink);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/link/${mockLink.id}`);
+      const req = httpMock.expectOne(`${apiBase}/link/${mockLink.link_id}`);
       expect(req.request.method).toBe('PUT');
       expect(req.request.body).toEqual(updates);
       req.flush(mockResponse);
@@ -323,11 +323,11 @@ describe('ApiService', () => {
         success: true,
       };
 
-      service.deleteLink(mockLink.id).subscribe((result) => {
+      service.deleteLink(mockLink.link_id).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
-      const req = httpMock.expectOne(`${apiBase}/link/${mockLink.id}`);
+      const req = httpMock.expectOne(`${apiBase}/link/${mockLink.link_id}`);
       expect(req.request.method).toBe('DELETE');
       req.flush(mockResponse);
     });
@@ -347,7 +347,7 @@ describe('ApiService', () => {
         success: true,
       };
 
-      service.createLinkInCategory(mockCategory.id, newLink).subscribe((link) => {
+      service.createLinkInCategory(mockCategory.category_id, newLink).subscribe((link) => {
         expect(link).toEqual(mockLink);
       });
 
@@ -358,9 +358,11 @@ describe('ApiService', () => {
       createReq.flush(linkResponse);
 
       // Second request: add link to category
-      const associateReq = httpMock.expectOne(`${apiBase}/category/${mockCategory.id}/link`);
+      const associateReq = httpMock.expectOne(
+        `${apiBase}/category/${mockCategory.category_id}/link`,
+      );
       expect(associateReq.request.method).toBe('POST');
-      expect(associateReq.request.body).toEqual({ link_id: mockLink.id });
+      expect(associateReq.request.body).toEqual({ link_id: mockLink.link_id });
       associateReq.flush(associationResponse);
     });
 
@@ -371,7 +373,7 @@ describe('ApiService', () => {
       };
 
       const errorSpy = vi.fn();
-      service.createLinkInCategory(mockCategory.id, newLink).subscribe({
+      service.createLinkInCategory(mockCategory.category_id, newLink).subscribe({
         error: errorSpy,
       });
 
@@ -392,7 +394,7 @@ describe('ApiService', () => {
       };
 
       const errorSpy = vi.fn();
-      service.createLinkInCategory(mockCategory.id, newLink).subscribe({
+      service.createLinkInCategory(mockCategory.category_id, newLink).subscribe({
         error: errorSpy,
       });
 
@@ -401,7 +403,9 @@ describe('ApiService', () => {
       createReq.flush(linkResponse);
 
       // Second request fails
-      const associateReq = httpMock.expectOne(`${apiBase}/category/${mockCategory.id}/link`);
+      const associateReq = httpMock.expectOne(
+        `${apiBase}/category/${mockCategory.category_id}/link`,
+      );
       associateReq.error(new ErrorEvent('Association failed'));
 
       expect(errorSpy).toHaveBeenCalled();
@@ -423,7 +427,7 @@ describe('ApiService', () => {
         data: mockFavorite,
       };
 
-      service.createLinkAsFavorite(mockDashboard.id, newLink).subscribe((link) => {
+      service.createLinkAsFavorite(mockDashboard.dashboard_id, newLink).subscribe((link) => {
         expect(link).toEqual(mockLink);
       });
 
@@ -434,11 +438,13 @@ describe('ApiService', () => {
       createReq.flush(linkResponse);
 
       // Second request: add link to favorites
-      const favoriteReq = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}/favorites`);
+      const favoriteReq = httpMock.expectOne(
+        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorites`,
+      );
       expect(favoriteReq.request.method).toBe('POST');
       expect(favoriteReq.request.body).toEqual({
-        dashboard_id: mockDashboard.id,
-        link_id: mockLink.id,
+        dashboard_id: mockDashboard.dashboard_id,
+        link_id: mockLink.link_id,
       });
       favoriteReq.flush(favoriteResponse);
     });
@@ -450,7 +456,7 @@ describe('ApiService', () => {
       };
 
       const errorSpy = vi.fn();
-      service.createLinkAsFavorite(mockDashboard.id, newLink).subscribe({
+      service.createLinkAsFavorite(mockDashboard.dashboard_id, newLink).subscribe({
         error: errorSpy,
       });
 
@@ -471,7 +477,7 @@ describe('ApiService', () => {
       };
 
       const errorSpy = vi.fn();
-      service.createLinkAsFavorite(mockDashboard.id, newLink).subscribe({
+      service.createLinkAsFavorite(mockDashboard.dashboard_id, newLink).subscribe({
         error: errorSpy,
       });
 
@@ -480,7 +486,9 @@ describe('ApiService', () => {
       createReq.flush(linkResponse);
 
       // Second request fails
-      const favoriteReq = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}/favorites`);
+      const favoriteReq = httpMock.expectOne(
+        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorites`,
+      );
       favoriteReq.error(new ErrorEvent('Favorite creation failed'));
 
       expect(errorSpy).toHaveBeenCalled();
@@ -522,7 +530,7 @@ describe('ApiService', () => {
 
       const req = httpMock.expectOne(`${apiBase}/tag`);
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ id: 'new-tag', color: undefined });
+      expect(req.request.body).toEqual({ tag_name: 'new-tag', color: undefined });
       req.flush(mockResponse);
     });
 
@@ -567,11 +575,11 @@ describe('ApiService', () => {
       };
       const tagData: Partial<Tag> = { tag_name: 'important' };
 
-      service.assignTagToLink(mockLink.id, tagData).subscribe((result) => {
+      service.assignTagToLink(mockLink.link_id, tagData).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
-      const req = httpMock.expectOne(`${apiBase}/link/${mockLink.id}/tag`);
+      const req = httpMock.expectOne(`${apiBase}/link/${mockLink.link_id}/tag`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(tagData);
       req.flush(mockResponse);
@@ -582,11 +590,11 @@ describe('ApiService', () => {
         success: true,
       };
 
-      service.removeTagFromLink(mockLink.id, mockTag.tag_name).subscribe((result) => {
+      service.removeTagFromLink(mockLink.link_id, mockTag.tag_name).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
-      const req = httpMock.expectOne(`${apiBase}/link/${mockLink.id}/tag/${mockTag.tag_name}`);
+      const req = httpMock.expectOne(`${apiBase}/link/${mockLink.link_id}/tag/${mockTag.tag_name}`);
       expect(req.request.method).toBe('DELETE');
       req.flush(mockResponse);
     });
@@ -599,15 +607,17 @@ describe('ApiService', () => {
         data: mockFavorite,
       };
 
-      service.addFavorite(mockDashboard.id, mockLink.id).subscribe((favorite) => {
+      service.addFavorite(mockDashboard.dashboard_id, mockLink.link_id).subscribe((favorite) => {
         expect(favorite).toEqual(mockFavorite);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}/favorites`);
+      const req = httpMock.expectOne(
+        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorites`,
+      );
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({
-        dashboard_id: mockDashboard.id,
-        link_id: mockLink.id,
+        dashboard_id: mockDashboard.dashboard_id,
+        link_id: mockLink.link_id,
       });
       req.flush(mockResponse);
     });
@@ -617,15 +627,17 @@ describe('ApiService', () => {
         success: true,
       };
 
-      service.removeFavorite(mockDashboard.id, mockLink.id).subscribe((result) => {
+      service.removeFavorite(mockDashboard.dashboard_id, mockLink.link_id).subscribe((result) => {
         expect(result).toBeUndefined();
       });
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}/favorites`);
+      const req = httpMock.expectOne(
+        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorites`,
+      );
       expect(req.request.method).toBe('DELETE');
       expect(req.request.body).toEqual({
-        dashboard_id: mockDashboard.id,
-        link_id: mockLink.id,
+        dashboard_id: mockDashboard.dashboard_id,
+        link_id: mockLink.link_id,
       });
       req.flush(mockResponse);
     });
@@ -633,13 +645,13 @@ describe('ApiService', () => {
     it('should reorder favorites', () => {
       const mockFavorites: Favorite[] = [
         {
-          dashboard_id: mockDashboard.id,
+          dashboard_id: mockDashboard.dashboard_id,
           link_id: 'link-1',
           sort_order: 1,
           created_at: '2025-11-15T00:00:00Z',
         },
         {
-          dashboard_id: mockDashboard.id,
+          dashboard_id: mockDashboard.dashboard_id,
           link_id: 'link-2',
           sort_order: 2,
           created_at: '2025-11-15T00:00:00Z',
@@ -654,14 +666,16 @@ describe('ApiService', () => {
         { link_id: 'link-2', sort_order: 2 },
       ];
 
-      service.reorderFavorites(mockDashboard.id, links).subscribe((result) => {
+      service.reorderFavorites(mockDashboard.dashboard_id, links).subscribe((result) => {
         expect(result).toEqual(mockFavorites);
       });
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}/favorites`);
+      const req = httpMock.expectOne(
+        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorites`,
+      );
       expect(req.request.method).toBe('PUT');
       expect(req.request.body).toEqual({
-        dashboard_id: mockDashboard.id,
+        dashboard_id: mockDashboard.dashboard_id,
         links,
       });
       req.flush(mockResponse);
@@ -688,9 +702,9 @@ describe('ApiService', () => {
         data: mockDashboard,
       };
 
-      service.updateDashboard(mockDashboard.id, { title: 'Updated' }).subscribe();
+      service.updateDashboard(mockDashboard.dashboard_id, { title: 'Updated' }).subscribe();
 
-      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.id}`);
+      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.dashboard_id}`);
       expect(req.request.headers.get('Content-Type')).toBe('application/json');
       req.flush(mockResponse);
     });

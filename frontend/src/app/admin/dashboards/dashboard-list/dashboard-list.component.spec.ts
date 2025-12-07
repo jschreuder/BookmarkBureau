@@ -17,7 +17,7 @@ describe('AdminDashboardListComponent', () => {
 
   const mockDashboards: Dashboard[] = [
     {
-      id: '123e4567-e89b-12d3-a456-426614174000',
+      dashboard_id: '123e4567-e89b-12d3-a456-426614174000',
       title: 'Home',
       description: 'Home dashboard',
       icon: 'home',
@@ -25,7 +25,7 @@ describe('AdminDashboardListComponent', () => {
       updated_at: '2024-01-01T00:00:00Z',
     },
     {
-      id: '223e4567-e89b-12d3-a456-426614174000',
+      dashboard_id: '223e4567-e89b-12d3-a456-426614174000',
       title: 'Work',
       description: 'Work dashboard',
       icon: 'work',

@@ -128,7 +128,7 @@ export class EditCategoryDialogComponent {
       dashboard_id: this.data.category.dashboard_id,
     };
 
-    this.apiService.updateCategory(this.data.category.id, categoryData).subscribe({
+    this.apiService.updateCategory(this.data.category.category_id, categoryData).subscribe({
       next: () => {
         this.loading = false;
         this.dialogRef.close(true);

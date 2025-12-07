@@ -134,7 +134,7 @@ export class DashboardOverviewComponent implements OnInit {
       width: '600px',
       maxWidth: '90vw',
       panelClass: 'add-link-dialog',
-      data: { dashboardId: this.dashboardId, categoryId: category.id, isFavorite: false },
+      data: { dashboardId: this.dashboardId, categoryId: category.category_id, isFavorite: false },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -156,7 +156,7 @@ export class DashboardOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.apiService.deleteCategory(category.id).subscribe({
+        this.apiService.deleteCategory(category.category_id).subscribe({
           next: () => {
             this.snackBar.open('Category deleted successfully', 'Close', { duration: 3000 });
             this.loadDashboard(true);
@@ -180,7 +180,7 @@ export class DashboardOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.apiService.removeFavorite(this.dashboardId, link.id).subscribe({
+        this.apiService.removeFavorite(this.dashboardId, link.link_id).subscribe({
           next: () => {
             this.snackBar.open('Removed from favorites', 'Close', { duration: 3000 });
             this.loadDashboard(true);
@@ -286,7 +286,7 @@ export class DashboardOverviewComponent implements OnInit {
     // Build the reorder payload matching FavoriteReorderAction format
     // Note: sort_order must be positive (1-indexed, not 0-indexed)
     const links = favorites.map((link, index) => ({
-      link_id: link.id,
+      link_id: link.link_id,
       sort_order: index + 1,
     }));
 
@@ -315,11 +315,11 @@ export class DashboardOverviewComponent implements OnInit {
     // Build the reorder payload matching CategoryLinkReorderAction format
     // Note: sort_order must be positive (1-indexed, not 0-indexed)
     const reorderLinks = links.map((link, index) => ({
-      link_id: link.id,
+      link_id: link.link_id,
       sort_order: index + 1,
     }));
 
-    this.apiService.reorderCategoryLinks(category.id, reorderLinks).subscribe({
+    this.apiService.reorderCategoryLinks(category.category_id, reorderLinks).subscribe({
       next: () => {
         this.snackBar.open('Category links reordered successfully', 'Close', { duration: 3000 });
       },

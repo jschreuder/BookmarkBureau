@@ -41,7 +41,7 @@ import { Observable } from 'rxjs';
         <mat-card
           class="dashboard-card"
           *ngFor="let dashboard of dashboards$ | async"
-          [routerLink]="['/dashboard', dashboard.id]"
+          [routerLink]="['/dashboard', dashboard.dashboard_id]"
         >
           <mat-card-header>
             <mat-card-title>{{ dashboard.title }}</mat-card-title>
@@ -51,7 +51,11 @@ import { Observable } from 'rxjs';
             <p *ngIf="!dashboard.description" class="no-description">No description provided</p>
           </mat-card-content>
           <mat-card-actions>
-            <button mat-button color="primary" [routerLink]="['/dashboard', dashboard.id]">
+            <button
+              mat-button
+              color="primary"
+              [routerLink]="['/dashboard', dashboard.dashboard_id]"
+            >
               <mat-icon>arrow_forward</mat-icon>
               View
             </button>

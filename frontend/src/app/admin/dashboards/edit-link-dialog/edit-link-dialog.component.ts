@@ -141,7 +141,7 @@ export class EditLinkDialogComponent {
     };
 
     this.apiService
-      .updateLink(this.data.link.id, linkData)
+      .updateLink(this.data.link.link_id, linkData)
       .pipe(
         switchMap(() => {
           // Handle tag changes
@@ -156,9 +156,9 @@ export class EditLinkDialogComponent {
           const tagsToRemove = currentTags.filter((t) => !newTagNames.has(t.tag_name));
 
           const operations = [
-            ...tagsToAdd.map((tag) => this.apiService.assignTagToLink(this.data.link.id, tag)),
+            ...tagsToAdd.map((tag) => this.apiService.assignTagToLink(this.data.link.link_id, tag)),
             ...tagsToRemove.map((tag) =>
-              this.apiService.removeTagFromLink(this.data.link.id, tag.tag_name),
+              this.apiService.removeTagFromLink(this.data.link.link_id, tag.tag_name),
             ),
           ];
 

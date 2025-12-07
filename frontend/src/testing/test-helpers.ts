@@ -15,11 +15,9 @@ import { vi } from 'vitest';
  * Create consistent test data for unit tests
  */
 
-export function createMockDashboard(
-  overrides?: Partial<Dashboard>
-): Dashboard {
+export function createMockDashboard(overrides?: Partial<Dashboard>): Dashboard {
   return {
-    id: '123e4567-e89b-12d3-a456-426614174000',
+    dashboard_id: '123e4567-e89b-12d3-a456-426614174000',
     title: 'Test Dashboard',
     description: 'Test Description',
     icon: 'dashboard',
@@ -32,17 +30,15 @@ export function createMockDashboard(
 export function createMockDashboards(count: number): Dashboard[] {
   return Array.from({ length: count }, (_, i) =>
     createMockDashboard({
-      id: `dashboard-${i + 1}`,
+      dashboard_id: `dashboard-${i + 1}`,
       title: `Dashboard ${i + 1}`,
-    })
+    }),
   );
 }
 
-export function createMockCategory(
-  overrides?: Partial<Category>
-): Category {
+export function createMockCategory(overrides?: Partial<Category>): Category {
   return {
-    id: '223e4567-e89b-12d3-a456-426614174000',
+    category_id: '223e4567-e89b-12d3-a456-426614174000',
     dashboard_id: '123e4567-e89b-12d3-a456-426614174000',
     title: 'Test Category',
     color: '#FF5733',
@@ -56,14 +52,14 @@ export function createMockCategory(
 export function createMockCategories(count: number): Category[] {
   return Array.from({ length: count }, (_, i) =>
     createMockCategory({
-      id: `category-${i + 1}`,
+      category_id: `category-${i + 1}`,
       title: `Category ${i + 1}`,
-    })
+    }),
   );
 }
 
 export function createMockCategoryWithLinks(
-  overrides?: Partial<CategoryWithLinks>
+  overrides?: Partial<CategoryWithLinks>,
 ): CategoryWithLinks {
   return {
     ...createMockCategory(),
@@ -74,7 +70,7 @@ export function createMockCategoryWithLinks(
 
 export function createMockLink(overrides?: Partial<Link>): Link {
   return {
-    id: '323e4567-e89b-12d3-a456-426614174000',
+    link_id: '323e4567-e89b-12d3-a456-426614174000',
     url: 'https://example.com',
     title: 'Test Link',
     description: 'Test link description',
@@ -89,10 +85,10 @@ export function createMockLink(overrides?: Partial<Link>): Link {
 export function createMockLinks(count: number): Link[] {
   return Array.from({ length: count }, (_, i) =>
     createMockLink({
-      id: `link-${i + 1}`,
+      link_id: `link-${i + 1}`,
       title: `Link ${i + 1}`,
       url: `https://example${i + 1}.com`,
-    })
+    }),
   );
 }
 
@@ -108,13 +104,11 @@ export function createMockTags(count: number): Tag[] {
   return Array.from({ length: count }, (_, i) =>
     createMockTag({
       tag_name: `tag-${i + 1}`,
-    })
+    }),
   );
 }
 
-export function createMockFavorite(
-  overrides?: Partial<Favorite>
-): Favorite {
+export function createMockFavorite(overrides?: Partial<Favorite>): Favorite {
   return {
     dashboard_id: '123e4567-e89b-12d3-a456-426614174000',
     link_id: '323e4567-e89b-12d3-a456-426614174000',
@@ -124,9 +118,7 @@ export function createMockFavorite(
   };
 }
 
-export function createMockFullDashboard(
-  overrides?: Partial<FullDashboard>
-): FullDashboard {
+export function createMockFullDashboard(overrides?: Partial<FullDashboard>): FullDashboard {
   return {
     dashboard: createMockDashboard(),
     categories: [
@@ -141,7 +133,7 @@ export function createMockFullDashboard(
 
 export function createMockApiResponse<T>(
   data?: T,
-  overrides?: Partial<ApiResponse<T>>
+  overrides?: Partial<ApiResponse<T>>,
 ): ApiResponse<T> {
   return {
     success: true,
@@ -150,9 +142,7 @@ export function createMockApiResponse<T>(
   };
 }
 
-export function createMockApiErrorResponse(
-  error: string
-): ApiResponse<null> {
+export function createMockApiErrorResponse(error: string): ApiResponse<null> {
   return {
     success: false,
     error,
@@ -164,36 +154,20 @@ export function createMockApiErrorResponse(
  * Simplify common DOM query operations
  */
 
-export function queryByTestId(
-  fixture: any,
-  testId: string
-): HTMLElement | null {
+export function queryByTestId(fixture: any, testId: string): HTMLElement | null {
   return fixture.nativeElement.querySelector(`[data-testid="${testId}"]`);
 }
 
-export function queryAllByTestId(
-  fixture: any,
-  testId: string
-): HTMLElement[] {
-  return Array.from(
-    fixture.nativeElement.querySelectorAll(`[data-testid="${testId}"]`)
-  );
+export function queryAllByTestId(fixture: any, testId: string): HTMLElement[] {
+  return Array.from(fixture.nativeElement.querySelectorAll(`[data-testid="${testId}"]`));
 }
 
-export function queryBySelector(
-  fixture: any,
-  selector: string
-): HTMLElement | null {
+export function queryBySelector(fixture: any, selector: string): HTMLElement | null {
   return fixture.nativeElement.querySelector(selector);
 }
 
-export function queryAllBySelector(
-  fixture: any,
-  selector: string
-): HTMLElement[] {
-  return Array.from(
-    fixture.nativeElement.querySelectorAll(selector)
-  );
+export function queryAllBySelector(fixture: any, selector: string): HTMLElement[] {
+  return Array.from(fixture.nativeElement.querySelectorAll(selector));
 }
 
 /**
@@ -257,19 +231,12 @@ export function detectChanges(fixture: any): void {
   fixture.detectChanges();
 }
 
-export function expectElementToExist(
-  fixture: any,
-  selector: string
-): boolean {
+export function expectElementToExist(fixture: any, selector: string): boolean {
   const element = fixture.nativeElement.querySelector(selector);
   return element !== null;
 }
 
-export function expectElementText(
-  fixture: any,
-  selector: string,
-  expectedText: string
-): boolean {
+export function expectElementText(fixture: any, selector: string, expectedText: string): boolean {
   const element = fixture.nativeElement.querySelector(selector);
   return element?.textContent?.includes(expectedText) ?? false;
 }
@@ -290,14 +257,8 @@ export function clickByTestId(fixture: any, testId: string): void {
   }
 }
 
-export function setInputValue(
-  fixture: any,
-  selector: string,
-  value: string
-): void {
-  const input = fixture.nativeElement.querySelector(
-    selector
-  ) as HTMLInputElement;
+export function setInputValue(fixture: any, selector: string, value: string): void {
+  const input = fixture.nativeElement.querySelector(selector) as HTMLInputElement;
   if (input) {
     input.value = value;
     input.dispatchEvent(new Event('input'));
@@ -306,11 +267,7 @@ export function setInputValue(
   }
 }
 
-export function setInputValueByTestId(
-  fixture: any,
-  testId: string,
-  value: string
-): void {
+export function setInputValueByTestId(fixture: any, testId: string, value: string): void {
   const input = queryByTestId(fixture, testId) as HTMLInputElement;
   if (input) {
     input.value = value;

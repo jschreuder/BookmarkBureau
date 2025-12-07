@@ -19,7 +19,7 @@ describe('DashboardFormComponent', () => {
   };
 
   const mockDashboard: Dashboard = {
-    id: '123e4567-e89b-12d3-a456-426614174000',
+    dashboard_id: '123e4567-e89b-12d3-a456-426614174000',
     title: 'Home',
     description: 'Home dashboard',
     icon: 'home',
@@ -133,11 +133,11 @@ describe('DashboardFormComponent', () => {
   it('should load dashboard in edit mode', () => {
     apiService.getDashboardBasic.mockReturnValue(of(mockDashboard));
     component.isEditMode = true;
-    component.dashboardId = mockDashboard.id;
+    component.dashboardId = mockDashboard.dashboard_id;
 
-    component.loadDashboard(mockDashboard.id);
+    component.loadDashboard(mockDashboard.dashboard_id);
 
-    expect(apiService.getDashboardBasic).toHaveBeenCalledWith(mockDashboard.id);
+    expect(apiService.getDashboardBasic).toHaveBeenCalledWith(mockDashboard.dashboard_id);
     expect(component.form.get('title')?.value).toBe(mockDashboard.title);
     expect(component.form.get('description')?.value).toBe(mockDashboard.description);
     expect(component.form.get('icon')?.value).toBe(mockDashboard.icon);
@@ -148,7 +148,7 @@ describe('DashboardFormComponent', () => {
     vi.spyOn(component['router'], 'navigate');
 
     component.isEditMode = true;
-    component.dashboardId = mockDashboard.id;
+    component.dashboardId = mockDashboard.dashboard_id;
     component.form.patchValue({
       title: 'Updated Title',
       description: 'Updated Description',
@@ -180,7 +180,7 @@ describe('DashboardFormComponent', () => {
     apiService.updateDashboard.mockReturnValue(throwError(() => error));
 
     component.isEditMode = true;
-    component.dashboardId = mockDashboard.id;
+    component.dashboardId = mockDashboard.dashboard_id;
     component.form.patchValue({
       title: 'Updated Title',
       description: 'Updated Description',

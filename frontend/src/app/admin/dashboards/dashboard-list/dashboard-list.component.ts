@@ -78,7 +78,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
                 <button
                   mat-icon-button
                   matTooltip="Edit"
-                  (click)="navigateToEdit(dashboard.id)"
+                  (click)="navigateToEdit(dashboard.dashboard_id)"
                   color="primary"
                 >
                   <mat-icon>edit</mat-icon>
@@ -86,7 +86,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
                 <button
                   mat-icon-button
                   matTooltip="Overview"
-                  (click)="navigateToOverview(dashboard.id)"
+                  (click)="navigateToOverview(dashboard.dashboard_id)"
                   color="primary"
                 >
                   <mat-icon>dashboard</mat-icon>
@@ -102,7 +102,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
                 <button
                   mat-icon-button
                   matTooltip="View"
-                  (click)="navigateToView(dashboard.id)"
+                  (click)="navigateToView(dashboard.dashboard_id)"
                   color="accent"
                 >
                   <mat-icon>visibility</mat-icon>
@@ -242,7 +242,7 @@ export class AdminDashboardListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.apiService.deleteDashboard(dashboard.id).subscribe({
+        this.apiService.deleteDashboard(dashboard.dashboard_id).subscribe({
           next: () => {
             this.snackBar.open('Dashboard deleted successfully', 'Close', { duration: 3000 });
             this.loadDashboards();

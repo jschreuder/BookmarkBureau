@@ -19,7 +19,7 @@ describe('AddCategoryDialogComponent', () => {
   };
 
   const mockCategory: Category = {
-    id: 'cat-id',
+    category_id: 'cat-id',
     dashboard_id: 'test-dashboard-id',
     title: 'Test Category',
     color: '#667eea',

@@ -166,7 +166,9 @@ export class AddLinkDialogComponent {
           }
 
           // Assign all tags to the newly created link
-          const tagAssignments = tags.map((tag) => this.apiService.assignTagToLink(link.id, tag));
+          const tagAssignments = tags.map((tag) =>
+            this.apiService.assignTagToLink(link.link_id, tag),
+          );
           return forkJoin(tagAssignments).pipe(switchMap(() => of(link)));
         }),
       )

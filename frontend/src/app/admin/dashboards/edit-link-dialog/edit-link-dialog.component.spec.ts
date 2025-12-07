@@ -18,7 +18,7 @@ describe('EditLinkDialogComponent', () => {
   let dialogRef: any;
   let snackBar: any;
   const mockLink: Link = {
-    id: '1',
+    link_id: '1',
     url: 'https://example.com',
     title: 'Example Link',
     description: 'A test link',
@@ -117,7 +117,7 @@ describe('EditLinkDialogComponent', () => {
 
       component.onSubmit();
 
-      expect(apiService.updateLink).toHaveBeenCalledWith(mockLink.id, {
+      expect(apiService.updateLink).toHaveBeenCalledWith(mockLink.link_id, {
         url: 'https://updated.com',
         title: 'Updated Title',
         description: 'Updated description',

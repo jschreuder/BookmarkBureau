@@ -15,7 +15,7 @@ describe('AddLinkDialogComponent', () => {
   let snackBar: any;
 
   const mockLink: Link = {
-    id: 'link-id',
+    link_id: 'link-id',
     url: 'https://example.com',
     title: 'Example Link',
     description: 'Test description',

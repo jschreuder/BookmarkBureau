@@ -1,6 +1,6 @@
 // Dashboard models
 export interface Dashboard {
-  id: string;
+  dashboard_id: string;
   title: string;
   description: string;
   icon?: string;
@@ -10,7 +10,7 @@ export interface Dashboard {
 
 // Category models
 export interface Category {
-  id: string;
+  category_id: string;
   dashboard_id: string;
   title: string;
   color?: string;
@@ -25,7 +25,7 @@ export interface CategoryWithLinks extends Category {
 
 // Link models
 export interface Link {
-  id: string;
+  link_id: string;
   url: string;
   title: string;
   description: string;

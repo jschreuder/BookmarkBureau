@@ -102,7 +102,7 @@ export class ApiService {
    */
   createLinkInCategory(categoryId: string, linkData: Partial<Link>): Observable<Link> {
     return this.createLink(linkData).pipe(
-      switchMap((link) => this.addLinkToCategory(categoryId, link.id).pipe(map(() => link))),
+      switchMap((link) => this.addLinkToCategory(categoryId, link.link_id).pipe(map(() => link))),
     );
   }
 
@@ -114,7 +114,7 @@ export class ApiService {
    */
   createLinkAsFavorite(dashboardId: string, linkData: Partial<Link>): Observable<Link> {
     return this.createLink(linkData).pipe(
-      switchMap((link) => this.addFavorite(dashboardId, link.id).pipe(map(() => link))),
+      switchMap((link) => this.addFavorite(dashboardId, link.link_id).pipe(map(() => link))),
     );
   }
 
@@ -158,9 +158,7 @@ export class ApiService {
 
   createTag(tag: Partial<Tag>): Observable<Tag> {
     return this.http
-      .post<
-        ApiResponse<Tag>
-      >(`${this.API_BASE}/tag`, { id: tag.tag_name, color: tag.color }, this.httpOptions)
+      .post<ApiResponse<Tag>>(`${this.API_BASE}/tag`, tag, this.httpOptions)
       .pipe(map((response) => response.data!));
   }
 
