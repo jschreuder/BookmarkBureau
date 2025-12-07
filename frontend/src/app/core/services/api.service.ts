@@ -144,6 +144,12 @@ export class ApiService {
   }
 
   // Tag endpoints
+  listTags(): Observable<Tag[]> {
+    return this.http
+      .get<ApiResponse<{ tags: Tag[] }>>(`${this.API_BASE}/tag`)
+      .pipe(map((response) => response.data?.tags || []));
+  }
+
   getTag(tagName: string): Observable<Tag> {
     return this.http
       .get<ApiResponse<Tag>>(`${this.API_BASE}/tag/${tagName}`)

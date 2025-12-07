@@ -6,10 +6,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
-import { Link } from '../../../core/models';
+import { Link, Tag } from '../../../core/models';
 import { IconPickerComponent } from '../../../shared/components/icon-picker/icon-picker.component';
+import { TagInputComponent } from '../../../shared/components/tag-input/tag-input.component';
 
 export interface AddLinkDialogData {
   dashboardId: string;
@@ -29,6 +31,7 @@ export interface AddLinkDialogData {
     MatButtonModule,
     MatSnackBarModule,
     IconPickerComponent,
+    TagInputComponent,
   ],
   template: `
     <h2 mat-dialog-title>
@@ -66,6 +69,8 @@ export interface AddLinkDialogData {
         </mat-form-field>
 
         <app-icon-picker formControlName="icon"></app-icon-picker>
+
+        <app-tag-input formControlName="tags"></app-tag-input>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
@@ -121,6 +126,7 @@ export class AddLinkDialogComponent {
       title: ['', [Validators.required, Validators.minLength(1)]],
       description: [''],
       icon: [''],
+      tags: [[]],
     });
   }
 
@@ -151,16 +157,29 @@ export class AddLinkDialogComponent {
       linkOperation = this.apiService.createLink(linkData);
     }
 
-    linkOperation.subscribe({
-      next: () => {
-        this.loading = false;
-        this.dialogRef.close(true);
-      },
-      error: (error: unknown) => {
-        this.loading = false;
-        this.snackBar.open('Failed to add link', 'Close', { duration: 5000 });
-      },
-    });
+    linkOperation
+      .pipe(
+        switchMap((link) => {
+          const tags: Tag[] = this.form.get('tags')?.value || [];
+          if (tags.length === 0) {
+            return of(link);
+          }
+
+          // Assign all tags to the newly created link
+          const tagAssignments = tags.map((tag) => this.apiService.assignTagToLink(link.id, tag));
+          return forkJoin(tagAssignments).pipe(switchMap(() => of(link)));
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          this.dialogRef.close(true);
+        },
+        error: (error: unknown) => {
+          this.loading = false;
+          this.snackBar.open('Failed to add link', 'Close', { duration: 5000 });
+        },
+      });
   }
 
   onCancel(): void {

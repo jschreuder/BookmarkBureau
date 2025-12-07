@@ -31,6 +31,8 @@ describe('AddLinkDialogComponent', () => {
       addLinkToCategory: vi.fn().mockReturnValue(of({})),
       createLinkAsFavorite: vi.fn().mockReturnValue(of(mockLink)),
       createLinkInCategory: vi.fn().mockReturnValue(of(mockLink)),
+      listTags: vi.fn().mockReturnValue(of([])),
+      assignTagToLink: vi.fn().mockReturnValue(of(void 0)),
     };
 
     dialogRef = {
@@ -107,7 +109,7 @@ describe('AddLinkDialogComponent', () => {
     it('should render all form fields', () => {
       const compiled = fixture.nativeElement;
       const formFields = compiled.querySelectorAll('mat-form-field');
-      expect(formFields.length).toBe(4);
+      expect(formFields.length).toBe(5); // url, title, description + icon-picker's mat-form-field + tag-input's mat-form-field
     });
 
     it('should render url input field', () => {

@@ -30,6 +30,9 @@ describe('EditLinkDialogComponent', () => {
   beforeEach(async () => {
     apiService = {
       updateLink: vi.fn().mockReturnValue(of(mockLink)),
+      listTags: vi.fn().mockReturnValue(of([])),
+      assignTagToLink: vi.fn().mockReturnValue(of(void 0)),
+      removeTagFromLink: vi.fn().mockReturnValue(of(void 0)),
     };
     dialogRef = {
       close: vi.fn(),

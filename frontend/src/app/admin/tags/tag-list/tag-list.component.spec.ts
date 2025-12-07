@@ -1,21 +1,67 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TagListComponent } from './tag-list.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
+import { MatTableModule } from '@angular/material/table';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { of, throwError } from 'rxjs';
+import { vi } from 'vitest';
+import { TagListComponent } from './tag-list.component';
+import { TagService } from '../../../core/services/tag.service';
+import { Tag } from '../../../core/models';
 
 describe('TagListComponent', () => {
   let component: TagListComponent;
   let fixture: ComponentFixture<TagListComponent>;
+  let tagService: TagService;
+  let dialog: MatDialog;
+  let snackBar: MatSnackBar;
+
+  const mockTags: Tag[] = [
+    { tag_name: 'work', color: '#2196f3' },
+    { tag_name: 'personal', color: '#4caf50' },
+  ];
 
   beforeEach(async () => {
+    const tagServiceMock = {
+      loadTags: vi.fn().mockReturnValue(of(mockTags)),
+      tags$: of(mockTags),
+      deleteTag: vi.fn(),
+    };
+
+    const dialogMock = {
+      open: vi.fn(),
+    };
+
+    const snackBarMock = {
+      open: vi.fn(),
+    };
+
     await TestBed.configureTestingModule({
-      imports: [TagListComponent, MatCardModule, MatButtonModule, MatIconModule, CommonModule]
+      imports: [
+        TagListComponent,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTableModule,
+        MatDialogModule,
+        MatSnackBarModule,
+        NoopAnimationsModule,
+      ],
+      providers: [
+        { provide: TagService, useValue: tagServiceMock },
+        { provide: MatDialog, useValue: dialogMock },
+        { provide: MatSnackBar, useValue: snackBarMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TagListComponent);
     component = fixture.componentInstance;
+    tagService = TestBed.inject(TagService);
+    dialog = TestBed.inject(MatDialog);
+    snackBar = TestBed.inject(MatSnackBar);
     fixture.detectChanges();
   });
 
@@ -23,69 +69,46 @@ describe('TagListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render page header', () => {
-    const header = fixture.nativeElement.querySelector('.page-header');
-    expect(header).toBeTruthy();
+  it('should load tags on init', () => {
+    expect(tagService.loadTags).toHaveBeenCalled();
   });
 
-  it('should display Tags heading', () => {
-    const h1 = fixture.nativeElement.querySelector('h1');
-    expect(h1).toBeTruthy();
-    expect(h1.textContent).toContain('Tags');
+  it('should display tags in table', () => {
+    const tableRows = fixture.nativeElement.querySelectorAll('tr.mat-mdc-row');
+    expect(tableRows.length).toBe(mockTags.length);
   });
 
-  it('should render New Tag button', () => {
-    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
-    expect(button).toBeTruthy();
+  it('should have openCreateDialog method', () => {
+    expect(typeof component.openCreateDialog).toBe('function');
   });
 
-  it('should have primary color on New Tag button', () => {
-    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
-    expect(button).toBeTruthy();
-    expect(button.getAttribute('color')).toBe('primary');
+  it('should have openEditDialog method', () => {
+    expect(typeof component.openEditDialog).toBe('function');
   });
 
-  it('should display New Tag text in button', () => {
-    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
-    expect(button.textContent).toContain('New Tag');
+  it('should delete tag on confirmation', () => {
+    vi.spyOn(tagService, 'deleteTag').mockReturnValue(of(void 0));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    component.deleteTag(mockTags[0]);
+
+    expect(tagService.deleteTag).toHaveBeenCalledWith('work');
   });
 
-  it('should have add icon in New Tag button', () => {
-    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
-    const icon = button.querySelector('mat-icon');
-    expect(icon).toBeTruthy();
-    expect(icon.textContent).toContain('add');
+  it('should not delete tag when user cancels', () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+    component.deleteTag(mockTags[0]);
+
+    expect(tagService.deleteTag).not.toHaveBeenCalled();
   });
 
-  it('should render Material card', () => {
-    const card = fixture.nativeElement.querySelector('mat-card');
-    expect(card).toBeTruthy();
-  });
+  it('should call deleteTag service when confirmed', () => {
+    tagService.deleteTag = vi.fn().mockReturnValue(of(void 0));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
 
-  it('should render card content', () => {
-    const cardContent = fixture.nativeElement.querySelector('mat-card-content');
-    expect(cardContent).toBeTruthy();
-  });
+    component.deleteTag(mockTags[0]);
 
-  it('should display main description in card', () => {
-    const cardContent = fixture.nativeElement.querySelector('mat-card-content');
-    expect(cardContent.textContent).toContain('Tag list will be implemented here');
-  });
-
-  it('should display additional description text', () => {
-    const cardContent = fixture.nativeElement.querySelector('mat-card-content');
-    expect(cardContent.textContent).toContain('This will show all tags with options to create, edit, and delete them');
-  });
-
-  it('should render button with correct icon', () => {
-    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
-    const matIcon = button.querySelector('mat-icon');
-    expect(matIcon).toBeTruthy();
-  });
-
-  it('should have Material button raised variant', () => {
-    const button = fixture.nativeElement.querySelector('[data-testid="create-btn"]');
-    expect(button).toBeTruthy();
-    expect(button.hasAttribute('mat-raised-button')).toBe(true);
+    expect(tagService.deleteTag).toHaveBeenCalledWith('work');
   });
 });
