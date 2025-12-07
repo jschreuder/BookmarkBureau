@@ -139,8 +139,8 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             new ResourceRouteBuilder(
                 $router,
                 "favorite",
-                "/dashboard/{dashboard_id}/favorites",
-                "/{favorite_id}",
+                "/dashboard/{dashboard_id}/favorite",
+                "/{link_id}",
             ),
         );
 

@@ -439,7 +439,7 @@ describe('ApiService', () => {
 
       // Second request: add link to favorites
       const favoriteReq = httpMock.expectOne(
-        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorites`,
+        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorite`,
       );
       expect(favoriteReq.request.method).toBe('POST');
       expect(favoriteReq.request.body).toEqual({
@@ -487,7 +487,7 @@ describe('ApiService', () => {
 
       // Second request fails
       const favoriteReq = httpMock.expectOne(
-        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorites`,
+        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorite`,
       );
       favoriteReq.error(new ErrorEvent('Favorite creation failed'));
 
@@ -611,9 +611,7 @@ describe('ApiService', () => {
         expect(favorite).toEqual(mockFavorite);
       });
 
-      const req = httpMock.expectOne(
-        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorites`,
-      );
+      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorite`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({
         dashboard_id: mockDashboard.dashboard_id,
@@ -632,13 +630,10 @@ describe('ApiService', () => {
       });
 
       const req = httpMock.expectOne(
-        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorites`,
+        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorite/${mockLink.link_id}`,
       );
       expect(req.request.method).toBe('DELETE');
-      expect(req.request.body).toEqual({
-        dashboard_id: mockDashboard.dashboard_id,
-        link_id: mockLink.link_id,
-      });
+      expect(req.request.body).toBeNull();
       req.flush(mockResponse);
     });
 
@@ -670,9 +665,7 @@ describe('ApiService', () => {
         expect(result).toEqual(mockFavorites);
       });
 
-      const req = httpMock.expectOne(
-        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorites`,
-      );
+      const req = httpMock.expectOne(`${apiBase}/dashboard/${mockDashboard.dashboard_id}/favorite`);
       expect(req.request.method).toBe('PUT');
       expect(req.request.body).toEqual({
         dashboard_id: mockDashboard.dashboard_id,

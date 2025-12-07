@@ -192,16 +192,13 @@ export class ApiService {
     return this.http
       .post<
         ApiResponse<Favorite>
-      >(`${this.API_BASE}/dashboard/${dashboardId}/favorites`, { dashboard_id: dashboardId, link_id: linkId }, this.httpOptions)
+      >(`${this.API_BASE}/dashboard/${dashboardId}/favorite`, { dashboard_id: dashboardId, link_id: linkId }, this.httpOptions)
       .pipe(map((response) => response.data!));
   }
 
   removeFavorite(dashboardId: string, linkId: string): Observable<void> {
     return this.http
-      .delete<ApiResponse<void>>(`${this.API_BASE}/dashboard/${dashboardId}/favorites`, {
-        ...this.httpOptions,
-        body: { dashboard_id: dashboardId, link_id: linkId },
-      })
+      .delete<ApiResponse<void>>(`${this.API_BASE}/dashboard/${dashboardId}/favorite/${linkId}`)
       .pipe(map(() => undefined));
   }
 
@@ -212,7 +209,7 @@ export class ApiService {
     return this.http
       .put<
         ApiResponse<Favorite[]>
-      >(`${this.API_BASE}/dashboard/${dashboardId}/favorites`, { dashboard_id: dashboardId, links }, this.httpOptions)
+      >(`${this.API_BASE}/dashboard/${dashboardId}/favorite`, { dashboard_id: dashboardId, links }, this.httpOptions)
       .pipe(map((response) => response.data || []));
   }
 
