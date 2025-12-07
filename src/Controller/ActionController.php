@@ -40,11 +40,10 @@ final readonly class ActionController implements
         }
         /** @var array<string, mixed> $rawData */
 
-        // Often the ID is part of the path, in which case routing should have added it to attributes
-        $id = $request->getAttribute("id");
-        if ($id !== null) {
-            $rawData["id"] = $id;
-        }
+        // Merge all routing attributes into rawData, overwriting existing values
+        /** @var array<string, mixed> $attributes */
+        $attributes = $request->getAttributes();
+        $rawData = [...$rawData, ...$attributes];
 
         // Return request with filtered body data
         return $request->withParsedBody($this->action->filter($rawData));
