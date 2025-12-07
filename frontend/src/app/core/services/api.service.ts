@@ -158,7 +158,9 @@ export class ApiService {
 
   createTag(tag: Partial<Tag>): Observable<Tag> {
     return this.http
-      .post<ApiResponse<Tag>>(`${this.API_BASE}/tag`, tag, this.httpOptions)
+      .post<
+        ApiResponse<Tag>
+      >(`${this.API_BASE}/tag`, { id: tag.tag_name, color: tag.color }, this.httpOptions)
       .pipe(map((response) => response.data!));
   }
 

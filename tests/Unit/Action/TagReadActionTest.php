@@ -11,7 +11,7 @@ use jschreuder\Middle\Exception\ValidationFailedException;
 
 describe("TagReadAction", function () {
     describe("filter method", function () {
-        test("filters tag_name and trims whitespace", function () {
+        test("filters id and trims whitespace", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
             $action = new TagReadAction(
                 $tagService,
@@ -19,14 +19,14 @@ describe("TagReadAction", function () {
                 new TagOutputSpec(),
             );
 
-            $filtered = $action->filter(["tag_name" => "  important  "]);
+            $filtered = $action->filter(["id" => "  important  "]);
 
-            expect($filtered["tag_name"])->toBe("important");
+            expect($filtered["id"])->toBe("important");
         });
     });
 
     describe("validate method", function () {
-        test("passes validation with valid tag_name", function () {
+        test("passes validation with valid id", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
             $action = new TagReadAction(
                 $tagService,
@@ -35,14 +35,14 @@ describe("TagReadAction", function () {
             );
 
             try {
-                $action->validate(["tag_name" => "important"]);
+                $action->validate(["id" => "important"]);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
         });
 
-        test("throws validation error for empty tag_name", function () {
+        test("throws validation error for empty id", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
             $action = new TagReadAction(
                 $tagService,
@@ -50,7 +50,7 @@ describe("TagReadAction", function () {
                 new TagOutputSpec(),
             );
 
-            expect(fn() => $action->validate(["tag_name" => ""]))->toThrow(
+            expect(fn() => $action->validate(["id" => ""]))->toThrow(
                 ValidationFailedException::class,
             );
         });
@@ -75,7 +75,7 @@ describe("TagReadAction", function () {
                 ->once()
                 ->andReturn($tag);
 
-            $result = $action->execute(["tag_name" => "important"]);
+            $result = $action->execute(["id" => "important"]);
 
             expect($result)->toBeArray();
             expect($result["tag_name"])->toBe("important");
@@ -96,7 +96,7 @@ describe("TagReadAction", function () {
                 ->andThrow(TagNotFoundException::class);
 
             expect(
-                fn() => $action->execute(["tag_name" => "nonexistent"]),
+                fn() => $action->execute(["id" => "nonexistent"]),
             )->toThrow(TagNotFoundException::class);
         });
     });
@@ -110,9 +110,9 @@ describe("TagReadAction", function () {
                 new TagOutputSpec(),
             );
 
-            $rawData = ["tag_name" => "  important  "];
+            $rawData = ["id" => "  important  "];
             $filtered = $action->filter($rawData);
-            expect($filtered["tag_name"])->toBe("important");
+            expect($filtered["id"])->toBe("important");
 
             try {
                 $action->validate($filtered);

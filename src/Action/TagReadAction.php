@@ -34,11 +34,11 @@ final readonly class TagReadAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{tag_name: string} $data */
+    /** @param array{id: string} $data */
     #[\Override]
     public function execute(array $data): array
     {
-        $tag = $this->tagService->getTag($data["tag_name"]);
+        $tag = $this->tagService->getTag($data["id"]);
         return $this->outputSpec->transform($tag);
     }
 }

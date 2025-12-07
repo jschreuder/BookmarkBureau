@@ -7,38 +7,38 @@ use jschreuder\Middle\Exception\ValidationFailedException;
 
 describe('TagDeleteAction', function () {
     describe('filter method', function () {
-        test('filters tag_name and trims whitespace', function () {
+        test('filters id and trims whitespace', function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
             $action = new TagDeleteAction($tagService, new TagNameInputSpec());
 
-            $filtered = $action->filter(['tag_name' => '  important  ']);
+            $filtered = $action->filter(['id' => '  important  ']);
 
-            expect($filtered['tag_name'])->toBe('important');
+            expect($filtered['id'])->toBe('important');
         });
     });
 
     describe('validate method', function () {
-        test('passes validation with valid tag_name', function () {
+        test('passes validation with valid id', function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
             $action = new TagDeleteAction($tagService, new TagNameInputSpec());
 
             try {
-                $action->validate(['tag_name' => 'important']);
+                $action->validate(['id' => 'important']);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
         });
 
-        test('throws validation error for empty tag_name', function () {
+        test('throws validation error for empty id', function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
             $action = new TagDeleteAction($tagService, new TagNameInputSpec());
 
-            expect(fn() => $action->validate(['tag_name' => '']))
+            expect(fn() => $action->validate(['id' => '']))
                 ->toThrow(ValidationFailedException::class);
         });
 
-        test('throws validation error for missing tag_name', function () {
+        test('throws validation error for missing id', function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
             $action = new TagDeleteAction($tagService, new TagNameInputSpec());
 
@@ -56,7 +56,7 @@ describe('TagDeleteAction', function () {
                 ->once()
                 ->with('important');
 
-            $result = $action->execute(['tag_name' => 'important']);
+            $result = $action->execute(['id' => 'important']);
 
             expect($result)->toBe([]);
         });
@@ -67,9 +67,9 @@ describe('TagDeleteAction', function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
             $action = new TagDeleteAction($tagService, new TagNameInputSpec());
 
-            $rawData = ['tag_name' => '  important  ', 'extra' => 'ignored'];
+            $rawData = ['id' => '  important  ', 'extra' => 'ignored'];
             $filtered = $action->filter($rawData);
-            expect($filtered['tag_name'])->toBe('important');
+            expect($filtered['id'])->toBe('important');
 
             try {
                 $action->validate($filtered);

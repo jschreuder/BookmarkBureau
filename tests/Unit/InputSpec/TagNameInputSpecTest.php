@@ -5,88 +5,88 @@ use jschreuder\Middle\Exception\ValidationFailedException;
 
 describe('TagNameInputSpec', function () {
     describe('getAvailableFields method', function () {
-        test('returns array containing only tag_name field', function () {
+        test('returns array containing only id field', function () {
             $spec = new TagNameInputSpec();
             $fields = $spec->getAvailableFields();
 
-            expect($fields)->toBe(['tag_name']);
+            expect($fields)->toBe(['id']);
             expect(count($fields))->toBe(1);
         });
     });
 
     describe('filter method', function () {
-        test('filters tag_name field and trims whitespace', function () {
+        test('filters id field and trims whitespace', function () {
             $spec = new TagNameInputSpec();
 
             $filtered = $spec->filter([
-                'tag_name' => '  Test Tag  '
+                'id' => '  Test Tag  '
             ]);
 
-            expect($filtered['tag_name'])->toBe('Test Tag');
+            expect($filtered['id'])->toBe('Test Tag');
         });
 
-        test('handles missing tag_name key with empty string', function () {
+        test('handles missing id key with empty string', function () {
             $spec = new TagNameInputSpec();
 
             $filtered = $spec->filter([]);
 
-            expect($filtered['tag_name'])->toBe('');
+            expect($filtered['id'])->toBe('');
         });
 
-        test('preserves valid tag_name without modification', function () {
+        test('preserves valid id without modification', function () {
             $spec = new TagNameInputSpec();
 
             $filtered = $spec->filter([
-                'tag_name' => 'Important'
+                'id' => 'Important'
             ]);
 
-            expect($filtered['tag_name'])->toBe('Important');
+            expect($filtered['id'])->toBe('Important');
         });
 
         test('ignores additional fields in input', function () {
             $spec = new TagNameInputSpec();
 
             $filtered = $spec->filter([
-                'tag_name' => 'Test Tag',
+                'id' => 'Test Tag',
                 'color' => 'Should be ignored',
                 'extra_field' => 'ignored'
             ]);
 
-            expect($filtered)->toHaveKey('tag_name');
+            expect($filtered)->toHaveKey('id');
             expect($filtered)->not->toHaveKey('color');
             expect($filtered)->not->toHaveKey('extra_field');
         });
 
-        test('handles empty string tag_name', function () {
+        test('handles empty string id', function () {
             $spec = new TagNameInputSpec();
 
             $filtered = $spec->filter([
-                'tag_name' => ''
+                'id' => ''
             ]);
 
-            expect($filtered['tag_name'])->toBe('');
+            expect($filtered['id'])->toBe('');
         });
 
-        test('converts null tag_name to empty string', function () {
+        test('converts null id to empty string', function () {
             $spec = new TagNameInputSpec();
 
             $filtered = $spec->filter([
-                'tag_name' => null
+                'id' => null
             ]);
 
-            expect($filtered['tag_name'])->toBe('');
+            expect($filtered['id'])->toBe('');
         });
 
         test('filters only specific fields when provided', function () {
             $spec = new TagNameInputSpec();
 
             $filtered = $spec->filter([
-                'tag_name' => 'Test Tag',
+                'id' => 'Test Tag',
                 'color' => 'Should be ignored'
-            ], ['tag_name']);
+            ], ['id']);
 
-            expect($filtered)->toHaveKey('tag_name');
-            expect($filtered['tag_name'])->toBe('Test Tag');
+            expect($filtered)->toHaveKey('id');
+            expect($filtered['id'])->toBe('Test Tag');
             expect(count($filtered))->toBe(1);
         });
 
@@ -94,32 +94,32 @@ describe('TagNameInputSpec', function () {
             $spec = new TagNameInputSpec();
 
             expect(function() use ($spec) {
-                $spec->filter(['tag_name' => 'test'], ['unknown_field']);
+                $spec->filter(['id' => 'test'], ['unknown_field']);
             })->toThrow(InvalidArgumentException::class);
         });
     });
 
     describe('validate method', function () {
-        test('passes validation with valid tag_name', function () {
+        test('passes validation with valid id', function () {
             $spec = new TagNameInputSpec();
 
             try {
-                $spec->validate(['tag_name' => 'Test Tag']);
+                $spec->validate(['id' => 'Test Tag']);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
         });
 
-        test('throws validation error for empty tag_name', function () {
+        test('throws validation error for empty id', function () {
             $spec = new TagNameInputSpec();
 
             expect(function() use ($spec) {
-                $spec->validate(['tag_name' => '']);
+                $spec->validate(['id' => '']);
             })->toThrow(ValidationFailedException::class);
         });
 
-        test('throws validation error for missing tag_name key', function () {
+        test('throws validation error for missing id key', function () {
             $spec = new TagNameInputSpec();
 
             expect(function() use ($spec) {
@@ -127,35 +127,35 @@ describe('TagNameInputSpec', function () {
             })->toThrow(ValidationFailedException::class);
         });
 
-        test('throws validation error for whitespace-only tag_name', function () {
+        test('throws validation error for whitespace-only id', function () {
             $spec = new TagNameInputSpec();
 
             expect(function() use ($spec) {
-                $spec->validate(['tag_name' => '   ']);
+                $spec->validate(['id' => '   ']);
             })->toThrow(ValidationFailedException::class);
         });
 
-        test('throws validation error for null tag_name', function () {
+        test('throws validation error for null id', function () {
             $spec = new TagNameInputSpec();
 
             expect(function() use ($spec) {
-                $spec->validate(['tag_name' => null]);
+                $spec->validate(['id' => null]);
             })->toThrow(ValidationFailedException::class);
         });
 
-        test('throws validation error for tag_name longer than 256 characters', function () {
+        test('throws validation error for id longer than 256 characters', function () {
             $spec = new TagNameInputSpec();
 
             expect(function() use ($spec) {
-                $spec->validate(['tag_name' => str_repeat('a', 257)]);
+                $spec->validate(['id' => str_repeat('a', 257)]);
             })->toThrow(ValidationFailedException::class);
         });
 
-        test('passes validation with tag_name at maximum length', function () {
+        test('passes validation with id at maximum length', function () {
             $spec = new TagNameInputSpec();
 
             try {
-                $spec->validate(['tag_name' => str_repeat('a', 256)]);
+                $spec->validate(['id' => str_repeat('a', 256)]);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
@@ -168,7 +168,7 @@ describe('TagNameInputSpec', function () {
 
             foreach ($validNames as $name) {
                 try {
-                    $spec->validate(['tag_name' => $name]);
+                    $spec->validate(['id' => $name]);
                     expect(true)->toBeTrue();
                 } catch (ValidationFailedException $e) {
                     throw $e;
@@ -180,7 +180,7 @@ describe('TagNameInputSpec', function () {
             $spec = new TagNameInputSpec();
 
             try {
-                $spec->validate(['tag_name' => 'Test Tag'], ['tag_name']);
+                $spec->validate(['id' => 'Test Tag'], ['id']);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
@@ -191,7 +191,7 @@ describe('TagNameInputSpec', function () {
             $spec = new TagNameInputSpec();
 
             expect(function() use ($spec) {
-                $spec->validate(['tag_name' => 'test'], ['unknown_field']);
+                $spec->validate(['id' => 'test'], ['unknown_field']);
             })->toThrow(InvalidArgumentException::class);
         });
     });
@@ -200,7 +200,7 @@ describe('TagNameInputSpec', function () {
         test('full workflow: filter and validate with valid data', function () {
             $spec = new TagNameInputSpec();
 
-            $rawData = ['tag_name' => '  Test Tag  '];
+            $rawData = ['id' => '  Test Tag  '];
             $filtered = $spec->filter($rawData);
 
             try {
@@ -215,7 +215,7 @@ describe('TagNameInputSpec', function () {
             $spec = new TagNameInputSpec();
 
             $rawData = [
-                'tag_name' => 'Test Tag',
+                'id' => 'Test Tag',
                 'color' => 'Should be ignored',
                 'extra' => 'data'
             ];
@@ -236,10 +236,10 @@ describe('TagNameInputSpec', function () {
         test('filter handles whitespace, validate ensures proper length', function () {
             $spec = new TagNameInputSpec();
 
-            $rawData = ['tag_name' => '  Important  '];
+            $rawData = ['id' => '  Important  '];
             $filtered = $spec->filter($rawData);
 
-            expect($filtered['tag_name'])->toBe('Important');
+            expect($filtered['id'])->toBe('Important');
 
             try {
                 $spec->validate($filtered);
@@ -252,10 +252,10 @@ describe('TagNameInputSpec', function () {
         test('validation failure after filter with invalid length', function () {
             $spec = new TagNameInputSpec();
 
-            $rawData = ['tag_name' => str_repeat('a', 257)];
+            $rawData = ['id' => str_repeat('a', 257)];
             $filtered = $spec->filter($rawData);
 
-            expect($filtered['tag_name'])->toBe(str_repeat('a', 257));
+            expect($filtered['id'])->toBe(str_repeat('a', 257));
 
             expect(function() use ($spec, $filtered) {
                 $spec->validate($filtered);
@@ -265,14 +265,14 @@ describe('TagNameInputSpec', function () {
         test('handles multiple filter and validate cycles', function () {
             $spec = new TagNameInputSpec();
 
-            $filtered1 = $spec->filter(['tag_name' => '  Important  ']);
+            $filtered1 = $spec->filter(['id' => '  Important  ']);
             $spec->validate($filtered1);
 
-            $filtered2 = $spec->filter(['tag_name' => '  Work  ']);
+            $filtered2 = $spec->filter(['id' => '  Work  ']);
             $spec->validate($filtered2);
 
-            expect($filtered1['tag_name'])->toBe('Important');
-            expect($filtered2['tag_name'])->toBe('Work');
+            expect($filtered1['id'])->toBe('Important');
+            expect($filtered2['id'])->toBe('Work');
         });
     });
 });

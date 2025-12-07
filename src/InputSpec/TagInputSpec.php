@@ -10,7 +10,7 @@ use Respect\Validation\Validator;
 
 final class TagInputSpec implements InputSpecInterface
 {
-    private const array FIELDS = ["tag_name", "color"];
+    private const array FIELDS = ["id", "color"];
 
     #[\Override]
     public function getAvailableFields(): array
@@ -18,7 +18,7 @@ final class TagInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
-    /** @return array{tag_name: string, color: ?string} */
+    /** @return array{id: string, color: ?string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -26,7 +26,7 @@ final class TagInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             $filtered[$field] = match ($field) {
-                "tag_name" => Filter::start($rawData, "tag_name", "")
+                "id" => Filter::start($rawData, "id", "")
                     ->string(allowNull: false)
                     ->trim()
                     ->done(),
@@ -40,11 +40,11 @@ final class TagInputSpec implements InputSpecInterface
             };
         }
 
-        /** @var array{tag_name: string, color: ?string} */
+        /** @var array{id: string, color: ?string} */
         return $filtered;
     }
 
-    /** @param array{tag_name: string, color: ?string} $data */
+    /** @param array{id: string, color: ?string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {
@@ -52,8 +52,8 @@ final class TagInputSpec implements InputSpecInterface
         $fields ??= $this->getAvailableFields();
         foreach ($fields as $field) {
             match ($field) {
-                "tag_name" => $validator->key(
-                    "tag_name",
+                "id" => $validator->key(
+                    "id",
                     Validator::notEmpty()->length(1, 256),
                 ),
                 "color" => $validator->key(

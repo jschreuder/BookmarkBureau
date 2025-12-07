@@ -13,9 +13,9 @@ describe('TagUpdateAction', function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
             $action = new TagUpdateAction($tagService, new TagInputSpec(), new TagOutputSpec());
 
-            $filtered = $action->filter(['tag_name' => '  important  ', 'color' => '  #FF0000  ']);
+            $filtered = $action->filter(['id' => '  important  ', 'color' => '  #FF0000  ']);
 
-            expect($filtered['tag_name'])->toBe('important');
+            expect($filtered['id'])->toBe('important');
             expect($filtered['color'])->toBe('#FF0000');
         });
     });
@@ -26,18 +26,18 @@ describe('TagUpdateAction', function () {
             $action = new TagUpdateAction($tagService, new TagInputSpec(), new TagOutputSpec());
 
             try {
-                $action->validate(['tag_name' => 'important', 'color' => '#FF0000']);
+                $action->validate(['id' => 'important', 'color' => '#FF0000']);
                 expect(true)->toBeTrue();
             } catch (ValidationFailedException $e) {
                 throw $e;
             }
         });
 
-        test('throws validation error for empty tag_name', function () {
+        test('throws validation error for empty id', function () {
             $tagService = Mockery::mock(TagServiceInterface::class);
             $action = new TagUpdateAction($tagService, new TagInputSpec(), new TagOutputSpec());
 
-            expect(fn() => $action->validate(['tag_name' => '', 'color' => '#FF0000']))
+            expect(fn() => $action->validate(['id' => '', 'color' => '#FF0000']))
                 ->toThrow(ValidationFailedException::class);
         });
     });
@@ -53,7 +53,7 @@ describe('TagUpdateAction', function () {
                 ->with('important', '#FF0000')
                 ->andReturn($updatedTag);
 
-            $result = $action->execute(['tag_name' => 'important', 'color' => '#FF0000']);
+            $result = $action->execute(['id' => 'important', 'color' => '#FF0000']);
 
             expect($result)->toBeArray();
             expect($result['tag_name'])->toBe('important');
