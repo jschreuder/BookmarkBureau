@@ -108,8 +108,73 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
             ),
         );
 
-        // Links
-        new ResourceRouteBuilder($router, "link", "/link")
+        // Resources
+        $this->registerLinkRoutes(
+            new ResourceRouteBuilder($router, "link", "/link"),
+        );
+
+        $this->registerTagRoutes(
+            new ResourceRouteBuilder($router, "tag", "/tag"),
+        );
+
+        $this->registerLinkTagRoutes(
+            new ResourceRouteBuilder(
+                $router,
+                "link_tag",
+                "/link/{id}/tag",
+                "/{tag_name}",
+            ),
+        );
+
+        $this->registerDashboardRoutes(
+            new ResourceRouteBuilder($router, "dashboard", "/dashboard"),
+        );
+
+        $this->registerFavoriteRoutes(
+            new ResourceRouteBuilder(
+                $router,
+                "favorite",
+                "/dashboard/{id}/favorites",
+            ),
+        );
+
+        $this->registerCategoryRoutes(
+            new ResourceRouteBuilder($router, "category", "/category"),
+        );
+
+        $this->registerCategoryLinkRoutes(
+            new ResourceRouteBuilder(
+                $router,
+                "category_link",
+                "/category/{id}/link",
+            ),
+        );
+
+        // Dashboard view (complex operation with categories and favorites)
+        // This route must be last as it uses a catch-all /{id} pattern with UUID validation
+        $router->get(
+            "dashboard-view",
+            "/{id}",
+            fn() => new DashboardViewController(
+                $this->container->getDashboardService(),
+                new JsonResponseTransformer(),
+                new FullDashboardOutputSpec(
+                    new DashboardOutputSpec(),
+                    new CategoryOutputSpec(),
+                    new LinkOutputSpec(new TagOutputSpec()),
+                ),
+            ),
+            [],
+            [
+                "id" =>
+                    "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+            ],
+        );
+    }
+
+    private function registerLinkRoutes(ResourceRouteBuilder $builder): void
+    {
+        $builder
             ->registerRead(
                 fn() => new LinkReadAction(
                     $this->container->getLinkService(),
@@ -137,9 +202,11 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                     new IdInputSpec(),
                 ),
             );
+    }
 
-        // Tags
-        new ResourceRouteBuilder($router, "tag", "/tag")
+    private function registerTagRoutes(ResourceRouteBuilder $builder): void
+    {
+        $builder
             ->registerList(
                 fn() => new TagListAction(
                     $this->container->getTagService(),
@@ -173,27 +240,29 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                     new TagNameInputSpec(),
                 ),
             );
+    }
 
-        // Link-Tag associations
-        new ResourceRouteBuilder($router, "link_tag", "/link/{id}/tag")
+    private function registerLinkTagRoutes(ResourceRouteBuilder $builder): void
+    {
+        $builder
             ->registerCreate(
                 fn() => new LinkTagCreateAction(
                     $this->container->getTagService(),
                     new LinkTagInputSpec(),
                 ),
             )
-            ->registerCustom(
-                "DELETE",
-                "delete",
-                "/{tag_name}",
+            ->registerDelete(
                 fn() => new LinkTagDeleteAction(
                     $this->container->getTagService(),
                     new LinkTagInputSpec(),
                 ),
             );
+    }
 
-        // Dashboards
-        new ResourceRouteBuilder($router, "dashboard", "/dashboard")
+    private function registerDashboardRoutes(
+        ResourceRouteBuilder $builder,
+    ): void {
+        $builder
             ->registerList(
                 fn() => new DashboardListAction(
                     $this->container->getDashboardService(),
@@ -227,13 +296,11 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                     new DashboardInputSpec(),
                 ),
             );
+    }
 
-        // Favorites
-        new ResourceRouteBuilder(
-            $router,
-            "favorite",
-            "/dashboard/{id}/favorites",
-        )
+    private function registerFavoriteRoutes(ResourceRouteBuilder $builder): void
+    {
+        $builder
             ->registerCreate(
                 fn() => new FavoriteCreateAction(
                     $this->container->getFavoriteService(),
@@ -260,9 +327,11 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                     new FavoriteOutputSpec(),
                 ),
             );
+    }
 
-        // Categories
-        new ResourceRouteBuilder($router, "category", "/category")
+    private function registerCategoryRoutes(ResourceRouteBuilder $builder): void
+    {
+        $builder
             ->registerRead(
                 fn() => new CategoryReadAction(
                     $this->container->getCategoryService(),
@@ -290,13 +359,12 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                     new CategoryInputSpec(),
                 ),
             );
+    }
 
-        // Category-Link associations
-        new ResourceRouteBuilder(
-            $router,
-            "category_link",
-            "/category/{id}/link",
-        )
+    private function registerCategoryLinkRoutes(
+        ResourceRouteBuilder $builder,
+    ): void {
+        $builder
             ->registerCreate(
                 fn() => new CategoryLinkCreateAction(
                     $this->container->getCategoryService(),
@@ -324,26 +392,5 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                     new LinkOutputSpec(new TagOutputSpec()),
                 ),
             );
-
-        // Dashboard view (complex operation with categories and favorites)
-        // This route must be last as it uses a catch-all /{id} pattern with UUID validation
-        $router->get(
-            "dashboard-view",
-            "/{id}",
-            fn() => new DashboardViewController(
-                $this->container->getDashboardService(),
-                new JsonResponseTransformer(),
-                new FullDashboardOutputSpec(
-                    new DashboardOutputSpec(),
-                    new CategoryOutputSpec(),
-                    new LinkOutputSpec(new TagOutputSpec()),
-                ),
-            ),
-            [],
-            [
-                "id" =>
-                    "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-            ],
-        );
     }
 }
