@@ -8,6 +8,16 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe("CategoryDeleteAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test("returns category_id attribute key", function () {
+            $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $inputSpec = new IdInputSpec("category_id");
+            $action = new CategoryDeleteAction($categoryService, $inputSpec);
+
+            expect($action->getAttributeKeysForData())->toBe(["category_id"]);
+        });
+    });
+
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);

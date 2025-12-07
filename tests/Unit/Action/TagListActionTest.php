@@ -7,6 +7,19 @@ use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
 use jschreuder\BookmarkBureau\Service\TagServiceInterface;
 
 describe("TagListAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns empty array since list actions have no routing params",
+            function () {
+                $tagService = Mockery::mock(TagServiceInterface::class);
+                $outputSpec = new TagOutputSpec();
+                $action = new TagListAction($tagService, $outputSpec);
+
+                expect($action->getAttributeKeysForData())->toBe([]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("returns empty array for list operation", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);

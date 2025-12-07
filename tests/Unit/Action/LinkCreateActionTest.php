@@ -9,6 +9,24 @@ use jschreuder\BookmarkBureau\OutputSpec\TagOutputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 
 describe("LinkCreateAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns empty array since create actions have no routing params",
+            function () {
+                $linkService = Mockery::mock(LinkServiceInterface::class);
+                $inputSpec = new LinkInputSpec();
+                $outputSpec = new LinkOutputSpec(new TagOutputSpec());
+                $action = new LinkCreateAction(
+                    $linkService,
+                    $inputSpec,
+                    $outputSpec,
+                );
+
+                expect($action->getAttributeKeysForData())->toBe([]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("trims whitespace from URL", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);

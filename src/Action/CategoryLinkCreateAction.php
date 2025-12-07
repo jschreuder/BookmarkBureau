@@ -22,6 +22,12 @@ final readonly class CategoryLinkCreateAction implements ActionInterface
     ) {}
 
     #[\Override]
+    public function getAttributeKeysForData(): array
+    {
+        return ["category_id"];
+    }
+
+    #[\Override]
     public function filter(array $rawData): array
     {
         return $this->inputSpec->filter($rawData);

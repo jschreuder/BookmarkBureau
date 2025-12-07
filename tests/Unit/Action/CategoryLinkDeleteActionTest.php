@@ -8,6 +8,27 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe("CategoryLinkDeleteAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns both category_id and link_id for delete relation action",
+            function () {
+                $categoryService = Mockery::mock(
+                    CategoryServiceInterface::class,
+                );
+                $inputSpec = new CategoryLinkInputSpec();
+                $action = new CategoryLinkDeleteAction(
+                    $categoryService,
+                    $inputSpec,
+                );
+
+                expect($action->getAttributeKeysForData())->toBe([
+                    "category_id",
+                    "link_id",
+                ]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("trims whitespace from id and link_id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);

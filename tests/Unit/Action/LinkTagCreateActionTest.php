@@ -8,6 +8,21 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe("LinkTagCreateAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns only link_id since this is a create relation action",
+            function () {
+                $tagService = Mockery::mock(TagServiceInterface::class);
+                $action = new LinkTagCreateAction(
+                    $tagService,
+                    new LinkTagInputSpec(),
+                );
+
+                expect($action->getAttributeKeysForData())->toBe(["link_id"]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("filters all fields with whitespace trimmed", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);

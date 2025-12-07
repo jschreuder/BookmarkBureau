@@ -18,6 +18,12 @@ final readonly class DashboardDeleteAction implements ActionInterface
     ) {}
 
     #[\Override]
+    public function getAttributeKeysForData(): array
+    {
+        return ["dashboard_id"];
+    }
+
+    #[\Override]
     public function filter(array $rawData): array
     {
         return $this->inputSpec->filter($rawData);

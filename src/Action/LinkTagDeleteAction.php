@@ -18,6 +18,12 @@ final readonly class LinkTagDeleteAction implements ActionInterface
     ) {}
 
     #[\Override]
+    public function getAttributeKeysForData(): array
+    {
+        return ["link_id", "tag_name"];
+    }
+
+    #[\Override]
     public function filter(array $rawData): array
     {
         return $this->inputSpec->filter($rawData);

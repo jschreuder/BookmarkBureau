@@ -8,6 +8,24 @@ use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
 use jschreuder\BookmarkBureau\Service\DashboardServiceInterface;
 
 describe("DashboardListAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns empty array since list actions have no routing params",
+            function () {
+                $dashboardService = Mockery::mock(
+                    DashboardServiceInterface::class,
+                );
+                $outputSpec = new DashboardOutputSpec();
+                $action = new DashboardListAction(
+                    $dashboardService,
+                    $outputSpec,
+                );
+
+                expect($action->getAttributeKeysForData())->toBe([]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("returns empty array for list operation", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);

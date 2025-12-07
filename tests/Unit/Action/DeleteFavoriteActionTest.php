@@ -7,6 +7,27 @@ use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Uuid;
 
 describe("DeleteFavoriteAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns both dashboard_id and link_id for delete relation action",
+            function () {
+                $favoriteService = Mockery::mock(
+                    FavoriteServiceInterface::class,
+                );
+                $inputSpec = new FavoriteInputSpec();
+                $action = new FavoriteDeleteAction(
+                    $favoriteService,
+                    $inputSpec,
+                );
+
+                expect($action->getAttributeKeysForData())->toBe([
+                    "dashboard_id",
+                    "link_id",
+                ]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("filters dashboard_id and link_id fields", function () {
             $favoriteService = Mockery::mock(FavoriteServiceInterface::class);

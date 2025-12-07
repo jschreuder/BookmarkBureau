@@ -13,6 +13,30 @@ use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Uuid;
 
 describe("CategoryLinkReorderAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns only category_id for reorder relation action",
+            function () {
+                $categoryService = Mockery::mock(
+                    CategoryServiceInterface::class,
+                );
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+                $inputSpec = new ReorderCategoryLinksInputSpec();
+                $outputSpec = new LinkOutputSpec(new TagOutputSpec());
+                $action = new CategoryLinkReorderAction(
+                    $categoryService,
+                    $linkRepository,
+                    $inputSpec,
+                    $outputSpec,
+                );
+
+                expect($action->getAttributeKeysForData())->toBe([
+                    "category_id",
+                ]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("filters category_id and links", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);

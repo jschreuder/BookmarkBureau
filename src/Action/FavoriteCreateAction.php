@@ -22,6 +22,12 @@ final readonly class FavoriteCreateAction implements ActionInterface
     ) {}
 
     #[\Override]
+    public function getAttributeKeysForData(): array
+    {
+        return ["dashboard_id"];
+    }
+
+    #[\Override]
     public function filter(array $rawData): array
     {
         // Create operations need dashboard_id and link_id, but not sort_order

@@ -38,14 +38,14 @@ final readonly class ActionController implements
         if (!\is_array($rawData)) {
             $rawData = [];
         }
-        /** @var array<string, mixed> $rawData */
 
-        // Merge all routing attributes into rawData, overwriting existing values
-        /** @var array<string, mixed> $attributes */
-        $attributes = $request->getAttributes();
-        $rawData = [...$rawData, ...$attributes];
+        // Merge required routing attributes into rawData, overwriting existing values
+        foreach ($this->action->getAttributeKeysForData() as $key) {
+            $rawData[$key] = $request->getAttribute($key);
+        }
 
         // Return request with filtered body data
+        /** @var array<string, mixed> $rawData */
         return $request->withParsedBody($this->action->filter($rawData));
     }
 

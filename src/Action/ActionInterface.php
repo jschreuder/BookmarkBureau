@@ -18,6 +18,12 @@ use jschreuder\Middle\Exception\ValidationFailedException;
 interface ActionInterface
 {
     /**
+     * Returns the attribute keys that are required to be added to the raw data
+     * @return array<string> The attribute keys
+     */
+    public function getAttributeKeysForData(): array;
+
+    /**
      * Filter/sanitize raw HTTP input
      * Should not error, invalid values should be nulled
      * @param array<string, mixed> $rawData

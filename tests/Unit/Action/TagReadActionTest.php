@@ -10,6 +10,19 @@ use jschreuder\BookmarkBureau\Exception\TagNotFoundException;
 use jschreuder\Middle\Exception\ValidationFailedException;
 
 describe("TagReadAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test("returns tag_name attribute key", function () {
+            $tagService = Mockery::mock(TagServiceInterface::class);
+            $action = new TagReadAction(
+                $tagService,
+                new TagNameInputSpec(),
+                new TagOutputSpec(),
+            );
+
+            expect($action->getAttributeKeysForData())->toBe(["tag_name"]);
+        });
+    });
+
     describe("filter method", function () {
         test("filters id and trims whitespace", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);

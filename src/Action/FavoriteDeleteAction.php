@@ -18,6 +18,12 @@ final readonly class FavoriteDeleteAction implements ActionInterface
     ) {}
 
     #[\Override]
+    public function getAttributeKeysForData(): array
+    {
+        return ["dashboard_id", "link_id"];
+    }
+
+    #[\Override]
     public function filter(array $rawData): array
     {
         $fields = ["dashboard_id", "link_id"];

@@ -8,6 +8,26 @@ use jschreuder\BookmarkBureau\OutputSpec\DashboardOutputSpec;
 use jschreuder\Middle\Exception\ValidationFailedException;
 
 describe("DashboardCreateAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns empty array since create actions have no routing params",
+            function () {
+                $dashboardService = Mockery::mock(
+                    DashboardServiceInterface::class,
+                );
+                $inputSpec = new DashboardInputSpec();
+                $outputSpec = new DashboardOutputSpec();
+                $action = new DashboardCreateAction(
+                    $dashboardService,
+                    $inputSpec,
+                    $outputSpec,
+                );
+
+                expect($action->getAttributeKeysForData())->toBe([]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("trims whitespace from title", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);

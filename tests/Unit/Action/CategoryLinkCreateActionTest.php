@@ -9,6 +9,28 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe("CategoryLinkCreateAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns only category_id since this is a create relation action",
+            function () {
+                $categoryService = Mockery::mock(
+                    CategoryServiceInterface::class,
+                );
+                $inputSpec = new CategoryLinkInputSpec();
+                $outputSpec = new CategoryLinkOutputSpec();
+                $action = new CategoryLinkCreateAction(
+                    $categoryService,
+                    $inputSpec,
+                    $outputSpec,
+                );
+
+                expect($action->getAttributeKeysForData())->toBe([
+                    "category_id",
+                ]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("trims whitespace from id and link_id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);

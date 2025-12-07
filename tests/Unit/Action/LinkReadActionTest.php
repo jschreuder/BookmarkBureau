@@ -13,6 +13,17 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe("LinkReadAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test("returns link_id attribute key", function () {
+            $linkService = Mockery::mock(LinkServiceInterface::class);
+            $inputSpec = new IdInputSpec("link_id");
+            $outputSpec = new LinkOutputSpec(new TagOutputSpec());
+            $action = new LinkReadAction($linkService, $inputSpec, $outputSpec);
+
+            expect($action->getAttributeKeysForData())->toBe(["link_id"]);
+        });
+    });
+
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $linkService = Mockery::mock(LinkServiceInterface::class);

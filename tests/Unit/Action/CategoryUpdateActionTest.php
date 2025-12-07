@@ -10,6 +10,21 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe("CategoryUpdateAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test("returns category_id attribute key", function () {
+            $categoryService = Mockery::mock(CategoryServiceInterface::class);
+            $inputSpec = new CategoryInputSpec();
+            $outputSpec = new CategoryOutputSpec();
+            $action = new CategoryUpdateAction(
+                $categoryService,
+                $inputSpec,
+                $outputSpec,
+            );
+
+            expect($action->getAttributeKeysForData())->toBe(["category_id"]);
+        });
+    });
+
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);

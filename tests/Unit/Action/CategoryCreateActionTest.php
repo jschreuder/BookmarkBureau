@@ -10,6 +10,26 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe("CategoryCreateAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns empty array since create actions have no routing params",
+            function () {
+                $categoryService = Mockery::mock(
+                    CategoryServiceInterface::class,
+                );
+                $inputSpec = new CategoryInputSpec();
+                $outputSpec = new CategoryOutputSpec();
+                $action = new CategoryCreateAction(
+                    $categoryService,
+                    $inputSpec,
+                    $outputSpec,
+                );
+
+                expect($action->getAttributeKeysForData())->toBe([]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("trims whitespace from dashboard_id", function () {
             $categoryService = Mockery::mock(CategoryServiceInterface::class);

@@ -22,6 +22,12 @@ final readonly class CategoryCreateAction implements ActionInterface
     ) {}
 
     #[\Override]
+    public function getAttributeKeysForData(): array
+    {
+        return [];
+    }
+
+    #[\Override]
     public function filter(array $rawData): array
     {
         // Create operations need all fields except "id", since it doesn't exist yet

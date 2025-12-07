@@ -8,6 +8,24 @@ use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\Middle\Exception\ValidationFailedException;
 
 describe("TagCreateAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns empty array since create actions have no routing params",
+            function () {
+                $tagService = Mockery::mock(TagServiceInterface::class);
+                $inputSpec = new TagInputSpec();
+                $outputSpec = new TagOutputSpec();
+                $action = new TagCreateAction(
+                    $tagService,
+                    $inputSpec,
+                    $outputSpec,
+                );
+
+                expect($action->getAttributeKeysForData())->toBe([]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);

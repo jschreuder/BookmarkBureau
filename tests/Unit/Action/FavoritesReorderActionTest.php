@@ -10,6 +10,28 @@ use jschreuder\Middle\Exception\ValidationFailedException;
 use Ramsey\Uuid\Uuid;
 
 describe("FavoritesReorderAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test(
+            "returns only dashboard_id for reorder relation action",
+            function () {
+                $favoriteService = Mockery::mock(
+                    FavoriteServiceInterface::class,
+                );
+                $inputSpec = new ReorderFavoritesInputSpec();
+                $outputSpec = new FavoriteOutputSpec();
+                $action = new FavoriteReorderAction(
+                    $favoriteService,
+                    $inputSpec,
+                    $outputSpec,
+                );
+
+                expect($action->getAttributeKeysForData())->toBe([
+                    "dashboard_id",
+                ]);
+            },
+        );
+    });
+
     describe("filter method", function () {
         test("filters dashboard_id and links", function () {
             $favoriteService = Mockery::mock(FavoriteServiceInterface::class);

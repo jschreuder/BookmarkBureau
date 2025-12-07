@@ -20,6 +20,12 @@ final readonly class DashboardListAction implements ActionInterface
     ) {}
 
     #[\Override]
+    public function getAttributeKeysForData(): array
+    {
+        return [];
+    }
+
+    #[\Override]
     public function filter(array $rawData): array
     {
         // No input parameters needed for listing all dashboards

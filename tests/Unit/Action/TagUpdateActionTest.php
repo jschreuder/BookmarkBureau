@@ -8,6 +8,19 @@ use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\Middle\Exception\ValidationFailedException;
 
 describe("TagUpdateAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test("returns tag_name attribute key", function () {
+            $tagService = Mockery::mock(TagServiceInterface::class);
+            $action = new TagUpdateAction(
+                $tagService,
+                new TagInputSpec(),
+                new TagOutputSpec(),
+            );
+
+            expect($action->getAttributeKeysForData())->toBe(["tag_name"]);
+        });
+    });
+
     describe("filter method", function () {
         test("filters all fields with whitespace trimmed", function () {
             $tagService = Mockery::mock(TagServiceInterface::class);

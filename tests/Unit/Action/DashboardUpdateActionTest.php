@@ -10,6 +10,21 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 describe("DashboardUpdateAction", function () {
+    describe("getAttributeKeysForData method", function () {
+        test("returns dashboard_id attribute key", function () {
+            $dashboardService = Mockery::mock(DashboardServiceInterface::class);
+            $inputSpec = new DashboardInputSpec();
+            $outputSpec = new DashboardOutputSpec();
+            $action = new DashboardUpdateAction(
+                $dashboardService,
+                $inputSpec,
+                $outputSpec,
+            );
+
+            expect($action->getAttributeKeysForData())->toBe(["dashboard_id"]);
+        });
+    });
+
     describe("filter method", function () {
         test("trims whitespace from id", function () {
             $dashboardService = Mockery::mock(DashboardServiceInterface::class);

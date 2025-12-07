@@ -21,6 +21,12 @@ final readonly class TagUpdateAction implements ActionInterface
     ) {}
 
     #[\Override]
+    public function getAttributeKeysForData(): array
+    {
+        return ["tag_name"];
+    }
+
+    #[\Override]
     public function filter(array $rawData): array
     {
         // Update operations can have tag_name and/or color

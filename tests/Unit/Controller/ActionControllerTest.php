@@ -40,6 +40,7 @@ describe("ActionController", function () {
     describe("filterRequest method", function () {
         test("filters GET request with query parameters", function () {
             $action = Mockery::mock(ActionInterface::class);
+            $action->shouldReceive("getAttributeKeysForData")->andReturn([]);
             $action
                 ->shouldReceive("filter")
                 ->with(["name" => "test", "value" => "123"])
@@ -67,6 +68,7 @@ describe("ActionController", function () {
 
         test("filters POST request with parsed body", function () {
             $action = Mockery::mock(ActionInterface::class);
+            $action->shouldReceive("getAttributeKeysForData")->andReturn([]);
             $action
                 ->shouldReceive("filter")
                 ->with(["name" => "test"])
@@ -90,6 +92,9 @@ describe("ActionController", function () {
             "handles null parsed body by treating as empty array",
             function () {
                 $action = Mockery::mock(ActionInterface::class);
+                $action
+                    ->shouldReceive("getAttributeKeysForData")
+                    ->andReturn([]);
                 $action->shouldReceive("filter")->with([])->andReturn([]);
 
                 $responseTransformer = new JsonResponseTransformer();
@@ -113,6 +118,9 @@ describe("ActionController", function () {
         test("includes route parameter id in filtered data", function () {
             $action = Mockery::mock(ActionInterface::class);
             $action
+                ->shouldReceive("getAttributeKeysForData")
+                ->andReturn(["id"]);
+            $action
                 ->shouldReceive("filter")
                 ->with(["id" => "123", "name" => "test"])
                 ->andReturn(["id" => "123", "name" => "test"]);
@@ -135,6 +143,9 @@ describe("ActionController", function () {
 
         test("merges all routing attributes into filtered data", function () {
             $action = Mockery::mock(ActionInterface::class);
+            $action
+                ->shouldReceive("getAttributeKeysForData")
+                ->andReturn(["id", "dashboard_id"]);
             $action
                 ->shouldReceive("filter")
                 ->with([
@@ -172,6 +183,9 @@ describe("ActionController", function () {
         test("routing attributes overwrite request data", function () {
             $action = Mockery::mock(ActionInterface::class);
             $action
+                ->shouldReceive("getAttributeKeysForData")
+                ->andReturn(["id"]);
+            $action
                 ->shouldReceive("filter")
                 ->with(["id" => "route-id", "name" => "test"])
                 ->andReturn(["id" => "route-id", "name" => "test"]);
@@ -194,6 +208,7 @@ describe("ActionController", function () {
 
         test("transforms data using action filter", function () {
             $action = Mockery::mock(ActionInterface::class);
+            $action->shouldReceive("getAttributeKeysForData")->andReturn([]);
             $action
                 ->shouldReceive("filter")
                 ->with(["email" => "test@example.com", "age" => "30"])
@@ -515,6 +530,7 @@ describe("ActionController", function () {
     describe("integration scenarios", function () {
         test("full request lifecycle with GET request", function () {
             $action = Mockery::mock(ActionInterface::class);
+            $action->shouldReceive("getAttributeKeysForData")->andReturn([]);
             $action
                 ->shouldReceive("filter")
                 ->with(["search" => "test"])
@@ -550,6 +566,9 @@ describe("ActionController", function () {
             "full request lifecycle with POST request and ID in route",
             function () {
                 $action = Mockery::mock(ActionInterface::class);
+                $action
+                    ->shouldReceive("getAttributeKeysForData")
+                    ->andReturn(["id"]);
                 $action
                     ->shouldReceive("filter")
                     ->with(["id" => "abc-123", "name" => "Updated"])
