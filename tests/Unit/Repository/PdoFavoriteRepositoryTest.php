@@ -161,6 +161,7 @@ describe("PdoFavoriteRepository", function () {
             new FavoriteEntityMapper(),
             new DashboardEntityMapper(),
             new LinkEntityMapper(),
+            new TagEntityMapper(),
         );
         return [$dashboardRepo, $linkRepo, $favoriteRepo];
     }
@@ -321,6 +322,7 @@ describe("PdoFavoriteRepository", function () {
                 new FavoriteEntityMapper(),
                 new DashboardEntityMapper(),
                 new LinkEntityMapper(),
+                new TagEntityMapper(),
             );
 
             expect(
@@ -447,6 +449,7 @@ describe("PdoFavoriteRepository", function () {
                     new FavoriteEntityMapper(),
                     new DashboardEntityMapper(),
                     new LinkEntityMapper(),
+                    new TagEntityMapper(),
                 );
 
                 expect(
@@ -502,6 +505,7 @@ describe("PdoFavoriteRepository", function () {
                     new FavoriteEntityMapper(),
                     new DashboardEntityMapper(),
                     new LinkEntityMapper(),
+                    new TagEntityMapper(),
                 );
 
                 expect(
@@ -557,6 +561,7 @@ describe("PdoFavoriteRepository", function () {
                     new FavoriteEntityMapper(),
                     new DashboardEntityMapper(),
                     new LinkEntityMapper(),
+                    new TagEntityMapper(),
                 );
 
                 expect(
@@ -786,6 +791,7 @@ describe("PdoFavoriteRepository", function () {
                 new FavoriteEntityMapper(),
                 new DashboardEntityMapper(),
                 new LinkEntityMapper(),
+                new TagEntityMapper(),
             );
 
             expect(fn() => $repo->countForDashboardId($dashboardId))->toThrow(

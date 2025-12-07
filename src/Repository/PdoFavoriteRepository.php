@@ -7,10 +7,12 @@ use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Composite\DashboardCollection;
 use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
+use jschreuder\BookmarkBureau\Composite\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\FavoriteEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
@@ -29,6 +31,7 @@ final readonly class PdoFavoriteRepository implements
         private readonly FavoriteEntityMapper $favoriteMapper,
         private readonly DashboardEntityMapper $dashboardMapper,
         private readonly LinkEntityMapper $linkMapper,
+        private readonly TagEntityMapper $tagMapper,
     ) {}
 
     /**
@@ -52,18 +55,52 @@ final readonly class PdoFavoriteRepository implements
             "l",
             ["created_at" => "link_created_at"],
         );
+        $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
         $statement = $this->pdo->prepare(
-            "SELECT {$favoriteFields}, {$linkFields}
+            "SELECT {$favoriteFields}, {$linkFields}, {$tagFields}
              FROM favorites f
              INNER JOIN links l ON f.link_id = l.link_id
+             LEFT JOIN link_tags lt ON l.link_id = lt.link_id
+             LEFT JOIN tags t ON lt.tag_name = t.tag_name
              WHERE f.dashboard_id = :dashboard_id
              ORDER BY f.sort_order ASC",
         );
         $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
 
+        /** @var array<int, array{dashboard_id: string, link_id: string, sort_order: string, favorite_created_at: string, url: string, title: string, description: string, icon: string|null, link_created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        // Group rows by link_id to handle multiple tags per link
+        $groupedByLink = [];
+        foreach ($rows as $row) {
+            $linkId = $row["link_id"];
+            if (!isset($groupedByLink[$linkId])) {
+                $groupedByLink[$linkId] = [
+                    "linkRow" => $row,
+                    "tagRows" => [],
+                ];
+            }
+            // Only collect tag data if a tag was actually joined
+            if ($row["tag_name"] !== null) {
+                $groupedByLink[$linkId]["tagRows"][] = $row;
+            }
+        }
+
+        // Build Favorite entities with their tags
         $favorites = [];
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            /** @var array{dashboard_id: string, link_id: string, sort_order: string, favorite_created_at:string, url: string, title: string, description: string, icon: string|null, link_created_at: string, updated_at: string} $row */
+        foreach ($groupedByLink as $group) {
+            $row = $group["linkRow"];
+            $tagRows = $group["tagRows"];
+
+            // Map tags to Tag entities
+            $tags = [];
+            foreach ($tagRows as $tagRow) {
+                $tags[] = $this->tagMapper->mapToEntity([
+                    "tag_name" => $tagRow["tag_name"],
+                    "color" => $tagRow["color"],
+                ]);
+            }
+
             unset($row["dashboard_id"]);
             $link = $this->linkMapper->mapToEntity([
                 "link_id" => $row["link_id"],
@@ -73,8 +110,9 @@ final readonly class PdoFavoriteRepository implements
                 "icon" => $row["icon"],
                 "created_at" => $row["link_created_at"],
                 "updated_at" => $row["updated_at"],
-                "tags" => null,
+                "tags" => new TagCollection(...$tags),
             ]);
+
             $favorites[] = $this->favoriteMapper->mapToEntity([
                 "dashboard" => $dashboard,
                 "link" => $link,

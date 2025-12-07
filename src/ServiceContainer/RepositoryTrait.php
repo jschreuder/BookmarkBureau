@@ -51,6 +51,7 @@ trait RepositoryTrait
             $this->getLinkRepository(),
             new CategoryEntityMapper(),
             new LinkEntityMapper(),
+            new TagEntityMapper(),
         );
     }
 
@@ -71,6 +72,7 @@ trait RepositoryTrait
             new FavoriteEntityMapper(),
             new DashboardEntityMapper(),
             new LinkEntityMapper(),
+            new TagEntityMapper(),
         );
     }
 

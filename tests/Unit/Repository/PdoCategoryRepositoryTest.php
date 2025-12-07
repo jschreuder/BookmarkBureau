@@ -161,6 +161,7 @@ describe("PdoCategoryRepository", function () {
             $linkRepo,
             new CategoryEntityMapper(),
             new LinkEntityMapper(),
+            new TagEntityMapper(),
         );
         return [$dashboardRepo, $linkRepo, $categoryRepo];
     }
@@ -517,6 +518,7 @@ describe("PdoCategoryRepository", function () {
                     $mockLinkRepo,
                     new CategoryEntityMapper(),
                     new LinkEntityMapper(),
+                    new TagEntityMapper(),
                 );
 
                 expect(fn() => $repo->insert($category))->toThrow(
@@ -566,6 +568,7 @@ describe("PdoCategoryRepository", function () {
                     $mockLinkRepo,
                     new CategoryEntityMapper(),
                     new LinkEntityMapper(),
+                    new TagEntityMapper(),
                 );
 
                 expect(fn() => $repo->insert($category))->toThrow(
@@ -752,6 +755,7 @@ describe("PdoCategoryRepository", function () {
                     $mockLinkRepo,
                     new CategoryEntityMapper(),
                     new LinkEntityMapper(),
+                    new TagEntityMapper(),
                 );
 
                 expect(
@@ -1051,6 +1055,7 @@ describe("PdoCategoryRepository", function () {
                 $mockLinkRepo,
                 new CategoryEntityMapper(),
                 new LinkEntityMapper(),
+                new TagEntityMapper(),
             );
 
             expect(
@@ -1152,6 +1157,7 @@ describe("PdoCategoryRepository", function () {
                 $mockLinkRepo,
                 new CategoryEntityMapper(),
                 new LinkEntityMapper(),
+                new TagEntityMapper(),
             );
 
             expect(
@@ -1214,6 +1220,7 @@ describe("PdoCategoryRepository", function () {
                 $mockLinkRepo,
                 new CategoryEntityMapper(),
                 new LinkEntityMapper(),
+                new TagEntityMapper(),
             );
 
             expect(fn() => $repo->count())->toThrow(
@@ -1288,6 +1295,7 @@ describe("PdoCategoryRepository", function () {
                 $mockLinkRepo,
                 new CategoryEntityMapper(),
                 new LinkEntityMapper(),
+                new TagEntityMapper(),
             );
 
             expect(

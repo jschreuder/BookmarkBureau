@@ -8,10 +8,12 @@ use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Composite\CategoryCollection;
 use jschreuder\BookmarkBureau\Composite\CategoryLinkCollection;
 use jschreuder\BookmarkBureau\Composite\LinkCollection;
+use jschreuder\BookmarkBureau\Composite\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
 use jschreuder\BookmarkBureau\Entity\Mapper\CategoryEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
+use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
@@ -30,6 +32,7 @@ final readonly class PdoCategoryRepository implements
         private readonly LinkRepositoryInterface $linkRepository,
         private readonly CategoryEntityMapper $categoryMapper,
         private readonly LinkEntityMapper $linkMapper,
+        private readonly TagEntityMapper $tagMapper,
     ) {}
 
     /**
@@ -106,18 +109,52 @@ final readonly class PdoCategoryRepository implements
             $this->linkMapper,
             "l",
         );
+        $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
         $statement = $this->pdo->prepare(
-            "SELECT cl.category_id, cl.link_id, cl.sort_order, cl.created_at as category_link_created_at, {$linkFields}
+            "SELECT cl.category_id, cl.link_id, cl.sort_order, cl.created_at as category_link_created_at, {$linkFields}, {$tagFields}
              FROM category_links cl
              INNER JOIN links l ON cl.link_id = l.link_id
+             LEFT JOIN link_tags lt ON l.link_id = lt.link_id
+             LEFT JOIN tags t ON lt.tag_name = t.tag_name
              WHERE cl.category_id = :category_id
              ORDER BY cl.sort_order ASC",
         );
         $statement->execute([":category_id" => $categoryId->getBytes()]);
 
+        /** @var array<int, array{category_id: string, link_id: string, sort_order: string, category_link_created_at: string, url: string, title: string, icon: string|null, description: string, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        // Group rows by link_id to handle multiple tags per link
+        $groupedByLink = [];
+        foreach ($rows as $row) {
+            $linkId = $row["link_id"];
+            if (!isset($groupedByLink[$linkId])) {
+                $groupedByLink[$linkId] = [
+                    "linkRow" => $row,
+                    "tagRows" => [],
+                ];
+            }
+            // Only collect tag data if a tag was actually joined
+            if ($row["tag_name"] !== null) {
+                $groupedByLink[$linkId]["tagRows"][] = $row;
+            }
+        }
+
+        // Build CategoryLink entities with their tags
         $categoryLinks = [];
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            /** @var array{category_id: string, link_id: string, sort_order: string, category_link_created_at: string, url: string, title: string, icon: string|null, description: string, created_at: string, updated_at: string} $row */
+        foreach ($groupedByLink as $group) {
+            $row = $group["linkRow"];
+            $tagRows = $group["tagRows"];
+
+            // Map tags to Tag entities
+            $tags = [];
+            foreach ($tagRows as $tagRow) {
+                $tags[] = $this->tagMapper->mapToEntity([
+                    "tag_name" => $tagRow["tag_name"],
+                    "color" => $tagRow["color"],
+                ]);
+            }
+
             $link = $this->linkMapper->mapToEntity([
                 "link_id" => $row["link_id"],
                 "url" => $row["url"],
@@ -126,8 +163,9 @@ final readonly class PdoCategoryRepository implements
                 "icon" => $row["icon"],
                 "created_at" => $row["created_at"],
                 "updated_at" => $row["updated_at"],
-                "tags" => null,
+                "tags" => new TagCollection(...$tags),
             ]);
+
             $categoryLinks[] = new CategoryLink(
                 category: $category,
                 link: $link,
