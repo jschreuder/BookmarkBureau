@@ -92,10 +92,12 @@ import { Observable, catchError, of } from 'rxjs';
                       <h4>{{ link.title }}</h4>
                       <p class="link-description" *ngIf="link.description">
                         {{ link.description }}
+                        <span class="link-tags" *ngIf="link.tags && link.tags.length > 0">
+                          <span class="tag" *ngFor="let tag of link.tags" [style.color]="tag.color"
+                            >#{{ tag.tag_name }}</span
+                          >
+                        </span>
                       </p>
-                      <mat-chip-set *ngIf="link.tags && link.tags.length > 0">
-                        <mat-chip *ngFor="let tag of link.tags">{{ tag.tag_name }}</mat-chip>
-                      </mat-chip-set>
                     </div>
                   </div>
                 </div>
@@ -346,8 +348,21 @@ import { Observable, catchError, of } from 'rxjs';
         overflow-wrap: break-word;
       }
 
-      .link-item mat-chip-set {
-        margin-top: 8px;
+      .link-tags {
+        display: inline;
+        margin-left: 8px;
+      }
+
+      .tag {
+        font-size: 0.67em;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: rgba(0, 0, 0, 0.5);
+        margin-left: 4px;
+      }
+
+      .tag:first-child {
+        margin-left: 0;
       }
 
       /* Empty State */

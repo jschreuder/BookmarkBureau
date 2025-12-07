@@ -507,18 +507,22 @@ describe('ApiService', () => {
       const newTag: Partial<Tag> = {
         tag_name: 'new-tag',
       };
+      const expectedResponse: Tag = {
+        tag_name: 'new-tag',
+        color: undefined,
+      };
       const mockResponse: ApiResponse<Tag> = {
         success: true,
-        data: mockTag,
+        data: expectedResponse,
       };
 
       service.createTag(newTag).subscribe((tag) => {
-        expect(tag).toEqual(mockTag);
+        expect(tag).toEqual(expectedResponse);
       });
 
       const req = httpMock.expectOne(`${apiBase}/tag`);
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(newTag);
+      expect(req.request.body).toEqual({ id: 'new-tag', color: undefined });
       req.flush(mockResponse);
     });
 
