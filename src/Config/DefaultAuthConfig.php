@@ -34,11 +34,10 @@ final readonly class DefaultAuthConfig implements AuthConfigInterface
     #[\Override]
     public function getJwtConfiguration(): Configuration
     {
-        /** @var non-empty-string $secret */
-        $secret = $this->jwtSecret;
+        assert($this->jwtSecret !== "", "JWT secret must be non-empty");
         return Configuration::forSymmetricSigner(
             new Sha256(),
-            InMemory::plainText($secret),
+            InMemory::plainText($this->jwtSecret),
         )->withValidationConstraints();
     }
 
@@ -54,9 +53,11 @@ final readonly class DefaultAuthConfig implements AuthConfigInterface
     #[\Override]
     public function getTotpVerifier(): TotpVerifierInterface
     {
-        /** @var positive-int $window */
-        $window = $this->totpWindow;
-        return new OtphpTotpVerifier($this->getClock(), window: $window);
+        assert($this->totpWindow > 0, "TOTP window must be positive");
+        return new OtphpTotpVerifier(
+            $this->getClock(),
+            window: $this->totpWindow,
+        );
     }
 
     #[\Override]

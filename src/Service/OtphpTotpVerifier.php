@@ -27,8 +27,8 @@ final readonly class OtphpTotpVerifier implements TotpVerifierInterface
         }
 
         try {
-            /** @var non-empty-string secretString */
             $secretString = (string) $secret;
+            assert($secretString !== "", "TOTP secret must not be empty");
             $totp = TOTP::create($secretString, clock: $this->clock);
             $timestamp = $this->clock->now()->getTimestamp();
             /** @var positive-int $window */

@@ -23,8 +23,11 @@ final readonly class ErrorHandlerController implements ControllerInterface
     #[\Override]
     public function execute(ServerRequestInterface $request): ResponseInterface
     {
-        /** @var  \Throwable $exception */
         $exception = $request->getAttribute("error");
+        assert(
+            $exception instanceof Throwable,
+            "Error attribute must be a Throwable instance",
+        );
         $code = $this->getCode($exception);
         $message = $this->getMessage($exception, $code);
 

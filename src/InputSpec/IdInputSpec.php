@@ -22,7 +22,6 @@ final class IdInputSpec implements InputSpecInterface
         return [$this->idName];
     }
 
-    /** @return non-empty-array<string, string> */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -41,7 +40,10 @@ final class IdInputSpec implements InputSpecInterface
             };
         }
 
-        /** @var non-empty-array<string, string> */
+        assert(
+            !empty($filtered),
+            "IdInputSpec filter must return non-empty array",
+        );
         return $filtered;
     }
 

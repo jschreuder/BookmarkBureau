@@ -18,11 +18,9 @@ final readonly class TokenOutputSpec implements OutputSpecInterface
         return $data instanceof TokenResponse;
     }
 
-    /** @param  TokenResponse $tokenResponse */
     #[\Override]
     private function doTransform(object $tokenResponse): array
     {
-        /** @var TokenResponse $tokenResponse */
         return [
             "token" => (string) $tokenResponse->token,
             "type" => $tokenResponse->type,
