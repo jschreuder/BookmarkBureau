@@ -98,6 +98,16 @@ interface CategoryRepositoryInterface
     ): bool;
 
     /**
+     * Reorder categories in a dashboard
+     * The index (position) of each category in the collection becomes its sort order
+     * @throws DashboardNotFoundException when dashboard doesn't exist
+     */
+    public function reorderCategories(
+        UuidInterface $dashboardId,
+        CategoryCollection $categories,
+    ): void;
+
+    /**
      * Reorder links in a category
      * The index (position) of each link in the collection becomes its sort order
      * @throws CategoryNotFoundException when category doesn't exist

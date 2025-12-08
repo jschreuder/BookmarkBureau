@@ -364,6 +364,44 @@ final readonly class PdoCategoryRepository implements
     }
 
     /**
+     * Reorder categories in a dashboard
+     * The index (position) of each category in the collection becomes its sort order
+     * @throws DashboardNotFoundException when dashboard doesn't exist
+     */
+    #[\Override]
+    public function reorderCategories(
+        UuidInterface $dashboardId,
+        CategoryCollection $categories,
+    ): void {
+        // Verify dashboard exists
+        $this->dashboardRepository->findById($dashboardId);
+
+        $sortOrder = 0;
+        foreach ($categories as $category) {
+            $this->updateCategorySortOrder($category, $sortOrder);
+            $sortOrder++;
+        }
+    }
+
+    /**
+     * Update sort order for a category
+     */
+    private function updateCategorySortOrder(
+        Category $category,
+        int $sortOrder,
+    ): void {
+        $query = SqlBuilder::buildUpdate(
+            "categories",
+            [
+                "category_id" => $category->categoryId->getBytes(),
+                "sort_order" => $sortOrder,
+            ],
+            ["category_id"],
+        );
+        $this->pdo->prepare($query["sql"])->execute($query["params"]);
+    }
+
+    /**
      * Reorder links in a category
      * The index (position) of each link in the collection becomes its sort order
      * @throws CategoryNotFoundException when category doesn't exist

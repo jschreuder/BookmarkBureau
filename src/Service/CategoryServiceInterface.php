@@ -2,6 +2,7 @@
 
 namespace jschreuder\BookmarkBureau\Service;
 
+use jschreuder\BookmarkBureau\Composite\CategoryCollection;
 use jschreuder\BookmarkBureau\Composite\LinkCollection;
 use jschreuder\BookmarkBureau\Entity\Category;
 use jschreuder\BookmarkBureau\Entity\CategoryLink;
@@ -16,6 +17,15 @@ interface CategoryServiceInterface
      * @throws CategoryNotFoundException when category doesn't exist
      */
     public function getCategory(UuidInterface $categoryId): Category;
+
+    /**
+     * Get all categories for a dashboard
+     *
+     * @throws DashboardNotFoundException when dashboard doesn't exist
+     */
+    public function getCategoriesForDashboard(
+        UuidInterface $dashboardId,
+    ): CategoryCollection;
 
     /**
      * Create a new category in a dashboard
@@ -48,13 +58,14 @@ interface CategoryServiceInterface
 
     /**
      * Reorder categories within a dashboard
+     * The index (position) of each category in the collection becomes its sort order
      *
      * @param UuidInterface $dashboardId
-     * @param array<string, int> $categoryIdToSortOrder Map of category UUID strings to sort orders
+     * @param CategoryCollection $categories Categories in the desired order
      */
     public function reorderCategories(
         UuidInterface $dashboardId,
-        array $categoryIdToSortOrder,
+        CategoryCollection $categories,
     ): void;
 
     /**

@@ -8,6 +8,7 @@ use jschreuder\BookmarkBureau\Action\CategoryLinkCreateAction;
 use jschreuder\BookmarkBureau\Action\CategoryLinkDeleteAction;
 use jschreuder\BookmarkBureau\Action\CategoryLinkReorderAction;
 use jschreuder\BookmarkBureau\Action\CategoryReadAction;
+use jschreuder\BookmarkBureau\Action\CategoryReorderAction;
 use jschreuder\BookmarkBureau\Action\CategoryUpdateAction;
 use jschreuder\BookmarkBureau\Action\DashboardCreateAction;
 use jschreuder\BookmarkBureau\Action\DashboardDeleteAction;
@@ -39,6 +40,7 @@ use jschreuder\BookmarkBureau\InputSpec\FavoriteInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\IdInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\LinkInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\LinkTagInputSpec;
+use jschreuder\BookmarkBureau\InputSpec\ReorderCategoriesInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\ReorderCategoryLinksInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\ReorderFavoritesInputSpec;
 use jschreuder\BookmarkBureau\InputSpec\TagInputSpec;
@@ -306,6 +308,16 @@ final readonly class GeneralRoutingProvider implements RoutingProviderInterface
                 fn() => new DashboardDeleteAction(
                     $this->container->getDashboardService(),
                     new IdInputSpec("dashboard_id"),
+                ),
+            )
+            ->registerCustom(
+                "PUT",
+                "reorder-categories",
+                "/{dashboard_id}/categories",
+                fn() => new CategoryReorderAction(
+                    $this->container->getCategoryService(),
+                    new ReorderCategoriesInputSpec(),
+                    new CategoryOutputSpec(),
                 ),
             );
     }

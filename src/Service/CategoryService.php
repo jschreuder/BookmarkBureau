@@ -48,6 +48,24 @@ final class CategoryService implements CategoryServiceInterface
      * @throws DashboardNotFoundException when dashboard doesn't exist
      */
     #[\Override]
+    public function getCategoriesForDashboard(
+        UuidInterface $dashboardId,
+    ): CategoryCollection {
+        // Verify dashboard exists
+        $this->dashboardRepository->findById($dashboardId);
+
+        return $this->pipelines
+            ->getCategoriesForDashboard()
+            ->run(
+                $this->categoryRepository->listForDashboardId(...),
+                $dashboardId,
+            );
+    }
+
+    /**
+     * @throws DashboardNotFoundException when dashboard doesn't exist
+     */
+    #[\Override]
     public function createCategory(
         UuidInterface $dashboardId,
         string $title,
@@ -119,32 +137,19 @@ final class CategoryService implements CategoryServiceInterface
     #[\Override]
     public function reorderCategories(
         UuidInterface $dashboardId,
-        array $categoryIdToSortOrder,
+        CategoryCollection $categories,
     ): void {
-        // Get all categories for the dashboard
-        $categories = $this->categoryRepository->listForDashboardId(
-            $dashboardId,
-        );
-
-        // Update sort orders
-        $updatedCategories = [];
-        foreach ($categories as $category) {
-            $categoryIdString = $category->categoryId->toString();
-            if (isset($categoryIdToSortOrder[$categoryIdString])) {
-                $category->sortOrder =
-                    $categoryIdToSortOrder[$categoryIdString];
-                $updatedCategories[] = $category;
-            }
-        }
-
         $this->pipelines
             ->reorderCategories()
-            ->run(function (CategoryCollection $reorderedCategories): null {
-                foreach ($reorderedCategories as $category) {
-                    $this->categoryRepository->update($category);
-                }
+            ->run(function (CategoryCollection $categories) use (
+                $dashboardId,
+            ): null {
+                $this->categoryRepository->reorderCategories(
+                    $dashboardId,
+                    $categories,
+                );
                 return null;
-            }, new CategoryCollection(...$updatedCategories));
+            }, $categories);
     }
 
     /**

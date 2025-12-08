@@ -905,6 +905,140 @@ describe("PdoCategoryRepository", function () {
         });
     });
 
+    describe("reorderCategories", function () {
+        test("reorders categories for a dashboard", function () {
+            $pdo = createCategoryDatabase();
+            [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories(
+                $pdo,
+            );
+            $dashboard = TestEntityFactory::createDashboard();
+            $category1 = TestEntityFactory::createCategory(
+                dashboard: $dashboard,
+                sortOrder: 0,
+            );
+            $category2 = TestEntityFactory::createCategory(
+                dashboard: $dashboard,
+                sortOrder: 1,
+            );
+            $category3 = TestEntityFactory::createCategory(
+                dashboard: $dashboard,
+                sortOrder: 2,
+            );
+
+            insertTestDashboardForCategory($pdo, $dashboard);
+            insertTestCategoryEntity($pdo, $category1);
+            insertTestCategoryEntity($pdo, $category2);
+            insertTestCategoryEntity($pdo, $category3);
+
+            // Reorder: category2 (0), category1 (1), category3 (2)
+            $category1->sortOrder = 1;
+            $category2->sortOrder = 0;
+            $category3->sortOrder = 2;
+
+            $repo->reorderCategories(
+                $dashboard->dashboardId,
+                new \jschreuder\BookmarkBureau\Composite\CategoryCollection(
+                    $category2,
+                    $category1,
+                    $category3,
+                ),
+            );
+
+            $stmt = $pdo->prepare(
+                "SELECT sort_order FROM categories WHERE category_id = ?",
+            );
+
+            $stmt->execute([$category2->categoryId->getBytes()]);
+            expect($stmt->fetch(PDO::FETCH_ASSOC)["sort_order"])->toBe(0);
+
+            $stmt->execute([$category1->categoryId->getBytes()]);
+            expect($stmt->fetch(PDO::FETCH_ASSOC)["sort_order"])->toBe(1);
+
+            $stmt->execute([$category3->categoryId->getBytes()]);
+            expect($stmt->fetch(PDO::FETCH_ASSOC)["sort_order"])->toBe(2);
+        });
+
+        test(
+            "handles reordering with subset of categories in dashboard",
+            function () {
+                $pdo = createCategoryDatabase();
+                [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories(
+                    $pdo,
+                );
+                $dashboard = TestEntityFactory::createDashboard();
+                $category1 = TestEntityFactory::createCategory(
+                    dashboard: $dashboard,
+                    sortOrder: 0,
+                );
+                $category2 = TestEntityFactory::createCategory(
+                    dashboard: $dashboard,
+                    sortOrder: 1,
+                );
+                $category3 = TestEntityFactory::createCategory(
+                    dashboard: $dashboard,
+                    sortOrder: 2,
+                );
+
+                insertTestDashboardForCategory($pdo, $dashboard);
+                insertTestCategoryEntity($pdo, $category1);
+                insertTestCategoryEntity($pdo, $category2);
+                insertTestCategoryEntity($pdo, $category3);
+
+                // Reorder only two categories
+                $category1->sortOrder = 1;
+                $category3->sortOrder = 0;
+
+                $repo->reorderCategories(
+                    $dashboard->dashboardId,
+                    new \jschreuder\BookmarkBureau\Composite\CategoryCollection(
+                        $category3,
+                        $category1,
+                    ),
+                );
+
+                $stmt = $pdo->prepare(
+                    "SELECT sort_order FROM categories WHERE category_id = ? ORDER BY sort_order",
+                );
+
+                // category3 should be 0
+                $stmt->execute([$category3->categoryId->getBytes()]);
+                expect($stmt->fetch(PDO::FETCH_ASSOC)["sort_order"])->toBe(0);
+
+                // category1 should be 1
+                $stmt->execute([$category1->categoryId->getBytes()]);
+                expect($stmt->fetch(PDO::FETCH_ASSOC)["sort_order"])->toBe(1);
+
+                // category2 should still be 1 (unchanged)
+                $stmt->execute([$category2->categoryId->getBytes()]);
+                expect($stmt->fetch(PDO::FETCH_ASSOC)["sort_order"])->toBe(1);
+            },
+        );
+
+        test(
+            "throws DashboardNotFoundException when dashboard does not exist",
+            function () {
+                $pdo = createCategoryDatabase();
+                [$dashboardRepo, $linkRepo, $repo] = createCategoryRepositories(
+                    $pdo,
+                );
+                $dashboard = TestEntityFactory::createDashboard();
+                $category = TestEntityFactory::createCategory(
+                    dashboard: $dashboard,
+                );
+                $nonExistentDashboardId = Uuid::uuid4();
+
+                expect(
+                    fn() => $repo->reorderCategories(
+                        $nonExistentDashboardId,
+                        new \jschreuder\BookmarkBureau\Composite\CategoryCollection(
+                            $category,
+                        ),
+                    ),
+                )->toThrow(DashboardNotFoundException::class);
+            },
+        );
+    });
+
     describe("reorderLinks", function () {
         test("reorders links in a category using LinkCollection", function () {
             $pdo = createCategoryDatabase();

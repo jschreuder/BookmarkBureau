@@ -198,6 +198,34 @@ describe("GeneralRoutingProvider", function () {
         );
 
         test(
+            "reorder-categories route handler returns ActionController instance",
+            function () {
+                $router = Mockery::mock(RouterInterface::class);
+                $capturedFactory = null;
+
+                $router
+                    ->shouldReceive("put")
+                    ->andReturnUsing(function ($name, $path, $factory) use (
+                        &$capturedFactory,
+                    ) {
+                        if ($name === "dashboard-reorder-categories") {
+                            $capturedFactory = $factory;
+                        }
+                    });
+                $router
+                    ->shouldReceive("get", "post", "delete")
+                    ->andReturnNull();
+
+                $provider = new GeneralRoutingProvider(createMockContainer());
+                $provider->registerRoutes($router);
+
+                expect($capturedFactory)->not->toBeNull();
+                $controller = $capturedFactory();
+                expect($controller)->toBeInstanceOf(ControllerInterface::class);
+            },
+        );
+
+        test(
             "dashboard-list route handler returns ActionController instance",
             function () {
                 $router = Mockery::mock(RouterInterface::class);
@@ -480,6 +508,13 @@ describe("GeneralRoutingProvider", function () {
                     "method" => "PUT",
                     "path" => "/dashboard/{dashboard_id}",
                 ]);
+                // Category reorder route
+                expect($registeredRoutes["dashboard-reorder-categories"])->toBe(
+                    [
+                        "method" => "PUT",
+                        "path" => "/dashboard/{dashboard_id}/categories",
+                    ],
+                );
                 expect($registeredRoutes["dashboard-delete"])->toBe([
                     "method" => "DELETE",
                     "path" => "/dashboard/{dashboard_id}",

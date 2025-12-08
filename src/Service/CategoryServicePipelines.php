@@ -15,6 +15,7 @@ final readonly class CategoryServicePipelines
 {
     /**
      * @param PipelineInterface<UuidInterface, Category>|null $getCategory
+     * @param PipelineInterface<UuidInterface, CategoryCollection>|null $getCategoriesForDashboard
      * @param PipelineInterface<Category, Category>|null $createCategory
      * @param PipelineInterface<Category, Category>|null $updateCategory
      * @param PipelineInterface<Category, null>|null $deleteCategory
@@ -26,6 +27,7 @@ final readonly class CategoryServicePipelines
     public function __construct(
         private PipelineInterface $default = new NoPipeline(),
         private ?PipelineInterface $getCategory = null,
+        private ?PipelineInterface $getCategoriesForDashboard = null,
         private ?PipelineInterface $createCategory = null,
         private ?PipelineInterface $updateCategory = null,
         private ?PipelineInterface $deleteCategory = null,
@@ -39,6 +41,12 @@ final readonly class CategoryServicePipelines
     public function getCategory(): PipelineInterface
     {
         return $this->getCategory ?? $this->default;
+    }
+
+    /** @return PipelineInterface<UuidInterface, CategoryCollection> */
+    public function getCategoriesForDashboard(): PipelineInterface
+    {
+        return $this->getCategoriesForDashboard ?? $this->default;
     }
 
     /** @return PipelineInterface<Category, Category> */

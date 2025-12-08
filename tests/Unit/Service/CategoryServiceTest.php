@@ -81,6 +81,129 @@ describe("CategoryService", function () {
         );
     });
 
+    describe("getCategoriesForDashboard method", function () {
+        test("retrieves all categories for a dashboard", function () {
+            $dashboardId = Uuid::uuid4();
+            $dashboard = TestEntityFactory::createDashboard(id: $dashboardId);
+            $category1 = TestEntityFactory::createCategory();
+            $category2 = TestEntityFactory::createCategory();
+            $categoryCollection = new CategoryCollection(
+                $category1,
+                $category2,
+            );
+
+            $categoryRepository = Mockery::mock(
+                CategoryRepositoryInterface::class,
+            );
+            $categoryRepository
+                ->shouldReceive("listForDashboardId")
+                ->with($dashboardId)
+                ->andReturn($categoryCollection)
+                ->once();
+
+            $dashboardRepository = Mockery::mock(
+                DashboardRepositoryInterface::class,
+            );
+            $dashboardRepository
+                ->shouldReceive("findById")
+                ->with($dashboardId)
+                ->andReturn($dashboard)
+                ->once();
+
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+            $pipelines = new CategoryServicePipelines();
+
+            $service = new CategoryService(
+                $categoryRepository,
+                $dashboardRepository,
+                $linkRepository,
+                $pipelines,
+            );
+
+            $result = $service->getCategoriesForDashboard($dashboardId);
+
+            expect($result)->toEqual($categoryCollection);
+            expect($result->count())->toBe(2);
+        });
+
+        test(
+            "returns empty collection when dashboard has no categories",
+            function () {
+                $dashboardId = Uuid::uuid4();
+                $dashboard = TestEntityFactory::createDashboard(
+                    id: $dashboardId,
+                );
+                $emptyCollection = new CategoryCollection();
+
+                $categoryRepository = Mockery::mock(
+                    CategoryRepositoryInterface::class,
+                );
+                $categoryRepository
+                    ->shouldReceive("listForDashboardId")
+                    ->with($dashboardId)
+                    ->andReturn($emptyCollection)
+                    ->once();
+
+                $dashboardRepository = Mockery::mock(
+                    DashboardRepositoryInterface::class,
+                );
+                $dashboardRepository
+                    ->shouldReceive("findById")
+                    ->with($dashboardId)
+                    ->andReturn($dashboard)
+                    ->once();
+
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+                $pipelines = new CategoryServicePipelines();
+
+                $service = new CategoryService(
+                    $categoryRepository,
+                    $dashboardRepository,
+                    $linkRepository,
+                    $pipelines,
+                );
+
+                $result = $service->getCategoriesForDashboard($dashboardId);
+
+                expect($result)->toEqual($emptyCollection);
+                expect($result->count())->toBe(0);
+            },
+        );
+
+        test(
+            "throws DashboardNotFoundException when dashboard does not exist",
+            function () {
+                $dashboardId = Uuid::uuid4();
+
+                $categoryRepository = Mockery::mock(
+                    CategoryRepositoryInterface::class,
+                );
+
+                $dashboardRepository = Mockery::mock(
+                    DashboardRepositoryInterface::class,
+                );
+                $dashboardRepository
+                    ->shouldReceive("findById")
+                    ->with($dashboardId)
+                    ->andThrow(DashboardNotFoundException::forId($dashboardId));
+
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+                $pipelines = new CategoryServicePipelines();
+
+                $service = new CategoryService(
+                    $categoryRepository,
+                    $dashboardRepository,
+                    $linkRepository,
+                    $pipelines,
+                );
+
+                expect(
+                    fn() => $service->getCategoriesForDashboard($dashboardId),
+                )->toThrow(DashboardNotFoundException::class);
+            },
+        );
+    });
+
     describe("createCategory method", function () {
         test("creates a new category with title and color", function () {
             $dashboardId = Uuid::uuid4();
@@ -424,84 +547,87 @@ describe("CategoryService", function () {
             $category1 = TestEntityFactory::createCategory(sortOrder: 0);
             $category2 = TestEntityFactory::createCategory(sortOrder: 1);
             $category3 = TestEntityFactory::createCategory(sortOrder: 2);
-            $categories = new CategoryCollection(
-                $category1,
+
+            $categoryRepository = Mockery::mock(
+                CategoryRepositoryInterface::class,
+            );
+            $categoryRepository
+                ->shouldReceive("reorderCategories")
+                ->with($dashboardId, Mockery::type(CategoryCollection::class))
+                ->once();
+
+            $dashboardRepository = Mockery::mock(
+                DashboardRepositoryInterface::class,
+            );
+            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+            $pipelines = new CategoryServicePipelines();
+
+            $service = new CategoryService(
+                $categoryRepository,
+                $dashboardRepository,
+                $linkRepository,
+                $pipelines,
+            );
+
+            $reorderedCategories = new CategoryCollection(
                 $category2,
                 $category3,
+                $category1,
             );
 
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $categoryRepository
-                ->shouldReceive("listForDashboardId")
-                ->with($dashboardId)
-                ->andReturn($categories);
-            $categoryRepository->shouldReceive("update")->times(3);
-
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $pipelines = new CategoryServicePipelines();
-
-            $service = new CategoryService(
-                $categoryRepository,
-                $dashboardRepository,
-                $linkRepository,
-                $pipelines,
-            );
-
-            $categoryIdToSortOrder = [
-                $category1->categoryId->toString() => 2,
-                $category2->categoryId->toString() => 0,
-                $category3->categoryId->toString() => 1,
-            ];
-
-            $service->reorderCategories($dashboardId, $categoryIdToSortOrder);
-
-            expect($category1->sortOrder)->toBe(2);
-            expect($category2->sortOrder)->toBe(0);
-            expect($category3->sortOrder)->toBe(1);
+            $service->reorderCategories($dashboardId, $reorderedCategories);
         });
 
-        test("ignores unmapped categories", function () {
-            $dashboardId = Uuid::uuid4();
-            $category1 = TestEntityFactory::createCategory(sortOrder: 0);
-            $category2 = TestEntityFactory::createCategory(sortOrder: 1);
-            $categories = new CategoryCollection($category1, $category2);
+        test(
+            "calls repository reorderCategories with dashboard ID and collection",
+            function () {
+                $dashboardId = Uuid::uuid4();
+                $category1 = TestEntityFactory::createCategory();
+                $category2 = TestEntityFactory::createCategory();
 
-            $categoryRepository = Mockery::mock(
-                CategoryRepositoryInterface::class,
-            );
-            $categoryRepository
-                ->shouldReceive("listForDashboardId")
-                ->with($dashboardId)
-                ->andReturn($categories);
-            $categoryRepository->shouldReceive("update")->once();
+                $categoryRepository = Mockery::mock(
+                    CategoryRepositoryInterface::class,
+                );
+                $categoryRepository
+                    ->shouldReceive("reorderCategories")
+                    ->with(
+                        $dashboardId,
+                        Mockery::on(function (
+                            CategoryCollection $collection,
+                        ) use ($category1, $category2) {
+                            $items = iterator_to_array($collection);
+                            return count($items) === 2 &&
+                                $items[0]->categoryId->equals(
+                                    $category1->categoryId,
+                                ) &&
+                                $items[1]->categoryId->equals(
+                                    $category2->categoryId,
+                                );
+                        }),
+                    )
+                    ->once();
 
-            $dashboardRepository = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $pipelines = new CategoryServicePipelines();
+                $dashboardRepository = Mockery::mock(
+                    DashboardRepositoryInterface::class,
+                );
+                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
+                $pipelines = new CategoryServicePipelines();
 
-            $service = new CategoryService(
-                $categoryRepository,
-                $dashboardRepository,
-                $linkRepository,
-                $pipelines,
-            );
+                $service = new CategoryService(
+                    $categoryRepository,
+                    $dashboardRepository,
+                    $linkRepository,
+                    $pipelines,
+                );
 
-            $categoryIdToSortOrder = [
-                $category1->categoryId->toString() => 5,
-            ];
+                $reorderedCategories = new CategoryCollection(
+                    $category1,
+                    $category2,
+                );
 
-            $service->reorderCategories($dashboardId, $categoryIdToSortOrder);
-
-            expect($category1->sortOrder)->toBe(5);
-            expect($category2->sortOrder)->toBe(1);
-        });
+                $service->reorderCategories($dashboardId, $reorderedCategories);
+            },
+        );
     });
 
     describe("addLinkToCategory method", function () {
@@ -807,8 +933,7 @@ describe("CategoryService", function () {
                     ->shouldReceive("computeCategoryMaxSortOrderForDashboardId")
                     ->andReturn(-1);
                 $categoryRepository->shouldReceive("insert")->times(1);
-                // 1 update + 1 reorder = 2 update calls
-                $categoryRepository->shouldReceive("update")->times(2);
+                $categoryRepository->shouldReceive("update")->times(1);
                 $categoryRepository
                     ->shouldReceive("findById")
                     ->andReturn($category);
@@ -821,6 +946,7 @@ describe("CategoryService", function () {
                 $categoryRepository
                     ->shouldReceive("addLink")
                     ->andReturn($categoryLink);
+                $categoryRepository->shouldReceive("reorderCategories")->once();
                 $categoryRepository->shouldReceive("reorderLinks");
                 $categoryRepository->shouldReceive("delete");
 
@@ -865,9 +991,10 @@ describe("CategoryService", function () {
                 $service->addLinkToCategory($categoryId, Uuid::uuid4());
 
                 // Reorder categories
-                $service->reorderCategories($dashboardId, [
-                    $categoryId->toString() => 5,
-                ]);
+                $service->reorderCategories(
+                    $dashboardId,
+                    new CategoryCollection($category),
+                );
 
                 // Reorder links
                 $links = new LinkCollection(TestEntityFactory::createLink());
@@ -907,8 +1034,6 @@ describe("CategoryService", function () {
 
             // 2 insert calls: one for create1, one for create2
             $categoryRepository->shouldReceive("insert")->times(2);
-            // 2 update calls: two for reorder
-            $categoryRepository->shouldReceive("update")->times(2);
 
             // For reorder, return the categories
             $categories = new CategoryCollection($category1, $category2);
@@ -916,6 +1041,9 @@ describe("CategoryService", function () {
                 ->shouldReceive("listForDashboardId")
                 ->with($dashboardId)
                 ->andReturn($categories);
+
+            // 1 call for reordering categories
+            $categoryRepository->shouldReceive("reorderCategories")->once();
 
             $dashboardRepository = Mockery::mock(
                 DashboardRepositoryInterface::class,
@@ -951,14 +1079,10 @@ describe("CategoryService", function () {
             expect($created2->sortOrder)->toBe(3);
 
             // Reorder all categories
-            $reorderMap = [
-                $category1->categoryId->toString() => 1,
-                $category2->categoryId->toString() => 0,
-            ];
-            $service->reorderCategories($dashboardId, $reorderMap);
-
-            expect($category1->sortOrder)->toBe(1);
-            expect($category2->sortOrder)->toBe(0);
+            $service->reorderCategories(
+                $dashboardId,
+                new CategoryCollection($category2, $category1),
+            );
         });
     });
 });
