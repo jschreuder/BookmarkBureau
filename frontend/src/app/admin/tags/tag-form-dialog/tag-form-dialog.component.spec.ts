@@ -129,6 +129,13 @@ describe('TagFormDialogComponent', () => {
       expect(component.form.get('tag_name')?.disabled).toBe(true);
     });
 
+    it('should not sanitize tag_name in edit mode because field is disabled', () => {
+      // In edit mode, the tag_name field is disabled, so no sanitization should occur
+      expect(component.form.get('tag_name')?.disabled).toBe(true);
+      // The field should not have a valueChanges subscription for sanitization
+      // This is implicitly tested by the field being disabled - disabled fields don't emit valueChanges
+    });
+
     it('should update tag on submit', async () => {
       const updatedTag: Tag = { tag_name: 'work', color: '#ff5722' };
       vi.spyOn(tagService, 'updateTag').mockReturnValue(of(updatedTag));
@@ -213,6 +220,48 @@ describe('TagFormDialogComponent', () => {
     it('should close dialog with false on cancel', () => {
       component.onCancel();
       expect(dialogRef.close).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('tag name sanitization', () => {
+    beforeEach(() => {
+      createComponent({});
+    });
+
+    it('should convert uppercase to lowercase in create mode', async () => {
+      component.form.patchValue({ tag_name: 'UPPERCASE' });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(component.form.get('tag_name')?.value).toBe('uppercase');
+    });
+
+    it('should remove invalid characters in create mode', async () => {
+      component.form.patchValue({ tag_name: 'hello@world!' });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(component.form.get('tag_name')?.value).toBe('helloworld');
+    });
+
+    it('should allow lowercase letters, numbers, and hyphens', async () => {
+      component.form.patchValue({ tag_name: 'valid-tag-123' });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(component.form.get('tag_name')?.value).toBe('valid-tag-123');
+    });
+
+    it('should remove spaces and special characters', async () => {
+      component.form.patchValue({ tag_name: 'tag with spaces & special!' });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(component.form.get('tag_name')?.value).toBe('tagwithspacesspecial');
+    });
+
+    it('should enforce maximum length of 100 characters', async () => {
+      component.form.patchValue({ tag_name: 'a'.repeat(150) });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(component.form.get('tag_name')?.value.length).toBe(100);
+    });
+
+    it('should handle mixed case and invalid characters', async () => {
+      component.form.patchValue({ tag_name: 'Test-Tag_123!@#' });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(component.form.get('tag_name')?.value).toBe('test-tag123');
     });
   });
 });

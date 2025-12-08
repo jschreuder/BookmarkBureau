@@ -148,7 +148,9 @@ export interface TagFormDialogData {
         border: 2px solid #ccc;
         border-radius: 4px;
         cursor: pointer;
-        transition: transform 0.2s, border-color 0.2s;
+        transition:
+          transform 0.2s,
+          border-color 0.2s;
       }
 
       .color-preset:hover {
@@ -202,6 +204,34 @@ export class TagFormDialogComponent {
       ],
       color: [data.tag?.color || '#2196f3'],
     });
+
+    // Add input event listener to sanitize tag name as user types
+    if (!this.isEditMode) {
+      this.form.get('tag_name')?.valueChanges.subscribe((value) => {
+        if (value) {
+          const sanitized = this.sanitizeTagName(value);
+          if (value !== sanitized) {
+            this.form.get('tag_name')?.setValue(sanitized, { emitEvent: false });
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * Sanitizes tag name to match backend validation rules:
+   * - Only lowercase letters (a-z), numbers (0-9), and hyphens (-)
+   * - Maximum 100 characters
+   * - Automatically converts to lowercase
+   */
+  private sanitizeTagName(value: string): string {
+    // Convert to lowercase and remove any characters that aren't a-z, 0-9, or hyphen
+    const sanitized = value
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '')
+      .slice(0, 100); // Enforce max length
+
+    return sanitized;
   }
 
   onColorChange(event: Event): void {

@@ -219,4 +219,72 @@ describe('TagInputComponent', () => {
       expect(''.trim()).toBe(''); // Empty trimmed string returns false in shouldShowCreateOption
     });
   });
+
+  describe('tag name sanitization', () => {
+    it('should convert uppercase to lowercase', () => {
+      fixture.detectChanges();
+      const input = fixture.nativeElement.querySelector('input');
+      const event = { target: input } as Event;
+
+      input.value = 'UPPERCASE';
+      component.onInput(event);
+
+      expect(component['lastInputValue']).toBe('uppercase');
+    });
+
+    it('should remove invalid characters', () => {
+      fixture.detectChanges();
+      const input = fixture.nativeElement.querySelector('input');
+      const event = { target: input } as Event;
+
+      input.value = 'hello@world!';
+      component.onInput(event);
+
+      expect(component['lastInputValue']).toBe('helloworld');
+    });
+
+    it('should allow lowercase letters, numbers, and hyphens', () => {
+      fixture.detectChanges();
+      const input = fixture.nativeElement.querySelector('input');
+      const event = { target: input } as Event;
+
+      input.value = 'valid-tag-123';
+      component.onInput(event);
+
+      expect(component['lastInputValue']).toBe('valid-tag-123');
+    });
+
+    it('should remove spaces and special characters', () => {
+      fixture.detectChanges();
+      const input = fixture.nativeElement.querySelector('input');
+      const event = { target: input } as Event;
+
+      input.value = 'tag with spaces & special!';
+      component.onInput(event);
+
+      expect(component['lastInputValue']).toBe('tagwithspacesspecial');
+    });
+
+    it('should enforce maximum length of 100 characters', () => {
+      fixture.detectChanges();
+      const input = fixture.nativeElement.querySelector('input');
+      const event = { target: input } as Event;
+
+      input.value = 'a'.repeat(150);
+      component.onInput(event);
+
+      expect(component['lastInputValue'].length).toBe(100);
+    });
+
+    it('should handle mixed case and invalid characters', () => {
+      fixture.detectChanges();
+      const input = fixture.nativeElement.querySelector('input');
+      const event = { target: input } as Event;
+
+      input.value = 'Test-Tag_123!@#';
+      component.onInput(event);
+
+      expect(component['lastInputValue']).toBe('test-tag123');
+    });
+  });
 });

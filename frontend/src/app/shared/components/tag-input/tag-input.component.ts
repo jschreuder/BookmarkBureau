@@ -143,7 +143,35 @@ export class TagInputComponent implements ControlValueAccessor, OnInit {
 
   onInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.lastInputValue = input.value;
+    const sanitized = this.sanitizeTagName(input.value);
+
+    // Only update if the value changed after sanitization
+    if (input.value !== sanitized) {
+      const cursorPos = input.selectionStart || 0;
+      const lengthDiff = input.value.length - sanitized.length;
+      input.value = sanitized;
+      this.tagCtrl.setValue(sanitized, { emitEvent: false });
+      // Adjust cursor position after removing invalid characters
+      input.setSelectionRange(cursorPos - lengthDiff, cursorPos - lengthDiff);
+    }
+
+    this.lastInputValue = sanitized;
+  }
+
+  /**
+   * Sanitizes tag name to match backend validation rules:
+   * - Only lowercase letters (a-z), numbers (0-9), and hyphens (-)
+   * - Maximum 100 characters
+   * - Automatically converts to lowercase
+   */
+  private sanitizeTagName(value: string): string {
+    // Convert to lowercase and remove any characters that aren't a-z, 0-9, or hyphen
+    const sanitized = value
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '')
+      .slice(0, 100); // Enforce max length
+
+    return sanitized;
   }
 
   ngOnInit(): void {
