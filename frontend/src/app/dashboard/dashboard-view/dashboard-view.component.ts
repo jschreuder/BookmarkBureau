@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -7,9 +7,11 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../core/services/api.service';
-import { FullDashboard, CategoryWithLinks, Link } from '../../core/models';
+import { FullDashboard } from '../../core/models';
 import { Observable, catchError, of } from 'rxjs';
+import { LinkSearchDialogComponent, SearchResult } from './link-search-dialog.component';
 
 @Component({
   selector: 'app-dashboard-view',
@@ -23,6 +25,7 @@ import { Observable, catchError, of } from 'rxjs';
     MatIconModule,
     MatChipsModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
   ],
   template: `
     <div class="container loading" *ngIf="(dashboard$ | async) === null">
@@ -40,6 +43,14 @@ import { Observable, catchError, of } from 'rxjs';
             </mat-icon>
             <mat-icon class="toolbar-icon" *ngIf="!data.dashboard.icon">dashboard</mat-icon>
             <span class="toolbar-title">{{ data.dashboard.title }}</span>
+            <button
+              mat-icon-button
+              class="search-button"
+              (click)="openSearch()"
+              title="Search links (Ctrl/Cmd+K)"
+            >
+              <mat-icon>search</mat-icon>
+            </button>
           </div>
 
           <!-- Favorites in Toolbar -->
@@ -184,6 +195,16 @@ import { Observable, catchError, of } from 'rxjs';
       .toolbar-title {
         font-size: 24px;
         font-weight: 500;
+        flex: 1;
+      }
+
+      .search-button {
+        color: white !important;
+        margin-left: 8px;
+      }
+
+      .search-button:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
       }
 
       .toolbar-favorites {
@@ -410,9 +431,11 @@ import { Observable, catchError, of } from 'rxjs';
 export class DashboardViewComponent implements OnInit {
   private apiService = inject(ApiService);
   private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
 
   dashboard$!: Observable<FullDashboard | null>;
   error$: Observable<string | null> = of(null);
+  private currentDashboard: FullDashboard | null = null;
 
   ngOnInit(): void {
     const dashboardId = this.route.snapshot.paramMap.get('id');
@@ -429,6 +452,73 @@ export class DashboardViewComponent implements OnInit {
         return of(null);
       }),
     );
+
+    // Store current dashboard for search
+    this.dashboard$.subscribe((dashboard) => {
+      this.currentDashboard = dashboard;
+    });
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardShortcut(event: KeyboardEvent): void {
+    // Cmd+K (Mac) or Ctrl+K (Windows/Linux)
+    if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+      event.preventDefault();
+      this.openSearch();
+    }
+  }
+
+  openSearch(): void {
+    if (!this.currentDashboard) {
+      return;
+    }
+
+    // Collect all links from favorites and categories
+    const allLinks: SearchResult[] = [];
+
+    // Add favorites
+    if (this.currentDashboard.favorites) {
+      for (const link of this.currentDashboard.favorites) {
+        allLinks.push({
+          ...link,
+          isFavorite: true,
+        });
+      }
+    }
+
+    // Add links from categories
+    if (this.currentDashboard.categories) {
+      for (const category of this.currentDashboard.categories) {
+        for (const link of category.links) {
+          // Check if already added as favorite
+          const existingIndex = allLinks.findIndex((l) => l.link_id === link.link_id);
+          if (existingIndex >= 0) {
+            // Already exists, just add category info
+            allLinks[existingIndex].category = category.title;
+          } else {
+            // New link
+            allLinks.push({
+              ...link,
+              category: category.title,
+              isFavorite: false,
+            });
+          }
+        }
+      }
+    }
+
+    const dialogRef = this.dialog.open(LinkSearchDialogComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      data: { links: allLinks },
+      panelClass: 'search-dialog',
+    });
+
+    dialogRef.afterClosed().subscribe((result: SearchResult | undefined) => {
+      if (result) {
+        this.openLink(result.url);
+      }
+    });
   }
 
   openLink(url: string): void {
