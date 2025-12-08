@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardViewComponent } from './dashboard-view.component';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -16,9 +17,7 @@ import {
   createMockCategoryWithLinks,
 } from '../../../testing/test-helpers';
 import { of } from 'rxjs';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { vi } from 'vitest';
-import { LinkSearchDialogComponent } from './link-search-dialog.component';
 import { FullDashboard, Link } from '../../core/models';
 
 describe('DashboardViewComponent', () => {
@@ -55,8 +54,6 @@ describe('DashboardViewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         DashboardViewComponent,
-        RouterTestingModule,
-        HttpClientTestingModule,
         MatIconModule,
         MatCardModule,
         MatToolbarModule,
@@ -64,6 +61,8 @@ describe('DashboardViewComponent', () => {
         MatChipsModule,
       ],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: ApiService, useValue: mockApiService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
         { provide: MatDialog, useValue: mockDialog },
