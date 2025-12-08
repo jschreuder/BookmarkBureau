@@ -675,6 +675,110 @@ describe('ApiService', () => {
     });
   });
 
+  describe('Category reordering endpoints', () => {
+    it('should reorder category links', () => {
+      const mockLinks: Link[] = [
+        {
+          link_id: 'link-1',
+          url: 'https://example1.com',
+          title: 'Link 1',
+          description: 'First link',
+          created_at: '2025-01-01T00:00:00Z',
+          updated_at: '2025-01-01T00:00:00Z',
+        },
+        {
+          link_id: 'link-2',
+          url: 'https://example2.com',
+          title: 'Link 2',
+          description: 'Second link',
+          created_at: '2025-01-01T00:00:00Z',
+          updated_at: '2025-01-01T00:00:00Z',
+        },
+      ];
+      const mockResponse: ApiResponse<Link[]> = {
+        success: true,
+        data: mockLinks,
+      };
+      const links = [
+        { link_id: 'link-1', sort_order: 1 },
+        { link_id: 'link-2', sort_order: 2 },
+      ];
+
+      service.reorderCategoryLinks(mockCategory.category_id, links).subscribe((result) => {
+        expect(result).toEqual(mockLinks);
+      });
+
+      const req = httpMock.expectOne(`${apiBase}/category/${mockCategory.category_id}/link`);
+      expect(req.request.method).toBe('PUT');
+      expect(req.request.body).toEqual({
+        category_id: mockCategory.category_id,
+        links,
+      });
+      req.flush(mockResponse);
+    });
+
+    it('should reorder categories', () => {
+      const mockCategories = [
+        {
+          category_id: 'cat-1',
+          dashboard_id: mockDashboard.dashboard_id,
+          title: 'Category 1',
+          color: '#FF5722',
+          sort_order: 1,
+          created_at: '2025-01-01T00:00:00Z',
+          updated_at: '2025-01-01T00:00:00Z',
+        },
+        {
+          category_id: 'cat-2',
+          dashboard_id: mockDashboard.dashboard_id,
+          title: 'Category 2',
+          color: '#2196F3',
+          sort_order: 2,
+          created_at: '2025-01-01T00:00:00Z',
+          updated_at: '2025-01-01T00:00:00Z',
+        },
+      ];
+      const mockResponse: ApiResponse<{ categories: any[] }> = {
+        success: true,
+        data: { categories: mockCategories },
+      };
+      const categories = [
+        { category_id: 'cat-1', sort_order: 1 },
+        { category_id: 'cat-2', sort_order: 2 },
+      ];
+
+      service.reorderCategories(mockDashboard.dashboard_id, categories).subscribe((result) => {
+        expect(result).toEqual(mockCategories);
+      });
+
+      const req = httpMock.expectOne(
+        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/categories`,
+      );
+      expect(req.request.method).toBe('PUT');
+      expect(req.request.body).toEqual({
+        dashboard_id: mockDashboard.dashboard_id,
+        categories,
+      });
+      req.flush(mockResponse);
+    });
+
+    it('should return empty array when reorderCategories returns null data', () => {
+      const mockResponse: ApiResponse<{ categories: any[] }> = {
+        success: true,
+      };
+      const categories = [{ category_id: 'cat-1', sort_order: 1 }];
+
+      service.reorderCategories(mockDashboard.dashboard_id, categories).subscribe((result) => {
+        expect(result).toEqual([]);
+      });
+
+      const req = httpMock.expectOne(
+        `${apiBase}/dashboard/${mockDashboard.dashboard_id}/categories`,
+      );
+      req.flush(mockResponse);
+    });
+  });
+
   describe('HTTP headers', () => {
     it('should set Content-Type header to application/json for POST requests', () => {
       const mockResponse: ApiResponse<Dashboard> = {

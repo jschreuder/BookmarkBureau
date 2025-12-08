@@ -78,6 +78,7 @@ describe('DashboardOverviewComponent', () => {
       getDashboard: vi.fn().mockReturnValue(of(mockFullDashboard)),
       reorderFavorites: vi.fn().mockReturnValue(of([])),
       reorderCategoryLinks: vi.fn().mockReturnValue(of([])),
+      reorderCategories: vi.fn().mockReturnValue(of([])),
     };
 
     matDialog = {
@@ -243,6 +244,120 @@ describe('DashboardOverviewComponent', () => {
       component.onCategoryLinksDropped(event as CdkDragDrop<any>, category);
 
       expect(apiService.reorderCategoryLinks).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Categories Reordering', () => {
+    const mockCategory1: CategoryWithLinks = {
+      category_id: 'cat-id-1',
+      dashboard_id: 'test-id',
+      title: 'Category 1',
+      color: '#667eea',
+      sort_order: 0,
+      created_at: '2025-01-01T00:00:00Z',
+      updated_at: '2025-01-01T00:00:00Z',
+      links: [],
+    };
+
+    const mockCategory2: CategoryWithLinks = {
+      category_id: 'cat-id-2',
+      dashboard_id: 'test-id',
+      title: 'Category 2',
+      color: '#764ba2',
+      sort_order: 1,
+      created_at: '2025-01-01T00:00:00Z',
+      updated_at: '2025-01-01T00:00:00Z',
+      links: [],
+    };
+
+    const mockCategory3: CategoryWithLinks = {
+      category_id: 'cat-id-3',
+      dashboard_id: 'test-id',
+      title: 'Category 3',
+      color: '#f093fb',
+      sort_order: 2,
+      created_at: '2025-01-01T00:00:00Z',
+      updated_at: '2025-01-01T00:00:00Z',
+      links: [],
+    };
+
+    it('should toggle reorder mode for categories', () => {
+      fixture.detectChanges();
+
+      expect(component.categoriesReorderMode).toBe(false);
+
+      component.categoriesReorderMode = true;
+      fixture.detectChanges();
+
+      expect(component.categoriesReorderMode).toBe(true);
+
+      component.categoriesReorderMode = false;
+      fixture.detectChanges();
+
+      expect(component.categoriesReorderMode).toBe(false);
+    });
+
+    it('should reorder categories when dropped', () => {
+      fixture.detectChanges();
+
+      // Setup fullDashboard with multiple categories
+      component.fullDashboard = {
+        ...mockFullDashboard,
+        categories: [mockCategory1, mockCategory2, mockCategory3],
+      };
+
+      const event: Partial<CdkDragDrop<any>> = {
+        previousIndex: 0,
+        currentIndex: 2,
+      };
+
+      component.onCategoriesDropped(event as CdkDragDrop<any>);
+
+      // Verify the order changed in the component
+      expect(component.fullDashboard.categories[0].category_id).toBe('cat-id-2');
+      expect(component.fullDashboard.categories[1].category_id).toBe('cat-id-3');
+      expect(component.fullDashboard.categories[2].category_id).toBe('cat-id-1');
+    });
+
+    it('should not reorder when drop index is same as previous', () => {
+      fixture.detectChanges();
+
+      component.fullDashboard = {
+        ...mockFullDashboard,
+        categories: [mockCategory1, mockCategory2, mockCategory3],
+      };
+
+      const event: Partial<CdkDragDrop<any>> = {
+        previousIndex: 1,
+        currentIndex: 1,
+      };
+
+      component.onCategoriesDropped(event as CdkDragDrop<any>);
+
+      expect(apiService.reorderCategories).not.toHaveBeenCalled();
+    });
+
+    it('should call API with correct payload when reordering', () => {
+      fixture.detectChanges();
+
+      component.fullDashboard = {
+        ...mockFullDashboard,
+        categories: [mockCategory1, mockCategory2, mockCategory3],
+      };
+
+      const event: Partial<CdkDragDrop<any>> = {
+        previousIndex: 0,
+        currentIndex: 2,
+      };
+
+      component.onCategoriesDropped(event as CdkDragDrop<any>);
+
+      // Verify API was called with correct dashboard ID and reordered categories
+      expect(apiService.reorderCategories).toHaveBeenCalledWith('test-id', [
+        { category_id: 'cat-id-2', sort_order: 1 },
+        { category_id: 'cat-id-3', sort_order: 2 },
+        { category_id: 'cat-id-1', sort_order: 3 },
+      ]);
     });
   });
 });

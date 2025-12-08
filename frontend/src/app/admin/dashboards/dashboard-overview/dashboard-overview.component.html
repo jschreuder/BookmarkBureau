@@ -130,6 +130,15 @@
         <button mat-icon-button (click)="openAddCategoryDialog()" matTooltip="Add Category">
           <mat-icon>add</mat-icon>
         </button>
+        <button
+          mat-icon-button
+          (click)="categoriesReorderMode = !categoriesReorderMode"
+          [matTooltip]="categoriesReorderMode ? 'Exit reorder mode' : 'Reorder categories'"
+          [class.active]="categoriesReorderMode"
+          class="reorder-toggle"
+        >
+          <mat-icon>{{ categoriesReorderMode ? 'grid_view' : 'view_agenda' }}</mat-icon>
+        </button>
       </mat-card-header>
       <mat-divider></mat-divider>
       <mat-card-content>
@@ -138,8 +147,13 @@
           <p>No categories yet</p>
         </div>
 
-        <div class="categories-grid">
-          <div *ngFor="let category of fullDashboard.categories" class="category-section">
+        <div
+          [class.categories-grid]="!categoriesReorderMode"
+          [class.categories-list]="categoriesReorderMode"
+          cdkDropList
+          (cdkDropListDropped)="onCategoriesDropped($event)"
+        >
+          <div *ngFor="let category of fullDashboard.categories" class="category-section" cdkDrag>
             <div class="category-header">
               <div class="category-info">
                 <mat-icon class="category-color" [style.color]="category.color || '#999'">
@@ -150,6 +164,7 @@
               </div>
               <div class="category-actions">
                 <button
+                  *ngIf="!categoriesReorderMode"
                   mat-icon-button
                   (click)="openAddLinkToCategoryDialog(category)"
                   matTooltip="Add Link"
@@ -158,6 +173,7 @@
                   <mat-icon>add_link</mat-icon>
                 </button>
                 <button
+                  *ngIf="!categoriesReorderMode"
                   mat-icon-button
                   (click)="editCategory(category)"
                   matTooltip="Edit Category"
@@ -166,6 +182,7 @@
                   <mat-icon>edit</mat-icon>
                 </button>
                 <button
+                  *ngIf="!categoriesReorderMode"
                   mat-icon-button
                   (click)="removeCategory(category)"
                   matTooltip="Delete Category"
@@ -173,10 +190,21 @@
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
+                <button
+                  *ngIf="categoriesReorderMode"
+                  cdkDragHandle
+                  mat-icon-button
+                  matTooltip="Drag to reorder"
+                  class="drag-handle"
+                  type="button"
+                >
+                  <mat-icon>drag_handle</mat-icon>
+                </button>
               </div>
             </div>
 
             <div
+              *ngIf="!categoriesReorderMode"
               class="category-links"
               cdkDropList
               [cdkDropListData]="category.links"
