@@ -109,6 +109,25 @@ describe('TagInputComponent', () => {
       expect(component.tagCtrl.value).toBe('');
     });
 
+    it('should clear input field when tag is selected', () => {
+      fixture.detectChanges();
+      const input = fixture.nativeElement.querySelector('input');
+
+      // Set some value in the input
+      input.value = 'work';
+      component['lastInputValue'] = 'work';
+
+      const event = {
+        option: { value: 'work' },
+      } as any;
+
+      component.selected(event);
+
+      expect(component.tagCtrl.value).toBe('');
+      expect(component['lastInputValue']).toBe('');
+      expect(input.value).toBe('');
+    });
+
     it('should not add duplicate tags', () => {
       component.writeValue([mockTags[0]]);
       const onChange = vi.fn();

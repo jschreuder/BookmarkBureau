@@ -1,4 +1,13 @@
-import { Component, Input, forwardRef, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  Input,
+  forwardRef,
+  inject,
+  OnInit,
+  signal,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ControlValueAccessor,
@@ -119,6 +128,7 @@ export class TagInputComponent implements ControlValueAccessor, OnInit {
   private tagService = inject(TagService);
 
   @Input() placeholder = 'Add tag...';
+  @ViewChild('tagInput') tagInputElement!: ElementRef<HTMLInputElement>;
 
   selectedTags = signal<Tag[]>([]);
   tagCtrl = new FormControl('');
@@ -205,16 +215,20 @@ export class TagInputComponent implements ControlValueAccessor, OnInit {
     if (value === '__CREATE__') {
       // Use the last input value before autocomplete changed it
       const tagName = this.lastInputValue.trim();
-      this.tagCtrl.setValue('');
-      this.lastInputValue = '';
       this.createNewTagWithName(tagName);
     } else {
       const tag = this.tagService.getTags().find((t) => t.tag_name === value);
       if (tag && !this.isTagSelected(tag)) {
         this.addTag(tag);
       }
-      this.tagCtrl.setValue('');
-      this.lastInputValue = '';
+    }
+
+    // Clear input after selection
+    this.tagCtrl.setValue('');
+    this.lastInputValue = '';
+    // Also clear the native input element to ensure UI is updated
+    if (this.tagInputElement) {
+      this.tagInputElement.nativeElement.value = '';
     }
   }
 
