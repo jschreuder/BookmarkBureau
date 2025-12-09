@@ -15,15 +15,6 @@ final readonly class TokenClaims implements ValueEqualityInterface
         public ?UuidInterface $jti = null,
     ) {}
 
-    public function isExpired(DateTimeInterface $now): bool
-    {
-        if ($this->expiresAt === null) {
-            return false;
-        }
-
-        return $now >= $this->expiresAt;
-    }
-
     #[\Override]
     public function equals(object $value): bool
     {
