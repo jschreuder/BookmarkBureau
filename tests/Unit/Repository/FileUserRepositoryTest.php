@@ -695,76 +695,6 @@ describe("FileUserRepository", function () {
         });
     });
 
-    describe("count", function () {
-        test("returns zero for empty database", function () {
-            $filePath = getTestFilePath();
-            $repo = new FileUserRepository($filePath, new UserEntityMapper());
-
-            expect($repo->count())->toBe(0);
-
-            cleanupTestFile($filePath);
-        });
-
-        test("returns correct count of users", function () {
-            $filePath = getTestFilePath();
-            $repo = new FileUserRepository($filePath, new UserEntityMapper());
-
-            $user1 = TestEntityFactory::createUser(
-                email: new Email("user1@example.com"),
-            );
-            $user2 = TestEntityFactory::createUser(
-                email: new Email("user2@example.com"),
-            );
-            $user3 = TestEntityFactory::createUser(
-                email: new Email("user3@example.com"),
-            );
-
-            $repo->insert($user1);
-            $repo->insert($user2);
-            $repo->insert($user3);
-
-            expect($repo->count())->toBe(3);
-
-            cleanupTestFile($filePath);
-        });
-
-        test("count updates after deletion", function () {
-            $filePath = getTestFilePath();
-            $repo = new FileUserRepository($filePath, new UserEntityMapper());
-            $user = TestEntityFactory::createUser();
-
-            $repo->insert($user);
-            expect($repo->count())->toBe(1);
-
-            $repo->delete($user);
-            expect($repo->count())->toBe(0);
-
-            cleanupTestFile($filePath);
-        });
-
-        test("loads from file to get count", function () {
-            $filePath = getTestFilePath();
-            $repo = new FileUserRepository($filePath, new UserEntityMapper());
-
-            $user1 = TestEntityFactory::createUser(
-                email: new Email("user1@example.com"),
-            );
-            $user2 = TestEntityFactory::createUser(
-                email: new Email("user2@example.com"),
-            );
-
-            $repo->insert($user1);
-            $repo->insert($user2);
-
-            // Create new repo instance to load from file
-            $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
-
-            expect($repo2->count())->toBe(2);
-
-            cleanupTestFile($filePath);
-        });
-    });
-
     describe("file persistence", function () {
         test("maintains data across repository instances", function () {
             $filePath = getTestFilePath();
@@ -783,7 +713,6 @@ describe("FileUserRepository", function () {
 
             // Second instance: load and verify
             $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
-            expect($repo2->count())->toBe(2);
             expect(
                 (string) $repo2->findByEmail(new Email("user1@example.com"))
                     ->email,
@@ -817,7 +746,15 @@ describe("FileUserRepository", function () {
 
             // Second instance should see both users when calling methods
             // (Note: this tests that repo2 reloads the file)
-            expect($repo2->count())->toBe(2);
+            $repo2 = new FileUserRepository($filePath, new UserEntityMapper());
+            expect(
+                (string) $repo2->findByEmail(new Email("user1@example.com"))
+                    ->email,
+            )->toBe("user1@example.com");
+            expect(
+                (string) $repo2->findByEmail(new Email("user2@example.com"))
+                    ->email,
+            )->toBe("user2@example.com");
 
             cleanupTestFile($filePath);
         });

@@ -22,20 +22,6 @@ interface TagRepositoryInterface
     public function listAll(): TagCollection;
 
     /**
-     * Get all tags for a specific link
-     * @throws LinkNotFoundException when link doesn't exist (FK violation)
-     */
-    public function listTagsForLinkId(UuidInterface $link): TagCollection;
-
-    /**
-     * Get tags that match a search query (prefix search)
-     */
-    public function listForNamePrefix(
-        string $query,
-        int $limit = 20,
-    ): TagCollection;
-
-    /**
      * Save a new tag
      * @throws DuplicateTagException when tag name already exists (on insert)
      */

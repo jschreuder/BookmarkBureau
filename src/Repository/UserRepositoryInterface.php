@@ -48,9 +48,4 @@ interface UserRepositoryInterface
      * Check if a user with the given email already exists
      */
     public function hasUserWithEmail(Email $email): bool;
-
-    /**
-     * Count total number of users
-     */
-    public function count(): int;
 }

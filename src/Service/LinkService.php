@@ -98,34 +98,4 @@ final class LinkService implements LinkServiceInterface
             return null;
         }, $deleteLink);
     }
-
-    #[\Override]
-    public function searchLinks(string $query, int $limit = 100): LinkCollection
-    {
-        return $this->pipelines
-            ->searchLinks()
-            ->run(
-                fn(): LinkCollection => $this->linkRepository->listForQuery(
-                    $query,
-                    $limit,
-                ),
-            );
-    }
-
-    #[\Override]
-    public function getLinksByTag(string $tagName): LinkCollection
-    {
-        $searchTagNames = new TagNameCollection(new TagName($tagName));
-        return $this->pipelines
-            ->getLinksByTag()
-            ->run($this->linkRepository->listForTags(...), $searchTagNames);
-    }
-
-    #[\Override]
-    public function getLinks(int $limit = 100, int $offset = 0): LinkCollection
-    {
-        return $this->pipelines
-            ->getLinks()
-            ->run(fn() => $this->linkRepository->listAll($limit, $offset));
-    }
 }

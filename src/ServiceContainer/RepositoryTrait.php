@@ -70,7 +70,6 @@ trait RepositoryTrait
             $this->getDashboardRepository(),
             $this->getLinkRepository(),
             new FavoriteEntityMapper(),
-            new DashboardEntityMapper(),
             new LinkEntityMapper(),
             new TagEntityMapper(),
         );

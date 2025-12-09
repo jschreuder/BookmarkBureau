@@ -44,22 +44,6 @@ final class TagService implements TagServiceInterface
     }
 
     /**
-     * @throws LinkNotFoundException when link doesn't exist
-     */
-    #[\Override]
-    public function getTagsForLink(UuidInterface $linkId): TagCollection
-    {
-        return $this->pipelines
-            ->getTagsForLink()
-            ->run(function (UuidInterface $lid): TagCollection {
-                // Verify link exists before fetching tags
-                $this->linkRepository->findById($lid);
-
-                return $this->tagRepository->listTagsForLinkId($lid);
-            }, $linkId);
-    }
-
-    /**
      * @throws DuplicateTagException when tag name already exists
      */
     #[\Override]
@@ -164,18 +148,5 @@ final class TagService implements TagServiceInterface
                 );
                 return null;
             }, $deleteLinkWithTag);
-    }
-
-    #[\Override]
-    public function searchTags(string $query, int $limit = 20): TagCollection
-    {
-        return $this->pipelines
-            ->searchTags()
-            ->run(
-                fn(): TagCollection => $this->tagRepository->listForNamePrefix(
-                    $query,
-                    $limit,
-                ),
-            );
     }
 }

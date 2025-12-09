@@ -159,7 +159,6 @@ describe("PdoFavoriteRepository", function () {
             $dashboardRepo,
             $linkRepo,
             new FavoriteEntityMapper(),
-            new DashboardEntityMapper(),
             new LinkEntityMapper(),
             new TagEntityMapper(),
         );
@@ -320,7 +319,6 @@ describe("PdoFavoriteRepository", function () {
                 $mockDashboardRepo,
                 $mockLinkRepo,
                 new FavoriteEntityMapper(),
-                new DashboardEntityMapper(),
                 new LinkEntityMapper(),
                 new TagEntityMapper(),
             );
@@ -447,7 +445,6 @@ describe("PdoFavoriteRepository", function () {
                     $mockDashboardRepo,
                     $mockLinkRepo,
                     new FavoriteEntityMapper(),
-                    new DashboardEntityMapper(),
                     new LinkEntityMapper(),
                     new TagEntityMapper(),
                 );
@@ -503,7 +500,6 @@ describe("PdoFavoriteRepository", function () {
                     $mockDashboardRepo,
                     $mockLinkRepo,
                     new FavoriteEntityMapper(),
-                    new DashboardEntityMapper(),
                     new LinkEntityMapper(),
                     new TagEntityMapper(),
                 );
@@ -559,7 +555,6 @@ describe("PdoFavoriteRepository", function () {
                     $mockDashboardRepo,
                     $mockLinkRepo,
                     new FavoriteEntityMapper(),
-                    new DashboardEntityMapper(),
                     new LinkEntityMapper(),
                     new TagEntityMapper(),
                 );
@@ -728,135 +723,6 @@ describe("PdoFavoriteRepository", function () {
                 expect($reorderedArray[2]->link->linkId->toString())->toBe(
                     $link2->linkId->toString(),
                 );
-            },
-        );
-    });
-
-    describe("countForDashboardId", function () {
-        test("returns correct count of favorites in a dashboard", function () {
-            $pdo = createFavoriteDatabase();
-            [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
-                $pdo,
-            );
-            $dashboard = TestEntityFactory::createDashboard();
-            $link1 = TestEntityFactory::createLink();
-            $link2 = TestEntityFactory::createLink();
-
-            insertTestDashboardForFavorite($pdo, $dashboard);
-            insertTestLinkForFavorite($pdo, $link1);
-            insertTestLinkForFavorite($pdo, $link2);
-
-            insertFavorite($pdo, $dashboard->dashboardId, $link1->linkId);
-            insertFavorite($pdo, $dashboard->dashboardId, $link2->linkId);
-
-            expect($repo->countForDashboardId($dashboard->dashboardId))->toBe(
-                2,
-            );
-        });
-
-        test("returns 0 when dashboard has no favorites", function () {
-            $pdo = createFavoriteDatabase();
-            [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
-                $pdo,
-            );
-            $dashboard = TestEntityFactory::createDashboard();
-
-            insertTestDashboardForFavorite($pdo, $dashboard);
-
-            expect($repo->countForDashboardId($dashboard->dashboardId))->toBe(
-                0,
-            );
-        });
-
-        test("throws RepositoryStorageException when fetch fails", function () {
-            $mockPdo = Mockery::mock(PDO::class);
-            $mockStmt = Mockery::mock(PDOStatement::class);
-
-            $dashboardId = Uuid::uuid4();
-
-            $mockStmt->shouldReceive("execute")->andReturn(true);
-            $mockStmt->shouldReceive("fetch")->andReturn(false);
-
-            $mockPdo->shouldReceive("prepare")->andReturn($mockStmt);
-
-            $mockDashboardRepo = Mockery::mock(
-                DashboardRepositoryInterface::class,
-            );
-            $mockLinkRepo = Mockery::mock(LinkRepositoryInterface::class);
-
-            $repo = new PdoFavoriteRepository(
-                $mockPdo,
-                $mockDashboardRepo,
-                $mockLinkRepo,
-                new FavoriteEntityMapper(),
-                new DashboardEntityMapper(),
-                new LinkEntityMapper(),
-                new TagEntityMapper(),
-            );
-
-            expect(fn() => $repo->countForDashboardId($dashboardId))->toThrow(
-                RepositoryStorageException::class,
-            );
-        });
-    });
-
-    describe("listDashboardsWithLinkAsFavorite", function () {
-        test("returns all dashboards where a link is favorited", function () {
-            $pdo = createFavoriteDatabase();
-            [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
-                $pdo,
-            );
-            $dashboard1 = TestEntityFactory::createDashboard();
-            $dashboard2 = TestEntityFactory::createDashboard();
-            $link = TestEntityFactory::createLink();
-
-            insertTestDashboardForFavorite($pdo, $dashboard1);
-            insertTestDashboardForFavorite($pdo, $dashboard2);
-            insertTestLinkForFavorite($pdo, $link);
-
-            insertFavorite($pdo, $dashboard1->dashboardId, $link->linkId);
-            insertFavorite($pdo, $dashboard2->dashboardId, $link->linkId);
-
-            $collection = $repo->listDashboardsWithLinkAsFavorite(
-                $link->linkId,
-            );
-
-            expect($collection)->toHaveCount(2);
-        });
-
-        test(
-            "returns empty collection when link is not favorited anywhere",
-            function () {
-                $pdo = createFavoriteDatabase();
-                [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
-                    $pdo,
-                );
-                $link = TestEntityFactory::createLink();
-
-                insertTestLinkForFavorite($pdo, $link);
-
-                $collection = $repo->listDashboardsWithLinkAsFavorite(
-                    $link->linkId,
-                );
-
-                expect($collection)->toHaveCount(0);
-            },
-        );
-
-        test(
-            "throws LinkNotFoundException when link does not exist",
-            function () {
-                $pdo = createFavoriteDatabase();
-                [$dashboardRepo, $linkRepo, $repo] = createFavoriteRepositories(
-                    $pdo,
-                );
-                $nonExistentId = Uuid::uuid4();
-
-                expect(
-                    fn() => $repo->listDashboardsWithLinkAsFavorite(
-                        $nonExistentId,
-                    ),
-                )->toThrow(LinkNotFoundException::class);
             },
         );
     });

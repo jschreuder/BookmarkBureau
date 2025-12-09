@@ -17,7 +17,6 @@ use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
-use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
 use jschreuder\BookmarkBureau\Util\SqlExceptionHandler;
@@ -445,46 +444,5 @@ final readonly class PdoCategoryRepository implements
             ["category_id", "link_id"],
         );
         $this->pdo->prepare($query["sql"])->execute($query["params"]);
-    }
-
-    /**
-     * Count total number of categories
-     */
-    #[\Override]
-    public function count(): int
-    {
-        $sql = SqlBuilder::buildCount("categories");
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute();
-
-        /** @var array{count: int}|false $result */
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-        if ($result === false) {
-            throw new RepositoryStorageException("Failed to count categories");
-        }
-        return (int) $result["count"];
-    }
-
-    /**
-     * Count links in a category
-     */
-    #[\Override]
-    public function countLinksForCategoryId(UuidInterface $categoryId): int
-    {
-        $sql = SqlBuilder::buildCount(
-            "category_links",
-            "category_id = :category_id",
-        );
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute([":category_id" => $categoryId->getBytes()]);
-
-        /** @var array{count: int}|false $result */
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-        if ($result === false) {
-            throw new RepositoryStorageException(
-                "Failed to count links in category",
-            );
-        }
-        return (int) $result["count"];
     }
 }

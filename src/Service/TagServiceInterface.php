@@ -25,13 +25,6 @@ interface TagServiceInterface
     public function getAllTags(): TagCollection;
 
     /**
-     * Get tags for a specific link
-     *
-     * @throws LinkNotFoundException when link doesn't exist
-     */
-    public function getTagsForLink(UuidInterface $linkId): TagCollection;
-
-    /**
      * Create a new tag
      *
      * @throws DuplicateTagException when tag name already exists
@@ -66,9 +59,4 @@ interface TagServiceInterface
         UuidInterface $linkId,
         string $tagName,
     ): void;
-
-    /**
-     * Search tags by name prefix
-     */
-    public function searchTags(string $query, int $limit = 20): TagCollection;
 }

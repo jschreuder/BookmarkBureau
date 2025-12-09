@@ -153,16 +153,6 @@ final class FileUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Count total number of users
-     */
-    #[\Override]
-    public function count(): int
-    {
-        $this->loadUsers();
-        return \count($this->users);
-    }
-
-    /**
      * Load users from JSON file into memory
      */
     private function loadUsers(): void

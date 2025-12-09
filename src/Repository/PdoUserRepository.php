@@ -140,22 +140,4 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         $statement->execute([":email" => (string) $email]);
         return $statement->fetch() !== false;
     }
-
-    /**
-     * Count total number of users
-     */
-    #[\Override]
-    public function count(): int
-    {
-        $sql = SqlBuilder::buildCount("users");
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute();
-
-        /** @var array{count: int}|false $result */
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-        if ($result === false) {
-            throw new RepositoryStorageException("Failed to count users");
-        }
-        return (int) $result["count"];
-    }
 }

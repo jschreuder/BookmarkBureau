@@ -45,22 +45,4 @@ interface LinkServiceInterface
      * @throws LinkNotFoundException when link doesn't exist
      */
     public function deleteLink(UuidInterface $linkId): void;
-
-    /**
-     * Search links by title and description
-     */
-    public function searchLinks(
-        string $query,
-        int $limit = 100,
-    ): LinkCollection;
-
-    /**
-     * Find links by tag
-     */
-    public function getLinksByTag(string $tagName): LinkCollection;
-
-    /**
-     * List all links with pagination
-     */
-    public function getLinks(int $limit = 100, int $offset = 0): LinkCollection;
 }

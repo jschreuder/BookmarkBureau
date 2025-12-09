@@ -2,7 +2,6 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use jschreuder\BookmarkBureau\Composite\DashboardCollection;
 use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 use jschreuder\BookmarkBureau\Entity\Favorite;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
@@ -66,17 +65,4 @@ interface FavoriteRepositoryInterface
         UuidInterface $dashboardId,
         FavoriteCollection $favorites,
     ): void;
-
-    /**
-     * Count favorites in a dashboard
-     */
-    public function countForDashboardId(UuidInterface $dashboardId): int;
-
-    /**
-     * Get all dashboards where a link is favorited
-     * @throws LinkNotFoundException when link doesn't exist (FK violation)
-     */
-    public function listDashboardsWithLinkAsFavorite(
-        UuidInterface $linkId,
-    ): DashboardCollection;
 }

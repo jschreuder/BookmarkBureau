@@ -33,9 +33,4 @@ interface DashboardRepositoryInterface
      * Delete a dashboard (cascades to categories, favorites)
      */
     public function delete(Dashboard $dashboard): void;
-
-    /**
-     * Count total number of dashboards
-     */
-    public function count(): int;
 }

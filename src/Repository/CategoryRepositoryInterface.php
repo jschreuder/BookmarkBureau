@@ -116,14 +116,4 @@ interface CategoryRepositoryInterface
         UuidInterface $categoryId,
         LinkCollection $links,
     ): void;
-
-    /**
-     * Count total number of categories
-     */
-    public function count(): int;
-
-    /**
-     * Count links in a category
-     */
-    public function countLinksForCategoryId(UuidInterface $categoryId): int;
 }

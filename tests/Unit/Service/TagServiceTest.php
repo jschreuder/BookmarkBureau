@@ -113,96 +113,6 @@ describe("TagService", function () {
         });
     });
 
-    describe("getTagsForLink method", function () {
-        test("returns tags for a specific link", function () {
-            $linkId = Uuid::uuid4();
-            $link = TestEntityFactory::createLink(id: $linkId);
-            $tag1 = TestEntityFactory::createTag(tagName: new TagName("tag1"));
-            $tag2 = TestEntityFactory::createTag(tagName: new TagName("tag2"));
-            $tagCollection = new TagCollection($tag1, $tag2);
-
-            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository
-                ->shouldReceive("listTagsForLinkId")
-                ->with($linkId)
-                ->once()
-                ->andReturn($tagCollection);
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository
-                ->shouldReceive("findById")
-                ->with($linkId)
-                ->once()
-                ->andReturn($link);
-
-            $service = new TagService(
-                $tagRepository,
-                $linkRepository,
-                new TagServicePipelines(),
-            );
-
-            $result = $service->getTagsForLink($linkId);
-
-            expect($result)->toBeInstanceOf(TagCollection::class);
-            expect(iterator_count($result))->toBe(2);
-        });
-
-        test("returns empty collection when link has no tags", function () {
-            $linkId = Uuid::uuid4();
-            $link = TestEntityFactory::createLink(id: $linkId);
-            $tagCollection = new TagCollection();
-
-            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository
-                ->shouldReceive("listTagsForLinkId")
-                ->with($linkId)
-                ->once()
-                ->andReturn($tagCollection);
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $linkRepository
-                ->shouldReceive("findById")
-                ->with($linkId)
-                ->once()
-                ->andReturn($link);
-
-            $service = new TagService(
-                $tagRepository,
-                $linkRepository,
-                new TagServicePipelines(),
-            );
-
-            $result = $service->getTagsForLink($linkId);
-
-            expect(iterator_count($result))->toBe(0);
-        });
-
-        test(
-            "throws LinkNotFoundException when link does not exist",
-            function () {
-                $linkId = Uuid::uuid4();
-
-                $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-                $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-                $linkRepository
-                    ->shouldReceive("findById")
-                    ->with($linkId)
-                    ->once()
-                    ->andThrow(LinkNotFoundException::class);
-
-                $service = new TagService(
-                    $tagRepository,
-                    $linkRepository,
-                    new TagServicePipelines(),
-                );
-
-                expect(fn() => $service->getTagsForLink($linkId))->toThrow(
-                    LinkNotFoundException::class,
-                );
-            },
-        );
-    });
-
     describe("createTag method", function () {
         test("creates a new tag with name and color", function () {
             $tagRepository = Mockery::mock(TagRepositoryInterface::class);
@@ -581,79 +491,6 @@ describe("TagService", function () {
         });
     });
 
-    describe("searchTags method", function () {
-        test("searches tags by query with default limit", function () {
-            $tag1 = TestEntityFactory::createTag(tagName: new TagName("api"));
-            $tag2 = TestEntityFactory::createTag(tagName: new TagName("async"));
-            $tagCollection = new TagCollection($tag1, $tag2);
-
-            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository
-                ->shouldReceive("listForNamePrefix")
-                ->with("api", 20)
-                ->once()
-                ->andReturn($tagCollection);
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $service = new TagService(
-                $tagRepository,
-                $linkRepository,
-                new TagServicePipelines(),
-            );
-
-            $result = $service->searchTags("api");
-
-            expect($result)->toBeInstanceOf(TagCollection::class);
-            expect(iterator_count($result))->toBe(2);
-        });
-
-        test("searches tags by query with custom limit", function () {
-            $tag1 = TestEntityFactory::createTag(tagName: new TagName("api"));
-            $tagCollection = new TagCollection($tag1);
-
-            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository
-                ->shouldReceive("listForNamePrefix")
-                ->with("api", 5)
-                ->once()
-                ->andReturn($tagCollection);
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $service = new TagService(
-                $tagRepository,
-                $linkRepository,
-                new TagServicePipelines(),
-            );
-
-            $result = $service->searchTags("api", 5);
-
-            expect($result)->toBeInstanceOf(TagCollection::class);
-            expect(iterator_count($result))->toBe(1);
-        });
-
-        test("returns empty collection when no tags match", function () {
-            $tagCollection = new TagCollection();
-
-            $tagRepository = Mockery::mock(TagRepositoryInterface::class);
-            $tagRepository
-                ->shouldReceive("listForNamePrefix")
-                ->with("xyz", 20)
-                ->once()
-                ->andReturn($tagCollection);
-
-            $linkRepository = Mockery::mock(LinkRepositoryInterface::class);
-            $service = new TagService(
-                $tagRepository,
-                $linkRepository,
-                new TagServicePipelines(),
-            );
-
-            $result = $service->searchTags("xyz");
-
-            expect(iterator_count($result))->toBe(0);
-        });
-    });
-
     describe("integration scenarios", function () {
         test(
             "full workflow: create, assign, list, and delete tags",
@@ -700,10 +537,6 @@ describe("TagService", function () {
 
                 // Assign tag to link
                 $service->addTagToLink($linkId, "important");
-
-                // Get tags for link
-                $linkTags = $service->getTagsForLink($linkId);
-                expect(iterator_count($linkTags))->toBe(1);
 
                 // List all tags (not transactional)
                 $allTags = $service->getAllTags();
@@ -756,10 +589,6 @@ describe("TagService", function () {
             // List all tags (not transactional)
             $allTags = $service->getAllTags();
             expect(iterator_count($allTags))->toBe(2);
-
-            // Search tags (not transactional)
-            $searchResults = $service->searchTags("php");
-            expect(iterator_count($searchResults))->toBe(1);
 
             expect(true)->toBeTrue();
         });

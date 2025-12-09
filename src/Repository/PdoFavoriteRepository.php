@@ -5,7 +5,6 @@ namespace jschreuder\BookmarkBureau\Repository;
 use DateTimeImmutable;
 use PDO;
 use Ramsey\Uuid\UuidInterface;
-use jschreuder\BookmarkBureau\Composite\DashboardCollection;
 use jschreuder\BookmarkBureau\Composite\FavoriteCollection;
 use jschreuder\BookmarkBureau\Composite\TagCollection;
 use jschreuder\BookmarkBureau\Entity\Favorite;
@@ -16,7 +15,6 @@ use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
 use jschreuder\BookmarkBureau\Exception\FavoriteNotFoundException;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
-use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
 use jschreuder\BookmarkBureau\Util\SqlExceptionHandler;
@@ -29,7 +27,6 @@ final readonly class PdoFavoriteRepository implements
         private readonly DashboardRepositoryInterface $dashboardRepository,
         private readonly LinkRepositoryInterface $linkRepository,
         private readonly FavoriteEntityMapper $favoriteMapper,
-        private readonly DashboardEntityMapper $dashboardMapper,
         private readonly LinkEntityMapper $linkMapper,
         private readonly TagEntityMapper $tagMapper,
     ) {}
@@ -284,58 +281,5 @@ final readonly class PdoFavoriteRepository implements
             ["dashboard_id", "link_id"],
         );
         $this->pdo->prepare($query["sql"])->execute($query["params"]);
-    }
-
-    /**
-     * Count favorites in a dashboard
-     */
-    #[\Override]
-    public function countForDashboardId(UuidInterface $dashboardId): int
-    {
-        $sql = SqlBuilder::buildCount(
-            "favorites",
-            "dashboard_id = :dashboard_id",
-        );
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute([":dashboard_id" => $dashboardId->getBytes()]);
-
-        /** @var array{count: int}|false $result */
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-        if ($result === false) {
-            throw new RepositoryStorageException("Failed to count users");
-        }
-        return (int) $result["count"];
-    }
-
-    /**
-     * Get all dashboards where a link is favorited
-     * @throws LinkNotFoundException when link doesn't exist (FK violation)
-     */
-    #[\Override]
-    public function listDashboardsWithLinkAsFavorite(
-        UuidInterface $linkId,
-    ): DashboardCollection {
-        // Verify link exists
-        $this->linkRepository->findById($linkId);
-
-        $dashboardFields = SqlBuilder::selectFieldsFromMapper(
-            $this->dashboardMapper,
-            "d",
-        );
-        $statement = $this->pdo->prepare(
-            "SELECT DISTINCT {$dashboardFields} FROM dashboards d
-             INNER JOIN favorites f ON d.dashboard_id = f.dashboard_id
-             WHERE f.link_id = :link_id
-             ORDER BY d.title ASC",
-        );
-        $statement->execute([":link_id" => $linkId->getBytes()]);
-
-        $dashboards = [];
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            /** @var array{dashboard_id: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string} $row */
-            $dashboards[] = $this->dashboardMapper->mapToEntity($row);
-        }
-
-        return new DashboardCollection(...$dashboards);
     }
 }

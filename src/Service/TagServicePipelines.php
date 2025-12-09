@@ -15,25 +15,21 @@ final readonly class TagServicePipelines
     /**
      * @param PipelineInterface<TagName, Tag>|null $getTag
      * @param PipelineInterface<null, TagCollection>|null $getAllTags
-     * @param PipelineInterface<UuidInterface, TagCollection>|null $getTagsForLink
      * @param PipelineInterface<Tag, Tag>|null $createTag
      * @param PipelineInterface<Tag, Tag>|null $updateTag
      * @param PipelineInterface<Tag, null>|null $deleteTag
      * @param PipelineInterface<LinkWithTagName, null>|null $addTagToLink
      * @param PipelineInterface<LinkWithTagName, null>|null $removeTagFromLink
-     * @param PipelineInterface<null, TagCollection>|null $searchTags
      */
     public function __construct(
         private PipelineInterface $default = new NoPipeline(),
         private ?PipelineInterface $getTag = null,
         private ?PipelineInterface $getAllTags = null,
-        private ?PipelineInterface $getTagsForLink = null,
         private ?PipelineInterface $createTag = null,
         private ?PipelineInterface $updateTag = null,
         private ?PipelineInterface $deleteTag = null,
         private ?PipelineInterface $addTagToLink = null,
         private ?PipelineInterface $removeTagFromLink = null,
-        private ?PipelineInterface $searchTags = null,
     ) {}
 
     /** @return PipelineInterface<TagName, Tag> */
@@ -46,12 +42,6 @@ final readonly class TagServicePipelines
     public function getAllTags(): PipelineInterface
     {
         return $this->getAllTags ?? $this->default;
-    }
-
-    /** @return PipelineInterface<UuidInterface, TagCollection> */
-    public function getTagsForLink(): PipelineInterface
-    {
-        return $this->getTagsForLink ?? $this->default;
     }
 
     /** @return PipelineInterface<Tag, Tag> */
@@ -82,11 +72,5 @@ final readonly class TagServicePipelines
     public function removeTagFromLink(): PipelineInterface
     {
         return $this->removeTagFromLink ?? $this->default;
-    }
-
-    /** @return PipelineInterface<null, TagCollection> */
-    public function searchTags(): PipelineInterface
-    {
-        return $this->searchTags ?? $this->default;
     }
 }

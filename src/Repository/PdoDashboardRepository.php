@@ -8,7 +8,6 @@ use jschreuder\BookmarkBureau\Composite\DashboardCollection;
 use jschreuder\BookmarkBureau\Entity\Dashboard;
 use jschreuder\BookmarkBureau\Entity\Mapper\DashboardEntityMapper;
 use jschreuder\BookmarkBureau\Exception\DashboardNotFoundException;
-use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
 
 final readonly class PdoDashboardRepository implements
@@ -105,23 +104,5 @@ final readonly class PdoDashboardRepository implements
             "dashboard_id" => $dashboard->dashboardId->getBytes(),
         ]);
         $this->pdo->prepare($query["sql"])->execute($query["params"]);
-    }
-
-    /**
-     * Count total number of dashboards
-     */
-    #[\Override]
-    public function count(): int
-    {
-        $sql = SqlBuilder::buildCount("dashboards");
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute();
-
-        /** @var array{count: string}|false $result */
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-        if ($result === false) {
-            throw new RepositoryStorageException("Failed to count dashboards");
-        }
-        return (int) $result["count"];
     }
 }

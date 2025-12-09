@@ -2,16 +2,13 @@
 
 namespace jschreuder\BookmarkBureau\Repository;
 
-use jschreuder\BookmarkBureau\Exception\RepositoryStorageException;
 use PDO;
 use Ramsey\Uuid\UuidInterface;
 use jschreuder\BookmarkBureau\Composite\LinkCollection;
 use jschreuder\BookmarkBureau\Composite\TagCollection;
-use jschreuder\BookmarkBureau\Composite\TagNameCollection;
 use jschreuder\BookmarkBureau\Entity\Link;
 use jschreuder\BookmarkBureau\Entity\Mapper\LinkEntityMapper;
 use jschreuder\BookmarkBureau\Entity\Mapper\TagEntityMapper;
-use jschreuder\BookmarkBureau\Entity\Value\TagName;
 use jschreuder\BookmarkBureau\Exception\LinkNotFoundException;
 use jschreuder\BookmarkBureau\Exception\CategoryNotFoundException;
 use jschreuder\BookmarkBureau\Util\SqlBuilder;
@@ -47,103 +44,6 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
         }
 
         return $this->buildLinkFromRows($rows)[0];
-    }
-
-    #[\Override]
-    public function listAll(int $limit = 100, int $offset = 0): LinkCollection
-    {
-        $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
-        $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
-        $statement = $this->pdo->prepare(
-            "SELECT {$fields}, {$tagFields} FROM links l
-             LEFT JOIN link_tags lt ON l.link_id = lt.link_id
-             LEFT JOIN tags t ON lt.tag_name = t.tag_name
-             ORDER BY l.created_at DESC
-             LIMIT :limit OFFSET :offset",
-        );
-        $statement->execute([":limit" => $limit, ":offset" => $offset]);
-
-        /** @var array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
-        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-        $links = $this->buildLinkFromRows($rows);
-
-        return new LinkCollection(...$links);
-    }
-
-    /**
-     * Search links using fulltext index on title and description
-     * Uses LIKE queries for cross-database compatibility (MySQL and SQLite)
-     */
-    #[\Override]
-    public function listForQuery(
-        string $query,
-        int $limit = 100,
-    ): LinkCollection {
-        $searchTerm = "%{$query}%";
-        $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
-        $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
-        $statement = $this->pdo->prepare(
-            "SELECT {$fields}, {$tagFields} FROM links l
-             LEFT JOIN link_tags lt ON l.link_id = lt.link_id
-             LEFT JOIN tags t ON lt.tag_name = t.tag_name
-             WHERE l.title LIKE :search_term OR l.description LIKE :search_term
-             ORDER BY l.created_at DESC
-             LIMIT :limit",
-        );
-        $statement->execute([
-            ":search_term" => $searchTerm,
-            ":limit" => $limit,
-        ]);
-
-        /** @var array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
-        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-        $links = $this->buildLinkFromRows($rows);
-
-        return new LinkCollection(...$links);
-    }
-
-    /**
-     * Find links that match any number of tags (using AND condition)
-     * Uses INTERSECT queries for cross-database compatibility (MySQL 8.0+ and SQLite)
-     */
-    #[\Override]
-    public function listForTags(TagNameCollection $tagNames): LinkCollection
-    {
-        if ($tagNames->isEmpty()) {
-            return new LinkCollection();
-        }
-
-        // Build INTERSECT query that works in both MySQL 8.0+ and SQLite
-        // For each tag, we select link_ids that have that tag,
-        // then intersect all results to get links with ALL tags
-        $intersectQueries = array_map(
-            fn() => "SELECT link_id FROM link_tags WHERE tag_name = ?",
-            $tagNames->toArray(),
-        );
-        $fields = SqlBuilder::selectFieldsFromMapper($this->mapper, "l");
-        $tagFields = SqlBuilder::selectFieldsFromMapper($this->tagMapper, "t");
-        $query =
-            "SELECT {$fields}, {$tagFields}
-             FROM links l
-             LEFT JOIN link_tags lt ON l.link_id = lt.link_id
-             LEFT JOIN tags t ON lt.tag_name = t.tag_name
-             WHERE l.link_id IN (" .
-            implode(" INTERSECT ", $intersectQueries) .
-            ") ORDER BY l.created_at DESC";
-
-        $statement = $this->pdo->prepare($query);
-        $statement->execute(
-            array_map(
-                fn(TagName $value) => $value->value,
-                $tagNames->toArray(),
-            ),
-        );
-
-        /** @var array<int, array{link_id: string, title: string, url: string, icon: string|null, description: string, sort_order: int, created_at: string, updated_at: string, tag_name: string|null, color: string|null}> $rows */
-        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-        $links = $this->buildLinkFromRows($rows);
-
-        return new LinkCollection(...$links);
     }
 
     /**
@@ -224,24 +124,6 @@ final readonly class PdoLinkRepository implements LinkRepositoryInterface
             "link_id" => $link->linkId->getBytes(),
         ]);
         $this->pdo->prepare($query["sql"])->execute($query["params"]);
-    }
-
-    /**
-     * Count total number of links
-     */
-    #[\Override]
-    public function count(): int
-    {
-        $sql = SqlBuilder::buildCount("links");
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute();
-
-        /** @var array{count: int}|false $result */
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-        if ($result === false) {
-            throw new RepositoryStorageException("Failed to count links");
-        }
-        return (int) $result["count"];
     }
 
     /**
