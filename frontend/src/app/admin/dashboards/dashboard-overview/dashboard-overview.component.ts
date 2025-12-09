@@ -181,7 +181,7 @@ export class DashboardOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.apiService.removeFavorite(this.dashboardId, link.link_id).subscribe({
+        this.apiService.deleteLink(link.link_id).subscribe({
           next: () => {
             this.snackBar.open('Removed from favorites', 'Close', { duration: 3000 });
             this.loadDashboard(true);
