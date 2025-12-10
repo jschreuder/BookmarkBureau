@@ -163,23 +163,21 @@ describe('DashboardViewComponent', () => {
   });
 
   it('should open link in new window when clicking favorite chip', () => {
-    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-    const chip = fixture.nativeElement.querySelector('.favorite-chip');
+    const chipLink = fixture.nativeElement.querySelector('.favorite-chip-link');
 
-    chip.click();
-
-    expect(windowOpenSpy).toHaveBeenCalledWith('https://example1.com', '_blank');
-    windowOpenSpy.mockRestore();
+    expect(chipLink).toBeTruthy();
+    expect(chipLink.getAttribute('href')).toBe('https://example1.com');
+    expect(chipLink.getAttribute('target')).toBe('_blank');
+    expect(chipLink.getAttribute('rel')).toBe('noopener noreferrer');
   });
 
   it('should open link in new window when clicking category link item', () => {
-    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
     const linkItem = fixture.nativeElement.querySelector('.link-item');
 
-    linkItem.click();
-
-    expect(windowOpenSpy).toHaveBeenCalledWith('https://example1.com', '_blank');
-    windowOpenSpy.mockRestore();
+    expect(linkItem).toBeTruthy();
+    expect(linkItem.getAttribute('href')).toBe('https://example1.com');
+    expect(linkItem.getAttribute('target')).toBe('_blank');
+    expect(linkItem.getAttribute('rel')).toBe('noopener noreferrer');
   });
 
   describe('search functionality', () => {

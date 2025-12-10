@@ -149,7 +149,7 @@ describe('DashboardOverviewComponent', () => {
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
     component.viewDashboard();
 
-    expect(openSpy).toHaveBeenCalledWith('/dashboard/test-id', '_blank');
+    expect(openSpy).toHaveBeenCalledWith('/dashboard/test-id', '_blank', 'noopener,noreferrer');
     openSpy.mockRestore();
   });
 

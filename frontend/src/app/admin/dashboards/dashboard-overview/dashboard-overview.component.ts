@@ -237,7 +237,18 @@ export class DashboardOverviewComponent implements OnInit {
   }
 
   viewDashboard(): void {
-    window.open(`/dashboard/${this.dashboardId}`, '_blank');
+    const newWindow = window.open(
+      `/dashboard/${this.dashboardId}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+    if (!newWindow) {
+      this.snackBar.open(
+        'Pop-up blocked. Please allow pop-ups for this site to open links.',
+        'Close',
+        { duration: 5000 },
+      );
+    }
   }
 
   editFavorite(link: Link): void {

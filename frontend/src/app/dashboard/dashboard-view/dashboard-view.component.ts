@@ -15,6 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../core/services/api.service';
 import { FullDashboard } from '../../core/models';
 import { Observable, catchError, of } from 'rxjs';
@@ -35,6 +36,7 @@ import { getTextColor } from '../../shared/utils/color.util';
     MatChipsModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    MatSnackBarModule,
   ],
   template: `
     <main role="main">
@@ -78,19 +80,18 @@ import { getTextColor } from '../../shared/utils/color.util';
               role="region"
               aria-label="Favorite links"
             >
-              <mat-chip
+              <a
                 *ngFor="let link of data.favorites"
-                (click)="openLink(link.url)"
-                class="favorite-chip"
-                role="button"
-                tabindex="0"
-                [attr.aria-label]="'Open ' + link.title"
-                (keydown.enter)="openLink(link.url)"
-                (keydown.space)="openLink(link.url)"
+                [href]="link.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="favorite-chip-link"
               >
-                <mat-icon *ngIf="link.icon" aria-hidden="true">{{ link.icon }}</mat-icon>
-                {{ link.title }}
-              </mat-chip>
+                <mat-chip class="favorite-chip" [attr.aria-label]="'Open ' + link.title">
+                  <mat-icon *ngIf="link.icon" aria-hidden="true">{{ link.icon }}</mat-icon>
+                  {{ link.title }}
+                </mat-chip>
+              </a>
             </div>
           </div>
         </header>
@@ -132,14 +133,12 @@ import { getTextColor } from '../../shared/utils/color.util';
                 </mat-card-header>
                 <mat-card-content>
                   <div class="link-list">
-                    <div
+                    <a
                       class="link-item"
-                      role="button"
-                      tabindex="0"
                       *ngFor="let link of category.links"
-                      (click)="openLink(link.url)"
-                      (keydown.enter)="openLink(link.url)"
-                      (keydown.space)="openLink(link.url)"
+                      [href]="link.url"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       [attr.aria-label]="'Open ' + link.title + ': ' + link.url"
                     >
                       <mat-icon *ngIf="link.icon" aria-hidden="true">{{ link.icon }}</mat-icon>
@@ -158,7 +157,7 @@ import { getTextColor } from '../../shared/utils/color.util';
                           </span>
                         </p>
                       </div>
-                    </div>
+                    </a>
                   </div>
                 </mat-card-content>
               </mat-card>
@@ -273,6 +272,11 @@ import { getTextColor } from '../../shared/utils/color.util';
         align-items: center;
       }
 
+      .favorite-chip-link {
+        text-decoration: none;
+        color: inherit;
+      }
+
       .favorite-chip {
         background-color: rgba(255, 255, 255, 0.2) !important;
         color: white !important;
@@ -280,15 +284,12 @@ import { getTextColor } from '../../shared/utils/color.util';
         transition:
           transform 0.2s,
           background-color 0.2s;
+        cursor: pointer !important;
       }
 
-      .favorite-chip:hover {
+      .favorite-chip-link:hover .favorite-chip {
         transform: scale(1.05);
         background-color: rgba(255, 255, 255, 0.3) !important;
-      }
-
-      .favorite-chip ::ng-deep .mdc-evolution-chip__action--primary {
-        cursor: pointer !important;
       }
 
       .favorite-chip ::ng-deep .mat-mdc-chip-action-label {
@@ -397,10 +398,17 @@ import { getTextColor } from '../../shared/utils/color.util';
         transition: background-color 0.2s;
         cursor: pointer;
         align-items: flex-start;
+        text-decoration: none;
+        color: inherit;
       }
 
       .link-item:hover {
         background-color: rgba(0, 0, 0, 0.04);
+      }
+
+      .link-item:focus {
+        outline: 2px solid #667eea;
+        outline-offset: 2px;
       }
 
       .link-item mat-icon {
@@ -494,6 +502,7 @@ export class DashboardViewComponent implements OnInit {
   private apiService = inject(ApiService);
   private route = inject(ActivatedRoute);
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
 
   dashboard$!: Observable<FullDashboard | null>;
@@ -589,6 +598,13 @@ export class DashboardViewComponent implements OnInit {
   }
 
   openLink(url: string): void {
-    window.open(url, '_blank');
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!newWindow) {
+      this.snackBar.open(
+        'Pop-up blocked. Please allow pop-ups for this site to open links.',
+        'Close',
+        { duration: 5000 },
+      );
+    }
   }
 }
