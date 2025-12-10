@@ -188,6 +188,13 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
         color: rgba(0, 0, 0, 0.38);
       }
 
+      .dashboards-table td mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+        vertical-align: middle;
+      }
+
       button[mat-icon-button] {
         margin: 0 4px;
       }

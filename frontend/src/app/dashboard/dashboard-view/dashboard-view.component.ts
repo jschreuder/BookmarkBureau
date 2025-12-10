@@ -253,6 +253,7 @@ import { LinkSearchDialogComponent, SearchResult } from './link-search-dialog.co
         font-size: 24px;
         font-weight: 500;
         flex: 1;
+        margin: 0;
       }
 
       .search-button {
@@ -402,6 +403,9 @@ import { LinkSearchDialogComponent, SearchResult } from './link-search-dialog.co
       }
 
       .link-item mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
         color: rgba(0, 0, 0, 0.6);
         flex-shrink: 0;
       }
