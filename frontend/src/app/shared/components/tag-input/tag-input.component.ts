@@ -23,6 +23,7 @@ import {
 } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { getTextColor } from '../../utils/color.util';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -142,6 +143,9 @@ export class TagInputComponent implements ControlValueAccessor, OnInit {
   private onChange: (tags: Tag[]) => void = () => {};
   onTouched: () => void = () => {};
   private lastInputValue = ''; // Track the user's typed input
+
+  // Expose shared utility function to template
+  protected readonly getTextColor = getTextColor;
 
   constructor() {
     this.filteredTags$ = this.tagCtrl.valueChanges.pipe(
@@ -316,23 +320,5 @@ export class TagInputComponent implements ControlValueAccessor, OnInit {
       '#607d8b',
     ];
     return colors[Math.floor(Math.random() * colors.length)];
-  }
-
-  getTextColor(backgroundColor: string | undefined): string {
-    if (!backgroundColor) {
-      return '#000000';
-    }
-
-    // Convert hex to RGB
-    const hex = backgroundColor.replace('#', '');
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 2), 16);
-    const b = parseInt(hex.substring(4, 2), 16);
-
-    // Calculate luminance
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-    // Return black or white based on luminance
-    return luminance > 0.5 ? '#000000' : '#ffffff';
   }
 }

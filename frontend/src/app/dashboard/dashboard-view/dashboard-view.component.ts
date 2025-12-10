@@ -19,6 +19,7 @@ import { ApiService } from '../../core/services/api.service';
 import { FullDashboard } from '../../core/models';
 import { Observable, catchError, of } from 'rxjs';
 import { LinkSearchDialogComponent, SearchResult } from './link-search-dialog.component';
+import { getTextColor } from '../../shared/utils/color.util';
 
 @Component({
   selector: 'app-dashboard-view',
@@ -499,6 +500,9 @@ export class DashboardViewComponent implements OnInit {
   error$: Observable<string | null> = of(null);
   private currentDashboard: FullDashboard | null = null;
 
+  // Expose shared utility function to template
+  protected readonly getTextColor = getTextColor;
+
   ngOnInit(): void {
     const dashboardId = this.route.snapshot.paramMap.get('id');
 
@@ -586,23 +590,5 @@ export class DashboardViewComponent implements OnInit {
 
   openLink(url: string): void {
     window.open(url, '_blank');
-  }
-
-  getTextColor(hexColor: string | undefined): string {
-    if (!hexColor) {
-      return 'white';
-    }
-
-    // Convert hex to RGB
-    const hex = hexColor.replace('#', '');
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-
-    // Calculate luminance using relative luminance formula
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-    // Return white text for dark backgrounds, black text for light backgrounds
-    return luminance > 0.5 ? '#000000' : '#ffffff';
   }
 }

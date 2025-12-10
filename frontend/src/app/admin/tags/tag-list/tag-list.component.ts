@@ -15,6 +15,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Tag } from '../../../core/models';
 import { TagService } from '../../../core/services/tag.service';
 import { TagFormDialogComponent } from '../tag-form-dialog/tag-form-dialog.component';
+import { getTextColor } from '../../../shared/utils/color.util';
 
 @Component({
   selector: 'app-tag-list',
@@ -182,6 +183,9 @@ export class TagListComponent implements OnInit {
   tags: Tag[] = [];
   displayedColumns = ['color', 'tag_name', 'actions'];
 
+  // Expose shared utility function to template
+  protected readonly getTextColor = getTextColor;
+
   ngOnInit(): void {
     this.loadTags();
   }
@@ -248,23 +252,5 @@ export class TagListComponent implements OnInit {
         this.cdr.markForCheck();
       },
     });
-  }
-
-  getTextColor(backgroundColor: string | undefined): string {
-    if (!backgroundColor) {
-      return '#000000';
-    }
-
-    // Convert hex to RGB
-    const hex = backgroundColor.replace('#', '');
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-
-    // Calculate luminance
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-    // Return black or white based on luminance
-    return luminance > 0.5 ? '#000000' : '#ffffff';
   }
 }
