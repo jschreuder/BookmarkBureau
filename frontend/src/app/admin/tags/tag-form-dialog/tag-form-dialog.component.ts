@@ -264,7 +264,7 @@ export class TagFormDialogComponent {
           this.loading = false;
           this.dialogRef.close(true);
         },
-        error: (error: unknown) => {
+        error: () => {
           this.loading = false;
           this.snackBar.open('Failed to update tag', 'Close', { duration: 5000 });
         },
@@ -281,7 +281,7 @@ export class TagFormDialogComponent {
           this.loading = false;
           this.dialogRef.close(true);
         },
-        error: (error: unknown) => {
+        error: () => {
           this.loading = false;
           this.snackBar.open('Failed to create tag', 'Close', { duration: 5000 });
         },

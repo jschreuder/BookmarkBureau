@@ -1,10 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import {
-  Router,
-  CanActivateFn,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-} from '@angular/router';
+import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 /**
@@ -18,7 +13,7 @@ export class AuthGuard {
   private auth = inject(AuthService);
   private router = inject(Router);
 
-  canActivate(_route: ActivatedRouteSnapshot, _state: RouterStateSnapshot): boolean {
+  canActivate(): boolean {
     if (this.auth.hasValidToken()) {
       return true;
     }
@@ -33,10 +28,7 @@ export class AuthGuard {
  * Function-based guard for protecting routes
  * Usage: { path: 'admin', component: AdminComponent, canActivate: [authGuard] }
  */
-export const authGuard: CanActivateFn = (
-  _route: ActivatedRouteSnapshot,
-  _state: RouterStateSnapshot,
-) => {
+export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 

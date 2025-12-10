@@ -207,7 +207,7 @@ export class DashboardOverviewComponent implements OnInit {
     });
   }
 
-  removeLinkFromCategory(categoryId: string, linkId: string, linkTitle: string): void {
+  removeLinkFromCategory(linkId: string, linkTitle: string): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {

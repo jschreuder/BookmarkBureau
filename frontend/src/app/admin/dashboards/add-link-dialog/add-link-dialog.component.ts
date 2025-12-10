@@ -186,7 +186,7 @@ export class AddLinkDialogComponent {
           this.cdr.markForCheck();
           this.dialogRef.close(true);
         },
-        error: (error: unknown) => {
+        error: () => {
           this.loading = false;
           this.cdr.markForCheck();
           this.snackBar.open('Failed to add link', 'Close', { duration: 5000 });

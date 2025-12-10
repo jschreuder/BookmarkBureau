@@ -217,7 +217,7 @@ export class AdminDashboardListComponent implements OnInit {
         this.loading = false;
         this.cdr.markForCheck();
       },
-      error: (_error) => {
+      error: () => {
         this.snackBar.open('Failed to load dashboards', 'Close', { duration: 5000 });
         this.loading = false;
         this.cdr.markForCheck();
@@ -257,7 +257,7 @@ export class AdminDashboardListComponent implements OnInit {
             this.snackBar.open('Dashboard deleted successfully', 'Close', { duration: 3000 });
             this.loadDashboards();
           },
-          error: (_error) => {
+          error: () => {
             this.snackBar.open('Failed to delete dashboard', 'Close', { duration: 5000 });
             this.cdr.markForCheck();
           },

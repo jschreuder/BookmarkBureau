@@ -192,7 +192,7 @@ export class TagListComponent implements OnInit {
         this.tags = tags;
         this.cdr.markForCheck();
       },
-      error: (error) => {
+      error: () => {
         this.snackBar.open('Failed to load tags', 'Close', { duration: 5000 });
         this.cdr.markForCheck();
       },
@@ -243,7 +243,7 @@ export class TagListComponent implements OnInit {
         this.snackBar.open('Tag deleted successfully', 'Close', { duration: 3000 });
         this.cdr.markForCheck();
       },
-      error: (error) => {
+      error: () => {
         this.snackBar.open('Failed to delete tag', 'Close', { duration: 5000 });
         this.cdr.markForCheck();
       },
@@ -257,9 +257,9 @@ export class TagListComponent implements OnInit {
 
     // Convert hex to RGB
     const hex = backgroundColor.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
 
     // Calculate luminance
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;

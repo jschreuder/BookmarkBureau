@@ -138,7 +138,7 @@ export class TokenRefreshService {
       next: () => {
         // Token refresh succeeded, auth service handles state
       },
-      error: (error) => {
+      error: () => {
         // Auth service already logs out on refresh failure
       },
     });

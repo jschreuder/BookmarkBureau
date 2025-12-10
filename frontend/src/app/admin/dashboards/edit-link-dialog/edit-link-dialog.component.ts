@@ -183,7 +183,7 @@ export class EditLinkDialogComponent {
           this.cdr.markForCheck();
           this.dialogRef.close(true);
         },
-        error: (error: unknown) => {
+        error: () => {
           this.loading = false;
           this.cdr.markForCheck();
           this.snackBar.open('Failed to update link', 'Close', { duration: 5000 });

@@ -88,12 +88,6 @@ export class ApiService {
       .pipe(map(() => undefined));
   }
 
-  removeLinkFromCategory(categoryId: string, linkId: string): Observable<void> {
-    return this.http
-      .delete<ApiResponse<void>>(`${this.API_BASE}/category/${categoryId}/link/${linkId}`)
-      .pipe(map(() => undefined));
-  }
-
   /**
    * Create a link and add it to a category in a single operation
    * Step 1: POST /api/link to create the link
