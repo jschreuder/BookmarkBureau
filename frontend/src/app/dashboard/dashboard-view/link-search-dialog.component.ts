@@ -1,12 +1,13 @@
-import { Component, Inject, OnInit, HostListener } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from "@angular/material/dialog";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
-import { MatIconModule } from "@angular/material/icon";
-import { MatListModule } from "@angular/material/list";
-import { Link } from "../../core/models";
+import { Component, Inject, OnInit, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { Link } from '../../core/models';
 
 export interface LinkSearchDialogData {
   links: Link[];
@@ -18,7 +19,7 @@ export interface SearchResult extends Link {
 }
 
 @Component({
-  selector: "app-link-search-dialog",
+  selector: 'app-link-search-dialog',
   standalone: true,
   imports: [
     CommonModule,
@@ -70,7 +71,8 @@ export interface SearchResult extends Link {
             <div matListItemLine class="result-meta">
               <span class="category-label" *ngIf="link.category">{{ link.category }}</span>
               <span class="result-description" *ngIf="link.description">
-                {{ link.description | slice: 0:80 }}{{ link.description.length > 80 ? "..." : "" }}
+                {{ link.description | slice: 0 : 80
+                }}{{ link.description.length > 80 ? '...' : '' }}
               </span>
               <span class="result-tags" *ngIf="link.tags && link.tags.length > 0">
                 <span class="tag" *ngFor="let tag of link.tags" [style.color]="tag.color">
@@ -304,42 +306,43 @@ export interface SearchResult extends Link {
   ],
 })
 export class LinkSearchDialogComponent implements OnInit {
-  searchQuery = "";
+  searchQuery = '';
   filteredLinks: SearchResult[] = [];
   selectedIndex = 0;
 
   constructor(
     public dialogRef: MatDialogRef<LinkSearchDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: LinkSearchDialogData,
+    private sanitizer: DomSanitizer,
   ) {}
 
   ngOnInit(): void {
     // Close dialog on Escape key
     this.dialogRef.keydownEvents().subscribe((event) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         this.close();
       }
     });
   }
 
-  @HostListener("document:keydown", ["$event"])
+  @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
     if (!this.searchQuery || this.filteredLinks.length === 0) {
       return;
     }
 
     switch (event.key) {
-      case "ArrowDown":
+      case 'ArrowDown':
         event.preventDefault();
         this.selectedIndex = Math.min(this.selectedIndex + 1, this.filteredLinks.length - 1);
         this.scrollToSelected();
         break;
-      case "ArrowUp":
+      case 'ArrowUp':
         event.preventDefault();
         this.selectedIndex = Math.max(this.selectedIndex - 1, 0);
         this.scrollToSelected();
         break;
-      case "Enter":
+      case 'Enter':
         event.preventDefault();
         if (this.filteredLinks[this.selectedIndex]) {
           this.selectLink(this.filteredLinks[this.selectedIndex]);
@@ -397,17 +400,30 @@ export class LinkSearchDialogComponent implements OnInit {
     return results.slice(0, 50); // Limit to 50 results for performance
   }
 
-  highlightText(text: string): string {
+  highlightText(text: string): SafeHtml {
     if (!this.searchQuery.trim()) {
       return text;
     }
 
-    const regex = new RegExp(`(${this.escapeRegex(this.searchQuery)})`, "gi");
-    return text.replace(regex, '<span class="highlight">$1</span>');
+    // Escape HTML in the original text to prevent XSS
+    const escapedText = this.escapeHtml(text);
+
+    // Now apply highlighting to the escaped text
+    const regex = new RegExp(`(${this.escapeRegex(this.searchQuery)})`, 'gi');
+    const highlightedText = escapedText.replace(regex, '<span class="highlight">$1</span>');
+
+    // Sanitize the result before returning
+    return this.sanitizer.sanitize(1, highlightedText) || '';
+  }
+
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   escapeRegex(str: string): string {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   selectLink(link: SearchResult): void {
@@ -420,8 +436,8 @@ export class LinkSearchDialogComponent implements OnInit {
 
   private scrollToSelected(): void {
     setTimeout(() => {
-      const element = document.querySelector(".result-item.selected");
-      element?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      const element = document.querySelector('.result-item.selected');
+      element?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   }
 }

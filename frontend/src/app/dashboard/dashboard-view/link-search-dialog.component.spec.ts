@@ -397,9 +397,64 @@ describe('LinkSearchDialogComponent', () => {
     it('should highlight multiple occurrences', () => {
       component.searchQuery = 'test';
       const highlighted = component.highlightText('test test test');
-      const matches = (highlighted.match(/class="highlight"/g) || []).length;
+      const highlightedStr = String(highlighted);
+      const matches = (highlightedStr.match(/class="highlight"/g) || []).length;
 
       expect(matches).toBe(3);
+    });
+
+    it('should sanitize HTML entities in link titles to prevent XSS', () => {
+      component.searchQuery = 'test';
+      const maliciousInput = '<script>alert("XSS")</script>test';
+      const highlighted = component.highlightText(maliciousInput);
+      const highlightedStr = String(highlighted);
+
+      // Should escape the script tags from the link title
+      expect(highlightedStr).not.toContain('<script>');
+      expect(highlightedStr).toContain('&lt;script&gt;');
+      // Should still highlight the search term
+      expect(highlightedStr).toContain('<span class="highlight">test</span>');
+    });
+
+    it('should prevent regex injection via search query', () => {
+      // Attempt to inject HTML through malicious text that matches a safe query
+      component.searchQuery = 'test';
+      const text = 'test)(<script>alert("XSS")</script>)(test';
+      const highlighted = component.highlightText(text);
+      const highlightedStr = String(highlighted);
+
+      // Should not contain unescaped script tags - the malicious HTML should be escaped
+      expect(highlightedStr).not.toContain('<script>alert');
+      expect(highlightedStr).toContain('&lt;script&gt;');
+      // Should still highlight the safe search term
+      expect(highlightedStr).toContain('<span class="highlight">test</span>');
+    });
+
+    it('should escape regex special characters in query and treat them literally', () => {
+      // Try to use regex special characters in the search query
+      component.searchQuery = '$1'; // Potential regex backreference
+      const text = 'Price: $100 for item';
+      const highlighted = component.highlightText(text);
+      const highlightedStr = String(highlighted);
+
+      // The $ character in the query should be escaped and treated literally
+      // So it WILL find and highlight the literal "$1" inside "$100"
+      expect(highlightedStr).toContain('<span class="highlight">$1</span>00');
+      // The highlighting should not break the text
+      expect(highlightedStr).toContain('Price:');
+    });
+
+    it('should escape HTML tags in text content', () => {
+      component.searchQuery = 'click';
+      const maliciousText = 'click <img src=x onerror=alert(1)> here';
+      const highlighted = component.highlightText(maliciousText);
+      const highlightedStr = String(highlighted);
+
+      // The malicious img tag should be escaped
+      expect(highlightedStr).not.toContain('<img src=x onerror');
+      expect(highlightedStr).toContain('&lt;img');
+      // Should still highlight the search term
+      expect(highlightedStr).toContain('<span class="highlight">click</span>');
     });
   });
 
