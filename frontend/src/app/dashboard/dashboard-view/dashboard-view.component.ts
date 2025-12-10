@@ -116,17 +116,17 @@ import { getTextColor } from '../../shared/utils/color.util';
                 *ngFor="let category of data.categories"
                 [attr.aria-labelledby]="'category-' + category.category_id"
               >
-                <mat-card-header [style.background-color]="category.color || '#667eea'">
+                <mat-card-header [style.background-color]="category.color || '#576bcb'">
                   <mat-icon
                     mat-card-avatar
                     class="category-icon"
-                    [style.color]="getTextColor(category.color)"
+                    [style.color]="getTextColor(category.color || '#576bcb')"
                     aria-hidden="true"
                   >
                     folder
                   </mat-icon>
                   <mat-card-title
-                    [style.color]="getTextColor(category.color)"
+                    [style.color]="getTextColor(category.color || '#576bcb')"
                     [attr.id]="'category-' + category.category_id"
                     >{{ category.title }}</mat-card-title
                   >
