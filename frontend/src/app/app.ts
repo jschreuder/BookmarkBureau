@@ -9,7 +9,7 @@ import { TokenRefreshService } from './core/services/token-refresh.service';
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
-export class App implements OnInit {
+export class AppComponent implements OnInit {
   protected readonly title = signal('frontend');
   private auth = inject(AuthService);
   private tokenRefresh = inject(TokenRefreshService);

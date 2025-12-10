@@ -10,34 +10,34 @@ describe('App Routes', () => {
   });
 
   it('should have empty path redirect to /dashboard', () => {
-    const emptyRoute = routes.find(route => route.path === '');
+    const emptyRoute = routes.find((route) => route.path === '');
     expect(emptyRoute).toBeDefined();
     expect(emptyRoute?.redirectTo).toBe('/dashboard');
     expect(emptyRoute?.pathMatch).toBe('full');
   });
 
   it('should have dashboard route', () => {
-    const dashboardRoute = routes.find(route => route.path === 'dashboard');
+    const dashboardRoute = routes.find((route) => route.path === 'dashboard');
     expect(dashboardRoute).toBeDefined();
   });
 
   it('should load dashboard children lazily', () => {
-    const dashboardRoute = routes.find(route => route.path === 'dashboard');
+    const dashboardRoute = routes.find((route) => route.path === 'dashboard');
     expect(dashboardRoute?.loadChildren).toBeDefined();
   });
 
   it('should have admin route', () => {
-    const adminRoute = routes.find(route => route.path === 'admin');
+    const adminRoute = routes.find((route) => route.path === 'admin');
     expect(adminRoute).toBeDefined();
   });
 
   it('should load admin children lazily', () => {
-    const adminRoute = routes.find(route => route.path === 'admin');
+    const adminRoute = routes.find((route) => route.path === 'admin');
     expect(adminRoute?.loadChildren).toBeDefined();
   });
 
   it('should have wildcard route that redirects to /dashboard', () => {
-    const wildcardRoute = routes.find(route => route.path === '**');
+    const wildcardRoute = routes.find((route) => route.path === '**');
     expect(wildcardRoute).toBeDefined();
     expect(wildcardRoute?.redirectTo).toBe('/dashboard');
   });
@@ -48,7 +48,7 @@ describe('App Routes', () => {
   });
 
   it('should not have duplicate paths', () => {
-    const paths = routes.map(route => route.path);
+    const paths = routes.map((route) => route.path);
     const uniquePaths = new Set(paths);
     expect(uniquePaths.size).toBe(paths.length);
   });
