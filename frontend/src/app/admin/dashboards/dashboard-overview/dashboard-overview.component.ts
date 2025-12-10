@@ -237,12 +237,10 @@ export class DashboardOverviewComponent implements OnInit {
   }
 
   viewDashboard(): void {
-    const newWindow = window.open(
-      `/dashboard/${this.dashboardId}`,
-      '_blank',
-      'noopener,noreferrer',
-    );
-    if (!newWindow) {
+    const newWindow = window.open(`/dashboard/${this.dashboardId}`, '_blank');
+    // Note: Some browsers return null even on success when using noopener/noreferrer
+    // Check both null and if the window is closed immediately (actual popup block)
+    if (!newWindow || newWindow.closed) {
       this.snackBar.open(
         'Pop-up blocked. Please allow pop-ups for this site to open links.',
         'Close',

@@ -185,11 +185,15 @@ export interface SearchResult extends Link {
       }
 
       .result-item {
-        cursor: pointer;
+        cursor: pointer !important;
         padding: 12px 16px;
         transition: background-color 0.15s;
         height: auto !important;
         min-height: 64px;
+      }
+
+      .result-item ::ng-deep .mdc-list-item__content {
+        cursor: pointer !important;
       }
 
       .result-item:hover,

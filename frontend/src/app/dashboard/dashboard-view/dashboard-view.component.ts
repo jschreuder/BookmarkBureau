@@ -275,6 +275,7 @@ import { getTextColor } from '../../shared/utils/color.util';
       .favorite-chip-link {
         text-decoration: none;
         color: inherit;
+        cursor: pointer;
       }
 
       .favorite-chip {
@@ -284,6 +285,10 @@ import { getTextColor } from '../../shared/utils/color.util';
         transition:
           transform 0.2s,
           background-color 0.2s;
+        cursor: pointer !important;
+      }
+
+      .favorite-chip ::ng-deep .mdc-evolution-chip__action {
         cursor: pointer !important;
       }
 
@@ -598,8 +603,10 @@ export class DashboardViewComponent implements OnInit {
   }
 
   openLink(url: string): void {
-    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!newWindow) {
+    const newWindow = window.open(url, '_blank');
+    // Note: Some browsers return null even on success when using noopener/noreferrer
+    // Check both null and if the window is closed immediately (actual popup block)
+    if (!newWindow || newWindow.closed) {
       this.snackBar.open(
         'Pop-up blocked. Please allow pop-ups for this site to open links.',
         'Close',
