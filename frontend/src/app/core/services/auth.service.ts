@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models';
+import { StorageService } from './storage.service';
 
 export interface TokenResponse {
   token: string;
@@ -23,6 +24,7 @@ export interface LoginRequest {
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private storage = inject(StorageService);
   private readonly API_BASE = environment.apiBaseUrl;
   private readonly TOKEN_KEY = 'auth_token';
   private readonly EXPIRES_AT_KEY = 'token_expires_at';
@@ -114,7 +116,7 @@ export class AuthService {
    * Get the token expiration time in milliseconds
    */
   getTokenExpiresAt(): number | null {
-    const expiresAt = localStorage.getItem(this.EXPIRES_AT_KEY);
+    const expiresAt = this.storage.getItem(this.EXPIRES_AT_KEY);
     if (!expiresAt) {
       return null;
     }
@@ -133,19 +135,19 @@ export class AuthService {
   }
 
   private getStoredToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    return this.storage.getItem(this.TOKEN_KEY);
   }
 
   private storeToken(response: TokenResponse): void {
     const expiresAtMs = new Date(response.expires_at).getTime();
-    localStorage.setItem(this.TOKEN_KEY, response.token);
-    localStorage.setItem(this.EXPIRES_AT_KEY, expiresAtMs.toString());
+    this.storage.setItem(this.TOKEN_KEY, response.token);
+    this.storage.setItem(this.EXPIRES_AT_KEY, expiresAtMs.toString());
     this.currentTokenSubject.next(response.token);
   }
 
   private clearToken(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.EXPIRES_AT_KEY);
+    this.storage.removeItem(this.TOKEN_KEY);
+    this.storage.removeItem(this.EXPIRES_AT_KEY);
     this.currentTokenSubject.next(null);
   }
 }
