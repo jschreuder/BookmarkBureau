@@ -27,9 +27,11 @@ export interface TagFormDialogData {
     MatSnackBarModule,
   ],
   template: `
-    <h2 mat-dialog-title>{{ isEditMode ? 'Edit Tag' : 'Create Tag' }}</h2>
+    <h2 mat-dialog-title [attr.id]="'tag-dialog-title'">
+      {{ isEditMode ? 'Edit Tag' : 'Create Tag' }}
+    </h2>
     <mat-dialog-content>
-      <form [formGroup]="form" class="dialog-form">
+      <form [formGroup]="form" class="dialog-form" [attr.aria-labelledby]="'tag-dialog-title'">
         <mat-form-field appearance="outline">
           <mat-label>Tag Name</mat-label>
           <input
@@ -38,9 +40,15 @@ export interface TagFormDialogData {
             placeholder="Enter tag name"
             required
             [readonly]="isEditMode"
+            [attr.aria-invalid]="form.get('tag_name')?.invalid && form.get('tag_name')?.touched"
+            [attr.aria-describedby]="
+              form.get('tag_name')?.invalid && form.get('tag_name')?.touched
+                ? 'tag-name-error'
+                : null
+            "
           />
           @if (form.get('tag_name')?.hasError('required') && form.get('tag_name')?.touched) {
-            <mat-error>Tag name is required</mat-error>
+            <mat-error id="tag-name-error">Tag name is required</mat-error>
           }
           @if (form.get('tag_name')?.hasError('minlength') && form.get('tag_name')?.touched) {
             <mat-error>Tag name must be at least 1 character</mat-error>
@@ -54,6 +62,7 @@ export interface TagFormDialogData {
               type="color"
               formControlName="color"
               class="color-picker"
+              aria-label="Select tag color"
               (change)="onColorChange($event)"
             />
             <input
@@ -61,13 +70,14 @@ export interface TagFormDialogData {
               [value]="form.get('color')?.value || '#e0e0e0'"
               placeholder="#e0e0e0"
               readonly
+              aria-label="Current color code"
               class="color-display"
             />
           </div>
-          <mat-hint>Choose a color for this tag</mat-hint>
+          <mat-hint id="color-hint">Choose a color for this tag</mat-hint>
         </mat-form-field>
 
-        <div class="color-presets">
+        <div class="color-presets" role="group" aria-label="Quick color selection">
           <span class="presets-label">Quick colors:</span>
           @for (color of presetColors; track color) {
             <button
@@ -82,13 +92,21 @@ export interface TagFormDialogData {
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()" type="button">Cancel</button>
+      <button
+        mat-button
+        (click)="onCancel()"
+        type="button"
+        [attr.aria-label]="'Cancel ' + (isEditMode ? 'editing' : 'creating') + ' tag'"
+      >
+        Cancel
+      </button>
       <button
         mat-raised-button
         color="primary"
         (click)="onSubmit()"
         [disabled]="!form.valid || loading"
         type="button"
+        [attr.aria-label]="isEditMode ? 'Update tag' : 'Create tag'"
       >
         {{ loading ? 'Saving...' : isEditMode ? 'Update Tag' : 'Create Tag' }}
       </button>

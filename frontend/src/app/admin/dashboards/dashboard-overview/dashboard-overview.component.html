@@ -1,17 +1,23 @@
 <div class="dashboard-overview">
   <!-- Loading Overlay (only for initial load) -->
-  <div *ngIf="loading && !fullDashboard" class="loading-spinner">
+  <div
+    *ngIf="loading && !fullDashboard"
+    class="loading-spinner"
+    role="status"
+    aria-live="polite"
+    aria-label="Loading dashboard"
+  >
     <mat-spinner diameter="50"></mat-spinner>
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error && !loading" class="error-message">
-    <mat-icon>error_outline</mat-icon>
+  <div *ngIf="error && !loading" class="error-message" role="alert">
+    <mat-icon aria-hidden="true">error_outline</mat-icon>
     <p>{{ error }}</p>
   </div>
 
   <!-- Dashboard Content -->
-  <ng-container *ngIf="fullDashboard">
+  <main role="main" *ngIf="fullDashboard">
     <!-- Dashboard Summary -->
     <div class="dashboard-header">
       <div class="header-content">
@@ -28,47 +34,60 @@
           mat-icon-button
           (click)="editDashboard()"
           matTooltip="Edit Dashboard"
+          aria-label="Edit dashboard"
           class="edit-dashboard-btn"
         >
-          <mat-icon>edit</mat-icon>
+          <mat-icon aria-hidden="true">edit</mat-icon>
         </button>
         <button
           mat-icon-button
           (click)="viewDashboard()"
           matTooltip="View Dashboard"
+          aria-label="View dashboard"
           class="view-dashboard-btn"
         >
-          <mat-icon>visibility</mat-icon>
+          <mat-icon aria-hidden="true">visibility</mat-icon>
         </button>
       </div>
     </div>
 
     <!-- Favorites Section -->
-    <mat-card class="section-card">
+    <mat-card class="section-card" role="region" aria-labelledby="favorites-heading">
       <mat-card-header>
-        <mat-icon class="section-icon">star</mat-icon>
-        <h2 class="section-title">Favorites</h2>
+        <mat-icon class="section-icon" aria-hidden="true">star</mat-icon>
+        <h2 class="section-title" id="favorites-heading">Favorites</h2>
         <button
           mat-icon-button
           (click)="openAddFavoriteDialog()"
           matTooltip="Add Link to Favorites"
+          aria-label="Add link to favorites"
         >
-          <mat-icon>add</mat-icon>
+          <mat-icon aria-hidden="true">add</mat-icon>
         </button>
         <button
           mat-icon-button
           (click)="favoritesReorderMode = !favoritesReorderMode"
           [matTooltip]="favoritesReorderMode ? 'Exit reorder mode' : 'Reorder favorites'"
+          [attr.aria-label]="
+            favoritesReorderMode ? 'Exit favorites reorder mode' : 'Reorder favorites'
+          "
           [class.active]="favoritesReorderMode"
           class="reorder-toggle"
         >
-          <mat-icon>{{ favoritesReorderMode ? 'apps' : 'view_agenda' }}</mat-icon>
+          <mat-icon aria-hidden="true">{{
+            favoritesReorderMode ? 'apps' : 'view_agenda'
+          }}</mat-icon>
         </button>
       </mat-card-header>
       <mat-divider></mat-divider>
       <mat-card-content>
-        <div *ngIf="fullDashboard.favorites.length === 0" class="empty-state">
-          <mat-icon>bookmark_border</mat-icon>
+        <div
+          *ngIf="fullDashboard.favorites.length === 0"
+          class="empty-state"
+          role="status"
+          aria-live="polite"
+        >
+          <mat-icon aria-hidden="true">bookmark_border</mat-icon>
           <p>No favorites yet</p>
         </div>
         <div
@@ -92,29 +111,32 @@
                 mat-icon-button
                 matTooltip="Edit"
                 (click)="editFavorite(link)"
+                [attr.aria-label]="'Edit favorite link: ' + link.title"
                 color="primary"
                 class="edit-btn"
               >
-                <mat-icon>edit</mat-icon>
+                <mat-icon aria-hidden="true">edit</mat-icon>
               </button>
               <button
                 mat-icon-button
                 matTooltip="Remove"
                 (click)="removeFavorite(link)"
+                [attr.aria-label]="'Remove favorite link: ' + link.title"
                 color="warn"
                 class="remove-btn"
               >
-                <mat-icon>delete</mat-icon>
+                <mat-icon aria-hidden="true">delete</mat-icon>
               </button>
               <button
                 *ngIf="favoritesReorderMode"
                 cdkDragHandle
                 mat-icon-button
                 matTooltip="Drag to reorder"
+                [attr.aria-label]="'Drag to reorder favorite: ' + link.title"
                 class="drag-handle"
                 type="button"
               >
-                <mat-icon>drag_handle</mat-icon>
+                <mat-icon aria-hidden="true">drag_handle</mat-icon>
               </button>
             </div>
           </div>
@@ -123,27 +145,42 @@
     </mat-card>
 
     <!-- Categories Section -->
-    <mat-card class="section-card">
+    <mat-card class="section-card" role="region" aria-labelledby="categories-heading">
       <mat-card-header>
-        <mat-icon class="section-icon">folder</mat-icon>
-        <h2 class="section-title">Categories</h2>
-        <button mat-icon-button (click)="openAddCategoryDialog()" matTooltip="Add Category">
-          <mat-icon>add</mat-icon>
+        <mat-icon class="section-icon" aria-hidden="true">folder</mat-icon>
+        <h2 class="section-title" id="categories-heading">Categories</h2>
+        <button
+          mat-icon-button
+          (click)="openAddCategoryDialog()"
+          matTooltip="Add Category"
+          aria-label="Add category"
+        >
+          <mat-icon aria-hidden="true">add</mat-icon>
         </button>
         <button
           mat-icon-button
           (click)="categoriesReorderMode = !categoriesReorderMode"
           [matTooltip]="categoriesReorderMode ? 'Exit reorder mode' : 'Reorder categories'"
+          [attr.aria-label]="
+            categoriesReorderMode ? 'Exit categories reorder mode' : 'Reorder categories'
+          "
           [class.active]="categoriesReorderMode"
           class="reorder-toggle"
         >
-          <mat-icon>{{ categoriesReorderMode ? 'grid_view' : 'view_agenda' }}</mat-icon>
+          <mat-icon aria-hidden="true">{{
+            categoriesReorderMode ? 'grid_view' : 'view_agenda'
+          }}</mat-icon>
         </button>
       </mat-card-header>
       <mat-divider></mat-divider>
       <mat-card-content>
-        <div *ngIf="fullDashboard.categories.length === 0" class="empty-state">
-          <mat-icon>folder_open</mat-icon>
+        <div
+          *ngIf="fullDashboard.categories.length === 0"
+          class="empty-state"
+          role="status"
+          aria-live="polite"
+        >
+          <mat-icon aria-hidden="true">folder_open</mat-icon>
           <p>No categories yet</p>
         </div>
 
@@ -168,37 +205,41 @@
                   mat-icon-button
                   (click)="openAddLinkToCategoryDialog(category)"
                   matTooltip="Add Link"
+                  [attr.aria-label]="'Add link to category: ' + category.title"
                   color="primary"
                 >
-                  <mat-icon>add_link</mat-icon>
+                  <mat-icon aria-hidden="true">add_link</mat-icon>
                 </button>
                 <button
                   *ngIf="!categoriesReorderMode"
                   mat-icon-button
                   (click)="editCategory(category)"
                   matTooltip="Edit Category"
+                  [attr.aria-label]="'Edit category: ' + category.title"
                   color="primary"
                 >
-                  <mat-icon>edit</mat-icon>
+                  <mat-icon aria-hidden="true">edit</mat-icon>
                 </button>
                 <button
                   *ngIf="!categoriesReorderMode"
                   mat-icon-button
                   (click)="removeCategory(category)"
                   matTooltip="Delete Category"
+                  [attr.aria-label]="'Delete category: ' + category.title"
                   color="warn"
                 >
-                  <mat-icon>delete</mat-icon>
+                  <mat-icon aria-hidden="true">delete</mat-icon>
                 </button>
                 <button
                   *ngIf="categoriesReorderMode"
                   cdkDragHandle
                   mat-icon-button
                   matTooltip="Drag to reorder"
+                  [attr.aria-label]="'Drag to reorder category: ' + category.title"
                   class="drag-handle"
                   type="button"
                 >
-                  <mat-icon>drag_handle</mat-icon>
+                  <mat-icon aria-hidden="true">drag_handle</mat-icon>
                 </button>
               </div>
             </div>
@@ -210,7 +251,12 @@
               [cdkDropListData]="category.links"
               (cdkDropListDropped)="onCategoryLinksDropped($event, category)"
             >
-              <div *ngIf="category.links.length === 0" class="empty-category">
+              <div
+                *ngIf="category.links.length === 0"
+                class="empty-category"
+                role="status"
+                aria-live="polite"
+              >
                 <p>No links in this category</p>
               </div>
               <div *ngFor="let link of category.links" class="link-item" cdkDrag>
@@ -227,28 +273,31 @@
                     mat-icon-button
                     matTooltip="Edit"
                     (click)="editLinkInCategory(link)"
+                    [attr.aria-label]="'Edit link: ' + link.title"
                     color="primary"
                     class="edit-btn"
                   >
-                    <mat-icon>edit</mat-icon>
+                    <mat-icon aria-hidden="true">edit</mat-icon>
                   </button>
                   <button
                     mat-icon-button
                     matTooltip="Remove"
                     (click)="removeLinkFromCategory(link.link_id, link.title)"
+                    [attr.aria-label]="'Remove link: ' + link.title"
                     color="warn"
                     class="remove-btn"
                   >
-                    <mat-icon>delete</mat-icon>
+                    <mat-icon aria-hidden="true">delete</mat-icon>
                   </button>
                   <button
                     cdkDragHandle
                     mat-icon-button
                     matTooltip="Drag to reorder"
+                    [attr.aria-label]="'Drag to reorder link: ' + link.title"
                     class="drag-handle"
                     type="button"
                   >
-                    <mat-icon>drag_handle</mat-icon>
+                    <mat-icon aria-hidden="true">drag_handle</mat-icon>
                   </button>
                 </div>
               </div>
@@ -257,5 +306,5 @@
         </div>
       </mat-card-content>
     </mat-card>
-  </ng-container>
+  </main>
 </div>

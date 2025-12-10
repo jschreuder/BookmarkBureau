@@ -35,9 +35,9 @@ export interface EditCategoryDialogData {
     MatSnackBarModule,
   ],
   template: `
-    <h2 mat-dialog-title>Edit Category</h2>
+    <h2 mat-dialog-title id="edit-category-dialog-title">Edit Category</h2>
     <mat-dialog-content>
-      <form [formGroup]="form" class="dialog-form">
+      <form [formGroup]="form" class="dialog-form" aria-labelledby="edit-category-dialog-title">
         <mat-form-field appearance="outline">
           <mat-label>Category Title</mat-label>
           <input
@@ -45,15 +45,25 @@ export interface EditCategoryDialogData {
             formControlName="title"
             placeholder="e.g., Work, Personal, Blogs"
             required
+            [attr.aria-invalid]="form.get('title')?.invalid && form.get('title')?.touched"
+            [attr.aria-describedby]="
+              form.get('title')?.invalid && form.get('title')?.touched ? 'title-error' : null
+            "
           />
           @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
-            <mat-error>Title is required</mat-error>
+            <mat-error id="title-error">Title is required</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Color (Optional)</mat-label>
-          <input matInput formControlName="color" type="color" placeholder="#667eea" />
+          <input
+            matInput
+            formControlName="color"
+            type="color"
+            placeholder="#667eea"
+            aria-label="Select color"
+          />
           @if (form.get('color')?.value) {
             <button
               matSuffix
@@ -62,20 +72,23 @@ export interface EditCategoryDialogData {
               (click)="clearColor()"
               aria-label="Clear color"
             >
-              <mat-icon>close</mat-icon>
+              <mat-icon aria-hidden="true">close</mat-icon>
             </button>
           }
         </mat-form-field>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()" type="button">Cancel</button>
+      <button mat-button (click)="onCancel()" type="button" aria-label="Cancel editing category">
+        Cancel
+      </button>
       <button
         mat-raised-button
         color="primary"
         (click)="onSubmit()"
         [disabled]="!form.valid || loading"
         type="button"
+        aria-label="Update category"
       >
         {{ loading ? 'Updating...' : 'Update Category' }}
       </button>

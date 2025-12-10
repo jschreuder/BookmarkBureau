@@ -36,120 +36,169 @@ import { LinkSearchDialogComponent, SearchResult } from './link-search-dialog.co
     MatDialogModule,
   ],
   template: `
-    <div class="container loading" *ngIf="(dashboard$ | async) === null">
-      <mat-spinner></mat-spinner>
-      <p>Loading dashboard...</p>
-    </div>
+    <main role="main">
+      <div
+        class="container loading"
+        role="status"
+        aria-live="polite"
+        aria-label="Loading dashboard"
+        *ngIf="(dashboard$ | async) === null"
+      >
+        <mat-spinner></mat-spinner>
+        <p>Loading dashboard...</p>
+      </div>
 
-    <div *ngIf="dashboard$ | async as data">
-      <!-- Compact Top Bar -->
-      <div class="dashboard-toolbar">
-        <div class="toolbar-content">
-          <div class="toolbar-header">
-            <mat-icon class="toolbar-icon" *ngIf="data.dashboard.icon">
-              {{ data.dashboard.icon }}
-            </mat-icon>
-            <mat-icon class="toolbar-icon" *ngIf="!data.dashboard.icon">dashboard</mat-icon>
-            <span class="toolbar-title">{{ data.dashboard.title }}</span>
-            <button
-              mat-icon-button
-              class="search-button"
-              (click)="openSearch()"
-              title="Search links (Ctrl/Cmd+K)"
-            >
-              <mat-icon>search</mat-icon>
-            </button>
-          </div>
+      <div *ngIf="dashboard$ | async as data">
+        <!-- Compact Top Bar -->
+        <header class="dashboard-toolbar">
+          <div class="toolbar-content">
+            <div class="toolbar-header">
+              <mat-icon class="toolbar-icon" aria-hidden="true" *ngIf="data.dashboard.icon">
+                {{ data.dashboard.icon }}
+              </mat-icon>
+              <mat-icon class="toolbar-icon" aria-hidden="true" *ngIf="!data.dashboard.icon"
+                >dashboard</mat-icon
+              >
+              <h1 class="toolbar-title">{{ data.dashboard.title }}</h1>
+              <button
+                mat-icon-button
+                class="search-button"
+                (click)="openSearch()"
+                aria-label="Search links"
+              >
+                <mat-icon aria-hidden="true">search</mat-icon>
+              </button>
+            </div>
 
-          <!-- Favorites in Toolbar -->
-          <div class="toolbar-favorites" *ngIf="data.favorites && data.favorites.length > 0">
-            <mat-chip
-              *ngFor="let link of data.favorites"
-              (click)="openLink(link.url)"
-              class="favorite-chip"
+            <!-- Favorites in Toolbar -->
+            <div
+              class="toolbar-favorites"
+              *ngIf="data.favorites && data.favorites.length > 0"
+              role="region"
+              aria-label="Favorite links"
             >
-              <mat-icon *ngIf="link.icon">{{ link.icon }}</mat-icon>
-              {{ link.title }}
-            </mat-chip>
+              <mat-chip
+                *ngFor="let link of data.favorites"
+                (click)="openLink(link.url)"
+                class="favorite-chip"
+                role="button"
+                tabindex="0"
+                [attr.aria-label]="'Open ' + link.title"
+                (keydown.enter)="openLink(link.url)"
+                (keydown.space)="openLink(link.url)"
+              >
+                <mat-icon *ngIf="link.icon" aria-hidden="true">{{ link.icon }}</mat-icon>
+                {{ link.title }}
+              </mat-chip>
+            </div>
           </div>
+        </header>
+
+        <!-- Description as Quote -->
+        <div class="description-quote" *ngIf="data.dashboard.description">
+          <p>{{ data.dashboard.description }}</p>
         </div>
-      </div>
 
-      <!-- Description as Quote -->
-      <div class="description-quote" *ngIf="data.dashboard.description">
-        <p>{{ data.dashboard.description }}</p>
-      </div>
-
-      <!-- Main Content Container -->
-      <div class="container">
-        <!-- Categories Section -->
-        <section class="categories-section" *ngIf="data.categories && data.categories.length > 0">
-          <div class="categories-grid">
-            <mat-card class="category-card" *ngFor="let category of data.categories">
-              <mat-card-header [style.background-color]="category.color || '#667eea'">
-                <mat-icon
-                  mat-card-avatar
-                  class="category-icon"
-                  [style.color]="getTextColor(category.color)"
-                >
-                  folder
-                </mat-icon>
-                <mat-card-title [style.color]="getTextColor(category.color)">{{
-                  category.title
-                }}</mat-card-title>
-              </mat-card-header>
-              <mat-card-content>
-                <div class="link-list">
-                  <div
-                    class="link-item"
-                    *ngFor="let link of category.links"
-                    (click)="openLink(link.url)"
+        <!-- Main Content Container -->
+        <div class="container">
+          <!-- Categories Section -->
+          <section
+            class="categories-section"
+            aria-labelledby="categories-heading"
+            *ngIf="data.categories && data.categories.length > 0"
+          >
+            <h2 id="categories-heading" style="display: none;">Categories</h2>
+            <div class="categories-grid">
+              <mat-card
+                class="category-card"
+                *ngFor="let category of data.categories"
+                [attr.aria-labelledby]="'category-' + category.category_id"
+              >
+                <mat-card-header [style.background-color]="category.color || '#667eea'">
+                  <mat-icon
+                    mat-card-avatar
+                    class="category-icon"
+                    [style.color]="getTextColor(category.color)"
+                    aria-hidden="true"
                   >
-                    <mat-icon *ngIf="link.icon">{{ link.icon }}</mat-icon>
-                    <mat-icon *ngIf="!link.icon">link</mat-icon>
-                    <div class="link-info">
-                      <h4>{{ link.title }}</h4>
-                      <p class="link-description" *ngIf="link.description">
-                        {{ link.description }}
-                        <span class="link-tags" *ngIf="link.tags && link.tags.length > 0">
-                          <span class="tag" *ngFor="let tag of link.tags" [style.color]="tag.color"
-                            >#{{ tag.tag_name }}</span
-                          >
-                        </span>
-                      </p>
+                    folder
+                  </mat-icon>
+                  <mat-card-title
+                    [style.color]="getTextColor(category.color)"
+                    [attr.id]="'category-' + category.category_id"
+                    >{{ category.title }}</mat-card-title
+                  >
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="link-list">
+                    <div
+                      class="link-item"
+                      role="button"
+                      tabindex="0"
+                      *ngFor="let link of category.links"
+                      (click)="openLink(link.url)"
+                      (keydown.enter)="openLink(link.url)"
+                      (keydown.space)="openLink(link.url)"
+                      [attr.aria-label]="'Open ' + link.title + ': ' + link.url"
+                    >
+                      <mat-icon *ngIf="link.icon" aria-hidden="true">{{ link.icon }}</mat-icon>
+                      <mat-icon *ngIf="!link.icon" aria-hidden="true">link</mat-icon>
+                      <div class="link-info">
+                        <h4>{{ link.title }}</h4>
+                        <p class="link-description" *ngIf="link.description">
+                          {{ link.description }}
+                          <span class="link-tags" *ngIf="link.tags && link.tags.length > 0">
+                            <span
+                              class="tag"
+                              *ngFor="let tag of link.tags"
+                              [style.color]="tag.color"
+                              >#{{ tag.tag_name }}</span
+                            >
+                          </span>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </mat-card-content>
-            </mat-card>
-          </div>
-        </section>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </section>
 
-        <!-- Empty State -->
-        <div
-          class="empty-state"
-          *ngIf="
-            (!data.favorites || data.favorites.length === 0) &&
-            (!data.categories || data.categories.length === 0)
-          "
-        >
-          <mat-icon>inbox</mat-icon>
-          <h2>No content yet</h2>
-          <p>Visit the admin panel to add links and categories to this dashboard.</p>
-          <button mat-raised-button color="primary" routerLink="/admin">
-            <mat-icon>settings</mat-icon>
-            Go to Admin
-          </button>
+          <!-- Empty State -->
+          <div
+            class="empty-state"
+            role="status"
+            aria-live="polite"
+            *ngIf="
+              (!data.favorites || data.favorites.length === 0) &&
+              (!data.categories || data.categories.length === 0)
+            "
+          >
+            <mat-icon aria-hidden="true">inbox</mat-icon>
+            <h2>No content yet</h2>
+            <p>Visit the admin panel to add links and categories to this dashboard.</p>
+            <button
+              mat-raised-button
+              color="primary"
+              routerLink="/admin"
+              aria-label="Go to administration panel"
+            >
+              <mat-icon aria-hidden="true">settings</mat-icon>
+              Go to Admin
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="container error-container" *ngIf="error$ | async as error">
-      <mat-icon class="error-icon">error</mat-icon>
-      <h2>Error loading dashboard</h2>
-      <p>{{ error }}</p>
-      <button mat-raised-button routerLink="/dashboard">Back to Dashboards</button>
-    </div>
+      <div class="container error-container" role="alert" *ngIf="error$ | async as error">
+        <mat-icon class="error-icon" aria-hidden="true">error</mat-icon>
+        <h2>Error loading dashboard</h2>
+        <p>{{ error }}</p>
+        <button mat-raised-button routerLink="/dashboard" aria-label="Back to dashboards">
+          Back to Dashboards
+        </button>
+      </div>
+    </main>
   `,
   styles: [
     `

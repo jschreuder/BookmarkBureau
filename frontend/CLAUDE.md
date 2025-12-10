@@ -91,6 +91,20 @@ httpMock.verify(); // In afterEach
 - Call `fixture.detectChanges()` after state changes
 - Query: `fixture.nativeElement.querySelector()`
 
+## Accessibility (WCAG 2.1 Level AA)
+
+All components are built with **WCAG 2.1 Level AA accessibility compliance** for screen reader support, keyboard navigation, and semantic structure.
+
+**Quick Patterns:**
+- Icon buttons: `[attr.aria-label]="'Action ' + name"` + `aria-hidden="true"` on icon
+- Form validation: `aria-invalid` + `aria-describedby` linked to error ID
+- Landmarks: `<main>`, `<nav>`, `<section>` with `aria-labelledby` for headings
+- Status updates: `role="status" aria-live="polite"` for dynamic content
+
+**Key Guideline:** Every interactive element must be keyboard accessible and properly labeled for screen readers.
+
+See [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) for complete implementation guide with detailed patterns, examples, testing strategies, and common mistakes to avoid.
+
 ## Code Style
 
 ### Component Structure

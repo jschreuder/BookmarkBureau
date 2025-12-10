@@ -9,14 +9,24 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
   template: `
-    <div class="dialog-container">
-      <mat-icon class="error-icon">error_outline</mat-icon>
-      <h2 mat-dialog-title>Session Expired</h2>
-      <mat-dialog-content>
+    <div
+      class="dialog-container"
+      role="alertdialog"
+      aria-labelledby="error-title"
+      aria-describedby="error-message"
+    >
+      <mat-icon class="error-icon" aria-hidden="true">error_outline</mat-icon>
+      <h2 mat-dialog-title id="error-title">Session Expired</h2>
+      <mat-dialog-content id="error-message">
         <p>Your session is no longer valid. Please log in again.</p>
       </mat-dialog-content>
       <mat-dialog-actions align="center">
-        <button mat-raised-button color="primary" (click)="onGoToLogin()">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="onGoToLogin()"
+          aria-label="Go to login page"
+        >
           Go to Login
         </button>
       </mat-dialog-actions>

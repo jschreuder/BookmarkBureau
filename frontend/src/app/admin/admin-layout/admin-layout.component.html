@@ -8,72 +8,83 @@
       </div>
     </div>
 
-    <mat-nav-list class="menu-list">
-      <!-- Dashboards section -->
-      <div class="nav-section">
-        <a
-          mat-list-item
-          routerLink="/admin/dashboards"
-          routerLinkActive="active-link"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="section-header"
-          (click)="toggleDashboards()"
-        >
-          <mat-icon matListItemIcon>dashboard</mat-icon>
-          <span matListItemTitle>Dashboards</span>
-          <span matListItemMeta>
-            <mat-icon class="expand-icon">{{
-              dashboardsExpanded ? 'expand_more' : 'chevron_right'
-            }}</mat-icon>
-          </span>
-        </a>
-
-        <!-- Nested dashboard list -->
-        <div class="nested-list" *ngIf="dashboardsExpanded">
+    <nav aria-label="Administration menu">
+      <mat-nav-list class="menu-list" role="navigation">
+        <!-- Dashboards section -->
+        <div class="nav-section">
           <a
-            *ngFor="let dashboard of topDashboards"
             mat-list-item
-            [routerLink]="['/admin/dashboards', dashboard.dashboard_id, 'overview']"
+            routerLink="/admin/dashboards"
             routerLinkActive="active-link"
-            class="nested-item"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="section-header"
+            (click)="toggleDashboards()"
+            [attr.aria-expanded]="dashboardsExpanded"
+            [attr.aria-label]="'Dashboards ' + (dashboardsExpanded ? 'expanded' : 'collapsed')"
           >
-            <mat-icon matListItemIcon>article</mat-icon>
-            <span matListItemTitle>{{ dashboard.title }}</span>
+            <mat-icon matListItemIcon aria-hidden="true">dashboard</mat-icon>
+            <span matListItemTitle>Dashboards</span>
+            <span matListItemMeta>
+              <mat-icon class="expand-icon" aria-hidden="true">{{
+                dashboardsExpanded ? 'expand_more' : 'chevron_right'
+              }}</mat-icon>
+            </span>
           </a>
+
+          <!-- Nested dashboard list -->
+          <div class="nested-list" *ngIf="dashboardsExpanded">
+            <a
+              *ngFor="let dashboard of topDashboards"
+              mat-list-item
+              [routerLink]="['/admin/dashboards', dashboard.dashboard_id, 'overview']"
+              routerLinkActive="active-link"
+              class="nested-item"
+            >
+              <mat-icon matListItemIcon>article</mat-icon>
+              <span matListItemTitle>{{ dashboard.title }}</span>
+            </a>
+          </div>
         </div>
-      </div>
 
-      <!-- Divider before other menu items -->
-      <mat-divider class="section-divider"></mat-divider>
+        <!-- Divider before other menu items -->
+        <mat-divider class="section-divider"></mat-divider>
 
-      <!-- Tags -->
-      <a mat-list-item routerLink="/admin/tags" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>label</mat-icon>
-        <span matListItemTitle>Tags</span>
-      </a>
-    </mat-nav-list>
+        <!-- Tags -->
+        <a mat-list-item routerLink="/admin/tags" routerLinkActive="active-link">
+          <mat-icon matListItemIcon aria-hidden="true">label</mat-icon>
+          <span matListItemTitle>Tags</span>
+        </a>
+      </mat-nav-list>
+    </nav>
 
     <div class="sidenav-footer">
       <mat-divider></mat-divider>
-      <button mat-list-item (click)="logout()" class="footer-button">
-        <mat-icon matListItemIcon>logout</mat-icon>
+      <button mat-list-item (click)="logout()" class="footer-button" aria-label="Logout">
+        <mat-icon matListItemIcon aria-hidden="true">logout</mat-icon>
         <span matListItemTitle>Logout</span>
       </button>
-      <button mat-list-item (click)="navigateToDashboards()" class="footer-button">
-        <mat-icon matListItemIcon>arrow_back</mat-icon>
+      <button
+        mat-list-item
+        (click)="navigateToDashboards()"
+        class="footer-button"
+        aria-label="Back to dashboards"
+      >
+        <mat-icon matListItemIcon aria-hidden="true">arrow_back</mat-icon>
         <span matListItemTitle>Back to Dashboards</span>
       </button>
     </div>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <mat-toolbar class="mat-elevation-z2">
-      <mat-icon>settings</mat-icon>
-      <span class="toolbar-title">Administration Panel</span>
-    </mat-toolbar>
+    <header class="mat-elevation-z2">
+      <mat-toolbar>
+        <mat-icon aria-hidden="true">settings</mat-icon>
+        <h1 class="toolbar-title">Administration Panel</h1>
+      </mat-toolbar>
+    </header>
 
-    <div class="admin-content">
+    <main class="admin-content" role="main">
       <router-outlet></router-outlet>
-    </div>
+    </main>
   </mat-sidenav-content>
 </mat-sidenav-container>

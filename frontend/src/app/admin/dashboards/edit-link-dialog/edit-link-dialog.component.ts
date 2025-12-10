@@ -39,14 +39,23 @@ export interface EditLinkDialogData {
     TagInputComponent,
   ],
   template: `
-    <h2 mat-dialog-title>Edit Link</h2>
+    <h2 mat-dialog-title id="edit-link-dialog-title">Edit Link</h2>
     <mat-dialog-content>
-      <form [formGroup]="form" class="dialog-form">
+      <form [formGroup]="form" class="dialog-form" aria-labelledby="edit-link-dialog-title">
         <mat-form-field appearance="outline">
           <mat-label>URL</mat-label>
-          <input matInput formControlName="url" placeholder="https://example.com" required />
+          <input
+            matInput
+            formControlName="url"
+            placeholder="https://example.com"
+            required
+            [attr.aria-invalid]="form.get('url')?.invalid && form.get('url')?.touched"
+            [attr.aria-describedby]="
+              form.get('url')?.invalid && form.get('url')?.touched ? 'url-error' : null
+            "
+          />
           @if (form.get('url')?.hasError('required') && form.get('url')?.touched) {
-            <mat-error>URL is required</mat-error>
+            <mat-error id="url-error">URL is required</mat-error>
           }
           @if (form.get('url')?.hasError('pattern') && form.get('url')?.touched) {
             <mat-error>Please enter a valid URL</mat-error>
@@ -55,9 +64,18 @@ export interface EditLinkDialogData {
 
         <mat-form-field appearance="outline">
           <mat-label>Title</mat-label>
-          <input matInput formControlName="title" placeholder="Link title" required />
+          <input
+            matInput
+            formControlName="title"
+            placeholder="Link title"
+            required
+            [attr.aria-invalid]="form.get('title')?.invalid && form.get('title')?.touched"
+            [attr.aria-describedby]="
+              form.get('title')?.invalid && form.get('title')?.touched ? 'title-error' : null
+            "
+          />
           @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
-            <mat-error>Title is required</mat-error>
+            <mat-error id="title-error">Title is required</mat-error>
           }
         </mat-form-field>
 
@@ -77,13 +95,16 @@ export interface EditLinkDialogData {
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()" type="button">Cancel</button>
+      <button mat-button (click)="onCancel()" type="button" aria-label="Cancel editing link">
+        Cancel
+      </button>
       <button
         mat-raised-button
         color="primary"
         (click)="onSubmit()"
         [disabled]="!form.valid || loading"
         type="button"
+        aria-label="Update link"
       >
         {{ loading ? 'Updating...' : 'Update Link' }}
       </button>
