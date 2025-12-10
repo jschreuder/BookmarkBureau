@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { InvalidTokenDialogService } from './invalid-token-dialog.service';
 import { AuthService } from './auth.service';
 import { InvalidTokenDialogComponent } from '../../shared/components/invalid-token-dialog/invalid-token-dialog.component';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { vi } from 'vitest';
 
 describe('InvalidTokenDialogService', () => {
@@ -76,7 +76,6 @@ describe('InvalidTokenDialogService', () => {
     it('should prevent multiple dialogs from opening simultaneously', () => {
       // Create a mock that returns an observable that NEVER completes
       // This simulates a dialog that stays open
-      const { Observable } = require('rxjs');
       const neverClosingDialogRef = {
         afterClosed: vi.fn().mockReturnValue(new Observable(() => {})),
       };

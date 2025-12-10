@@ -4,7 +4,7 @@ This document explains how testing is set up in the BookmarkBureau frontend appl
 
 ## Test Framework
 
-We use **Vitest** as our test runner with **Jasmine-compatible syntax** for assertions. This setup is officially supported by Angular 20+ and will become the default in Angular 21.
+We use **Vitest** as our test runner with **Jasmine-compatible syntax** for assertions. This setup is the default test runner in Angular 21+.
 
 ### Why Vitest?
 
