@@ -60,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage
-          path: frontend/coverage/frontend/clover.xml
+          path: frontend/coverage/frontend/lcov.info
           retention-days: 1
 
   sonarcloud:

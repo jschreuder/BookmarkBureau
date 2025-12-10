@@ -105,7 +105,8 @@
           "options": {
             "buildTarget": "frontend:build",
             "runner": "vitest",
-            "tsConfig": "tsconfig.spec.json"
+            "tsConfig": "tsconfig.spec.json",
+            "coverageReporters": ["html", "lcov", "text-summary"]
           }
         }
       }
