@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardViewComponent } from './dashboard-view.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { Title } from '@angular/platform-browser';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -26,6 +27,7 @@ describe('DashboardViewComponent', () => {
   let mockApiService: any;
   let mockActivatedRoute: any;
   let mockDialog: { open: ReturnType<typeof vi.fn> };
+  let mockTitleService: { setTitle: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     mockApiService = createMockApiService();
@@ -48,6 +50,11 @@ describe('DashboardViewComponent', () => {
       }),
     };
 
+    // Mock Title service
+    mockTitleService = {
+      setTitle: vi.fn(),
+    };
+
     // Mock the getDashboard method to return test data
     mockApiService.getDashboard = vi.fn().mockReturnValue(of(createMockFullDashboard()));
 
@@ -66,6 +73,7 @@ describe('DashboardViewComponent', () => {
         { provide: ApiService, useValue: mockApiService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
         { provide: MatDialog, useValue: mockDialog },
+        { provide: Title, useValue: mockTitleService },
       ],
     }).compileComponents();
 
@@ -76,6 +84,19 @@ describe('DashboardViewComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should set page title with dashboard name', () => {
+    expect(mockTitleService.setTitle).toHaveBeenCalledWith('Test Dashboard | BookmarkBureau');
+  });
+
+  it('should not set page title when dashboard is null', () => {
+    mockTitleService.setTitle.mockClear();
+    mockApiService.getDashboard = vi.fn().mockReturnValue(of(null));
+
+    component.ngOnInit();
+
+    expect(mockTitleService.setTitle).not.toHaveBeenCalled();
   });
 
   it('should render dashboard toolbar', () => {

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -47,6 +48,7 @@ export class DashboardViewComponent implements OnInit {
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
+  private titleService = inject(Title);
 
   dashboard$!: Observable<FullDashboard | null>;
   error$: Observable<string | null> = of(null);
@@ -71,9 +73,12 @@ export class DashboardViewComponent implements OnInit {
       }),
     );
 
-    // Store current dashboard for search
+    // Store current dashboard for search and update page title
     this.dashboard$.subscribe((dashboard) => {
       this.currentDashboard = dashboard;
+      if (dashboard) {
+        this.titleService.setTitle(`${dashboard.dashboard.title} | BookmarkBureau`);
+      }
       this.cdr.markForCheck();
     });
   }
