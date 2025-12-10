@@ -17,7 +17,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
-import { FullDashboard, CategoryWithLinks, Link, Favorite } from '../../../core/models';
+import { FullDashboard, CategoryWithLinks, Link } from '../../../core/models';
 import { ApiService } from '../../../core/services/api.service';
 import { AddCategoryDialogComponent } from '../add-category-dialog/add-category-dialog.component';
 import { AddLinkDialogComponent } from '../add-link-dialog/add-link-dialog.component';
@@ -99,7 +99,7 @@ export class DashboardOverviewComponent implements OnInit {
           });
         }
       },
-      error: (error) => {
+      error: () => {
         this.error = 'Failed to load dashboard';
         this.snackBar.open('Failed to load dashboard', 'Close', { duration: 5000 });
         this.loading = false;
@@ -173,7 +173,7 @@ export class DashboardOverviewComponent implements OnInit {
             this.snackBar.open('Category deleted successfully', 'Close', { duration: 3000 });
             this.loadDashboard(true);
           },
-          error: (error) => {
+          error: () => {
             this.snackBar.open('Failed to delete category', 'Close', { duration: 5000 });
             this.cdr.markForCheck();
           },
@@ -198,7 +198,7 @@ export class DashboardOverviewComponent implements OnInit {
             this.snackBar.open('Removed from favorites', 'Close', { duration: 3000 });
             this.loadDashboard(true);
           },
-          error: (error) => {
+          error: () => {
             this.snackBar.open('Failed to remove favorite', 'Close', { duration: 5000 });
             this.cdr.markForCheck();
           },
@@ -223,7 +223,7 @@ export class DashboardOverviewComponent implements OnInit {
             this.snackBar.open('Link deleted successfully', 'Close', { duration: 3000 });
             this.loadDashboard(true);
           },
-          error: (_error) => {
+          error: () => {
             this.snackBar.open('Failed to delete link', 'Close', { duration: 5000 });
             this.cdr.markForCheck();
           },
@@ -309,7 +309,7 @@ export class DashboardOverviewComponent implements OnInit {
       next: () => {
         this.snackBar.open('Favorites reordered successfully', 'Close', { duration: 3000 });
       },
-      error: (error) => {
+      error: () => {
         this.snackBar.open('Failed to reorder favorites', 'Close', { duration: 5000 });
         // Reload dashboard to restore original order
         this.loadDashboard();
@@ -338,7 +338,7 @@ export class DashboardOverviewComponent implements OnInit {
       next: () => {
         this.snackBar.open('Category links reordered successfully', 'Close', { duration: 3000 });
       },
-      error: (error) => {
+      error: () => {
         this.snackBar.open('Failed to reorder category links', 'Close', { duration: 5000 });
         // Reload dashboard to restore original order
         this.loadDashboard();
@@ -367,7 +367,7 @@ export class DashboardOverviewComponent implements OnInit {
       next: () => {
         this.snackBar.open('Categories reordered successfully', 'Close', { duration: 3000 });
       },
-      error: (error) => {
+      error: () => {
         this.snackBar.open('Failed to reorder categories', 'Close', { duration: 5000 });
         // Reload dashboard to restore original order
         this.loadDashboard();
