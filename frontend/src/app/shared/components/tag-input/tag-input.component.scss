@@ -1,0 +1,29 @@
+.tag-input-field {
+  width: 100%;
+}
+
+mat-chip-row {
+  font-size: 14px;
+}
+
+.tag-color-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.create-option {
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.create-option mat-icon {
+  vertical-align: middle;
+  margin-right: 4px;
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+}

@@ -49,84 +49,8 @@ import { TagService } from '../../../core/services/tag.service';
       multi: true,
     },
   ],
-  template: `
-    <mat-form-field appearance="outline" class="tag-input-field">
-      <mat-label>Tags</mat-label>
-      <mat-chip-grid #chipGrid aria-label="Tag selection">
-        @for (tag of selectedTags(); track tag.tag_name) {
-          <mat-chip-row
-            (removed)="removeTag(tag)"
-            [style.background-color]="tag.color || '#e0e0e0'"
-            [style.color]="getTextColor(tag.color)"
-          >
-            {{ tag.tag_name }}
-            <button matChipRemove aria-label="Remove tag">
-              <mat-icon>cancel</mat-icon>
-            </button>
-          </mat-chip-row>
-        }
-      </mat-chip-grid>
-      <input
-        placeholder="Add tag..."
-        #tagInput
-        [formControl]="tagCtrl"
-        [matChipInputFor]="chipGrid"
-        [matAutocomplete]="auto"
-        (input)="onInput($event)"
-        (blur)="onTouched()"
-      />
-      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-        @for (tag of filteredTags$ | async; track tag.tag_name) {
-          <mat-option [value]="tag.tag_name">
-            <span
-              class="tag-color-indicator"
-              [style.background-color]="tag.color || '#e0e0e0'"
-            ></span>
-            {{ tag.tag_name }}
-          </mat-option>
-        }
-        @if (showCreateOption$ | async) {
-          <mat-option [value]="'__CREATE__'" class="create-option">
-            <mat-icon>add</mat-icon>
-            Create tag "{{ tagCtrl.value }}"
-          </mat-option>
-        }
-      </mat-autocomplete>
-    </mat-form-field>
-  `,
-  styles: [
-    `
-      .tag-input-field {
-        width: 100%;
-      }
-
-      mat-chip-row {
-        font-size: 14px;
-      }
-
-      .tag-color-indicator {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        margin-right: 8px;
-        vertical-align: middle;
-      }
-
-      .create-option {
-        color: #1976d2;
-        font-weight: 500;
-      }
-
-      .create-option mat-icon {
-        vertical-align: middle;
-        margin-right: 4px;
-        font-size: 18px;
-        height: 18px;
-        width: 18px;
-      }
-    `,
-  ],
+  templateUrl: './tag-input.component.html',
+  styleUrl: './tag-input.component.scss',
 })
 export class TagInputComponent implements ControlValueAccessor, OnInit {
   private tagService = inject(TagService);

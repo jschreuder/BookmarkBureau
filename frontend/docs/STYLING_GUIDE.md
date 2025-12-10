@@ -162,13 +162,39 @@ Available Material palettes:
 4. **Elevation**: Use Material elevation classes for shadows
 5. **Accessibility**: Include aria-labels for icon-only buttons
 6. **Responsive**: Use flex/grid layouts, avoid fixed widths
+7. **External Templates**: Use separate `.html` and `.scss` files for all components (see Template Location Standard below)
+
+## Template Location Standard
+
+**Rule:** All templates > 40 lines MUST use external `.html` files.
+Templates ≤ 40 lines SHOULD use external files unless trivially small (< 10 lines).
+
+**Rationale:**
+- Separation of concerns (view layer separated from logic)
+- Better tooling support (HTML language servers, syntax highlighting)
+- Cleaner git diffs (template changes don't mix with logic changes)
+- Consistency with Angular CLI defaults
+
+**Component Structure:**
+```typescript
+@Component({
+  selector: 'app-component-name',
+  standalone: true,
+  imports: [CommonModule, MaterialModules],
+  templateUrl: './component-name.component.html',  // External template
+  styleUrl: './component-name.component.scss'      // External styles
+})
+export class ComponentNameComponent { }
+```
+
+**Exceptions:** Only trivial stub components (< 10 lines) may use inline templates.
 
 ## Adding New Styles
 
 When adding new components:
 
 1. Import required Material modules
-2. Use component-scoped styles (in component file)
+2. Create separate `.html` and `.scss` files (follow Template Location Standard)
 3. Follow existing spacing/color patterns
 4. Test hover states and transitions
 5. Ensure responsive behavior

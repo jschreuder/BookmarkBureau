@@ -113,7 +113,8 @@ See [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) for complete implementation g
   selector: 'app-component-name',
   standalone: true,
   imports: [CommonModule, MaterialModules],
-  template: '...'
+  templateUrl: './component-name.component.html',
+  styleUrl: './component-name.component.scss'
 })
 export class ComponentNameComponent {
   private service = inject(ApiService);
@@ -121,6 +122,19 @@ export class ComponentNameComponent {
   // Component logic
 }
 ```
+
+### Template Location Standard
+
+**Rule:** All templates > 40 lines MUST use external `.html` files.
+Templates ≤ 40 lines SHOULD use external files unless trivially small (< 10 lines).
+
+**Rationale:**
+- Separation of concerns (view layer separated from logic)
+- Better tooling support (HTML language servers, syntax highlighting)
+- Cleaner git diffs (template changes don't mix with logic changes)
+- Consistency with Angular CLI defaults
+
+**Exceptions:** Only trivial stub components (< 10 lines) may use inline templates.
 
 ### Conventions
 - **Standalone components** (NO NgModules)

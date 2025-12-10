@@ -1,0 +1,76 @@
+<div class="page-header">
+  <h1>Tags</h1>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="openCreateDialog()"
+    data-testid="create-btn"
+  >
+    <mat-icon>add</mat-icon>
+    New Tag
+  </button>
+</div>
+<mat-card>
+  <mat-card-content>
+    @if (tags.length === 0) {
+      <div class="empty-state">
+        <mat-icon>local_offer</mat-icon>
+        <p>No tags yet</p>
+        <p class="hint">Create your first tag to organize your links</p>
+      </div>
+    } @else {
+      <table mat-table [dataSource]="tags" class="tag-table">
+        <ng-container matColumnDef="color">
+          <th mat-header-cell *matHeaderCellDef>Color</th>
+          <td mat-cell *matCellDef="let tag">
+            <div
+              class="color-indicator"
+              [style.background-color]="tag.color || '#e0e0e0'"
+              [attr.aria-label]="'Color: ' + (tag.color || 'default')"
+            ></div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="tag_name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let tag">
+            <span
+              class="tag-chip"
+              [style.background-color]="tag.color || '#e0e0e0'"
+              [style.color]="getTextColor(tag.color)"
+            >
+              {{ tag.tag_name }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let tag">
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="openEditDialog(tag)"
+              [attr.aria-label]="'Edit tag ' + tag.tag_name"
+              data-testid="edit-btn"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="deleteTag(tag)"
+              [attr.aria-label]="'Delete tag ' + tag.tag_name"
+              data-testid="delete-btn"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    }
+  </mat-card-content>
+</mat-card>

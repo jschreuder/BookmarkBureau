@@ -1,0 +1,36 @@
+.form-header {
+  margin-bottom: 24px;
+}
+
+.form-header h1 {
+  margin: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+button {
+  min-width: 100px;
+}
+
+mat-form-field {
+  display: block;
+}
+
+mat-error {
+  font-size: 12px;
+}

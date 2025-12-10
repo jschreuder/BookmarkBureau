@@ -1,0 +1,72 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+h1 {
+  margin: 0;
+}
+
+button mat-icon {
+  margin-right: 8px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  color: rgba(0, 0, 0, 0.26);
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.dashboards-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboards-table th {
+  font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.dashboards-table td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.no-icon {
+  color: rgba(0, 0, 0, 0.38);
+}
+
+.dashboards-table td mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
+
+button[mat-icon-button] {
+  margin: 0 4px;
+}
