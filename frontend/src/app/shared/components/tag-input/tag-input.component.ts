@@ -23,6 +23,7 @@ import {
 } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { Tag } from '../../../core/models';
@@ -128,6 +129,7 @@ import { TagService } from '../../../core/services/tag.service';
 })
 export class TagInputComponent implements ControlValueAccessor, OnInit {
   private tagService = inject(TagService);
+  private snackBar = inject(MatSnackBar);
 
   @Input() placeholder = 'Add tag...';
   @ViewChild('tagInput') tagInputElement!: ElementRef<HTMLInputElement>;
@@ -265,8 +267,8 @@ export class TagInputComponent implements ControlValueAccessor, OnInit {
       next: (createdTag) => {
         this.addTag(createdTag);
       },
-      error: (error) => {
-        console.error('Failed to create tag:', error);
+      error: () => {
+        this.snackBar.open('Failed to create tag', 'Close', { duration: 5000 });
       },
     });
   }
