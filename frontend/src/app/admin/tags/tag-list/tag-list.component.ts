@@ -15,6 +15,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Tag } from '../../../core/models';
 import { TagService } from '../../../core/services/tag.service';
 import { TagFormDialogComponent } from '../tag-form-dialog/tag-form-dialog.component';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { getTextColor } from '../../../shared/utils/color.util';
 
 @Component({
@@ -238,19 +239,27 @@ export class TagListComponent implements OnInit {
   }
 
   deleteTag(tag: Tag): void {
-    if (!confirm(`Are you sure you want to delete the tag "${tag.tag_name}"?`)) {
-      return;
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Tag',
+        message: `Are you sure you want to delete the tag "${tag.tag_name}"? This action cannot be undone.`,
+      },
+    });
 
-    this.tagService.deleteTag(tag.tag_name).subscribe({
-      next: () => {
-        this.snackBar.open('Tag deleted successfully', 'Close', { duration: 3000 });
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.snackBar.open('Failed to delete tag', 'Close', { duration: 5000 });
-        this.cdr.markForCheck();
-      },
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.tagService.deleteTag(tag.tag_name).subscribe({
+          next: () => {
+            this.snackBar.open('Tag deleted successfully', 'Close', { duration: 3000 });
+            this.cdr.markForCheck();
+          },
+          error: () => {
+            this.snackBar.open('Failed to delete tag', 'Close', { duration: 5000 });
+            this.cdr.markForCheck();
+          },
+        });
+      }
     });
   }
 }

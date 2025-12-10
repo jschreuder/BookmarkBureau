@@ -6,7 +6,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Subject } from 'rxjs';
 import { vi } from 'vitest';
 import { TagListComponent } from './tag-list.component';
 import { TagService } from '../../../core/services/tag.service';
@@ -31,8 +31,18 @@ describe('TagListComponent', () => {
       deleteTag: vi.fn(),
     };
 
+    const dialogRefMock = {
+      afterClosed: vi.fn().mockReturnValue(of(false)),
+    };
+
+    const afterAllClosedSubject = new Subject();
+
     const dialogMock = {
-      open: vi.fn(),
+      open: vi.fn().mockReturnValue(dialogRefMock),
+      openDialogs: [],
+      _getAfterAllClosed: vi.fn().mockReturnValue(afterAllClosedSubject),
+      afterAllClosed: afterAllClosedSubject.asObservable(),
+      _afterAllClosedAtThisLevel: afterAllClosedSubject,
     };
 
     const snackBarMock = {
@@ -87,28 +97,40 @@ describe('TagListComponent', () => {
   });
 
   it('should delete tag on confirmation', () => {
+    const dialogRefMock = {
+      afterClosed: vi.fn().mockReturnValue(of(true)),
+    };
+    vi.spyOn(component['dialog'], 'open').mockReturnValue(dialogRefMock as any);
     vi.spyOn(tagService, 'deleteTag').mockReturnValue(of(void 0));
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     component.deleteTag(mockTags[0]);
 
+    expect(component['dialog'].open).toHaveBeenCalled();
     expect(tagService.deleteTag).toHaveBeenCalledWith('work');
   });
 
   it('should not delete tag when user cancels', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    const dialogRefMock = {
+      afterClosed: vi.fn().mockReturnValue(of(false)),
+    };
+    vi.spyOn(component['dialog'], 'open').mockReturnValue(dialogRefMock as any);
 
     component.deleteTag(mockTags[0]);
 
+    expect(component['dialog'].open).toHaveBeenCalled();
     expect(tagService.deleteTag).not.toHaveBeenCalled();
   });
 
   it('should call deleteTag service when confirmed', () => {
+    const dialogRefMock = {
+      afterClosed: vi.fn().mockReturnValue(of(true)),
+    };
+    vi.spyOn(component['dialog'], 'open').mockReturnValue(dialogRefMock as any);
     tagService.deleteTag = vi.fn().mockReturnValue(of(void 0));
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     component.deleteTag(mockTags[0]);
 
+    expect(component['dialog'].open).toHaveBeenCalled();
     expect(tagService.deleteTag).toHaveBeenCalledWith('work');
   });
 });
