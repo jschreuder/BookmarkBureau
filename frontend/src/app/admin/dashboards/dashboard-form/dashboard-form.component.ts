@@ -1,4 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,6 +22,7 @@ import { IconPickerComponent } from '../../../shared/components/icon-picker/icon
 @Component({
   selector: 'app-dashboard-form',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -128,6 +135,7 @@ export class DashboardFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   form: FormGroup;
   loading = false;
@@ -150,6 +158,7 @@ export class DashboardFormComponent implements OnInit {
         this.dashboardId = id;
         this.loadDashboard(id);
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -163,10 +172,12 @@ export class DashboardFormComponent implements OnInit {
           icon: dashboard.icon || '',
         });
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (_error) => {
         this.snackBar.open('Failed to load dashboard', 'Close', { duration: 5000 });
         this.loading = false;
+        this.cdr.markForCheck();
         this.router.navigate(['/admin/dashboards']);
       },
     });
@@ -193,6 +204,7 @@ export class DashboardFormComponent implements OnInit {
         error: (_error) => {
           this.snackBar.open('Failed to update dashboard', 'Close', { duration: 5000 });
           this.loading = false;
+          this.cdr.markForCheck();
         },
       });
     } else {
@@ -204,6 +216,7 @@ export class DashboardFormComponent implements OnInit {
         error: (_error) => {
           this.snackBar.open('Failed to create dashboard', 'Close', { duration: 5000 });
           this.loading = false;
+          this.cdr.markForCheck();
         },
       });
     }

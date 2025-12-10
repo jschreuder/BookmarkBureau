@@ -7,6 +7,7 @@ import {
   signal,
   ViewChild,
   ElementRef,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -30,6 +31,7 @@ import { TagService } from '../../../core/services/tag.service';
 @Component({
   selector: 'app-tag-input',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     ReactiveFormsModule,

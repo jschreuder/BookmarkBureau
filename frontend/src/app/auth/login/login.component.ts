@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,6 +14,7 @@ import { AuthService, LoginRequest } from '../../core/services/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -32,6 +33,7 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   form: FormGroup;
   isLoading = false;
@@ -93,6 +95,7 @@ export class LoginComponent {
     this.auth.login(request).subscribe({
       next: () => {
         this.isLoading = false;
+        this.cdr.markForCheck();
         this.router.navigate(['/admin']);
       },
       error: (httpError) => {
@@ -103,6 +106,7 @@ export class LoginComponent {
           this.requiresTotpFirst = true;
           this.showTotpField = true;
           this.errorMessage = 'Please enter your TOTP code';
+          this.cdr.markForCheck();
           return;
         }
 
@@ -118,6 +122,7 @@ export class LoginComponent {
         // Reset TOTP field on error
         this.showTotpField = false;
         this.form.get('totp_code')?.reset();
+        this.cdr.markForCheck();
       },
     });
   }

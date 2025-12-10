@@ -1,4 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +19,7 @@ import { TagFormDialogComponent } from '../tag-form-dialog/tag-form-dialog.compo
 @Component({
   selector: 'app-tag-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     MatCardModule,
@@ -170,6 +177,7 @@ export class TagListComponent implements OnInit {
   private tagService = inject(TagService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   tags: Tag[] = [];
   displayedColumns = ['color', 'tag_name', 'actions'];
@@ -182,9 +190,11 @@ export class TagListComponent implements OnInit {
     this.tagService.loadTags().subscribe({
       next: (tags) => {
         this.tags = tags;
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.snackBar.open('Failed to load tags', 'Close', { duration: 5000 });
+        this.cdr.markForCheck();
       },
     });
 
@@ -192,6 +202,7 @@ export class TagListComponent implements OnInit {
     this.tagService.tags$.subscribe({
       next: (tags) => {
         this.tags = tags;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -230,9 +241,11 @@ export class TagListComponent implements OnInit {
     this.tagService.deleteTag(tag.tag_name).subscribe({
       next: () => {
         this.snackBar.open('Tag deleted successfully', 'Close', { duration: 3000 });
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.snackBar.open('Failed to delete tag', 'Close', { duration: 5000 });
+        this.cdr.markForCheck();
       },
     });
   }

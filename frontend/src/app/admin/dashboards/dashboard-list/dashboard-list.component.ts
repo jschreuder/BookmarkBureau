@@ -1,4 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -16,6 +22,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 @Component({
   selector: 'app-admin-dashboard-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -192,6 +199,7 @@ export class AdminDashboardListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   dashboards: Dashboard[] = [];
   loading = true;
@@ -207,10 +215,12 @@ export class AdminDashboardListComponent implements OnInit {
       next: (dashboards) => {
         this.dashboards = dashboards;
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (_error) => {
         this.snackBar.open('Failed to load dashboards', 'Close', { duration: 5000 });
         this.loading = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -249,6 +259,7 @@ export class AdminDashboardListComponent implements OnInit {
           },
           error: (_error) => {
             this.snackBar.open('Failed to delete dashboard', 'Close', { duration: 5000 });
+            this.cdr.markForCheck();
           },
         });
       }

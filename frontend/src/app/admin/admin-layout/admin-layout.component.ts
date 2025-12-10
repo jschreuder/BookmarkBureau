@@ -1,4 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -14,6 +20,7 @@ import { Dashboard } from '../../core/models';
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -31,6 +38,7 @@ export class AdminLayoutComponent implements OnInit {
   private apiService = inject(ApiService);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   dashboardsExpanded = true;
   topDashboards: Dashboard[] = [];
@@ -54,10 +62,12 @@ export class AdminLayoutComponent implements OnInit {
             return dateB - dateA;
           })
           .slice(0, 10);
+        this.cdr.markForCheck();
       },
       error: () => {
         // Handle error silently - dashboards will just be empty
         this.topDashboards = [];
+        this.cdr.markForCheck();
       },
     });
   }

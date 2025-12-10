@@ -1,4 +1,11 @@
-import { Component, OnInit, inject, HostListener } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  HostListener,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -16,6 +23,7 @@ import { LinkSearchDialogComponent, SearchResult } from './link-search-dialog.co
 @Component({
   selector: 'app-dashboard-view',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -432,6 +440,7 @@ export class DashboardViewComponent implements OnInit {
   private apiService = inject(ApiService);
   private route = inject(ActivatedRoute);
   private dialog = inject(MatDialog);
+  private cdr = inject(ChangeDetectorRef);
 
   dashboard$!: Observable<FullDashboard | null>;
   error$: Observable<string | null> = of(null);
@@ -456,6 +465,7 @@ export class DashboardViewComponent implements OnInit {
     // Store current dashboard for search
     this.dashboard$.subscribe((dashboard) => {
       this.currentDashboard = dashboard;
+      this.cdr.markForCheck();
     });
   }
 

@@ -1,4 +1,4 @@
-import { Injectable, inject, NgZone } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { AuthService } from './auth.service';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
@@ -18,7 +18,6 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
 })
 export class TokenRefreshService {
   private auth = inject(AuthService);
-  private ngZone = inject(NgZone);
 
   private destroy$ = new Subject<void>();
   private activity$ = new Subject<void>();
@@ -90,15 +89,13 @@ export class TokenRefreshService {
   }
 
   private setupActivityListeners(): void {
-    // Run outside Angular zone to avoid triggering change detection on every event
-    this.ngZone.runOutsideAngular(() => {
-      // User activity events
-      const events = ['mousedown', 'keydown', 'touchstart', 'click'];
-      events.forEach((event) => {
-        const handler = () => this.onActivity();
-        this.activityHandlers.set(event, handler);
-        document.addEventListener(event, handler);
-      });
+    // In zoneless mode, event listeners don't trigger change detection
+    // User activity events
+    const events = ['mousedown', 'keydown', 'touchstart', 'click'];
+    events.forEach((event) => {
+      const handler = () => this.onActivity();
+      this.activityHandlers.set(event, handler);
+      document.addEventListener(event, handler);
     });
   }
 
@@ -135,16 +132,15 @@ export class TokenRefreshService {
       return;
     }
 
-    // Run refresh in Angular zone so that any side effects are detected
-    this.ngZone.run(() => {
-      this.auth.refreshToken().subscribe({
-        next: () => {
-          // Token refresh succeeded, auth service handles state
-        },
-        error: (error) => {
-          // Auth service already logs out on refresh failure
-        },
-      });
+    // In zoneless mode, change detection is automatic with markForCheck()
+    // Auth service will handle any necessary change detection notifications
+    this.auth.refreshToken().subscribe({
+      next: () => {
+        // Token refresh succeeded, auth service handles state
+      },
+      error: (error) => {
+        // Auth service already logs out on refresh failure
+      },
     });
   }
 }

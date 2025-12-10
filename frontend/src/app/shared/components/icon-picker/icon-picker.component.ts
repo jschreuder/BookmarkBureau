@@ -1,4 +1,4 @@
-import { Component, forwardRef, OnInit } from '@angular/core';
+import { Component, forwardRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ControlValueAccessor,
@@ -20,6 +20,7 @@ const MATERIAL_ICONS = Object.keys(materialIcons).sort();
 @Component({
   selector: 'app-icon-picker',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -108,6 +109,8 @@ export class IconPickerComponent implements ControlValueAccessor, OnInit {
   writeValue(value: string): void {
     this.value = value || '';
     this.searchControl.setValue(value || '', { emitEvent: false });
+    // Emit manually to trigger change detection for template binding
+    this.searchControl.updateValueAndValidity({ emitEvent: true });
   }
 
   registerOnChange(fn: (value: string) => void): void {

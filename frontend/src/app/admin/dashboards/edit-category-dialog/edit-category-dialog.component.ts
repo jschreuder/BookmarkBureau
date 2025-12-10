@@ -1,4 +1,10 @@
-import { Component, Inject, inject } from '@angular/core';
+import {
+  Component,
+  Inject,
+  inject,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -17,6 +23,7 @@ export interface EditCategoryDialogData {
 @Component({
   selector: 'app-edit-category-dialog',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -104,6 +111,7 @@ export class EditCategoryDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<EditCategoryDialogComponent>);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   form: FormGroup;
   loading = false;
@@ -131,10 +139,12 @@ export class EditCategoryDialogComponent {
     this.apiService.updateCategory(this.data.category.category_id, categoryData).subscribe({
       next: () => {
         this.loading = false;
+        this.cdr.markForCheck();
         this.dialogRef.close(true);
       },
       error: (_error) => {
         this.loading = false;
+        this.cdr.markForCheck();
         this.snackBar.open('Failed to update category', 'Close', { duration: 5000 });
       },
     });

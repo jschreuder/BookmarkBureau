@@ -1,4 +1,10 @@
-import { Component, Inject, inject } from '@angular/core';
+import {
+  Component,
+  Inject,
+  inject,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -16,6 +22,7 @@ export interface AddCategoryDialogData {
 @Component({
   selector: 'app-add-category-dialog',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -103,6 +110,7 @@ export class AddCategoryDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<AddCategoryDialogComponent>);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   form: FormGroup;
   loading = false;
@@ -131,10 +139,12 @@ export class AddCategoryDialogComponent {
     this.apiService.createCategory(categoryData).subscribe({
       next: () => {
         this.loading = false;
+        this.cdr.markForCheck();
         this.dialogRef.close(true);
       },
       error: (_error) => {
         this.loading = false;
+        this.cdr.markForCheck();
         this.snackBar.open('Failed to create category', 'Close', { duration: 5000 });
       },
     });

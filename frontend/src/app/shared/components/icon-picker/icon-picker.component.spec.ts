@@ -52,7 +52,7 @@ describe('IconPickerComponent', () => {
     });
 
     it('should show icon prefix when value is set', () => {
-      component.value = 'home';
+      component.writeValue('home');
       fixture.detectChanges();
 
       const icon = fixture.nativeElement.querySelector('mat-icon[matPrefix]');

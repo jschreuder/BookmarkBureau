@@ -1,4 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule, ViewportScroller } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -22,6 +28,7 @@ import { EditCategoryDialogComponent } from '../edit-category-dialog/edit-catego
 @Component({
   selector: 'app-dashboard-overview',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -46,6 +53,7 @@ export class DashboardOverviewComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly viewportScroller = inject(ViewportScroller);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   dashboardId: string = '';
   fullDashboard: FullDashboard | null = null;
@@ -61,6 +69,7 @@ export class DashboardOverviewComponent implements OnInit {
       if (!this.dashboardId) {
         this.error = 'Dashboard ID not found';
         this.loading = false;
+        this.cdr.markForCheck();
         return;
       }
       this.loadDashboard();
@@ -79,6 +88,7 @@ export class DashboardOverviewComponent implements OnInit {
       next: (dashboard) => {
         this.fullDashboard = dashboard;
         this.loading = false;
+        this.cdr.markForCheck();
 
         // Restore scroll position after Angular updates the DOM
         if (preserveScroll && this.savedScrollPosition) {
@@ -94,6 +104,7 @@ export class DashboardOverviewComponent implements OnInit {
         this.snackBar.open('Failed to load dashboard', 'Close', { duration: 5000 });
         this.loading = false;
         this.savedScrollPosition = null;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -164,6 +175,7 @@ export class DashboardOverviewComponent implements OnInit {
           },
           error: (error) => {
             this.snackBar.open('Failed to delete category', 'Close', { duration: 5000 });
+            this.cdr.markForCheck();
           },
         });
       }
@@ -188,6 +200,7 @@ export class DashboardOverviewComponent implements OnInit {
           },
           error: (error) => {
             this.snackBar.open('Failed to remove favorite', 'Close', { duration: 5000 });
+            this.cdr.markForCheck();
           },
         });
       }
@@ -212,6 +225,7 @@ export class DashboardOverviewComponent implements OnInit {
           },
           error: (_error) => {
             this.snackBar.open('Failed to delete link', 'Close', { duration: 5000 });
+            this.cdr.markForCheck();
           },
         });
       }

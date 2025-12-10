@@ -1,4 +1,10 @@
-import { Component, Inject, inject } from '@angular/core';
+import {
+  Component,
+  Inject,
+  inject,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -20,6 +26,7 @@ export interface EditLinkDialogData {
 @Component({
   selector: 'app-edit-link-dialog',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -112,6 +119,7 @@ export class EditLinkDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<EditLinkDialogComponent>);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   form: FormGroup;
   loading = false;
@@ -172,10 +180,12 @@ export class EditLinkDialogComponent {
       .subscribe({
         next: () => {
           this.loading = false;
+          this.cdr.markForCheck();
           this.dialogRef.close(true);
         },
         error: (error: unknown) => {
           this.loading = false;
+          this.cdr.markForCheck();
           this.snackBar.open('Failed to update link', 'Close', { duration: 5000 });
         },
       });
