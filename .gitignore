@@ -13,6 +13,8 @@ coverage.xml
 # Frontend build artifacts
 /web/browser/
 /web/server/
+/web/fonts/
+/web/media/
 /web/*.js
 /web/*.json
 /web/*.css

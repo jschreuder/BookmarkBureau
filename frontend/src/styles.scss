@@ -1,33 +1,37 @@
 /* You can add global styles to this file, and also import other style files */
+
 @use '@angular/material' as mat;
 
 // Include Material core styles
 @include mat.core();
 
 // Define a Material 3 theme
-$theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$azure-palette,
-    tertiary: mat.$violet-palette,
-  ),
-  typography: (
-    brand-family: 'Roboto, "Helvetica Neue", sans-serif',
-    plain-family: 'Roboto, "Helvetica Neue", sans-serif',
-  ),
-  density: (
-    scale: 0,
+$theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$azure-palette,
+      tertiary: mat.$violet-palette,
+    ),
+    typography: (
+      brand-family: 'Roboto, "Helvetica Neue", sans-serif',
+      plain-family: 'Roboto, "Helvetica Neue", sans-serif',
+    ),
+    density: (
+      scale: 0,
+    ),
   )
-));
+);
 
 // Include all Material component themes
 @include mat.all-component-themes($theme);
 
 // Global styles
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 * {

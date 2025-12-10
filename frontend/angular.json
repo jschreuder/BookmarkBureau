@@ -40,9 +40,26 @@
               {
                 "glob": "api.php",
                 "input": "src"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@fontsource/roboto/files",
+                "output": "/fonts/roboto"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@fontsource/material-icons/files",
+                "output": "/fonts/material-icons"
               }
             ],
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "node_modules/@fontsource/roboto/300.css",
+              "node_modules/@fontsource/roboto/400.css",
+              "node_modules/@fontsource/roboto/500.css",
+              "node_modules/@fontsource/roboto/700.css",
+              "node_modules/@fontsource/material-icons/index.css",
+              "src/styles.scss"
+            ]
           },
           "configurations": {
             "production": {
