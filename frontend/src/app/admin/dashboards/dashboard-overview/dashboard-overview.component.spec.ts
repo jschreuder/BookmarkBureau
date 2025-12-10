@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { DashboardOverviewComponent } from './dashboard-overview.component';
@@ -359,6 +359,16 @@ describe('DashboardOverviewComponent', () => {
         { category_id: 'cat-id-3', sort_order: 2 },
         { category_id: 'cat-id-1', sort_order: 3 },
       ]);
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should handle missing dashboard ID', () => {
+      activatedRoute.paramMap = of({ get: () => null });
+      component.ngOnInit();
+
+      expect(component.error).toBe('Dashboard ID not found');
+      expect(component.loading).toBe(false);
     });
   });
 });
