@@ -4,6 +4,7 @@
 
 [![Build](https://github.com/jschreuder/BookmarkBureau/actions/workflows/ci.yml/badge.svg)](https://github.com/jschreuder/BookmarkBureau/actions)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%2010-brightgreen.svg?style=flat)](phpstan.neon)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-success)](https://github.com/jschreuder/BookmarkBureau/security/dependabot)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=jschreuder_BookmarkBureau&metric=security_rating)](https://sonarcloud.io/dashboard?id=jschreuder_BookmarkBureau)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=jschreuder_BookmarkBureau&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=jschreuder_BookmarkBureau)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=jschreuder_BookmarkBureau&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=jschreuder_BookmarkBureau)
