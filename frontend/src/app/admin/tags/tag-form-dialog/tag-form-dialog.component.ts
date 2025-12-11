@@ -92,7 +92,7 @@ export class TagFormDialogComponent {
     // Convert to lowercase and remove any characters that aren't a-z, 0-9, or hyphen
     const sanitized = value
       .toLowerCase()
-      .replace(/[^a-z0-9-]/g, '')
+      .replaceAll(/[^a-z0-9-]/g, '')
       .slice(0, 100); // Enforce max length
 
     return sanitized;
