@@ -80,12 +80,12 @@ jobs:
           fetch-depth: 0 # Needed for SonarCloud
 
       - name: Download backend coverage
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: backend-coverage
 
       - name: Download frontend coverage
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: frontend-coverage
           path: frontend/coverage
