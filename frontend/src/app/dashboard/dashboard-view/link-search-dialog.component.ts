@@ -43,7 +43,7 @@ export class LinkSearchDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<LinkSearchDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: LinkSearchDialogData,
-    private sanitizer: DomSanitizer,
+    private readonly sanitizer: DomSanitizer,
   ) {}
 
   ngOnInit(): void {
@@ -153,7 +153,7 @@ export class LinkSearchDialogComponent implements OnInit {
   }
 
   escapeRegex(str: string): string {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return str.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
   }
 
   selectLink(link: SearchResult): void {
