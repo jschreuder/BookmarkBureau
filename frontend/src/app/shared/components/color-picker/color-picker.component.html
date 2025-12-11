@@ -1,0 +1,45 @@
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>{{ label }}</mat-label>
+  <div class="color-input-wrapper">
+    <input
+      type="color"
+      [formControl]="colorControl"
+      class="color-picker"
+      [attr.aria-label]="label"
+      (change)="onColorChange($event)"
+    />
+    <input
+      matInput
+      [value]="colorControl.value || placeholder"
+      [placeholder]="placeholder"
+      readonly
+      [attr.aria-label]="'Current color code'"
+      class="color-display"
+    />
+  </div>
+  @if (allowClear && colorControl.value) {
+    <button
+      matSuffix
+      mat-icon-button
+      type="button"
+      (click)="clearColor()"
+      aria-label="Clear color"
+    >
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  }
+  <mat-hint>{{ hint }}</mat-hint>
+</mat-form-field>
+
+<fieldset class="color-presets">
+  <legend class="presets-label">Quick colors:</legend>
+  @for (color of presetColors; track color) {
+    <button
+      type="button"
+      class="color-preset"
+      [style.background-color]="color"
+      (click)="selectColor(color)"
+      [attr.aria-label]="'Select color ' + color"
+    ></button>
+  }
+</fieldset>

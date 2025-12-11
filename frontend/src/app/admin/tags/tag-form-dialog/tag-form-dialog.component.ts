@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Tag } from '../../../core/models';
 import { TagService } from '../../../core/services/tag.service';
+import { ColorPickerComponent } from '../../../shared/components/color-picker/color-picker.component';
 
 export interface TagFormDialogData {
   tag?: Tag; // If provided, we're editing; otherwise creating
@@ -25,6 +26,7 @@ export interface TagFormDialogData {
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
+    ColorPickerComponent,
   ],
   templateUrl: './tag-form-dialog.component.html',
   styleUrl: './tag-form-dialog.component.scss',
@@ -38,25 +40,6 @@ export class TagFormDialogComponent {
   form: FormGroup;
   loading = false;
   isEditMode: boolean;
-
-  presetColors = [
-    '#f44336',
-    '#e91e63',
-    '#9c27b0',
-    '#673ab7',
-    '#3f51b5',
-    '#2196f3',
-    '#03a9f4',
-    '#00bcd4',
-    '#009688',
-    '#4caf50',
-    '#8bc34a',
-    '#cddc39',
-    '#ffc107',
-    '#ff9800',
-    '#ff5722',
-    '#795548',
-  ];
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: TagFormDialogData) {
     this.isEditMode = !!data.tag;
@@ -96,15 +79,6 @@ export class TagFormDialogComponent {
       .slice(0, 100); // Enforce max length
 
     return sanitized;
-  }
-
-  onColorChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.form.patchValue({ color: input.value });
-  }
-
-  selectColor(color: string): void {
-    this.form.patchValue({ color });
   }
 
   onSubmit(): void {

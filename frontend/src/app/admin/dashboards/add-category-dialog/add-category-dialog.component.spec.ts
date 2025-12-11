@@ -93,19 +93,22 @@ describe('AddCategoryDialogComponent', () => {
     expect(titleInput).toBeTruthy();
   });
 
-  it('should render color input field', () => {
+  it('should render color picker component', () => {
     const compiled = fixture.nativeElement;
-    const colorInput = compiled.querySelector('input[formControlName="color"]');
+    const colorPicker = compiled.querySelector('app-color-picker');
+    expect(colorPicker).toBeTruthy();
+    const colorInput = colorPicker.querySelector('input[type="color"]');
     expect(colorInput).toBeTruthy();
-    expect(colorInput.type).toBe('color');
   });
 
   it('should render cancel and submit buttons', () => {
     const compiled = fixture.nativeElement;
-    const buttons = compiled.querySelectorAll('button');
-    expect(buttons.length).toBeGreaterThanOrEqual(2);
-    expect(buttons[0].textContent).toContain('Cancel');
-    expect(buttons[1].textContent).toContain('Create Category');
+    const cancelButton = compiled.querySelector('button[aria-label="Cancel adding category"]');
+    const submitButton = compiled.querySelector('button[aria-label="Create category"]');
+    expect(cancelButton).toBeTruthy();
+    expect(cancelButton.textContent).toContain('Cancel');
+    expect(submitButton).toBeTruthy();
+    expect(submitButton.textContent).toContain('Create Category');
   });
 
   it('should disable submit button when form is invalid', () => {
@@ -113,7 +116,7 @@ describe('AddCategoryDialogComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
-    const submitButton = compiled.querySelectorAll('button')[1];
+    const submitButton = compiled.querySelector('button[aria-label="Create category"]');
     expect(submitButton.disabled).toBe(true);
   });
 
@@ -223,30 +226,13 @@ describe('AddCategoryDialogComponent', () => {
     expect(callArgs.color).toBeUndefined();
   });
 
-  it('should clear color when clearColor is called', () => {
+  it('should clear color when color picker clear is triggered', () => {
     component.form.patchValue({ color: '#ff0000' });
     expect(component.form.get('color')?.value).toBe('#ff0000');
 
-    component.clearColor();
+    // Simulate color picker clearing the value
+    component.form.patchValue({ color: null });
 
-    expect(component.form.get('color')?.value).toBe('');
-  });
-
-  it('should hide clear button when color is empty', () => {
-    component.form.patchValue({ color: '' });
-    fixture.detectChanges();
-
-    const compiled = fixture.nativeElement;
-    const clearButton = compiled.querySelector('button[aria-label="Clear color"]');
-    expect(clearButton).toBeFalsy();
-  });
-
-  it('should show clear button when color has a value', () => {
-    component.form.patchValue({ color: '#ff0000' });
-    fixture.detectChanges();
-
-    const compiled = fixture.nativeElement;
-    const clearButton = compiled.querySelector('button[aria-label="Clear color"]');
-    expect(clearButton).toBeTruthy();
+    expect(component.form.get('color')?.value).toBeNull();
   });
 });

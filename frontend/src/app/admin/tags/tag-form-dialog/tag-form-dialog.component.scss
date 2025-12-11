@@ -14,53 +14,6 @@ mat-form-field {
   width: 100%;
 }
 
-.color-input-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.color-picker {
-  width: 60px;
-  height: 40px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.color-display {
-  flex: 1;
-}
-
-.color-presets {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.presets-label {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
-  margin-right: 4px;
-}
-
-.color-preset {
-  width: 32px;
-  height: 32px;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  transition:
-    transform 0.2s,
-    border-color 0.2s;
-}
-
-.color-preset:hover {
-  transform: scale(1.1);
-  border-color: #666;
-}
-
 mat-dialog-actions {
   padding: 8px 24px 16px !important;
   margin: 0;

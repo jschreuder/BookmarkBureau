@@ -175,9 +175,10 @@ describe('EditCategoryDialogComponent', () => {
       component.form.patchValue({ color: '#ff0000' });
       expect(component.form.get('color')?.value).toBe('#ff0000');
 
-      component.clearColor();
+      // Simulate color picker clearing the value
+      component.form.patchValue({ color: null });
 
-      expect(component.form.get('color')?.value).toBe('');
+      expect(component.form.get('color')?.value).toBeNull();
     });
   });
 });

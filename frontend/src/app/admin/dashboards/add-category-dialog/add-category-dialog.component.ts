@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../../core/services/api.service';
+import { ColorPickerComponent } from '../../../shared/components/color-picker/color-picker.component';
 
 export interface AddCategoryDialogData {
   dashboardId: string;
@@ -32,6 +33,7 @@ export interface AddCategoryDialogData {
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
+    ColorPickerComponent,
   ],
   templateUrl: './add-category-dialog.component.html',
   styleUrl: './add-category-dialog.component.scss',
@@ -83,9 +85,5 @@ export class AddCategoryDialogComponent {
 
   onCancel(): void {
     this.dialogRef.close(false);
-  }
-
-  clearColor(): void {
-    this.form.patchValue({ color: '' });
   }
 }

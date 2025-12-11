@@ -1,0 +1,64 @@
+.full-width {
+  width: 100%;
+}
+
+.color-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.color-picker {
+  width: 50px;
+  height: 40px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.color-display {
+  flex: 1;
+  font-family: monospace;
+  font-size: 14px;
+  cursor: default;
+}
+
+.color-presets {
+  border: none;
+  padding: 0;
+  margin: 16px 0 0 0;
+}
+
+.presets-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 8px;
+  display: block;
+  padding: 0;
+}
+
+.color-preset {
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  padding: 0;
+  transition: transform 0.2s, border-color 0.2s;
+  display: inline-block;
+
+  &:hover {
+    transform: scale(1.1);
+    border-color: rgba(0, 0, 0, 0.4);
+  }
+
+  &:focus {
+    outline: 2px solid #2196f3;
+    outline-offset: 2px;
+  }
+}

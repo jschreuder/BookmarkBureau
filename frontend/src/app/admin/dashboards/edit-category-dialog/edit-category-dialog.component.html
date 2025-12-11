@@ -18,27 +18,13 @@
       }
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Color (Optional)</mat-label>
-      <input
-        matInput
-        formControlName="color"
-        type="color"
-        placeholder="#667eea"
-        aria-label="Select color"
-      />
-      @if (form.get('color')?.value) {
-        <button
-          matSuffix
-          mat-icon-button
-          type="button"
-          (click)="clearColor()"
-          aria-label="Clear color"
-        >
-          <mat-icon aria-hidden="true">close</mat-icon>
-        </button>
-      }
-    </mat-form-field>
+    <app-color-picker
+      formControlName="color"
+      label="Color (Optional)"
+      placeholder="#667eea"
+      hint="Choose a color for this category"
+      [allowClear]="true"
+    ></app-color-picker>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">

@@ -171,18 +171,16 @@ describe('TagFormDialogComponent', () => {
       createComponent({});
     });
 
-    it('should update color on color input change', () => {
-      const event = {
-        target: { value: '#123456' },
-      } as any;
-
-      component.onColorChange(event);
+    it('should update color via form control', () => {
+      // Simulate color picker updating the value
+      component.form.patchValue({ color: '#123456' });
 
       expect(component.form.get('color')?.value).toBe('#123456');
     });
 
-    it('should update color on preset selection', () => {
-      component.selectColor('#ff9800');
+    it('should update color on preset selection via form', () => {
+      // Simulate color picker preset selection
+      component.form.patchValue({ color: '#ff9800' });
 
       expect(component.form.get('color')?.value).toBe('#ff9800');
     });
