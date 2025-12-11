@@ -23,16 +23,16 @@ export interface LoginRequest {
   providedIn: 'root',
 })
 export class AuthService {
-  private http = inject(HttpClient);
-  private storage = inject(StorageService);
+  private readonly http = inject(HttpClient);
+  private readonly storage = inject(StorageService);
   private readonly API_BASE = environment.apiBaseUrl;
   private readonly TOKEN_KEY = 'auth_token';
   private readonly EXPIRES_AT_KEY = 'token_expires_at';
 
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
+  private readonly isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  private currentTokenSubject = new BehaviorSubject<string | null>(this.getStoredToken());
+  private readonly currentTokenSubject = new BehaviorSubject<string | null>(this.getStoredToken());
   public currentToken$ = this.currentTokenSubject.asObservable();
 
   constructor() {

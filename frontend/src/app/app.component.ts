@@ -6,13 +6,12 @@ import { TokenRefreshService } from './core/services/token-refresh.service';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.scss',
+  templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
   protected readonly title = signal('frontend');
-  private auth = inject(AuthService);
-  private tokenRefresh = inject(TokenRefreshService);
+  private readonly auth = inject(AuthService);
+  private readonly tokenRefresh = inject(TokenRefreshService);
 
   ngOnInit(): void {
     // Initialize activity-based token refresh if user is already authenticated

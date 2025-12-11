@@ -35,10 +35,10 @@ import { getTextColor } from '../../../shared/utils/color.util';
   styleUrl: './tag-list.component.scss',
 })
 export class TagListComponent implements OnInit {
-  private tagService = inject(TagService);
-  private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
-  private cdr = inject(ChangeDetectorRef);
+  private readonly tagService = inject(TagService);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   tags: Tag[] = [];
   displayedColumns = ['color', 'tag_name', 'actions'];
