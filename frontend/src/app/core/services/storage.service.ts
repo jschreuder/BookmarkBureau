@@ -8,7 +8,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class StorageService {
-  private memoryStorage = new Map<string, string>();
+  private readonly memoryStorage = new Map<string, string>();
 
   /**
    * Get an item from storage

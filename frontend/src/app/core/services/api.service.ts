@@ -9,10 +9,10 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class ApiService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
   private readonly API_BASE = environment.apiBaseUrl;
 
-  private httpOptions = {
+  private readonly httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
     }),

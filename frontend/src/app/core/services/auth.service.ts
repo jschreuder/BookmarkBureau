@@ -120,7 +120,7 @@ export class AuthService {
     if (!expiresAt) {
       return null;
     }
-    return parseInt(expiresAt, 10);
+    return Number.parseInt(expiresAt, 10);
   }
 
   /**

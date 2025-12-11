@@ -9,11 +9,11 @@ import { InvalidTokenDialogComponent } from '../../shared/components/invalid-tok
   providedIn: 'root',
 })
 export class InvalidTokenDialogService {
-  private dialog = inject(MatDialog);
-  private auth = inject(AuthService);
-  private router = inject(Router);
+  private readonly dialog = inject(MatDialog);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
-  private isShowingDialog = new BehaviorSubject<boolean>(false);
+  private readonly isShowingDialog = new BehaviorSubject<boolean>(false);
 
   /**
    * Show the invalid token dialog and handle cleanup
