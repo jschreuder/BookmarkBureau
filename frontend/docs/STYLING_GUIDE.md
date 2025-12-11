@@ -106,6 +106,21 @@ $theme: mat.define-theme((
 - Buttons: Material ripple effect (built-in)
 - Links: Underline on hover (default)
 
+## Color Contrast
+
+**WCAG 2.1 Level AA Compliance:**
+All text must meet minimum contrast ratios:
+- Normal text (< 18pt): 4.5:1 minimum
+- Large text (≥ 18pt or 14pt bold): 3:1 minimum
+- Interactive components: 3:1 minimum
+
+**Best Practices:**
+- Use lighter background colors with darker foreground text
+- Example: `rgba(200, 210, 250, 0.2)` background with `#667eea` text provides good contrast
+- Avoid darkening backgrounds when highlighting active states - lighten instead
+- Test contrast ratios using browser DevTools or online contrast checkers
+- For active button states, lighten the background color rather than using the primary color at low opacity
+
 ## Gradients
 
 The app uses a consistent purple-to-blue gradient for branded elements:
