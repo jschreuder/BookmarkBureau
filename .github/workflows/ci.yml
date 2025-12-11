@@ -88,7 +88,7 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: frontend-coverage
-          path: frontend/coverage
+          path: frontend/coverage/frontend
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@master
