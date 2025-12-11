@@ -75,7 +75,7 @@
 }
 
 .favorite-chip {
-  background-color: rgba(255, 255, 255, 0.2) !important;
+  background-color: rgba(40, 34, 74, 0.2) !important;
   color: white !important;
   border: none !important;
   transition:
@@ -90,7 +90,7 @@
 
 .favorite-chip-link:hover .favorite-chip {
   transform: scale(1.05);
-  background-color: rgba(255, 255, 255, 0.3) !important;
+  background-color: rgba(40, 34, 74, 0.4) !important;
 }
 
 .favorite-chip ::ng-deep .mat-mdc-chip-action-label {
