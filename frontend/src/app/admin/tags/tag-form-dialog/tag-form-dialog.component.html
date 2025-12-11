@@ -13,9 +13,7 @@
         [readonly]="isEditMode"
         [attr.aria-invalid]="form.get('tag_name')?.invalid && form.get('tag_name')?.touched"
         [attr.aria-describedby]="
-          form.get('tag_name')?.invalid && form.get('tag_name')?.touched
-            ? 'tag-name-error'
-            : null
+          form.get('tag_name')?.invalid && form.get('tag_name')?.touched ? 'tag-name-error' : null
         "
       />
       @if (form.get('tag_name')?.hasError('required') && form.get('tag_name')?.touched) {
@@ -48,8 +46,8 @@
       <mat-hint id="color-hint">Choose a color for this tag</mat-hint>
     </mat-form-field>
 
-    <div class="color-presets" role="group" aria-label="Quick color selection">
-      <span class="presets-label">Quick colors:</span>
+    <fieldset class="color-presets">
+      <legend class="presets-label">Quick colors:</legend>
       @for (color of presetColors; track color) {
         <button
           type="button"
@@ -59,7 +57,7 @@
           [attr.aria-label]="'Select color ' + color"
         ></button>
       }
-    </div>
+    </fieldset>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
