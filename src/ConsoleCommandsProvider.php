@@ -21,33 +21,37 @@ final readonly class ConsoleCommandsProvider
 
     public function registerCommands(Application $application): void
     {
-        $application->add(
+        $application->addCommand(
             new CreateCommand($this->container->getUserService()),
         );
-        $application->add(new ListCommand($this->container->getUserService()));
-        $application->add(
+        $application->addCommand(
+            new ListCommand($this->container->getUserService()),
+        );
+        $application->addCommand(
             new DeleteCommand($this->container->getUserService()),
         );
-        $application->add(
+        $application->addCommand(
             new ChangePasswordCommand($this->container->getUserService()),
         );
-        $application->add(new TotpCommand($this->container->getUserService()));
-        $application->add(
+        $application->addCommand(
+            new TotpCommand($this->container->getUserService()),
+        );
+        $application->addCommand(
             new GenerateCliTokenCommand(
                 $this->container->getUserService(),
                 $this->container->getJwtService(),
                 new GenerateCliTokenInputSpec(),
             ),
         );
-        $application->add(
+        $application->addCommand(
             new RevokeCliTokenCommand($this->container->getJwtJtiRepository()),
         );
-        $application->add(
+        $application->addCommand(
             new CreateRateLimitDatabaseCommand(
                 $this->container->getRateLimitDb(),
             ),
         );
-        $application->add(
+        $application->addCommand(
             new RateLimitCleanupCommand(
                 $this->container->getRateLimitService(),
             ),
