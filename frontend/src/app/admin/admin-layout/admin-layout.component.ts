@@ -35,10 +35,10 @@ import { Dashboard } from '../../core/models';
   styleUrls: ['./admin-layout.component.scss'],
 })
 export class AdminLayoutComponent implements OnInit {
-  private apiService = inject(ApiService);
-  private auth = inject(AuthService);
-  private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
+  private readonly apiService = inject(ApiService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   dashboardsExpanded = true;
   topDashboards: Dashboard[] = [];
