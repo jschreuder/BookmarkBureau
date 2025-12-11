@@ -53,8 +53,8 @@ import { TagService } from '../../../core/services/tag.service';
   styleUrl: './tag-input.component.scss',
 })
 export class TagInputComponent implements ControlValueAccessor, OnInit {
-  private tagService = inject(TagService);
-  private snackBar = inject(MatSnackBar);
+  private readonly tagService = inject(TagService);
+  private readonly snackBar = inject(MatSnackBar);
 
   @Input() placeholder = 'Add tag...';
   @ViewChild('tagInput') tagInputElement!: ElementRef<HTMLInputElement>;
@@ -110,7 +110,7 @@ export class TagInputComponent implements ControlValueAccessor, OnInit {
     // Convert to lowercase and remove any characters that aren't a-z, 0-9, or hyphen
     const sanitized = value
       .toLowerCase()
-      .replace(/[^a-z0-9-]/g, '')
+      .replaceAll(/[^a-z0-9-]/g, '')
       .slice(0, 100); // Enforce max length
 
     return sanitized;
