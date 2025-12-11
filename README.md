@@ -24,6 +24,31 @@ BookmarkBureau is a real-world application demonstrating how to build production
 
 This demonstrates patterns, practices, and architecture that actually work.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="33%" align="center">
+      <a href="assets/dashboard-screenshot.png">
+        <img src="assets/dashboard-screenshot.png" alt="Dashboard View" width="100%" />
+      </a>
+      <br /><em>Dashboard View</em>
+    </td>
+    <td width="33%" align="center">
+      <a href="assets/search-screenshot.png">
+        <img src="assets/search-screenshot.png" alt="Search Functionality" width="100%" />
+      </a>
+      <br /><em>Search Functionality</em>
+    </td>
+    <td width="33%" align="center">
+      <a href="assets/admin-screenshot.png">
+        <img src="assets/admin-screenshot.png" alt="Admin Panel" width="100%" />
+      </a>
+      <br /><em>Admin Panel</em>
+    </td>
+  </tr>
+</table>
+
 ## Why Middle Framework?
 
 ### Coming from mainstream PHP frameworks?
