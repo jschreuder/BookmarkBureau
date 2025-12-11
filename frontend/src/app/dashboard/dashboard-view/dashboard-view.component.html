@@ -1,14 +1,13 @@
 <main role="main">
-  <div
+  <output
     class="container loading"
-    role="status"
     aria-live="polite"
     aria-label="Loading dashboard"
     *ngIf="(dashboard$ | async) === null"
   >
     <mat-spinner></mat-spinner>
     <p>Loading dashboard...</p>
-  </div>
+  </output>
 
   <div *ngIf="dashboard$ | async as data">
     <!-- Compact Top Bar -->
@@ -33,10 +32,9 @@
         </div>
 
         <!-- Favorites in Toolbar -->
-        <div
+        <section
           class="toolbar-favorites"
           *ngIf="data.favorites && data.favorites.length > 0"
-          role="region"
           aria-label="Favorite links"
         >
           <a
@@ -51,7 +49,7 @@
               {{ link.title }}
             </mat-chip>
           </a>
-        </div>
+        </section>
       </div>
     </header>
 
@@ -68,7 +66,7 @@
         aria-labelledby="categories-heading"
         *ngIf="data.categories && data.categories.length > 0"
       >
-        <h2 id="categories-heading" style="display: none;">Categories</h2>
+        <h2 id="categories-heading" style="display: none">Categories</h2>
         <div class="categories-grid">
           <mat-card
             class="category-card"
@@ -107,10 +105,7 @@
                     <p class="link-description" *ngIf="link.description">
                       {{ link.description }}
                       <span class="link-tags" *ngIf="link.tags && link.tags.length > 0">
-                        <span
-                          class="tag"
-                          *ngFor="let tag of link.tags"
-                          [style.color]="tag.color"
+                        <span class="tag" *ngFor="let tag of link.tags" [style.color]="tag.color"
                           >#{{ tag.tag_name }}</span
                         >
                       </span>
@@ -124,9 +119,8 @@
       </section>
 
       <!-- Empty State -->
-      <div
+      <output
         class="empty-state"
-        role="status"
         aria-live="polite"
         *ngIf="
           (!data.favorites || data.favorites.length === 0) &&
@@ -145,7 +139,7 @@
           <mat-icon aria-hidden="true">settings</mat-icon>
           Go to Admin
         </button>
-      </div>
+      </output>
     </div>
   </div>
 
