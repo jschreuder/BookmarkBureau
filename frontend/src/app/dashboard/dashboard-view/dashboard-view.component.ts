@@ -119,11 +119,13 @@ export class DashboardViewComponent implements OnInit {
           if (existingIndex >= 0) {
             // Already exists, just add category info
             allLinks[existingIndex].category = category.title;
+            allLinks[existingIndex].categoryColor = category.color;
           } else {
             // New link
             allLinks.push({
               ...link,
               category: category.title,
+              categoryColor: category.color,
               isFavorite: false,
             });
           }

@@ -33,18 +33,32 @@
         <mat-icon matListItemIcon *ngIf="!link.icon">link</mat-icon>
         <div matListItemTitle class="result-title">
           <span [innerHTML]="highlightText(link.title)"></span>
-          <span class="favorite-badge" *ngIf="link.isFavorite">★</span>
         </div>
         <div matListItemLine class="result-meta">
-          <span class="category-label" *ngIf="link.category">{{ link.category }}</span>
-          <span class="result-description" *ngIf="link.description">
-            {{ link.description | slice: 0 : 80
-            }}{{ link.description.length > 80 ? '...' : '' }}
-          </span>
-          <span class="result-tags" *ngIf="link.tags && link.tags.length > 0">
+          <span class="result-badges">
+            <span
+              class="badge"
+              *ngIf="link.isFavorite"
+              [style.background-color]="'rgb(87, 107, 203)'"
+              [style.color]="getTextColor('rgb(87, 107, 203)')"
+            >
+              <mat-icon class="badge-icon">star</mat-icon>
+              FAVORITE
+            </span>
+            <span
+              class="badge"
+              *ngIf="link.category"
+              [style.background-color]="link.categoryColor || 'rgb(87, 107, 203)'"
+              [style.color]="getTextColor(link.categoryColor || 'rgb(87, 107, 203)')"
+            >
+              {{ link.category.toUpperCase() }}
+            </span>
             <span class="tag" *ngFor="let tag of link.tags" [style.color]="tag.color">
               #{{ tag.tag_name }}
             </span>
+          </span>
+          <span class="result-description" *ngIf="link.description">
+            {{ link.description | slice: 0 : 80 }}{{ link.description.length > 80 ? '...' : '' }}
           </span>
         </div>
       </mat-list-item>

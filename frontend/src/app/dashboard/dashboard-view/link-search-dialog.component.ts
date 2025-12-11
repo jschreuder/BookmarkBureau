@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Link } from '../../core/models';
+import { getTextColor } from '../../shared/utils/color.util';
 
 export interface LinkSearchDialogData {
   links: Link[];
@@ -15,6 +16,7 @@ export interface LinkSearchDialogData {
 
 export interface SearchResult extends Link {
   category?: string;
+  categoryColor?: string;
   isFavorite?: boolean;
 }
 
@@ -160,6 +162,10 @@ export class LinkSearchDialogComponent implements OnInit {
 
   close(): void {
     this.dialogRef.close();
+  }
+
+  getTextColor(backgroundColor: string): string {
+    return getTextColor(backgroundColor);
   }
 
   private scrollToSelected(): void {

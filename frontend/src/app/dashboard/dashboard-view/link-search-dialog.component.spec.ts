@@ -300,7 +300,7 @@ describe('LinkSearchDialogComponent', () => {
       expect(component.filteredLinks.length).toBeGreaterThan(0);
 
       fixture.detectChanges();
-      const tags = fixture.nativeElement.querySelectorAll('.result-tags .tag');
+      const tags = fixture.nativeElement.querySelectorAll('.result-badges .tag');
       expect(tags.length).toBeGreaterThan(0);
     });
 
@@ -314,9 +314,9 @@ describe('LinkSearchDialogComponent', () => {
       component.onSearchChange();
       fixture.detectChanges();
 
-      const badge = fixture.nativeElement.querySelector('.favorite-badge');
+      const badge = fixture.nativeElement.querySelector('.badge');
       expect(badge).toBeTruthy();
-      expect(badge.textContent).toContain('★');
+      expect(badge.textContent).toContain('FAVORITE');
     });
 
     it('should display category label when present', () => {
@@ -329,9 +329,9 @@ describe('LinkSearchDialogComponent', () => {
       component.onSearchChange();
       fixture.detectChanges();
 
-      const categoryLabel = fixture.nativeElement.querySelector('.category-label');
-      expect(categoryLabel).toBeTruthy();
-      expect(categoryLabel.textContent).toContain('Development');
+      const categoryBadge = fixture.nativeElement.querySelector('.badge');
+      expect(categoryBadge).toBeTruthy();
+      expect(categoryBadge.textContent).toContain('DEVELOPMENT');
     });
 
     it('should truncate long descriptions', () => {
