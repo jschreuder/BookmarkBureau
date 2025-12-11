@@ -43,12 +43,12 @@ import { getTextColor } from '../../shared/utils/color.util';
   styleUrl: './dashboard-view.component.scss',
 })
 export class DashboardViewComponent implements OnInit {
-  private apiService = inject(ApiService);
-  private route = inject(ActivatedRoute);
-  private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
-  private cdr = inject(ChangeDetectorRef);
-  private titleService = inject(Title);
+  private readonly apiService = inject(ApiService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly titleService = inject(Title);
 
   dashboard$!: Observable<FullDashboard | null>;
   error$: Observable<string | null> = of(null);
