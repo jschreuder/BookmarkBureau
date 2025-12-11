@@ -63,7 +63,8 @@ export class StorageService {
       localStorage.setItem(testKey, 'test');
       localStorage.removeItem(testKey);
       return true;
-    } catch (e) {
+    } catch {
+      // localStorage is unavailable (disabled, private browsing, etc.)
       return false;
     }
   }
