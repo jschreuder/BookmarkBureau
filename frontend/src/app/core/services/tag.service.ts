@@ -8,8 +8,8 @@ import { ApiService } from './api.service';
   providedIn: 'root',
 })
 export class TagService {
-  private apiService = inject(ApiService);
-  private tagsSubject = new BehaviorSubject<Tag[]>([]);
+  private readonly apiService = inject(ApiService);
+  private readonly tagsSubject = new BehaviorSubject<Tag[]>([]);
   private loaded = false;
 
   tags$ = this.tagsSubject.asObservable();

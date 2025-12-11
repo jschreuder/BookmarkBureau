@@ -17,14 +17,14 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class TokenRefreshService {
-  private auth = inject(AuthService);
+  private readonly auth = inject(AuthService);
 
-  private destroy$ = new Subject<void>();
-  private activity$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
+  private readonly activity$ = new Subject<void>();
   private isMonitoring = false;
-  private activityDebounceMs = 5000; // Debounce activity for 5 seconds
+  private readonly activityDebounceMs = 5000; // Debounce activity for 5 seconds
   private refreshThresholdMs = 10 * 60 * 1000; // Refresh when less than 10 minutes remain
-  private activityHandlers: Map<string, () => void> = new Map();
+  private readonly activityHandlers: Map<string, () => void> = new Map();
 
   /**
    * Initialize activity monitoring and watch for logout

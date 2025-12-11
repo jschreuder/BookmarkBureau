@@ -24,7 +24,7 @@ import { Observable } from 'rxjs';
   styleUrl: './dashboard-list.component.scss',
 })
 export class DashboardListComponent implements OnInit {
-  private apiService = inject(ApiService);
+  private readonly apiService = inject(ApiService);
 
   dashboards$!: Observable<Dashboard[]>;
 
