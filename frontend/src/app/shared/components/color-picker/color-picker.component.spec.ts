@@ -56,9 +56,21 @@ describe('ColorPickerComponent', () => {
       expect(presetButtons.length).toBe(16);
     });
 
-    it('should accept label input', () => {
-      component.label = 'Test Label';
-      expect(component.label).toBe('Test Label');
+    it('should use custom label when provided', () => {
+      component.label = 'Custom Label';
+      expect(component.effectiveLabel).toBe('Custom Label');
+    });
+
+    it('should show "Color (Optional)" when allowClear is true and no custom label', () => {
+      component.label = '';
+      component.allowClear = true;
+      expect(component.effectiveLabel).toBe('Color (Optional)');
+    });
+
+    it('should show "Color *" when allowClear is false and no custom label', () => {
+      component.label = '';
+      component.allowClear = false;
+      expect(component.effectiveLabel).toBe('Color *');
     });
 
     it('should accept hint input', () => {

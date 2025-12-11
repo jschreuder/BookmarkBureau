@@ -1,5 +1,5 @@
 <mat-form-field appearance="outline" class="full-width">
-  <mat-label>{{ label }}</mat-label>
+  <mat-label>{{ effectiveLabel }}</mat-label>
   <div class="color-input-wrapper">
     <input
       type="color"
@@ -18,13 +18,7 @@
     />
   </div>
   @if (allowClear && colorControl.value) {
-    <button
-      matSuffix
-      mat-icon-button
-      type="button"
-      (click)="clearColor()"
-      aria-label="Clear color"
-    >
+    <button matSuffix mat-icon-button type="button" (click)="clearColor()" aria-label="Clear color">
       <mat-icon aria-hidden="true">close</mat-icon>
     </button>
   }

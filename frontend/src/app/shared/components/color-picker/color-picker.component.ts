@@ -34,10 +34,17 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './color-picker.component.scss',
 })
 export class ColorPickerComponent implements ControlValueAccessor {
-  @Input() label = 'Color (Optional)';
+  @Input() label = '';
   @Input() placeholder = '#e0e0e0';
   @Input() hint = 'Choose a color';
   @Input() allowClear = false;
+
+  get effectiveLabel(): string {
+    if (this.label) {
+      return this.label;
+    }
+    return this.allowClear ? 'Color (Optional)' : 'Color *';
+  }
 
   colorControl = new FormControl('');
 
