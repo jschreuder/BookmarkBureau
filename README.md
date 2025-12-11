@@ -10,7 +10,7 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=jschreuder_BookmarkBureau&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=jschreuder_BookmarkBureau)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jschreuder_BookmarkBureau&metric=coverage)](https://sonarcloud.io/dashboard?id=jschreuder_BookmarkBureau)
 
-> ⚠️ **Development Status**: Very much in development.
+> ⚠️ **Development Status**: Getting very close to a 1.0 release.
 
 ## What is This?
 
