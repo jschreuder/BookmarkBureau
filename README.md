@@ -10,11 +10,11 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=jschreuder_BookmarkBureau&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=jschreuder_BookmarkBureau)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jschreuder_BookmarkBureau&metric=coverage)](https://sonarcloud.io/dashboard?id=jschreuder_BookmarkBureau)
 
-> ⚠️ **Development Status**: Getting very close to a 1.0 release.
+> ⚠️ **Development Status**: Beta - undergoing QA and API stabilization before 1.0 release.
 
 ## What is This?
 
-BookmarkBureau is a real-world application demonstrating how to build production-quality APIs without magic:
+BookmarkBureau is a real-world application demonstrating how to build production-quality APIs without magic - and it's also a fully functional bookmark manager ready for personal/homelab use:
 
 - ✅ **Type-safe throughout** - Compile-time dependency injection with [Middle-DI](https://github.com/jschreuder/Middle-DI)
 - ✅ **Clean architecture** - Action pattern, DDD principles, Repository pattern
@@ -268,10 +268,10 @@ Access the application at `http://localhost:8080`
    - Store securely (environment variable or secrets manager)
 
 3. **Known Limitations**
-   - No multi-user authorization (all authenticated users can modify all data)
+   - Multi-user authentication supported, but no authorization checks (all authenticated users can access/modify all data)
    - Rate limiting only on login endpoints (no API endpoint throttling)
    - SQLite is used (suitable for personal use, not high-traffic scenarios)
-   - Session tokens valid until expiry (30 min default, no server-side revocation except JTI blacklist)
+   - Session/remember-me tokens valid until expiry (no server-side revocation; CLI tokens use JTI whitelist and can be revoked)
 
 4. **IP Whitelisting (Recommended for Internet Exposure)**
    - Restrict admin access to your local network or specific IPs
@@ -286,7 +286,7 @@ Access the application at `http://localhost:8080`
    - Monitor logs regularly (`/var/www/var/logs/`)
    - Keep Docker images updated
 
-**For personal/demonstration use only. Not recommended for multi-user production environments.**
+**Suitable for personal homelab deployments and self-hosted use. Not designed for enterprise production environments.**
 
 ### Local Development
 
