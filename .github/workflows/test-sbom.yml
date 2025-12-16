@@ -38,9 +38,13 @@ jobs:
         run: npx @cyclonedx/cyclonedx-npm --output-format JSON --output-file ../sbom-frontend.json
         working-directory: ./frontend
 
-      - name: Merge SBOMs
+      - name: Install CycloneDX CLI
         run: |
-          npx @cyclonedx/cdxgen-cli merge --input-files sbom-backend.json,sbom-frontend.json --output-file sbom.json
+          wget -q https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -O cyclonedx
+          chmod +x cyclonedx
+
+      - name: Merge SBOMs
+        run: ./cyclonedx merge --input-files sbom-backend.json,sbom-frontend.json --output-file sbom.json
 
       - name: Display SBOM info
         run: |
