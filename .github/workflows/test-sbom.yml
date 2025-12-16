@@ -1,0 +1,62 @@
+name: Test SBOM Generation
+
+# Manual trigger only - for testing SBOM generation
+on:
+  workflow_dispatch:
+
+jobs:
+  sbom-generation-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+
+      - name: Install PHP dependencies
+        run: composer install --prefer-dist --no-progress --no-dev
+
+      - name: Install Frontend dependencies
+        run: npm ci
+        working-directory: ./frontend
+
+      - name: Generate PHP SBOM
+        run: |
+          composer global require cyclonedx/cyclonedx-php-composer
+          composer global exec cyclonedx-php-composer make-bom --output-format=json --output-file=sbom-backend.json
+
+      - name: Generate Frontend SBOM
+        run: npx @cyclonedx/cyclonedx-npm --output-format JSON --output-file ../sbom-frontend.json
+        working-directory: ./frontend
+
+      - name: Merge SBOMs
+        run: |
+          npx @cyclonedx/cdxgen-cli merge --input-files sbom-backend.json,sbom-frontend.json --output-file sbom.json
+
+      - name: Display SBOM info
+        run: |
+          echo "=== SBOM Generated Successfully ==="
+          echo "Backend components:"
+          jq '.components | length' sbom-backend.json
+          echo "Frontend components:"
+          jq '.components | length' sbom-frontend.json
+          echo "Merged SBOM components:"
+          jq '.components | length' sbom.json
+          echo ""
+          echo "First 5 components in merged SBOM:"
+          jq '.components[0:5] | .[] | {name: .name, version: .version, type: .type}' sbom.json
+
+      - name: Upload SBOM for inspection
+        uses: actions/upload-artifact@v5
+        with:
+          name: test-sbom
+          path: sbom.json
+          retention-days: 7
