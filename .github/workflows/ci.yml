@@ -95,6 +95,54 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  sbom-generation:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [backend-tests, frontend-tests]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+
+      - name: Install PHP dependencies
+        run: composer install --prefer-dist --no-progress --no-dev
+
+      - name: Install Frontend dependencies
+        run: npm ci
+        working-directory: ./frontend
+
+      - name: Generate PHP SBOM
+        run: |
+          composer global config --no-plugins allow-plugins.cyclonedx/cyclonedx-php-composer true
+          composer global require cyclonedx/cyclonedx-php-composer
+          composer CycloneDX:make-sbom --output-format=JSON --output-file=sbom-backend.json
+
+      - name: Generate Frontend SBOM
+        run: npx @cyclonedx/cyclonedx-npm --output-format JSON --output-file ../sbom-frontend.json
+        working-directory: ./frontend
+
+      - name: Install CycloneDX CLI
+        run: |
+          wget -q https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -O cyclonedx
+          chmod +x cyclonedx
+
+      - name: Merge SBOMs
+        run: ./cyclonedx merge --input-files sbom-backend.json sbom-frontend.json --output-file sbom.json
+
+      - name: Attach SBOM to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: sbom.json
+
   # Combined status check for branch protection
   # This job succeeds only if all required jobs pass
   ci-status:
