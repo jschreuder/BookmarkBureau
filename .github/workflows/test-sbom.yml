@@ -44,7 +44,7 @@ jobs:
           chmod +x cyclonedx
 
       - name: Merge SBOMs
-        run: ./cyclonedx merge --input-files sbom-backend.json,sbom-frontend.json --output-file sbom.json
+        run: ./cyclonedx merge --input-files sbom-backend.json sbom-frontend.json --output-file sbom.json
 
       - name: Display SBOM info
         run: |
