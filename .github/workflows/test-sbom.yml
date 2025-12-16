@@ -32,7 +32,7 @@ jobs:
         run: |
           composer global config --no-plugins allow-plugins.cyclonedx/cyclonedx-php-composer true
           composer global require cyclonedx/cyclonedx-php-composer
-          composer global exec cyclonedx-php-composer make-bom --output-format=json --output-file=sbom-backend.json
+          composer CycloneDX:make-sbom --output-format=JSON --output-file=sbom-backend.json
 
       - name: Generate Frontend SBOM
         run: npx @cyclonedx/cyclonedx-npm --output-format JSON --output-file ../sbom-frontend.json
