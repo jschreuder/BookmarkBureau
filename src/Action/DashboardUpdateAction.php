@@ -39,7 +39,7 @@ final readonly class DashboardUpdateAction implements ActionInterface
         $this->inputSpec->validate($data);
     }
 
-    /** @param array{dashboard_id: string, title: string, description: string, icon: ?string} $data */
+    /** @param array{dashboard_id: string, title: string, description: ?string, icon: ?string} $data */
     #[\Override]
     public function execute(array $data): array
     {

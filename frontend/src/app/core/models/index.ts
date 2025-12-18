@@ -2,7 +2,7 @@
 export interface Dashboard {
   dashboard_id: string;
   title: string;
-  description: string;
+  description?: string;
   icon?: string;
   created_at: string;
   updated_at: string;

@@ -10,8 +10,8 @@ use jschreuder\BookmarkBureau\Entity\Value\Title;
 use jschreuder\BookmarkBureau\Util\SqlFormat;
 
 /**
- * @phpstan-type DashboardEntityData array{dashboard_id: string, title: string, description: string, icon: string|null, created_at: string, updated_at: string}
- * @phpstan-type DashboardRowData array{dashboard_id: string, title: string, description: string, icon: ?string, created_at: string, updated_at: string}
+ * @phpstan-type DashboardEntityData array{dashboard_id: string, title: string, description: ?string, icon: string|null, created_at: string, updated_at: string}
+ * @phpstan-type DashboardRowData array{dashboard_id: string, title: string, description: ?string, icon: ?string, created_at: string, updated_at: string}
  *
  * @implements EntityMapperInterface<Dashboard, DashboardEntityData, DashboardRowData>
  */

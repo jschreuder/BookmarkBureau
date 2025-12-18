@@ -18,7 +18,7 @@ final class Dashboard implements EntityEqualityInterface
         }
     }
 
-    public string $description {
+    public ?string $description {
         set {
             $this->description = $value;
             $this->markAsUpdated();
@@ -39,7 +39,7 @@ final class Dashboard implements EntityEqualityInterface
     public function __construct(
         UuidInterface $dashboardId,
         Value\Title $title,
-        string $description,
+        ?string $description,
         ?Value\Icon $icon,
         DateTimeInterface $createdAt,
         DateTimeInterface $updatedAt

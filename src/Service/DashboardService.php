@@ -110,7 +110,7 @@ final class DashboardService implements DashboardServiceInterface
     #[\Override]
     public function createDashboard(
         string $title,
-        string $description,
+        ?string $description,
         ?string $icon = null,
     ): Dashboard {
         $newDashboard = new Dashboard(
@@ -137,7 +137,7 @@ final class DashboardService implements DashboardServiceInterface
     public function updateDashboard(
         UuidInterface $dashboardId,
         string $title,
-        string $description,
+        ?string $description,
         ?string $icon = null,
     ): Dashboard {
         $updatedDashboard = $this->dashboardRepository->findById($dashboardId);

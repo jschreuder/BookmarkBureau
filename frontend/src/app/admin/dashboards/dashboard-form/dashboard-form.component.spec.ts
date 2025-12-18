@@ -85,13 +85,13 @@ describe('DashboardFormComponent', () => {
     expect(titleControl?.hasError('maxlength')).toBe(false);
   });
 
-  it('should validate required description', () => {
+  it('should allow optional description', () => {
     const descControl = component.form.get('description');
     descControl?.setValue('');
-    expect(descControl?.hasError('required')).toBe(true);
+    expect(descControl?.valid).toBe(true);
 
     descControl?.setValue('Valid Description');
-    expect(descControl?.hasError('required')).toBe(false);
+    expect(descControl?.valid).toBe(true);
   });
 
   it('should allow optional icon', () => {
@@ -121,8 +121,7 @@ describe('DashboardFormComponent', () => {
 
   it('should not submit with invalid form', () => {
     component.form.patchValue({
-      title: '',
-      description: '',
+      title: '', // title is required, so form is invalid
     });
 
     component.onSubmit();
@@ -217,8 +216,7 @@ describe('DashboardFormComponent', () => {
 
   it('should disable submit button when form is invalid', () => {
     component.form.patchValue({
-      title: '',
-      description: '',
+      title: '', // title is required, so form is invalid
     });
     fixture.detectChanges();
 
@@ -229,7 +227,7 @@ describe('DashboardFormComponent', () => {
   it('should enable submit button when form is valid', () => {
     component.form.patchValue({
       title: 'Valid Title',
-      description: 'Valid Description',
+      // description is optional, so form is valid with just title
     });
     fixture.detectChanges();
 

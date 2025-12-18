@@ -38,7 +38,7 @@ interface DashboardServiceInterface
      */
     public function createDashboard(
         string $title,
-        string $description,
+        ?string $description,
         ?string $icon = null,
     ): Dashboard;
 
@@ -50,7 +50,7 @@ interface DashboardServiceInterface
     public function updateDashboard(
         UuidInterface $dashboardId,
         string $title,
-        string $description,
+        ?string $description,
         ?string $icon = null,
     ): Dashboard;
 

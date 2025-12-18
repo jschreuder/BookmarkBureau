@@ -124,7 +124,7 @@ describe("DashboardUpdateAction", function () {
 
             expect($filtered["dashboard_id"])->toBe("");
             expect($filtered["title"])->toBe("");
-            expect($filtered["description"])->toBe("");
+            expect($filtered["description"])->toBeNull();
             expect($filtered["icon"])->toBeNull();
         });
 

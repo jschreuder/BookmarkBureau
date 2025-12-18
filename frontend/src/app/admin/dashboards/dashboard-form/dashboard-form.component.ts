@@ -54,7 +54,7 @@ export class DashboardFormComponent implements OnInit {
   constructor() {
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(256)]],
-      description: ['', [Validators.required]],
+      description: [''],
       icon: [''],
     });
   }
@@ -98,9 +98,10 @@ export class DashboardFormComponent implements OnInit {
     }
 
     this.loading = true;
+    const descriptionValue = this.form.get('description')?.value;
     const data: Partial<Dashboard> = {
       title: this.form.get('title')?.value,
-      description: this.form.get('description')?.value,
+      description: descriptionValue ? descriptionValue : undefined,
       icon: this.form.get('icon')?.value || undefined,
     };
 

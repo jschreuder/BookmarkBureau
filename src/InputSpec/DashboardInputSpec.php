@@ -23,7 +23,7 @@ final class DashboardInputSpec implements InputSpecInterface
         return self::FIELDS;
     }
 
-    /** @return array{dashboard_id: string, title: string, description: string, icon: ?string} */
+    /** @return array{dashboard_id: string, title: string, description: ?string, icon: ?string} */
     #[\Override]
     public function filter(array $rawData, ?array $fields = null): array
     {
@@ -40,8 +40,8 @@ final class DashboardInputSpec implements InputSpecInterface
                     ->trim()
                     ->striptags()
                     ->done(),
-                "description" => Filter::start($rawData, "description", "")
-                    ->string(allowNull: false)
+                "description" => Filter::start($rawData, "description", null)
+                    ->string()
                     ->trim()
                     ->striptags()
                     ->done(),
@@ -55,11 +55,11 @@ final class DashboardInputSpec implements InputSpecInterface
             };
         }
 
-        /** @var array{dashboard_id: string, title: string, description: string, icon: ?string} */
+        /** @var array{dashboard_id: string, title: string, description: ?string, icon: ?string} */
         return $filtered;
     }
 
-    /** @param array{dashboard_id: string, title: string, description: string, icon: ?string} $data */
+    /** @param array{dashboard_id: string, title: string, description: ?string, icon: ?string} $data */
     #[\Override]
     public function validate(array $data, ?array $fields = null): void
     {

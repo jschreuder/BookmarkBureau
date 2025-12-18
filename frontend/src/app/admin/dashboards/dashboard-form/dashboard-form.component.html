@@ -9,9 +9,7 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Title</mat-label>
         <input matInput formControlName="title" required />
-        <mat-error *ngIf="form.get('title')?.hasError('required')">
-          Title is required
-        </mat-error>
+        <mat-error *ngIf="form.get('title')?.hasError('required')"> Title is required </mat-error>
         <mat-error *ngIf="form.get('title')?.hasError('minlength')">
           Title must be at least 1 character
         </mat-error>
@@ -23,10 +21,7 @@
       <!-- Description Field -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Description</mat-label>
-        <textarea matInput formControlName="description" rows="4" required></textarea>
-        <mat-error *ngIf="form.get('description')?.hasError('required')">
-          Description is required
-        </mat-error>
+        <textarea matInput formControlName="description" rows="4"></textarea>
       </mat-form-field>
 
       <!-- Icon Field -->
@@ -42,7 +37,7 @@
           [disabled]="form.invalid || loading"
         >
           <mat-icon *ngIf="!loading">save</mat-icon>
-          <mat-spinner *ngIf="loading" diameter="20" style="margin-right: 8px;"></mat-spinner>
+          <mat-spinner *ngIf="loading" diameter="20" style="margin-right: 8px"></mat-spinner>
           {{ isEditMode ? 'Update' : 'Create' }}
         </button>
       </div>
