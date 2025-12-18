@@ -4,6 +4,25 @@
 
 mat-chip-row {
   font-size: 14px;
+
+  // Default dark text for light backgrounds
+  ::ng-deep .mdc-evolution-chip__text-label {
+    color: #000000 !important;
+  }
+
+  // Default dark icon for light backgrounds
+  ::ng-deep .mat-mdc-chip-remove {
+    color: #000000 !important;
+  }
+
+  // White text and icon for dark backgrounds
+  &.light-text ::ng-deep .mdc-evolution-chip__text-label {
+    color: #ffffff !important;
+  }
+
+  &.light-text ::ng-deep .mat-mdc-chip-remove {
+    color: #ffffff !important;
+  }
 }
 
 .tag-color-indicator {

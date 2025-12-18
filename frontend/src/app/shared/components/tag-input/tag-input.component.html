@@ -5,7 +5,7 @@
       <mat-chip-row
         (removed)="removeTag(tag)"
         [style.background-color]="tag.color || '#e0e0e0'"
-        [style.color]="getTextColor(tag.color)"
+        [class.light-text]="getTextColor(tag.color || '#e0e0e0') === '#ffffff'"
       >
         {{ tag.tag_name }}
         <button matChipRemove aria-label="Remove tag">
@@ -26,10 +26,7 @@
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
     @for (tag of filteredTags$ | async; track tag.tag_name) {
       <mat-option [value]="tag.tag_name">
-        <span
-          class="tag-color-indicator"
-          [style.background-color]="tag.color || '#e0e0e0'"
-        ></span>
+        <span class="tag-color-indicator" [style.background-color]="tag.color || '#e0e0e0'"></span>
         {{ tag.tag_name }}
       </mat-option>
     }
