@@ -65,6 +65,10 @@ const MATERIAL_ICONS = Object.keys(materialIcons).sort();
         width: 100%;
       }
 
+      mat-icon[matPrefix] {
+        line-height: 24px !important;
+      }
+
       mat-option {
         display: flex;
         align-items: center;
