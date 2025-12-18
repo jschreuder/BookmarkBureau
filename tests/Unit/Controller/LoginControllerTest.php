@@ -1,10 +1,8 @@
 <?php
 
 use jschreuder\BookmarkBureau\Controller\LoginController;
-use jschreuder\BookmarkBureau\Entity\Value\Email;
 use jschreuder\BookmarkBureau\Entity\Value\JwtToken;
 use jschreuder\BookmarkBureau\Entity\Value\TokenClaims;
-use jschreuder\BookmarkBureau\Entity\Value\TokenResponse;
 use jschreuder\BookmarkBureau\Entity\Value\TokenType;
 use jschreuder\BookmarkBureau\Entity\Value\TotpSecret;
 use jschreuder\BookmarkBureau\Exception\RateLimitExceededException;
