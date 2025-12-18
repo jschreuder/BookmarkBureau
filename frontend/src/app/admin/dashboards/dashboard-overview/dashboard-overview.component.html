@@ -61,7 +61,7 @@
           matTooltip="Add Link to Favorites"
           aria-label="Add link to favorites"
         >
-          <mat-icon aria-hidden="true">add</mat-icon>
+          <mat-icon aria-hidden="true">add_link</mat-icon>
         </button>
         <button
           mat-icon-button
@@ -119,7 +119,7 @@
                 color="warn"
                 class="remove-btn"
               >
-                <mat-icon aria-hidden="true">delete</mat-icon>
+                <mat-icon aria-hidden="true">link_off</mat-icon>
               </button>
               <button
                 *ngIf="favoritesReorderMode"
@@ -149,7 +149,7 @@
           matTooltip="Add Category"
           aria-label="Add category"
         >
-          <mat-icon aria-hidden="true">add</mat-icon>
+          <mat-icon aria-hidden="true">create_new_folder</mat-icon>
         </button>
         <button
           mat-icon-button
@@ -221,7 +221,7 @@
                   [attr.aria-label]="'Delete category: ' + category.title"
                   color="warn"
                 >
-                  <mat-icon aria-hidden="true">delete</mat-icon>
+                  <mat-icon aria-hidden="true">folder_delete</mat-icon>
                 </button>
                 <button
                   *ngIf="categoriesReorderMode"
@@ -275,7 +275,7 @@
                     color="warn"
                     class="remove-btn"
                   >
-                    <mat-icon aria-hidden="true">delete</mat-icon>
+                    <mat-icon aria-hidden="true">link_off</mat-icon>
                   </button>
                   <button
                     cdkDragHandle
