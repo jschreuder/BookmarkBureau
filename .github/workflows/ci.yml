@@ -30,7 +30,7 @@ jobs:
         run: vendor/bin/pest --coverage --coverage-clover=coverage.xml
 
       - name: Upload backend coverage
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: backend-coverage
           path: coverage.xml
@@ -64,7 +64,7 @@ jobs:
         working-directory: ./frontend
 
       - name: Upload frontend coverage
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: frontend-coverage
           path: frontend/coverage/frontend/lcov.info
