@@ -168,7 +168,7 @@ Templates ≤ 40 lines SHOULD use external files unless trivially small (< 10 li
 - [docs/FRONTEND_SETUP.md](docs/FRONTEND_SETUP.md) - Architecture, directory structure, API mapping, routing
 - [docs/BUILD_INSTRUCTIONS.md](docs/BUILD_INSTRUCTIONS.md) - Build and deployment instructions
 - [docs/STYLING_GUIDE.md](docs/STYLING_GUIDE.md) - Angular Material styling guide
-- Backend context: See [../CLAUDE.md](../CLAUDE.md)
+- Backend context: See [../AGENTS.md](../AGENTS.md)
 
 ## Do Not
 

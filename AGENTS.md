@@ -35,7 +35,7 @@ BookmarkBureau is a bookmark management application demonstrating clean architec
 ├── migrations/             - Phinx database migrations
 ├── var/log                 - Application logs, when CLI or integration test output is limited
 ├── web/                    - Public directory (api.php entry point)
-└── frontend/               - Angular 20 SPA (see frontend/CLAUDE.md)
+└── frontend/               - Angular 20 SPA (see frontend/AGENTS.md)
 ```
 
 ## Commands
@@ -197,7 +197,7 @@ Example: `DashboardViewController` - implements `ControllerInterface` + filter/v
 
 - [README.md](README.md) - Project overview, Middle Framework rationale, Action Pattern explanation
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) - Complete implementation checklist, API endpoints, database schema
-- Frontend docs: See [frontend/CLAUDE.md](frontend/CLAUDE.md) and [frontend/docs/](frontend/docs/)
+- Frontend docs: See [frontend/AGENTS.md](frontend/AGENTS.md) and [frontend/docs/](frontend/docs/)
 
 ## Do Not
 
