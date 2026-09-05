@@ -25,9 +25,11 @@ npm run test:ci
 
 ## Key Dependencies
 
-- **vitest** (v3.2.4): Test runner
-- **jsdom** (v27.1.0): DOM implementation for Node.js
-- **@vitest/coverage-v8** (v3.2.4): Code coverage reporting
+- **vitest** (v4.1.11): Test runner
+- **jsdom** (v28.x): DOM implementation for Node.js
+- **@vitest/coverage-v8** (v4.1.11): Code coverage reporting
+
+> **Note:** `@angular/build` pins its `vitest` peer dependency to `^4.0.8` (also true for Angular 22), so vitest cannot be upgraded to 5.x until Angular widens that range. Upgrading it anyway requires `--legacy-peer-deps` and makes `npm ci` fail with `ERESOLVE` in CI.
 - **jasmine-core** (~5.9.0): Provides Jasmine syntax compatibility
 
 ## Writing Tests
@@ -250,7 +252,8 @@ Test configuration is defined in [angular.json](../angular.json):
   "options": {
     "buildTarget": "frontend:build",
     "runner": "vitest",
-    "tsConfig": "tsconfig.spec.json"
+    "tsConfig": "tsconfig.spec.json",
+    "setupFiles": ["src/testing/web-storage-setup.ts"]
   }
 }
 ```
@@ -270,6 +273,22 @@ Test-specific TypeScript configuration is in [tsconfig.spec.json](../tsconfig.sp
 7. **Clean up**: Use `afterEach` to verify HTTP mocks and clean up resources
 
 ## Troubleshooting
+
+### `localStorage` is undefined in tests on Node 25+
+
+Node 25+ exposes non-functional native Web Storage accessors on the global
+object (`Web Storage API` is on by default, but requires
+`--localstorage-file` to operate). Because those properties already exist,
+vitest 4's jsdom environment does not install jsdom's working storage, so
+`localStorage`/`sessionStorage` are `undefined`
+([vitest#8757](https://github.com/vitest-dev/vitest/issues/8757), fixed in
+vitest 5 which Angular does not support yet).
+
+This is handled automatically by
+[src/testing/web-storage-setup.ts](../src/testing/web-storage-setup.ts), which
+is registered as a `setupFiles` entry in angular.json. If storage-related tests
+fail on a new Node version, check that the setup file still runs: on Node < 25
+the setup file is a no-op because vitest wires jsdom's storage itself.
 
 ### Test fails with "jasmine is not defined"
 

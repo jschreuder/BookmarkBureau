@@ -106,6 +106,7 @@
             "buildTarget": "frontend:build",
             "runner": "vitest",
             "tsConfig": "tsconfig.spec.json",
+            "setupFiles": ["src/testing/web-storage-setup.ts"],
             "coverageReporters": ["html", "lcov", "text-summary"]
           }
         }
