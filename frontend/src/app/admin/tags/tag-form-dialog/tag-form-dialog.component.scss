@@ -1,6 +1,13 @@
+:host {
+  // Override Material's dialog padding tokens instead of fighting the
+  // component's `.mat-mdc-dialog-container .mat-mdc-dialog-content` rule.
+  --mat-dialog-content-padding: 20px 24px;
+  --mat-dialog-with-actions-content-padding: 20px 24px;
+  --mat-dialog-actions-padding: 8px 24px 16px;
+}
+
 mat-dialog-content {
   min-width: 400px;
-  padding: 20px 24px !important;
 }
 
 .dialog-form {
@@ -12,9 +19,4 @@ mat-dialog-content {
 
 mat-form-field {
   width: 100%;
-}
-
-mat-dialog-actions {
-  padding: 8px 24px 16px !important;
-  margin: 0;
 }

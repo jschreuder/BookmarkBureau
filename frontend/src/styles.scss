@@ -59,55 +59,7 @@ html {
 
   // Highly visible focus rings for keyboard users (WCAG 2.4.7).
   @include mat.strong-focus-indicators();
-}
 
-// ---------------------------------------------------------------------------
-// 2. Base document
-// ---------------------------------------------------------------------------
-html,
-body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  font: var(--mat-sys-body-medium);
-  font-family: var(--mat-sys-body-medium-font), Roboto, sans-serif;
-  color: var(--mat-sys-on-surface);
-  background: var(--mat-sys-surface);
-  // Smooth theme switch transitions for browsers that support it.
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-// NOTE: because box-sizing is border-box globally, mat-icon "tiles" that add
-// padding MUST keep their glyph (font-size) <= width/height - 2*padding, or
-// the ligature overflows toward the bottom-right. Padded icon tiles should
-// also set `display: inline-flex; align-items: center; justify-content: center;`.
-
-// Keep Material Icons font for mat-icon elements regardless of theme font.
-.mat-icon,
-mat-icon {
-  font-family: 'Material Icons' !important;
-  font-size: 24px;
-  line-height: 1;
-}
-
-// Semantic helper: brand gradient used for hero headers.
-:root {
-  --bb-hero-grad: linear-gradient(135deg, var(--mat-sys-primary) 0%, var(--mat-sys-tertiary) 100%);
-  --bb-focus-ring: 0 0 0 2px var(--mat-sys-surface), 0 0 0 4px var(--mat-sys-primary);
-}
-
-// ---------------------------------------------------------------------------
-// 3. Global component shaping via token overrides
-// ---------------------------------------------------------------------------
-html {
   // Dialogs: spacious, floating sheets with big corners.
   @include mat.dialog-overrides(
     (
@@ -149,7 +101,52 @@ html {
 }
 
 // ---------------------------------------------------------------------------
-// 4. Shared patterns used across screens
+// 2. Base document
+// ---------------------------------------------------------------------------
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  font-family: var(--mat-sys-body-medium-font), Roboto, sans-serif;
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface);
+  // Smooth theme switch transitions for browsers that support it.
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+// NOTE: because box-sizing is border-box globally, mat-icon "tiles" that add
+// padding MUST keep their glyph (font-size) <= width/height - 2*padding, or
+// the ligature overflows toward the bottom-right. Padded icon tiles should
+// also set `display: inline-flex; align-items: center; justify-content: center;`.
+
+// Keep Material Icons font for mat-icon elements regardless of theme font.
+// A direct rule on the element always wins over inherited theme fonts, so
+// no !important is needed here.
+.mat-icon,
+mat-icon {
+  font-family: 'Material Icons';
+  font-size: 24px;
+  line-height: 1;
+}
+
+// Semantic helper: brand gradient used for hero headers.
+:root {
+  --bb-hero-grad: linear-gradient(135deg, var(--mat-sys-primary) 0%, var(--mat-sys-tertiary) 100%);
+  --bb-focus-ring: 0 0 0 2px var(--mat-sys-surface), 0 0 0 4px var(--mat-sys-primary);
+}
+
+// ---------------------------------------------------------------------------
+// 3. Shared patterns used across screens
 // ---------------------------------------------------------------------------
 
 /* Hero header pattern: deep brand-colored band above page content. */

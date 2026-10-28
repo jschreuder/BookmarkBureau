@@ -5,24 +5,26 @@
 mat-chip-row {
   font-size: 14px;
 
-  // Default dark text for light backgrounds
-  ::ng-deep .mdc-evolution-chip__text-label {
-    color: #000000 !important;
-  }
+  // Material token override: consumed by the MDC label-color rule and the
+  // intended customization point — beats it cleanly without !important.
+  // Default dark text for light tag backgrounds.
+  --mat-chip-label-text-color: #000000;
 
-  // Default dark icon for light backgrounds
-  ::ng-deep .mat-mdc-chip-remove {
-    color: #000000 !important;
+  // White label text for dark tag backgrounds.
+  &.light-text {
+    --mat-chip-label-text-color: #ffffff;
   }
+}
 
-  // White text and icon for dark backgrounds
-  &.light-text ::ng-deep .mdc-evolution-chip__text-label {
-    color: #ffffff !important;
-  }
+// The remove button lives in this template (projected into the chip), so a
+// plain selector applies. Material only colors trailing icons in
+// selected/highlighted states, so no specificity conflict here.
+mat-chip-row .mat-mdc-chip-remove {
+  color: #000000;
+}
 
-  &.light-text ::ng-deep .mat-mdc-chip-remove {
-    color: #ffffff !important;
-  }
+mat-chip-row.light-text .mat-mdc-chip-remove {
+  color: #ffffff;
 }
 
 .tag-color-indicator {

@@ -1,10 +1,4 @@
-import {
-  Component,
-  Inject,
-  inject,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -48,18 +42,15 @@ export class EditLinkDialogComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  form: FormGroup;
+  readonly data = inject<EditLinkDialogData>(MAT_DIALOG_DATA);
+  form: FormGroup = this.fb.group({
+    url: [this.data.link.url, [Validators.required, Validators.pattern(/^https?:\/\/.+/)]],
+    title: [this.data.link.title, [Validators.required, Validators.minLength(1)]],
+    description: [this.data.link.description || ''],
+    icon: [this.data.link.icon || ''],
+    tags: [this.data.link.tags || []],
+  });
   loading = false;
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: EditLinkDialogData) {
-    this.form = this.fb.group({
-      url: [data.link.url, [Validators.required, Validators.pattern(/^https?:\/\/.+/)]],
-      title: [data.link.title, [Validators.required, Validators.minLength(1)]],
-      description: [data.link.description || ''],
-      icon: [data.link.icon || ''],
-      tags: [data.link.tags || []],
-    });
-  }
 
   onSubmit(): void {
     if (!this.form.valid) {

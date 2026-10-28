@@ -77,6 +77,17 @@ button mat-icon {
   box-shadow: 0 14px 28px -16px rgba(23, 0, 61, 0.35);
 }
 
+/* Respect reduced-motion preferences: no card lift/transition. */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-card {
+    transition: none;
+  }
+
+  .dashboard-card:hover {
+    transform: none;
+  }
+}
+
 .dashboard-card ::ng-deep .mat-mdc-card-title {
   font: var(--mat-sys-title-medium);
   font-weight: 600;

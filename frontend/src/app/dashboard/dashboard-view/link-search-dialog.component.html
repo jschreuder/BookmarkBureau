@@ -1,17 +1,20 @@
 <div class="search-container">
   <div class="search-header">
-    <mat-icon class="search-icon">search</mat-icon>
+    <label id="link-search-label" for="link-search-input" class="search-label">
+      Search links by title, description, or tags
+    </label>
+    <mat-icon class="search-icon" aria-hidden="true">search</mat-icon>
     <input
       type="text"
+      id="link-search-input"
       class="search-input"
       placeholder="Search links by title, description, or tags..."
       [(ngModel)]="searchQuery"
       (ngModelChange)="onSearchChange()"
       #searchInput
-      autofocus
     />
-    <button class="close-button" (click)="close()">
-      <mat-icon>close</mat-icon>
+    <button class="close-button" (click)="close()" aria-label="Close search">
+      <mat-icon aria-hidden="true">close</mat-icon>
     </button>
   </div>
 

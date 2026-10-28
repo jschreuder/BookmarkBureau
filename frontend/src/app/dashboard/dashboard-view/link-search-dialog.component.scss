@@ -23,6 +23,21 @@
   flex-shrink: 0;
 }
 
+/* Visually hidden label: accessible name for the search input without
+   taking up visual space (the icon + placeholder carry the visual weight). */
+.search-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .search-input {
   flex: 1;
   border: none;
@@ -90,17 +105,17 @@
   padding: 8px;
 }
 
-.result-item {
-  cursor: pointer !important;
+/* Styled as a descendant of the list so the compiled rule (with the
+   encapsulation attribute) out-specifies Material's
+   `.mat-mdc-list-item:not(.mat-mdc-list-item-interactive)` (cursor) and
+   `.mdc-list-item--with-two-lines` (fixed height) without !important. */
+.results-list .result-item {
+  cursor: pointer;
   padding: 12px 16px;
   transition: background-color 0.15s;
-  height: auto !important;
+  height: auto;
   min-height: 64px;
   border-radius: 12px;
-}
-
-.result-item ::ng-deep .mdc-list-item__content {
-  cursor: pointer !important;
 }
 
 .result-item:hover,
@@ -120,13 +135,17 @@
   display: none;
 }
 
-.result-title {
+/* Descendant selector keeps the -14px margin above Material's
+   `.mdc-list-item--with-two-lines .mdc-list-item__primary-text`
+   (-20px) rule without !important. Deliberately NO display/alignment
+   overrides: Material's `display: block` must win, because its
+   ::before/::after pseudo-elements (which size the line box) only work
+   in block flow. A flex container would turn them into 32px/20px flex
+   items and break the two-line layout. */
+.results-list .result-title {
   font-size: 15px;
   font-weight: 600;
-  margin-bottom: -14px !important;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin-bottom: -14px;
 }
 
 .result-title ::ng-deep .highlight {
@@ -222,5 +241,17 @@ kbd {
     max-width: 100vw;
     max-height: 100vh;
     border-radius: 0;
+  }
+}
+
+/* Respect reduced-motion preferences: disable hover transitions. */
+@media (prefers-reduced-motion: reduce) {
+  .results-list .result-item,
+  .close-button {
+    transition: none;
+  }
+
+  .result-item ::ng-deep .highlight {
+    transition: none;
   }
 }

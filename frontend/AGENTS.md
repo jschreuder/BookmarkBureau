@@ -102,6 +102,8 @@ All components are built with **WCAG 2.1 Level AA accessibility compliance** for
 - Status updates: Use `<output>` instead of `<div role="status">` for better device support
 - Regions: Use `<section>` instead of `<div role="region">` for semantic HTML
 - Form groups: Use `<fieldset>` + `<legend>` instead of `<div role="group">`
+- Inputs: Associate labels via `id`/`for` (use CDK `_IdGenerator` for inputs inside custom components); never use `autofocus`
+- Animations: Disable transitions/transforms inside `@media (prefers-reduced-motion: reduce)`
 
 **Semantic HTML Over ARIA:**
 Prefer native HTML5 elements over ARIA roles:
@@ -182,6 +184,9 @@ Templates ≤ 40 lines SHOULD use external files unless trivially small (< 10 li
 ### Architecture
 - ❌ **DO NOT** create NgModules → ✅ Use standalone components
 - ❌ **DO NOT** commit `environment.ts` (gitignored) → ✅ Copy from `environment.ts.dist`
+
+### Styling
+- ❌ **DO NOT** use `!important` to fight Material styles → ✅ Override Material design tokens (e.g., `--mat-chip-label-text-color`) or `@include mat.*-overrides()`
 
 ## API Integration
 

@@ -78,15 +78,18 @@
   margin: 0;
   flex: 1;
   min-width: 0;
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .search-button {
-  color: var(--bb-contrast) !important;
+  // Icon color token — beats Material's `.mat-mdc-icon-button` color rule
+  // without any !important (tokens are the intended override point).
+  --mat-icon-button-icon-color: var(--bb-contrast);
+  color: var(--bb-contrast);
   margin-left: 8px;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.14) !important;
+    background-color: rgba(255, 255, 255, 0.14);
   }
 }
 
@@ -105,37 +108,40 @@
 }
 
 .favorite-chip {
-  background-color: rgba(255, 255, 255, 0.16) !important;
-  color: #fff !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  // Chip surface/label/outline via Material tokens (the intended override
+  // point), replacing former !important rules that fought the MDC selectors.
+  --mat-chip-elevated-container-color: rgba(255, 255, 255, 0.16);
+  --mat-chip-label-text-color: #ffffff;
+  --mat-chip-outline-color: rgba(255, 255, 255, 0.22);
   backdrop-filter: blur(4px);
   transition:
     transform 0.2s,
     background-color 0.2s;
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 .favorite-chip ::ng-deep .mdc-evolution-chip__action {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 .favorite-chip-link:hover .favorite-chip {
   transform: translateY(-1px);
-  background-color: rgba(255, 255, 255, 0.28) !important;
+  // Darken on hover (rather than lighten) to keep white chip text at
+  // WCAG AA contrast over both ends of the hero gradient.
+  background-color: rgba(0, 0, 0, 0.12);
 }
 
 .favorite-chip ::ng-deep .mat-mdc-chip-action-label {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #fff !important;
 }
 
 .favorite-chip mat-icon {
   font-size: 18px;
   width: 18px;
   height: 18px;
-  color: #fff !important;
+  color: inherit;
   vertical-align: middle;
 }
 
@@ -205,18 +211,10 @@
   box-shadow: 0 10px 24px -12px rgba(23, 0, 61, 0.25);
 }
 
-.category-card ::ng-deep .mat-card-header {
-  align-items: center;
-  padding: 16px 20px !important;
-  margin: 0 !important;
-  border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-outline-variant) 50%, transparent);
-}
-
-.category-card ::ng-deep .mat-card-title {
-  font: var(--mat-sys-title-medium);
-  font-weight: 600;
-  margin: 0;
-}
+/* Category card header: intentionally unstyled. The old custom rules
+   (.mat-card-header/.mat-card-title) never matched Material's mat-mdc-* host
+   classes, so the rendered design users are used to IS Material's default:
+   16px top padding, title-large (22px) title. Keep it that way. */
 
 .category-icon {
   width: 24px;
@@ -344,4 +342,18 @@
   height: 64px;
   color: var(--mat-sys-error);
   margin-bottom: 16px;
+}
+
+/* Respect reduced-motion preferences: disable transforms/transitions. */
+@media (prefers-reduced-motion: reduce) {
+  .favorite-chip,
+  .category-card,
+  .link-item {
+    transition: none;
+  }
+
+  .favorite-chip-link:hover .favorite-chip,
+  .category-card:hover {
+    transform: none;
+  }
 }

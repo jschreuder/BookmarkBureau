@@ -1,10 +1,4 @@
-import {
-  Component,
-  Inject,
-  inject,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -46,15 +40,12 @@ export class EditCategoryDialogComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  form: FormGroup;
+  readonly data = inject<EditCategoryDialogData>(MAT_DIALOG_DATA);
+  form: FormGroup = this.fb.group({
+    title: [this.data.category.title, [Validators.required, Validators.minLength(1)]],
+    color: [this.data.category.color || ''],
+  });
   loading = false;
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: EditCategoryDialogData) {
-    this.form = this.fb.group({
-      title: [data.category.title, [Validators.required, Validators.minLength(1)]],
-      color: [data.category.color || ''],
-    });
-  }
 
   onSubmit(): void {
     if (!this.form.valid) {

@@ -9,6 +9,7 @@ import {
   ElementRef,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { _IdGenerator } from '@angular/cdk/a11y';
 import { CommonModule } from '@angular/common';
 import {
   ControlValueAccessor,
@@ -57,6 +58,8 @@ export class TagInputComponent implements ControlValueAccessor, OnInit {
   private readonly snackBar = inject(MatSnackBar);
 
   @Input() placeholder = 'Add tag...';
+  /** Unique id so the mat-label can associate with the inner input. */
+  readonly inputId = inject(_IdGenerator).getId('tag-input-');
   @ViewChild('tagInput') tagInputElement!: ElementRef<HTMLInputElement>;
 
   selectedTags = signal<Tag[]>([]);

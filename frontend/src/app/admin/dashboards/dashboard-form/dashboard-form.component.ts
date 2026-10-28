@@ -98,10 +98,9 @@ export class DashboardFormComponent implements OnInit {
     }
 
     this.loading = true;
-    const descriptionValue = this.form.get('description')?.value;
     const data: Partial<Dashboard> = {
       title: this.form.get('title')?.value,
-      description: descriptionValue ? descriptionValue : undefined,
+      description: this.form.get('description')?.value || undefined,
       icon: this.form.get('icon')?.value || undefined,
     };
 

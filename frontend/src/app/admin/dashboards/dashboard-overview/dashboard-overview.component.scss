@@ -114,7 +114,7 @@
     align-items: center;
     gap: 16px;
     padding: 16px 24px;
-    border: none !important;
+    border: none;
     min-height: 56px;
 
     .section-icon {
@@ -145,7 +145,11 @@
       flex-shrink: 0;
 
       &.reorder-toggle {
-        transition: all 0.3s ease;
+        // Specify the animated properties so future style changes
+        // don't animate unexpectedly.
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
 
         &.active {
           background-color: var(--mat-sys-primary-container);
@@ -285,7 +289,7 @@
         font-size: 14px;
         font-weight: 600;
         color: var(--mat-sys-on-surface);
-        word-break: break-word;
+        overflow-wrap: break-word;
       }
 
       .url {

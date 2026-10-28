@@ -65,4 +65,13 @@
     outline: 2px solid var(--mat-sys-primary);
     outline-offset: 2px;
   }
+
+  /* Respect reduced-motion preferences: skip the scale animation. */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
 }

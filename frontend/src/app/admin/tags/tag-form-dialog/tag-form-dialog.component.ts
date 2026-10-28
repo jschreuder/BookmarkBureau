@@ -1,6 +1,7 @@
-import { Component, Inject, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -31,38 +32,47 @@ export interface TagFormDialogData {
   templateUrl: './tag-form-dialog.component.html',
   styleUrl: './tag-form-dialog.component.scss',
 })
-export class TagFormDialogComponent {
+export class TagFormDialogComponent implements OnInit, OnDestroy {
+  readonly data = inject<TagFormDialogData>(MAT_DIALOG_DATA);
+  isEditMode = !!this.data.tag;
+
   private readonly tagService = inject(TagService);
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<TagFormDialogComponent>);
   private readonly snackBar = inject(MatSnackBar);
 
-  form: FormGroup;
+  form: FormGroup = this.fb.group({
+    tag_name: [
+      { value: this.data.tag?.tag_name || '', disabled: this.isEditMode },
+      [Validators.required, Validators.minLength(1)],
+    ],
+    color: [this.data.tag?.color || '#2196f3'],
+  });
   loading = false;
-  isEditMode: boolean;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: TagFormDialogData) {
-    this.isEditMode = !!data.tag;
+  private destroy$ = new Subject<void>();
 
-    this.form = this.fb.group({
-      tag_name: [
-        { value: data.tag?.tag_name || '', disabled: this.isEditMode },
-        [Validators.required, Validators.minLength(1)],
-      ],
-      color: [data.tag?.color || '#2196f3'],
-    });
-
-    // Add input event listener to sanitize tag name as user types
+  ngOnInit(): void {
+    // Sanitize tag name as user types (create mode only — name is fixed in
+    // edit mode).
     if (!this.isEditMode) {
-      this.form.get('tag_name')?.valueChanges.subscribe((value) => {
-        if (value) {
-          const sanitized = this.sanitizeTagName(value);
-          if (value !== sanitized) {
-            this.form.get('tag_name')?.setValue(sanitized, { emitEvent: false });
+      this.form
+        .get('tag_name')
+        ?.valueChanges.pipe(takeUntil(this.destroy$))
+        .subscribe((value) => {
+          if (value) {
+            const sanitized = this.sanitizeTagName(value);
+            if (value !== sanitized) {
+              this.form.get('tag_name')?.setValue(sanitized, { emitEvent: false });
+            }
           }
-        }
-      });
+        });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**

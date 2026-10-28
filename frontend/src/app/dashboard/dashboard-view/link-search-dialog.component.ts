@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -40,11 +40,9 @@ export class LinkSearchDialogComponent implements OnInit {
   filteredLinks: SearchResult[] = [];
   selectedIndex = 0;
 
-  constructor(
-    public dialogRef: MatDialogRef<LinkSearchDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: LinkSearchDialogData,
-    private readonly sanitizer: DomSanitizer,
-  ) {}
+  readonly dialogRef = inject(MatDialogRef<LinkSearchDialogComponent>);
+  readonly data = inject<LinkSearchDialogData>(MAT_DIALOG_DATA);
+  private readonly sanitizer = inject(DomSanitizer);
 
   ngOnInit(): void {
     // Close dialog on Escape key
