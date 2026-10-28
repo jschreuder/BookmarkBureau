@@ -41,7 +41,7 @@ export class TagFormDialogComponent implements OnInit, OnDestroy {
   private readonly dialogRef = inject(MatDialogRef<TagFormDialogComponent>);
   private readonly snackBar = inject(MatSnackBar);
 
-  form: FormGroup = this.fb.group({
+  readonly form: FormGroup = this.fb.group({
     tag_name: [
       { value: this.data.tag?.tag_name || '', disabled: this.isEditMode },
       [Validators.required, Validators.minLength(1)],
