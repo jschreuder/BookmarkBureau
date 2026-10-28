@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-BookmarkBureau is a bookmark management application demonstrating clean architecture with PHP 8.4 and Angular 20. This is a **demonstration project** showcasing the Middle Framework's patterns and compile-time dependency injection.
+BookmarkBureau is a bookmark management application demonstrating clean architecture with PHP 8.4 and Angular 22. This is a **demonstration project** showcasing the Middle Framework's patterns and compile-time dependency injection.
 
 **Monorepo Structure:** PHP backend at root, Angular frontend in `/frontend/` directory.
 
@@ -35,7 +35,7 @@ BookmarkBureau is a bookmark management application demonstrating clean architec
 ├── migrations/             - Phinx database migrations
 ├── var/log                 - Application logs, when CLI or integration test output is limited
 ├── web/                    - Public directory (api.php entry point)
-└── frontend/               - Angular 20 SPA (see frontend/AGENTS.md)
+└── frontend/               - Angular 22 SPA (see frontend/AGENTS.md)
 ```
 
 ## Commands

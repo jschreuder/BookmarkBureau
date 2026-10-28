@@ -290,7 +290,7 @@ The current setup provides the scaffolding. To complete the implementation:
 
 ## Technology Stack
 
-- **Frontend Framework**: Angular 21+
+- **Frontend Framework**: Angular 22+
 - **UI Framework**: Angular Material
 - **HTTP Client**: Angular HttpClient
 - **State Management**: None (can add NgRx/Signals if needed)

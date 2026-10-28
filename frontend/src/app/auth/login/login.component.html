@@ -24,8 +24,8 @@
             type="email"
             formControlName="email"
             placeholder="your@email.com"
-            [attr.aria-invalid]="email?.invalid && email?.touched"
-            [attr.aria-describedby]="email?.invalid && email?.touched ? 'email-error' : null"
+            [attr.aria-invalid]="email?.invalid && email.touched"
+            [attr.aria-describedby]="email?.invalid && email.touched ? 'email-error' : null"
           />
           <mat-error *ngIf="email?.hasError('required')" id="email-error">
             Email is required
@@ -41,9 +41,9 @@
             type="password"
             formControlName="password"
             placeholder="Enter your password"
-            [attr.aria-invalid]="password?.invalid && password?.touched"
+            [attr.aria-invalid]="password?.invalid && password.touched"
             [attr.aria-describedby]="
-              password?.invalid && password?.touched ? 'password-error' : null
+              password?.invalid && password.touched ? 'password-error' : null
             "
           />
           <mat-error *ngIf="password?.hasError('required')" id="password-error">
@@ -67,9 +67,9 @@
               placeholder="Enter 6-digit code"
               maxlength="6"
               pattern="[0-9]*"
-              [attr.aria-invalid]="totpCode?.invalid && totpCode?.touched"
+              [attr.aria-invalid]="totpCode?.invalid && totpCode.touched"
               [attr.aria-describedby]="
-                totpCode?.invalid && totpCode?.touched ? 'totp-error' : 'totp-section-title'
+                totpCode?.invalid && totpCode.touched ? 'totp-error' : 'totp-section-title'
               "
             />
             <mat-error *ngIf="totpCode?.hasError('pattern')" id="totp-error">

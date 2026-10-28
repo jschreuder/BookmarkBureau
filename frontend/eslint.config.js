@@ -1,7 +1,6 @@
 // eslint.config.js
 import angular from 'angular-eslint';
 import tseslint from 'typescript-eslint';
-import importPlugin from 'eslint-plugin-import';
 import jsdoc from 'eslint-plugin-jsdoc';
 import preferArrow from 'eslint-plugin-prefer-arrow';
 
@@ -10,7 +9,6 @@ export default tseslint.config(
     files: ['**/*.ts'],
     extends: [...tseslint.configs.recommended, ...angular.configs.tsRecommended],
     plugins: {
-      import: importPlugin,
       jsdoc: jsdoc,
       'prefer-arrow': preferArrow,
     },
@@ -30,11 +28,6 @@ export default tseslint.config(
       '@angular-eslint/no-output-rename': 'error',
       '@angular-eslint/use-lifecycle-interface': 'error',
       '@angular-eslint/use-pipe-transform-interface': 'error',
-
-      // Import rules
-      'import/namespace': 'error',
-      'import/default': 'error',
-      'import/export': 'error',
 
       // JSDoc rules
       'jsdoc/check-alignment': 'error',

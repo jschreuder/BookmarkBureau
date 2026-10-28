@@ -2,18 +2,18 @@
 
 ## Overview
 
-Angular 21 SPA for BookmarkBureau bookmark management. Part of a monorepo with PHP backend at root.
+Angular 22 SPA for BookmarkBureau bookmark management. Part of a monorepo with PHP backend at root.
 
-**Important** We are using Angular Material 21.0+. When building something new or bugfixing on the frontend, please refer to the official online Angular Material documentation for examples before continuing to write.
+**Important** We are using Angular Material 22.0+. When building something new or bugfixing on the frontend, please refer to the official online Angular Material documentation for examples before continuing to write.
 
 **Build Output:** Builds to `../web/` directory (served alongside PHP backend)
 
 ## Tech Stack
 
-- **Framework:** Angular 21.0+
+- **Framework:** Angular 22.0+
 - **UI:** Angular Material 21.0+
-- **Language:** TypeScript 5.9+ (strict mode)
-- **Testing:** Vitest 4.0+ (NOT Karma/Jasmine)
+- **Language:** TypeScript 6.0+ (strict mode)
+- **Testing:** Vitest 5.0+ (NOT Karma/Jasmine)
 - **Package Manager:** npm
 
 ## Project Structure

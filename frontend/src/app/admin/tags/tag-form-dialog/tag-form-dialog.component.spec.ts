@@ -5,7 +5,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { TagFormDialogComponent } from './tag-form-dialog.component';
@@ -44,7 +43,6 @@ describe('TagFormDialogComponent', () => {
         MatInputModule,
         MatButtonModule,
         MatSnackBarModule,
-        NoopAnimationsModule,
       ],
       providers: [
         { provide: TagService, useValue: tagServiceMock },

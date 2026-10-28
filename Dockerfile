@@ -1,5 +1,6 @@
 # Stage 1: Build frontend
-FROM node:22-alpine AS frontend-builder
+# Pinned to Node 24 LTS (satisfies Angular 22 CLI: node ^22.22.3 || ^24.15.0 || >=26;
+FROM node:24.22.1-alpine AS frontend-builder
 
 WORKDIR /build
 

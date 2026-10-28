@@ -45,7 +45,7 @@ npm run build
 
 ## Tech Stack
 
-- **Framework**: Angular 21+
+- **Framework**: Angular 22+
 - **UI Library**: Angular Material 3
 - **Language**: TypeScript
 - **Styling**: SCSS

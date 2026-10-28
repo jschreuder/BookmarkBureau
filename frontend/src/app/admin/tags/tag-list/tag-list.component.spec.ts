@@ -5,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError, Subject } from 'rxjs';
 import { vi } from 'vitest';
 import { TagListComponent } from './tag-list.component';
@@ -58,7 +57,6 @@ describe('TagListComponent', () => {
         MatTableModule,
         MatDialogModule,
         MatSnackBarModule,
-        NoopAnimationsModule,
       ],
       providers: [
         { provide: TagService, useValue: tagServiceMock },
