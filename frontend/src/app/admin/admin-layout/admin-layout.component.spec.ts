@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdminLayoutComponent } from './admin-layout.component';
 import { provideRouter } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,7 +32,6 @@ describe('AdminLayoutComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         AdminLayoutComponent,
-        MatToolbarModule,
         MatSidenavModule,
         MatListModule,
         MatIconModule,
@@ -191,25 +189,11 @@ describe('AdminLayoutComponent', () => {
     expect(content).toBeTruthy();
   });
 
-  it('should render toolbar in content area', () => {
+  it('should not render a redundant toolbar above the content area', () => {
+    // The working pages carry their own titles, so the admin shell keeps
+    // the content area free of a static "Administration Panel" bar.
     const toolbar = fixture.nativeElement.querySelector('mat-sidenav-content mat-toolbar');
-    expect(toolbar).toBeTruthy();
-  });
-
-  it('should display Administration Panel title in toolbar', () => {
-    const toolbarTitle = fixture.nativeElement.querySelector(
-      'mat-sidenav-content mat-toolbar .toolbar-title',
-    );
-    expect(toolbarTitle).toBeTruthy();
-    expect(toolbarTitle.textContent).toContain('Administration Panel');
-  });
-
-  it('should have settings icon in toolbar', () => {
-    const settingsIcon = fixture.nativeElement.querySelector(
-      'mat-sidenav-content mat-toolbar mat-icon',
-    );
-    expect(settingsIcon).toBeTruthy();
-    expect(settingsIcon.textContent).toContain('settings');
+    expect(toolbar).toBeNull();
   });
 
   it('should render router outlet for content', () => {
@@ -276,5 +260,45 @@ describe('AdminLayoutComponent', () => {
 
     expect(mockAuthService.logout).toHaveBeenCalled();
     expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('should toggle sidenav collapse', () => {
+    expect(component.sidenavCollapsed).toBe(false);
+    const sidenav = fixture.nativeElement.querySelector('mat-sidenav');
+
+    // Click the logo toggle — the Angular binding marks the view dirty (OnPush/zoneless).
+    const logoButton = fixture.nativeElement.querySelector(
+      '.sidenav-header .logo-button',
+    ) as HTMLElement;
+    logoButton.click();
+    fixture.detectChanges();
+
+    expect(component.sidenavCollapsed).toBe(true);
+    expect(sidenav.classList.contains('collapsed')).toBe(true);
+
+    // Collapsed: the hint icon flips to chevron_right.
+    const hint = fixture.nativeElement.querySelector('.sidenav-header .toggle-hint');
+    expect(hint.textContent.trim()).toBe('chevron_right');
+    expect(logoButton.getAttribute('aria-label')).toBe('Expand sidebar');
+
+    logoButton.click();
+    fixture.detectChanges();
+
+    expect(component.sidenavCollapsed).toBe(false);
+    expect(sidenav.classList.contains('collapsed')).toBe(false);
+    expect(logoButton.getAttribute('aria-label')).toBe('Collapse sidebar');
+  });
+
+  it('should use the dashboard\u2019s own icon in nested menu items when set', () => {
+    mockApiService.listDashboards = () =>
+      of([
+        { dashboard_id: '1', title: 'Starred', icon: 'star', updated_at: new Date().toISOString() },
+      ]);
+    component.loadTopDashboards();
+    fixture.detectChanges();
+
+    const nestedIcons = fixture.nativeElement.querySelectorAll('.nested-item mat-icon');
+    expect(nestedIcons.length).toBeGreaterThan(0);
+    expect(nestedIcons[0].textContent.trim()).toBe('star');
   });
 });

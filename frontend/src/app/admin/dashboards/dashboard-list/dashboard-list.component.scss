@@ -1,3 +1,5 @@
+/* Admin dashboards table screen — one flat outlined card per page. */
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -7,10 +9,29 @@
 
 h1 {
   margin: 0;
+  font: var(--mat-sys-headline-small);
+  font-weight: 600;
 }
 
 button mat-icon {
   margin-right: 8px;
+}
+
+/* The card is the list container: flat, outlined, no inner boxes. */
+mat-card {
+  padding: 0;
+  background: var(--mat-sys-surface-container-lowest);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 16px;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+mat-card-content,
+mat-card-content:first-child,
+mat-card-content:last-child {
+  display: block;
+  padding: 0;
 }
 
 .loading-spinner {
@@ -26,17 +47,18 @@ button mat-icon {
   justify-content: center;
   padding: 60px 40px;
   text-align: center;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    color: color-mix(in srgb, var(--mat-sys-on-surface) 25%, transparent);
+  }
 }
 
-.empty-state mat-icon {
-  font-size: 64px;
-  width: 64px;
-  height: 64px;
-  margin-bottom: 16px;
-  color: rgba(0, 0, 0, 0.26);
-}
-
+/* Horizontal scroll for the table only; the card clips the corners. */
 .table-container {
   overflow-x: auto;
 }
@@ -44,20 +66,40 @@ button mat-icon {
 .dashboards-table {
   width: 100%;
   border-collapse: collapse;
-}
 
-.dashboards-table th {
-  font-weight: 600;
-  background-color: rgba(0, 0, 0, 0.04);
-}
+  th {
+    text-align: left;
+    font-weight: 600;
+    background-color: var(--mat-sys-surface-container-low);
+    color: var(--mat-sys-on-surface-variant);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+  }
 
-.dashboards-table td {
-  padding: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-outline-variant) 60%, transparent);
+    color: var(--mat-sys-on-surface);
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--mat-sys-primary) 5%, transparent);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
 }
 
 .no-icon {
-  color: rgba(0, 0, 0, 0.38);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 // Only style icons in the icon column, not in buttons

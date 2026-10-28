@@ -82,9 +82,11 @@ export class ApiService {
 
   addLinkToCategory(categoryId: string, linkId: string): Observable<void> {
     return this.http
-      .post<
-        ApiResponse<void>
-      >(`${this.API_BASE}/category/${categoryId}/link`, { link_id: linkId }, this.httpOptions)
+      .post<ApiResponse<void>>(
+        `${this.API_BASE}/category/${categoryId}/link`,
+        { link_id: linkId },
+        this.httpOptions,
+      )
       .pipe(map(() => undefined));
   }
 
@@ -184,9 +186,11 @@ export class ApiService {
   // Favorite endpoints
   addFavorite(dashboardId: string, linkId: string): Observable<Favorite> {
     return this.http
-      .post<
-        ApiResponse<Favorite>
-      >(`${this.API_BASE}/dashboard/${dashboardId}/favorite`, { dashboard_id: dashboardId, link_id: linkId }, this.httpOptions)
+      .post<ApiResponse<Favorite>>(
+        `${this.API_BASE}/dashboard/${dashboardId}/favorite`,
+        { dashboard_id: dashboardId, link_id: linkId },
+        this.httpOptions,
+      )
       .pipe(map((response) => response.data!));
   }
 
@@ -201,9 +205,11 @@ export class ApiService {
     links: Array<{ link_id: string; sort_order: number }>,
   ): Observable<Favorite[]> {
     return this.http
-      .put<
-        ApiResponse<Favorite[]>
-      >(`${this.API_BASE}/dashboard/${dashboardId}/favorite`, { dashboard_id: dashboardId, links }, this.httpOptions)
+      .put<ApiResponse<Favorite[]>>(
+        `${this.API_BASE}/dashboard/${dashboardId}/favorite`,
+        { dashboard_id: dashboardId, links },
+        this.httpOptions,
+      )
       .pipe(map((response) => response.data || []));
   }
 
@@ -212,9 +218,11 @@ export class ApiService {
     links: Array<{ link_id: string; sort_order: number }>,
   ): Observable<Link[]> {
     return this.http
-      .put<
-        ApiResponse<Link[]>
-      >(`${this.API_BASE}/category/${categoryId}/link`, { category_id: categoryId, links }, this.httpOptions)
+      .put<ApiResponse<Link[]>>(
+        `${this.API_BASE}/category/${categoryId}/link`,
+        { category_id: categoryId, links },
+        this.httpOptions,
+      )
       .pipe(map((response) => response.data || []));
   }
 
@@ -223,9 +231,11 @@ export class ApiService {
     categories: Array<{ category_id: string; sort_order: number }>,
   ): Observable<Category[]> {
     return this.http
-      .put<
-        ApiResponse<{ categories: Category[] }>
-      >(`${this.API_BASE}/dashboard/${dashboardId}/categories`, { dashboard_id: dashboardId, categories }, this.httpOptions)
+      .put<ApiResponse<{ categories: Category[] }>>(
+        `${this.API_BASE}/dashboard/${dashboardId}/categories`,
+        { dashboard_id: dashboardId, categories },
+        this.httpOptions,
+      )
       .pipe(map((response) => response.data?.categories || []));
   }
 }

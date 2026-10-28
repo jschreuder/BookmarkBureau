@@ -1,7 +1,15 @@
+/* Dashboard public view — layered M3 surfaces on a soft indigo canvas. */
+
+:host {
+  display: block;
+  min-height: 100%;
+}
+
 .container {
-  padding: 20px;
+  padding: 0 24px 48px;
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .container.loading {
@@ -10,57 +18,79 @@
   align-items: center;
   justify-content: center;
   min-height: 400px;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .container.loading mat-spinner {
   margin-bottom: 16px;
 }
 
-/* Compact Toolbar */
+/* Hero band: title, favorites and search live on the brand gradient. */
 .dashboard-toolbar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 16px 0;
-  color: white;
+  --bb-contrast: #ffffff;
+  margin: 20px auto 0;
+  max-width: 1200px;
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: var(--bb-hero-grad);
+  color: var(--mat-sys-on-primary);
+  box-shadow:
+    0 1px 2px rgba(23, 0, 61, 0.08),
+    0 12px 32px -12px rgba(23, 0, 61, 0.35);
 }
 
 .toolbar-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
+  flex-wrap: wrap;
 }
 
 .toolbar-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  min-width: 0;
 }
 
+/* Icon tiles: the glyph (font-size) must fit inside the content box
+   (size minus padding) — the icon font anchors glyphs top-left, so an
+   oversized glyph would overflow toward the bottom-right. Flex centering
+   keeps the glyph dead-center inside the tile. */
 .toolbar-icon {
-  font-size: 32px;
-  width: 32px;
-  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(4px);
+  flex-shrink: 0;
 }
 
 .toolbar-title {
-  font-size: 24px;
-  font-weight: 500;
-  flex: 1;
+  font: var(--mat-sys-headline-medium);
+  font-weight: 600;
   margin: 0;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
 }
 
 .search-button {
-  color: white !important;
+  color: var(--bb-contrast) !important;
   margin-left: 8px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+  }
 }
 
-.search-button:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
+/* Favorites as frosted pills on the hero. */
 .toolbar-favorites {
   display: flex;
   gap: 8px;
@@ -75,9 +105,10 @@
 }
 
 .favorite-chip {
-  background-color: rgba(40, 34, 74, 0.2) !important;
-  color: white !important;
-  border: none !important;
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  backdrop-filter: blur(4px);
   transition:
     transform 0.2s,
     background-color 0.2s;
@@ -89,44 +120,43 @@
 }
 
 .favorite-chip-link:hover .favorite-chip {
-  transform: scale(1.05);
-  background-color: rgba(40, 34, 74, 0.4) !important;
+  transform: translateY(-1px);
+  background-color: rgba(255, 255, 255, 0.28) !important;
 }
 
 .favorite-chip ::ng-deep .mat-mdc-chip-action-label {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: white !important;
+  color: #fff !important;
 }
 
 .favorite-chip mat-icon {
   font-size: 18px;
   width: 18px;
   height: 18px;
-  color: white !important;
+  color: #fff !important;
   vertical-align: middle;
 }
 
-/* Description Quote */
+/* Description sits under the hero as a quiet kicker line. */
 .description-quote {
   text-align: center;
-  padding: 20px 24px 0 24px;
+  padding: 18px 24px 0;
   max-width: 800px;
-  margin: 0 auto -10px auto;
+  margin: 0 auto -6px;
 }
 
 .description-quote p {
   margin: 0;
-  font-size: 14px;
-  font-style: italic;
-  color: rgba(0, 0, 0, 0.5);
-  line-height: 1.5;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.6;
 }
 
-/* Categories Section */
+/* Categories grid of soft cards. */
 .categories-section {
-  margin-top: 8px;
+  margin-top: 28px;
 }
 
 .categories-grid {
@@ -157,19 +187,33 @@
   }
 }
 
+/* Category card: colored accent bar replaces full-bleed colored header. */
 .category-card {
-  margin-bottom: 0;
   overflow: hidden;
+  background: var(--mat-sys-surface-container-lowest);
+  border: 1px solid var(--mat-sys-outline-variant);
+  box-shadow: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--mat-sys-primary) 40%, transparent);
+  box-shadow: 0 10px 24px -12px rgba(23, 0, 61, 0.25);
 }
 
 .category-card ::ng-deep .mat-card-header {
   align-items: center;
-  padding: 12px 20px !important;
+  padding: 16px 20px !important;
   margin: 0 !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-outline-variant) 50%, transparent);
 }
 
 .category-card ::ng-deep .mat-card-title {
-  font-size: 16px;
+  font: var(--mat-sys-title-medium);
   font-weight: 600;
   margin: 0;
 }
@@ -188,35 +232,41 @@
 .link-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 4px;
 }
 
 .link-item {
   display: flex;
   gap: 12px;
-  padding: 10px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  padding: 10px 12px;
+  border-radius: 10px;
+  transition: background-color 0.15s ease;
   cursor: pointer;
   align-items: flex-start;
   text-decoration: none;
   color: inherit;
-}
 
-.link-item:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-}
+  &:hover {
+    background-color: color-mix(in srgb, var(--mat-sys-primary) 8%, transparent);
+  }
 
-.link-item:focus {
-  outline: 2px solid #667eea;
-  outline-offset: 2px;
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
 }
 
 .link-item mat-icon {
-  font-size: 24px;
-  width: 24px;
-  height: 24px;
-  color: rgba(0, 0, 0, 0.6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container);
+  color: var(--mat-sys-primary);
   flex-shrink: 0;
 }
 
@@ -226,16 +276,16 @@
 }
 
 .link-info h4 {
-  margin: 0 0 4px 0;
-  font-size: 15px;
-  font-weight: 500;
+  margin: 0 0 2px 0;
+  font: var(--mat-sys-body-large);
+  font-weight: 600;
 }
 
 .link-description {
   margin: 0;
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.6);
-  line-height: 1.4;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.5;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -246,18 +296,19 @@
 }
 
 .tag {
-  font-size: 0.67em;
-  font-weight: bold;
+  font-size: 0.75em;
+  font-weight: 700;
   text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.5);
-  margin-left: 4px;
+  letter-spacing: 0.04em;
+  color: var(--mat-sys-on-surface-variant);
+  margin-left: 6px;
 }
 
 .tag:first-child {
   margin-left: 0;
 }
 
-/* Empty State */
+/* Empty & error states */
 .empty-state {
   text-align: center;
   padding: 64px 24px;
@@ -267,23 +318,21 @@
   font-size: 64px;
   width: 64px;
   height: 64px;
-  color: rgba(0, 0, 0, 0.2);
+  color: color-mix(in srgb, var(--mat-sys-on-surface) 25%, transparent);
   margin-bottom: 16px;
 }
 
 .empty-state h2 {
   margin: 16px 0 8px 0;
-  font-size: 24px;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.6);
+  font: var(--mat-sys-headline-small);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .empty-state p {
   margin: 0 0 24px 0;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--mat-sys-on-surface-variant);
 }
 
-/* Error State */
 .error-container {
   text-align: center;
   padding: 64px 24px;
@@ -293,6 +342,6 @@
   font-size: 64px;
   width: 64px;
   height: 64px;
-  color: #d32f2f;
+  color: var(--mat-sys-error);
   margin-bottom: 16px;
 }

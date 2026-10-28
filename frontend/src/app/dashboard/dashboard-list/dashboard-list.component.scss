@@ -1,10 +1,12 @@
+/* Public dashboards home — hero heading + card grid on soft canvas. */
+
 .logo-icon {
   margin-right: 8px;
 }
 
 .app-title {
-  font-size: 20px;
-  font-weight: 500;
+  font: var(--mat-sys-title-large);
+  font-weight: 600;
 }
 
 .spacer {
@@ -16,47 +18,72 @@ button mat-icon {
 }
 
 .container {
-  padding: 24px;
+  padding: 32px 24px 64px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: 36px;
+  max-width: 640px;
 }
 
 .page-header h1 {
-  margin: 0 0 8px 0;
-  font-size: 32px;
-  font-weight: 400;
+  margin: 8px 0 12px 0;
+  font: var(--mat-sys-display-small);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--mat-sys-on-surface);
 }
 
-.subtitle {
+.page-header .subtitle {
   margin: 0;
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 16px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-large);
+}
+
+/* Small overline brand label above the H1. */
+.page-header::before {
+  content: 'BookmarkBureau';
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mat-sys-primary);
 }
 
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+  gap: 20px;
 }
 
 .dashboard-card {
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
   cursor: pointer;
+  background: var(--mat-sys-surface-container-lowest);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 16px;
+  box-shadow: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .dashboard-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--mat-sys-primary) 45%, transparent);
+  box-shadow: 0 14px 28px -16px rgba(23, 0, 61, 0.35);
+}
+
+.dashboard-card ::ng-deep .mat-mdc-card-title {
+  font: var(--mat-sys-title-medium);
+  font-weight: 600;
 }
 
 .no-description {
-  color: rgba(0, 0, 0, 0.4);
+  color: var(--mat-sys-on-surface-variant);
   font-style: italic;
 }
 
@@ -69,18 +96,17 @@ button mat-icon {
   font-size: 64px;
   width: 64px;
   height: 64px;
-  color: rgba(0, 0, 0, 0.2);
+  color: color-mix(in srgb, var(--mat-sys-on-surface) 25%, transparent);
   margin-bottom: 16px;
 }
 
 .empty-state h2 {
   margin: 16px 0 8px 0;
-  font-size: 24px;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.6);
+  font: var(--mat-sys-headline-small);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .empty-state p {
   margin: 0 0 24px 0;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--mat-sys-on-surface-variant);
 }

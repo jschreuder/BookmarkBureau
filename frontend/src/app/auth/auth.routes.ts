@@ -4,6 +4,6 @@ import { LoginComponent } from './login/login.component';
 export const AUTH_ROUTES: Routes = [
   {
     path: 'login',
-    component: LoginComponent
-  }
+    component: LoginComponent,
+  },
 ];

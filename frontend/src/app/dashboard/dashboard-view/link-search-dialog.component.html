@@ -39,8 +39,8 @@
             <span
               class="badge"
               *ngIf="link.isFavorite"
-              [style.background-color]="'rgb(87, 107, 203)'"
-              [style.color]="getTextColor('rgb(87, 107, 203)')"
+              [style.background-color]="'rgb(125, 0, 250)'"
+              [style.color]="getTextColor('rgb(125, 0, 250)')"
             >
               <mat-icon class="badge-icon">star</mat-icon>
               FAVORITE
@@ -48,8 +48,8 @@
             <span
               class="badge"
               *ngIf="link.category"
-              [style.background-color]="link.categoryColor || 'rgb(87, 107, 203)'"
-              [style.color]="getTextColor(link.categoryColor || 'rgb(87, 107, 203)')"
+              [style.background-color]="link.categoryColor || 'rgb(125, 0, 250)'"
+              [style.color]="getTextColor(link.categoryColor || 'rgb(125, 0, 250)')"
             >
               {{ link.category.toUpperCase() }}
             </span>

@@ -11,7 +11,7 @@ describe('LinkListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LinkListComponent, MatCardModule, MatButtonModule, MatIconModule, CommonModule]
+      imports: [LinkListComponent, MatCardModule, MatButtonModule, MatIconModule, CommonModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LinkListComponent);
@@ -74,7 +74,9 @@ describe('LinkListComponent', () => {
 
   it('should display additional description text', () => {
     const cardContent = fixture.nativeElement.querySelector('mat-card-content');
-    expect(cardContent.textContent).toContain('This will show all links with options to create, edit, and delete them');
+    expect(cardContent.textContent).toContain(
+      'This will show all links with options to create, edit, and delete them',
+    );
   });
 
   it('should render button with correct icon', () => {

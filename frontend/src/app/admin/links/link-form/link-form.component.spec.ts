@@ -9,7 +9,7 @@ describe('LinkFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LinkFormComponent, MatCardModule, CommonModule]
+      imports: [LinkFormComponent, MatCardModule, CommonModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LinkFormComponent);
@@ -43,7 +43,9 @@ describe('LinkFormComponent', () => {
 
   it('should display placeholder message in card', () => {
     const cardContent = fixture.nativeElement.querySelector('mat-card-content');
-    expect(cardContent.textContent).toContain('Link form will be implemented here for creating/editing links');
+    expect(cardContent.textContent).toContain(
+      'Link form will be implemented here for creating/editing links',
+    );
   });
 
   it('should have card with content wrapper', () => {

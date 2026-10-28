@@ -13,6 +13,6 @@ import { MatCardModule } from '@angular/material/card';
         <p>Link form will be implemented here for creating/editing links.</p>
       </mat-card-content>
     </mat-card>
-  `
+  `,
 })
 export class LinkFormComponent {}

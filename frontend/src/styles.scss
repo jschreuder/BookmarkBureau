@@ -1,51 +1,186 @@
-/* You can add global styles to this file, and also import other style files */
-
+/*
+ * BookmarkBureau global theme — Material 3 system based design.
+ *
+ * The theme defines the app's color scheme (indigo-violet), typography (Inter
+ * Variable), shape scale and motion. Components consume these through the
+ * --mat-sys-* design tokens; custom styles below always reference the tokens
+ * so the entire UI re-skins consistently (including dark mode).
+ */
+@use 'sass:map';
 @use '@angular/material' as mat;
 
-// Include Material core styles
-@include mat.core();
+// ---------------------------------------------------------------------------
+// 1. Design tokens
+// ---------------------------------------------------------------------------
+html {
+  color-scheme: light dark;
 
-// Define a Material 3 theme
-$theme: mat.define-theme(
-  (
-    color: (
-      theme-type: light,
-      primary: mat.$azure-palette,
-      tertiary: mat.$violet-palette,
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$violet-palette,
+        tertiary: mat.$azure-palette,
+      ),
+      typography: (
+        plain-family: (
+          'Inter Variable',
+          Roboto,
+          sans-serif,
+        ),
+        brand-family: (
+          'Inter Variable',
+          Roboto,
+          sans-serif,
+        ),
+        bold-weight: 700,
+        medium-weight: 500,
+        regular-weight: 400,
+      ),
+      density: 0,
     ),
-    typography: (
-      brand-family: 'Roboto, "Helvetica Neue", sans-serif',
-      plain-family: 'Roboto, "Helvetica Neue", sans-serif',
-    ),
-    density: (
-      scale: 0,
-    ),
-  )
-);
+    $overrides: (
+      // Softer, ink-wash neutrals: slightly violet-tinted surfaces for a
+      // cohesive branded feel (defaults are plain gray).
+      surface: light-dark(#f7f5fb, #131114),
+      surface-container-lowest: light-dark(#ffffff, #0e0d10),
+      surface-container-low: light-dark(#f2eff7, #1b191d),
+      surface-container: light-dark(#ece8f2, #201e23),
+      surface-container-high: light-dark(#e6e2ed, #2a282d),
+      surface-container-highest: light-dark(#e1dce8, #353238),
+      on-surface: light-dark(#1b1b1f, #e6e1e9),
+      on-surface-variant: light-dark(#474552, #cbc4cf),
+      outline: light-dark(#77747f, #918c96),
+      outline-variant: light-dark(#c8c5d0, #464349),
+      // Punch up the shape language: rounder dialogs/cards everywhere.
+      corner-medium: 16px,
+      corner-large: 20px
+    )
+  );
 
-// Include all Material component themes
-@include mat.all-component-themes($theme);
+  // Highly visible focus rings for keyboard users (WCAG 2.4.7).
+  @include mat.strong-focus-indicators();
+}
 
-// Global styles
+// ---------------------------------------------------------------------------
+// 2. Base document
+// ---------------------------------------------------------------------------
 html,
 body {
   height: 100%;
+}
+
+body {
   margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  font: var(--mat-sys-body-medium);
+  font-family: var(--mat-sys-body-medium-font), Roboto, sans-serif;
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface);
+  // Smooth theme switch transitions for browsers that support it.
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 * {
   box-sizing: border-box;
 }
 
-// Ensure Material Icons font is applied to mat-icon elements
-.mat-icon {
+// NOTE: because box-sizing is border-box globally, mat-icon "tiles" that add
+// padding MUST keep their glyph (font-size) <= width/height - 2*padding, or
+// the ligature overflows toward the bottom-right. Padded icon tiles should
+// also set `display: inline-flex; align-items: center; justify-content: center;`.
+
+// Keep Material Icons font for mat-icon elements regardless of theme font.
+.mat-icon,
+mat-icon {
   font-family: 'Material Icons' !important;
+  font-size: 24px;
+  line-height: 1;
 }
 
-// Material Dialog overrides
+// Semantic helper: brand gradient used for hero headers.
+:root {
+  --bb-hero-grad: linear-gradient(135deg, var(--mat-sys-primary) 0%, var(--mat-sys-tertiary) 100%);
+  --bb-focus-ring: 0 0 0 2px var(--mat-sys-surface), 0 0 0 4px var(--mat-sys-primary);
+}
+
+// ---------------------------------------------------------------------------
+// 3. Global component shaping via token overrides
+// ---------------------------------------------------------------------------
+html {
+  // Dialogs: spacious, floating sheets with big corners.
+  @include mat.dialog-overrides(
+    (
+      container-shape: 24px,
+    )
+  );
+
+  // Cards: soft outlined surfaces (not the default elevated shadow look).
+  @include mat.card-overrides(
+    (
+      elevated-container-shape: 16px,
+      outlined-container-shape: 16px,
+      filled-container-shape: 16px,
+    )
+  );
+
+  // Form fields: softer rounded outline look.
+  @include mat.form-field-overrides(
+    (
+      outlined-container-shape: 12px,
+      filled-container-shape: 12px,
+    )
+  );
+
+  // Chips: fully rounded pill chips.
+  @include mat.chips-overrides(
+    (
+      container-shape-radius: 9999px,
+    )
+  );
+
+  // Toolbar: surface-level bar, not a colored slab.
+  @include mat.toolbar-overrides(
+    (
+      container-background-color: var(--mat-sys-surface-container-lowest),
+      container-text-color: var(--mat-sys-on-surface),
+    )
+  );
+}
+
+// ---------------------------------------------------------------------------
+// 4. Shared patterns used across screens
+// ---------------------------------------------------------------------------
+
+/* Hero header pattern: deep brand-colored band above page content. */
+.bb-hero {
+  background: var(--bb-hero-grad);
+  color: var(--mat-sys-on-primary);
+  border-radius: 24px;
+}
+
+/* Kicker: small overline label above headings. */
+.bb-kicker {
+  font: var(--mat-sys-label-medium);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mat-sys-primary);
+  font-weight: 600;
+}
+
+/* Monospace utility for URLs and ids. */
+.bb-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+// ---------------------------------------------------------------------------
+// 5. Material Dialog context-specific styles
+// ---------------------------------------------------------------------------
 .add-link-dialog,
-.add-category-dialog {
+.add-category-dialog,
+.edit-link-dialog,
+.edit-category-dialog,
+.tag-form-dialog {
   mat-dialog-content {
     max-height: 70vh;
     overflow-y: auto;
@@ -55,4 +190,40 @@ body {
   mat-dialog-actions {
     padding: 16px 24px;
   }
+}
+
+// Search dialog: floating command-palette style panel.
+.search-dialog .mat-mdc-dialog-surface {
+  border-radius: 20px;
+  background: var(--mat-sys-surface-container-lowest);
+  padding: 0;
+}
+
+.search-dialog .search-container {
+  background: transparent;
+}
+
+// Global scrollbar styling (WebKit + Firefox) for a cohesive look.
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 20%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 30%, transparent);
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-track-piece {
+  background: transparent;
 }

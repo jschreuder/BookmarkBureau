@@ -73,17 +73,17 @@
             *ngFor="let category of data.categories"
             [attr.aria-labelledby]="'category-' + category.category_id"
           >
-            <mat-card-header [style.background-color]="category.color || '#576bcb'">
+            <mat-card-header [style.background-color]="category.color || '#7d00fa'">
               <mat-icon
                 mat-card-avatar
                 class="category-icon"
-                [style.color]="getTextColor(category.color || '#576bcb')"
+                [style.color]="getTextColor(category.color || '#7d00fa')"
                 aria-hidden="true"
               >
                 folder
               </mat-icon>
               <mat-card-title
-                [style.color]="getTextColor(category.color || '#576bcb')"
+                [style.color]="getTextColor(category.color || '#7d00fa')"
                 [attr.id]="'category-' + category.category_id"
                 >{{ category.title }}</mat-card-title
               >

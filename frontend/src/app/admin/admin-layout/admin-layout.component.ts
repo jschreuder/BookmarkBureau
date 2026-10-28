@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,7 +23,6 @@ import { Dashboard } from '../../core/models';
   imports: [
     CommonModule,
     RouterModule,
-    MatToolbarModule,
     MatSidenavModule,
     MatListModule,
     MatIconModule,
@@ -42,6 +40,7 @@ export class AdminLayoutComponent implements OnInit {
 
   dashboardsExpanded = true;
   topDashboards: Dashboard[] = [];
+  sidenavCollapsed = false;
 
   ngOnInit(): void {
     this.loadTopDashboards();
@@ -49,6 +48,10 @@ export class AdminLayoutComponent implements OnInit {
 
   toggleDashboards(): void {
     this.dashboardsExpanded = !this.dashboardsExpanded;
+  }
+
+  toggleSidenav(): void {
+    this.sidenavCollapsed = !this.sidenavCollapsed;
   }
 
   loadTopDashboards(): void {

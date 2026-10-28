@@ -23,21 +23,23 @@ import { MatIconModule } from '@angular/material/icon';
       </mat-card-content>
     </mat-card>
   `,
-  styles: [`
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
+  styles: [
+    `
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
 
-    h1 {
-      margin: 0;
-    }
+      h1 {
+        margin: 0;
+      }
 
-    button mat-icon {
-      margin-right: 8px;
-    }
-  `]
+      button mat-icon {
+        margin-right: 8px;
+      }
+    `,
+  ],
 })
 export class LinkListComponent {}

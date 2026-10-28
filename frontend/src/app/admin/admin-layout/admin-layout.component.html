@@ -1,8 +1,19 @@
 <mat-sidenav-container class="admin-container">
-  <mat-sidenav mode="side" opened class="admin-sidenav">
+  <mat-sidenav mode="side" opened class="admin-sidenav" [class.collapsed]="sidenavCollapsed">
     <div class="sidenav-header">
-      <mat-icon class="logo-icon">bookmark</mat-icon>
-      <div class="logo-text">
+      <button
+        type="button"
+        class="logo-button"
+        (click)="toggleSidenav()"
+        [attr.aria-label]="sidenavCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+        [attr.aria-expanded]="!sidenavCollapsed"
+      >
+        <mat-icon class="logo-icon" aria-hidden="true">bookmark</mat-icon>
+        <mat-icon class="toggle-hint" aria-hidden="true">{{
+          sidenavCollapsed ? 'chevron_right' : 'chevron_left'
+        }}</mat-icon>
+      </button>
+      <div class="logo-text" *ngIf="!sidenavCollapsed">
         <span class="app-name">Bookmark Bureau</span>
         <span class="admin-label">Administration</span>
       </div>
@@ -21,6 +32,7 @@
             (click)="toggleDashboards()"
             [attr.aria-expanded]="dashboardsExpanded"
             [attr.aria-label]="'Dashboards ' + (dashboardsExpanded ? 'expanded' : 'collapsed')"
+            [attr.title]="sidenavCollapsed ? 'Dashboards' : null"
           >
             <mat-icon matListItemIcon aria-hidden="true">dashboard</mat-icon>
             <span matListItemTitle>Dashboards</span>
@@ -39,8 +51,11 @@
               [routerLink]="['/admin/dashboards', dashboard.dashboard_id, 'overview']"
               routerLinkActive="active-link"
               class="nested-item"
+              [attr.title]="sidenavCollapsed ? dashboard.title : null"
             >
-              <mat-icon matListItemIcon>article</mat-icon>
+              <mat-icon matListItemIcon aria-hidden="true">{{
+                dashboard.icon || 'article'
+              }}</mat-icon>
               <span matListItemTitle>{{ dashboard.title }}</span>
             </a>
           </div>
@@ -50,7 +65,12 @@
         <mat-divider class="section-divider"></mat-divider>
 
         <!-- Tags -->
-        <a mat-list-item routerLink="/admin/tags" routerLinkActive="active-link">
+        <a
+          mat-list-item
+          routerLink="/admin/tags"
+          routerLinkActive="active-link"
+          [attr.title]="sidenavCollapsed ? 'Tags' : null"
+        >
           <mat-icon matListItemIcon aria-hidden="true">label</mat-icon>
           <span matListItemTitle>Tags</span>
         </a>
@@ -76,13 +96,6 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <header class="mat-elevation-z2">
-      <mat-toolbar>
-        <mat-icon aria-hidden="true">settings</mat-icon>
-        <h1 class="toolbar-title">Administration Panel</h1>
-      </mat-toolbar>
-    </header>
-
     <main class="admin-content" role="main">
       <router-outlet></router-outlet>
     </main>

@@ -1,3 +1,6 @@
+/* Admin tags table screen — one flat outlined card per page,
+   matching the dashboards list styling. */
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -7,55 +10,100 @@
 
 h1 {
   margin: 0;
+  font: var(--mat-sys-headline-small);
+  font-weight: 600;
 }
 
 button mat-icon {
   margin-right: 8px;
 }
 
+/* The card is the list container: flat, outlined, no inner boxes. */
+mat-card {
+  padding: 0;
+  background: var(--mat-sys-surface-container-lowest);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 16px;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+mat-card-content,
+mat-card-content:first-child,
+mat-card-content:last-child {
+  display: block;
+  padding: 0;
+}
+
 .empty-state {
   text-align: center;
   padding: 48px 24px;
-  color: rgba(0, 0, 0, 0.6);
-}
+  color: var(--mat-sys-on-surface-variant);
 
-.empty-state mat-icon {
-  font-size: 64px;
-  width: 64px;
-  height: 64px;
-  color: rgba(0, 0, 0, 0.3);
-  margin-bottom: 16px;
-}
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: color-mix(in srgb, var(--mat-sys-on-surface) 25%, transparent);
+    margin-bottom: 16px;
+  }
 
-.empty-state p {
-  margin: 8px 0;
-}
+  p {
+    margin: 8px 0;
+  }
 
-.empty-state .hint {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.4);
+  .hint {
+    font-size: 14px;
+    color: var(--mat-sys-on-surface-variant);
+  }
 }
 
 .tag-table {
   width: 100%;
+  border-collapse: collapse;
+
+  th {
+    text-align: left;
+    font-weight: 600;
+    background-color: var(--mat-sys-surface-container-low);
+    color: var(--mat-sys-on-surface-variant);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-outline-variant) 60%, transparent);
+    color: var(--mat-sys-on-surface);
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--mat-sys-primary) 5%, transparent);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
 }
 
 .color-indicator {
   width: 24px;
   height: 24px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: 1px solid var(--mat-sys-outline-variant);
 }
 
 .tag-chip {
   display: inline-block;
   padding: 4px 12px;
-  border-radius: 16px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
-}
-
-td.mat-cell,
-th.mat-header-cell {
-  padding: 8px 16px;
 }

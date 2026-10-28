@@ -1,9 +1,13 @@
+/* Admin dashboard form page. */
+
 .form-header {
   margin-bottom: 24px;
 }
 
 .form-header h1 {
   margin: 0;
+  font: var(--mat-sys-headline-small);
+  font-weight: 600;
 }
 
 form {

@@ -11,7 +11,7 @@ describe('CategoryListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CategoryListComponent, MatCardModule, MatButtonModule, MatIconModule, CommonModule]
+      imports: [CategoryListComponent, MatCardModule, MatButtonModule, MatIconModule, CommonModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CategoryListComponent);
@@ -74,7 +74,9 @@ describe('CategoryListComponent', () => {
 
   it('should display additional description text', () => {
     const cardContent = fixture.nativeElement.querySelector('mat-card-content');
-    expect(cardContent.textContent).toContain('This will show all categories with options to create, edit, and delete them');
+    expect(cardContent.textContent).toContain(
+      'This will show all categories with options to create, edit, and delete them',
+    );
   });
 
   it('should render button with correct icon', () => {

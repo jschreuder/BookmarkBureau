@@ -1,3 +1,11 @@
+/* Admin shell — deep-violet sidenav over a soft neutral canvas.
+ *
+ * Sidebar geometry is driven through Angular Material's list tokens
+ * (scoped to the sidenav) instead of fighting MDC's internal layout:
+ * the tokens control item radius, height, icon spacing, hover tint and
+ * text styles, so menu items line up on one consistent grid.
+ */
+
 .admin-container {
   height: 100vh;
   display: flex;
@@ -6,22 +14,82 @@
 
 .admin-sidenav {
   width: 280px;
+  transition: width 0.25s ease;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  background: var(--mat-sys-surface-container-low);
+  border-right: 1px solid var(--mat-sys-outline-variant);
+
+  /* M3 nav-list tokens: rounded items on a tidy 48px grid. */
+  --mat-list-list-item-container-shape: 12px;
+  --mat-list-active-indicator-shape: 12px;
+  --mat-list-list-item-one-line-container-height: 48px;
+  --mat-list-list-item-label-text-size: 14px;
+  --mat-list-list-item-label-text-weight: 500;
+  --mat-list-list-item-leading-icon-start-space: 16px;
+  --mat-list-list-item-leading-icon-end-space: 24px;
+  --mat-list-list-item-leading-icon-color: var(--mat-sys-on-surface-variant);
+  --mat-list-list-item-hover-state-layer-color: var(--mat-sys-primary);
+  --mat-list-list-item-hover-state-layer-opacity: 0.08;
+  --mat-list-list-item-hover-label-text-color: var(--mat-sys-on-surface);
+  --mat-list-list-item-focus-state-layer-color: var(--mat-sys-primary);
+  --mat-list-list-item-focus-state-layer-opacity: 0.12;
 
   .sidenav-header {
-    padding: 24px 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    padding: 20px 16px;
+    background: var(--bb-hero-grad);
+    color: var(--mat-sys-on-primary);
     display: flex;
     align-items: center;
     gap: 12px;
 
-    .logo-icon {
-      font-size: 32px;
-      width: 32px;
-      height: 32px;
+    /* The logo tile doubles as the collapse/expand toggle: on hover the
+       bookmark crossfades into an arrow pointing the way it will move. */
+    .logo-button {
+      position: relative;
+      display: inline-flex;
+      padding: 0;
+      border: none;
+      background: none;
+      color: inherit; /* native <button> doesn't inherit; keep header's white */
+      border-radius: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+
+      &:focus-visible {
+        outline: 2px solid var(--mat-sys-on-primary);
+        outline-offset: 2px;
+      }
+
+      .logo-icon,
+      .toggle-hint {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+        padding: 8px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.16);
+        transition: opacity 0.15s ease;
+      }
+
+      .toggle-hint {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+      }
+
+      &:hover .logo-icon,
+      &:focus-visible .logo-icon {
+        opacity: 0;
+      }
+
+      &:hover .toggle-hint,
+      &:focus-visible .toggle-hint {
+        opacity: 1;
+      }
     }
 
     .logo-text {
@@ -29,110 +97,153 @@
       flex-direction: column;
 
       .app-name {
-        font-size: 18px;
-        font-weight: 500;
+        font-size: 17px;
+        font-weight: 600;
         line-height: 1.2;
+        letter-spacing: 0.01em;
       }
 
       .admin-label {
-        font-size: 12px;
-        opacity: 0.9;
-        margin-top: 2px;
+        font-size: 11px;
+        opacity: 0.85;
+        margin-top: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
       }
     }
   }
 
   .menu-list {
     flex: 1;
-    padding-top: 8px;
+    /* Inset the item pills from the sidebar edges. */
+    padding: 8px 12px;
+    background: transparent;
+    overflow-y: auto;
 
-    .nav-section {
-      .section-header {
-        font-weight: 500;
+    .section-header {
+      /* Section headers share the pill grid with regular items. */
+      --mat-list-list-item-label-text-weight: 600;
 
-        .expand-icon {
-          font-size: 20px;
-          width: 20px;
-          height: 20px;
-          color: rgba(0, 0, 0, 0.54);
-        }
-
-        &.active-link {
-          padding-left: 12px;
-        }
+      .expand-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: var(--mat-sys-on-surface-variant);
       }
+    }
 
-      .nested-list {
-        .nested-item {
-          font-size: 13px;
-          height: 36px;
-          padding-left: 52px;
-          color: rgba(0, 0, 0, 0.6);
+    .nested-list {
+      .nested-item {
+        /* Indent via the leading-icon token so text stays aligned
+           with the MDC grid instead of manual padding-left. */
+        --mat-list-list-item-one-line-container-height: 40px;
+        --mat-list-list-item-leading-icon-start-space: 40px;
+        --mat-list-list-item-leading-icon-end-space: 24px;
+        --mat-list-list-item-label-text-size: 13px;
+        --mat-list-list-item-label-text-weight: 400;
+        --mat-list-list-item-label-text-color: var(--mat-sys-on-surface-variant);
 
-          mat-icon {
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
-            margin-left: 8px;
-          }
-
-          &:hover {
-            background-color: rgba(0, 0, 0, 0.04);
-          }
-
-          &.active-link {
-            padding-left: 48px;
-          }
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
         }
       }
     }
 
     .section-divider {
-      margin: 12px 0;
+      margin: 12px 8px;
+      border-top-color: color-mix(in srgb, var(--mat-sys-outline-variant) 70%, transparent);
     }
   }
 
   .sidenav-footer {
-    padding: 8px 0 16px 0;
+    padding: 0 12px 12px;
+    background: transparent;
+
+    mat-divider {
+      margin: 4px 8px 8px;
+    }
 
     .footer-button {
       border: none;
       background: none;
-      color: rgba(0, 0, 0, 0.87);
+      color: var(--mat-sys-on-surface);
       text-align: left;
       width: 100%;
       cursor: pointer;
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.04);
-      }
+      font: inherit;
     }
   }
 }
 
+/* Active route: tinted rounded pill — no border rail, no padding shift. */
 .active-link {
-  background-color: rgba(0, 0, 0, 0.08) !important;
-  border-left: 4px solid #667eea !important;
+  background-color: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
+}
+
+.active-link .mat-mdc-list-item-title {
+  color: var(--mat-sys-primary);
+  font-weight: 600;
+}
+
+/* Collapsed rail: icons only, centered. */
+.admin-sidenav.collapsed {
+  width: 76px;
+
+  .sidenav-header {
+    justify-content: center;
+    padding: 20px 8px;
+
+    /* Collapsed: the arrow peeks through so the expand affordance stays discoverable. */
+    .logo-button .toggle-hint {
+      opacity: 0.45;
+    }
+
+    .logo-button:hover .toggle-hint,
+    .logo-button:focus-visible .toggle-hint {
+      opacity: 1;
+    }
+
+    .logo-button:hover .logo-icon,
+    .logo-button:focus-visible .logo-icon {
+      opacity: 0;
+    }
+  }
+
+  .menu-list {
+    padding: 8px 8px;
+
+    /* Center the leading icons of one-line items; hide labels + meta.
+       MDC internals need ::ng-deep (they live in MatListItem's template). */
+    ::ng-deep .mat-mdc-list-item .mdc-list-item__start {
+      margin-inline: auto;
+    }
+
+    ::ng-deep .mat-mdc-list-item .mdc-list-item__content {
+      display: none;
+    }
+
+    ::ng-deep .mat-mdc-list-item .mdc-list-item__end {
+      display: none;
+    }
+  }
+
+  .sidenav-footer {
+    padding: 0 8px 12px;
+
+    mat-divider {
+      margin: 4px 0 8px;
+    }
+  }
 }
 
 mat-sidenav-content {
-  mat-toolbar {
-    background-color: white;
-    color: rgba(0, 0, 0, 0.87);
-
-    mat-icon {
-      margin-right: 8px;
-    }
-
-    .toolbar-title {
-      font-size: 20px;
-      font-weight: 500;
-    }
-  }
+  background: var(--mat-sys-surface);
 }
 
 .admin-content {
-  padding: 24px;
+  padding: 32px 24px 48px;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;

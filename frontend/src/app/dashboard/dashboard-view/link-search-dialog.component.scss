@@ -1,24 +1,25 @@
+/* Link search dialog — command palette styling. */
+
 .search-container {
   width: 600px;
   max-width: 90vw;
   max-height: 70vh;
   display: flex;
   flex-direction: column;
-  background: white;
-  border-radius: 8px;
+  background: var(--mat-sys-surface-container-lowest);
   overflow: hidden;
 }
 
 .search-header {
   display: flex;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
   gap: 12px;
 }
 
 .search-icon {
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--mat-sys-primary);
   flex-shrink: 0;
 }
 
@@ -26,33 +27,35 @@
   flex: 1;
   border: none;
   outline: none;
-  font-size: 16px;
+  font: var(--mat-sys-body-large);
   padding: 0;
   background: transparent;
+  color: var(--mat-sys-on-surface);
 }
 
 .search-input::placeholder {
-  color: rgba(0, 0, 0, 0.38);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .close-button {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  border-radius: 999px;
+  color: var(--mat-sys-on-surface-variant);
+  transition: background-color 0.15s;
 }
 
 .close-button:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
 }
 
 .close-button mat-icon {
-  color: rgba(0, 0, 0, 0.54);
+  color: inherit;
   font-size: 20px;
   width: 20px;
   height: 20px;
@@ -67,7 +70,7 @@
 .no-results {
   text-align: center;
   padding: 48px 24px;
-  color: rgba(0, 0, 0, 0.38);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .no-results mat-icon {
@@ -75,6 +78,7 @@
   width: 48px;
   height: 48px;
   margin-bottom: 12px;
+  opacity: 0.6;
 }
 
 .no-results p {
@@ -83,7 +87,7 @@
 }
 
 .results-list {
-  padding: 0;
+  padding: 8px;
 }
 
 .result-item {
@@ -92,6 +96,7 @@
   transition: background-color 0.15s;
   height: auto !important;
   min-height: 64px;
+  border-radius: 12px;
 }
 
 .result-item ::ng-deep .mdc-list-item__content {
@@ -100,7 +105,11 @@
 
 .result-item:hover,
 .result-item.selected {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: color-mix(in srgb, var(--mat-sys-primary) 10%, transparent);
+}
+
+.result-item.selected {
+  outline: 1px solid color-mix(in srgb, var(--mat-sys-primary) 30%, transparent);
 }
 
 .result-item ::ng-deep .mat-mdc-list-item-unscoped-content {
@@ -113,7 +122,7 @@
 
 .result-title {
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: -14px !important;
   display: flex;
   align-items: center;
@@ -121,13 +130,14 @@
 }
 
 .result-title ::ng-deep .highlight {
-  background-color: #fff59d;
-  font-weight: 600;
+  background-color: color-mix(in srgb, var(--mat-sys-tertiary) 30%, transparent);
+  border-radius: 3px;
+  font-weight: 700;
 }
 
 .result-meta {
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--mat-sys-on-surface-variant);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -146,7 +156,7 @@
   align-items: center;
   gap: 4px;
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -156,12 +166,14 @@
   font-size: 14px;
   width: 14px;
   height: 14px;
+  color: inherit;
 }
 
 .tag {
   font-size: 11px;
-  font-weight: bold;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
   opacity: 0.7;
 }
 
@@ -170,9 +182,9 @@
 }
 
 .search-hint {
-  padding: 24px;
+  padding: 32px 24px;
   text-align: center;
-  color: rgba(0, 0, 0, 0.38);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .search-hint p {
@@ -195,13 +207,13 @@
 }
 
 kbd {
-  background-color: rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 4px;
+  background-color: color-mix(in srgb, var(--mat-sys-on-surface) 6%, transparent);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 6px;
   padding: 2px 6px;
-  font-family: monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 11px;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--mat-sys-on-surface) 15%, transparent);
 }
 
 @media (max-width: 768px) {

@@ -11,7 +11,7 @@ Angular 22 SPA for BookmarkBureau bookmark management. Part of a monorepo with P
 ## Tech Stack
 
 - **Framework:** Angular 22.0+
-- **UI:** Angular Material 21.0+
+- **UI:** Angular Material 22.0+
 - **Language:** TypeScript 6.0+ (strict mode)
 - **Testing:** Vitest 5.0+ (NOT Karma/Jasmine)
 - **Package Manager:** npm
