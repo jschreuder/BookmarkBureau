@@ -36,7 +36,7 @@ RUN composer install \
     --optimize-autoloader
 
 # Stage 3: Final runtime image
-FROM php:8.4-fpm-alpine
+FROM php:8.5-fpm-alpine
 
 # Update apk cache and install runtime dependencies
 RUN apk update && apk add --no-cache \
